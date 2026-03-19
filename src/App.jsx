@@ -48,13 +48,14 @@ const efColor=(v)=>v<0?C.red:v>=4?C.green:v===3?C.blue:v===2?C.amber:C.gray;
 function WaitlistForm(){
   const [email,setEmail]=useState("");
   const [done,setDone]=useState(false);
+  const isMob=useIsMobile();
   const submit=(e)=>{e.stopPropagation();if(email.includes("@"))setDone(true);};
   if(done)return <p style={{fontSize:13,color:"#4ade80",fontWeight:700,margin:0}}>You are on the list. We will reach out when Pro launches.</p>;
   return(
-    <div style={{display:"flex",gap:0,maxWidth:440}} onClick={e=>e.stopPropagation()}>
+    <div style={{display:"flex",flexDirection:isMob?"column":"row",gap:isMob?8:0,maxWidth:440,width:"100%"}} onClick={e=>e.stopPropagation()}>
       <input value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit(e)} placeholder="your@email.com"
-        style={{flex:1,padding:"11px 16px",background:"#1f2937",border:"1px solid #374151",borderRight:"none",color:"#e8e5df",fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none"}}/>
-      <button onClick={submit} style={{padding:"11px 20px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>
+        style={{flex:1,padding:"11px 16px",background:"#1f2937",border:"1px solid #374151",borderRight:isMob?"1px solid #374151":"none",color:"#e8e5df",fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",width:isMob?"100%":"auto",boxSizing:"border-box"}}/>
+      <button onClick={submit} style={{padding:"11px 20px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0,width:isMob?"100%":"auto"}}>
         Notify me
       </button>
     </div>
@@ -570,9 +571,9 @@ function AppInner(){
   const isMobile=useIsMobile();
   const [mobileMenu,setMobileMenu]=useState(false);
 
-  const navigateTo=(p)=>{navigate(p);navigateTo(p);};
+  const navigateTo=(p)=>{navigate(p);setPage(p);};
   useEffect(()=>{
-    const onPop=()=>navigateTo(getPageFromPath());
+    const onPop=()=>setPage(getPageFromPath());
     window.addEventListener("popstate",onPop);
     return()=>window.removeEventListener("popstate",onPop);
   },[]);

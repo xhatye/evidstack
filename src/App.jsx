@@ -1,4 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+
+function useIsMobile(){ 
+  const [m,setM]=useState(()=>typeof window!=="undefined"&&window.innerWidth<768);
+  useEffect(()=>{const h=()=>setM(window.innerWidth<768);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h);},[]);
+  return m;
+}
 import { SUPPLEMENTS, GOALS, TIERS } from "./data.js";
 import { AuthProvider, useAuth } from "./AuthContext.jsx";
 
@@ -145,7 +151,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
 }
 
 /* PAYWALL CARD */
-function PaywallCard({supp,onUpgrade}){
+function PaywallCard({supp,onUpgrade,isMob}){
   const tc=tierColor(supp.tier);
   return(
     <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${tc}`,position:"relative",overflow:"hidden",minHeight:120}}>
@@ -210,7 +216,8 @@ function EffectRow({effect,goalObj}){
 
 /* SUPPLEMENT CARD */
 function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade}){
-  if(supp.tier>=2&&!isPro)return <PaywallCard supp={supp} onUpgrade={onUpgrade}/>;
+  const isMob=useIsMobile();
+  if(supp.tier>=2&&!isPro)return <PaywallCard supp={supp} onUpgrade={onUpgrade} isMob={isMob}/>;
   const goalMap=Object.fromEntries(GOALS.map((g,i)=>[g.id,{...g,label:T.controls.goals[i]||g.label}]));
   const effects=activeGoal==="all"?supp.effects:supp.effects.filter(e=>e.goal===activeGoal);
   if(!effects.length)return null;
@@ -219,7 +226,7 @@ function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade}){
   const avgEv=Math.round(effects.reduce((s,e)=>s+e.evidence,0)/effects.length);
   return(
     <div onClick={onClick} style={{background:C.white,border:`1px solid ${isSelected?C.black:C.border}`,borderTop:`3px solid ${tc}`,cursor:"pointer",transition:"border-color .2s, box-shadow .2s",boxShadow:isSelected?"0 8px 32px rgba(0,0,0,.08)":"none"}}>
-      <div style={{padding:"24px 28px 20px"}}>
+      <div style={{padding:isMob?"16px 14px 14px":"24px 28px 20px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
           <div>
             <p style={{fontSize:9,fontWeight:800,color:tc,letterSpacing:".14em",margin:"0 0 6px",textTransform:"uppercase"}}>TIER {supp.tier} / {TIERS[supp.tier]?.label?.toUpperCase()||""}</p>
@@ -230,7 +237,7 @@ function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade}){
             <p style={{fontSize:9,color:supp.safety>=4?C.green:C.amber,margin:"4px 0 0",fontWeight:700,letterSpacing:".08em"}}>{T.card.safety[supp.safety]||""}</p>
           </div>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:18}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:14}}>
           <ScoreBlock label={T.card.avgEfficacy} value={avgEff} color={efColor(avgEff)}/>
           <ScoreBlock label={T.card.avgEvidence} value={avgEv} color={efColor(avgEv+1)}/>
         </div>
@@ -243,10 +250,10 @@ function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade}){
       </div>
       {isSelected&&(
         <div style={{borderTop:`1px solid ${C.border}`}}>
-          <div style={{padding:"0 28px"}}>
+          <div style={{padding:isMob?"0 14px":"0 28px"}}>
             {effects.map(e=><EffectRow key={e.goal} effect={e} goalObj={goalMap[e.goal]}/>)}
           </div>
-          <div style={{padding:"20px 28px 24px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+          <div style={{padding:isMob?"14px":"20px 28px 24px",display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:10}}>
             <div style={{background:C.bg,padding:"18px 20px",border:`1px solid ${C.border}`}}>
               <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>{T.card.dosage}</p>
               <p style={{fontSize:16,fontWeight:900,color:C.ink,margin:"0 0 4px"}}>{supp.dosage.amount}</p>
@@ -320,7 +327,7 @@ function StackBuilder({onUpgrade}){
   );
 
   return(
-    <div style={{maxWidth:840,margin:"0 auto",padding:"56px 48px 100px"}}>
+    <div style={{maxWidth:840,margin:"0 auto",padding:isMob?"32px 16px 60px":"56px 48px 100px"}}>
       <p style={{fontSize:11,fontWeight:700,letterSpacing:".2em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Pro Feature</p>
       <h2 style={{fontSize:40,fontWeight:900,letterSpacing:"-.05em",color:C.ink,margin:"0 0 8px"}}>Stack Builder AI</h2>
       <p style={{fontSize:14,color:C.gray,margin:"0 0 40px",lineHeight:1.7}}>Select your goals, set your budget, and get a personalized evidence-based protocol in seconds.</p>
@@ -403,9 +410,10 @@ function StackBuilder({onUpgrade}){
 
 /* ABOUT */
 function AboutPage(){
+  const isMob=useIsMobile();
   return(
-    <div style={{maxWidth:760,margin:"0 auto",padding:"64px 48px 100px"}}>
-      <h2 style={{fontSize:44,fontWeight:900,lineHeight:1.05,letterSpacing:"-.05em",margin:"0 0 12px",color:C.ink}}>Built for people who want real answers.</h2>
+    <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"32px 16px 60px":"64px 48px 100px"}}>
+      <h2 style={{fontSize:isMob?28:44,fontWeight:900,lineHeight:1.05,letterSpacing:"-.05em",margin:"0 0 12px",color:C.ink}}>Built for people who want real answers.</h2>
       <p style={{fontSize:15,color:C.gray,lineHeight:1.9,margin:"0 0 48px",maxWidth:600}}>The supplement industry runs on marketing. Evidstack runs on data.</p>
       <div style={{height:1,background:C.border,margin:"0 0 48px"}}/>
       {[
@@ -419,6 +427,7 @@ function AboutPage(){
 
 /* PROTOCOLS */
 function ProtocolsPage({onGoToSupplements}){
+  const isMob=useIsMobile();
   const protocols=[
     {icon:"🧠",name:"Cognitive Stack",desc:"Focus, memory, and mental clarity. All compounds RCT-backed with evidence scores of 3+.",supps:["Caffeine + L-Theanine","Bacopa Monnieri","Alpha-GPC","Lions Mane"],badge:"Most popular",color:C.blue},
     {icon:"💪",name:"Performance Stack",desc:"Strength, endurance, and recovery. The strongest evidence base in sports science.",supps:["Creatine Monohydrate","Beta-Alanine","L-Citrulline","Omega-3"],badge:"Best evidence",color:C.green},
@@ -428,11 +437,11 @@ function ProtocolsPage({onGoToSupplements}){
     {icon:"🌊",name:"Stress Recovery Stack",desc:"Adaptogenic compounds that regulate the HPA axis and reduce chronic stress burden.",supps:["Ashwagandha KSM-66","Rhodiola Rosea","Magnesium","Omega-3"],badge:"RCT backed",color:"#06b6d4"},
   ];
   return(
-    <div style={{maxWidth:960,margin:"0 auto",padding:"64px 48px 100px"}}>
+    <div style={{maxWidth:960,margin:"0 auto",padding:isMob?"32px 16px 60px":"64px 48px 100px"}}>
       <p style={{fontSize:11,fontWeight:700,letterSpacing:".2em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Curated Stacks</p>
-      <h2 style={{fontSize:44,fontWeight:900,lineHeight:1.05,letterSpacing:"-.05em",margin:"0 0 16px",color:C.ink}}>Pre-built protocols.</h2>
+      <h2 style={{fontSize:isMob?28:44,fontWeight:900,lineHeight:1.05,letterSpacing:"-.05em",margin:"0 0 16px",color:C.ink}}>Pre-built protocols.</h2>
       <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 0 48px",maxWidth:520}}>Each stack combines supplements with compatible mechanisms, no major interactions, and evidence scores of 3+.</p>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16}}>
+      <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr 1fr",gap:12}}>
         {protocols.map(p=>(
           <div key={p.name} style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${p.color}`,padding:"24px"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}}>
@@ -507,40 +516,86 @@ function AppInner(){
     {id:"about",label:"About"},
   ];
 
+  const isMobile=useIsMobile();
+  const [mobileMenu,setMobileMenu]=useState(false);
+
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} initialMode={authMode}/>}
       {showUpgrade&&<UpgradeModal onClose={()=>setShowUpgrade(false)} onAuthNeeded={()=>openAuth("signup")}/>}
 
-      <nav style={{borderBottom:`1px solid ${C.border}`,padding:"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
-        <div onClick={()=>setPage("supplements")} style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer"}}>
-          <div style={{width:32,height:32,border:`2px solid ${C.black}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:10,fontWeight:900}}>E</span></div>
-          <span style={{fontSize:14,fontWeight:900,letterSpacing:"-.04em",color:C.ink}}>EVIDSTACK</span>
+      {/* Mobile menu drawer */}
+      {isMobile&&mobileMenu&&(
+        <div onClick={()=>setMobileMenu(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200}}>
+          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:0,right:0,width:280,height:"100%",background:C.white,padding:"24px 20px",display:"flex",flexDirection:"column",gap:4}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+              <span style={{fontSize:14,fontWeight:900,letterSpacing:"-.04em"}}>EVIDSTACK</span>
+              <button onClick={()=>setMobileMenu(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:C.gray}}>x</button>
+            </div>
+            {navItems.map(item=>(
+              <button key={item.id} onClick={()=>{setPage(item.id);setMobileMenu(false);}}
+                style={{padding:"14px 16px",fontSize:14,fontWeight:700,background:page===item.id?C.ink:"transparent",color:page===item.id?C.white:item.pro&&!isPro?C.gold:C.gray,border:"none",cursor:"pointer",textAlign:"left",borderRadius:4}}>
+                {item.pro&&!isPro?"✦ "+item.label:item.label}
+              </button>
+            ))}
+            <div style={{height:1,background:C.border,margin:"12px 0"}}/>
+            {user?(
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                {isPro&&<span style={{fontSize:11,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px",alignSelf:"flex-start"}}>PRO MEMBER</span>}
+                {!isPro&&<button onClick={()=>{openUpgrade();setMobileMenu(false);}} style={{padding:"12px 16px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",width:"100%"}}>Upgrade to Pro</button>}
+                <button onClick={()=>{logout();setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>Sign out</button>
+              </div>
+            ):(
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                <button onClick={()=>{openAuth("login");setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:"transparent",color:C.ink,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>Sign in</button>
+                <button onClick={()=>{openAuth("signup");setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:800,background:C.ink,color:C.white,border:"none",cursor:"pointer",width:"100%"}}>Sign up</button>
+              </div>
+            )}
+          </div>
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:4}}>
-          {navItems.map(item=>(
-            <button key={item.id} onClick={()=>setPage(item.id)}
-              style={{padding:"8px 14px",fontSize:12,fontWeight:700,
-                background:page===item.id?C.ink:"transparent",
-                color:page===item.id?C.white:item.pro&&!isPro?C.gold:C.gray,
-                border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s"}}>
-              {item.pro&&!isPro?"✦ "+item.label:item.label}
+      )}
+
+      <nav style={{borderBottom:`1px solid ${C.border}`,padding:isMobile?"0 16px":"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:56,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
+        <div onClick={()=>setPage("supplements")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+          <div style={{width:30,height:30,border:`2px solid ${C.black}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:10,fontWeight:900}}>E</span></div>
+          <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink}}>EVIDSTACK</span>
+        </div>
+        {isMobile?(
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            {user&&!isPro&&<button onClick={openUpgrade} style={{padding:"6px 12px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
+            {isPro&&<span style={{fontSize:9,fontWeight:800,color:C.gold,border:`1px solid ${C.gold}`,padding:"2px 6px"}}>PRO</span>}
+            <button onClick={()=>setMobileMenu(true)} style={{background:"none",border:"none",cursor:"pointer",padding:4,display:"flex",flexDirection:"column",gap:5}}>
+              <span style={{display:"block",width:22,height:2,background:C.ink}}/>
+              <span style={{display:"block",width:22,height:2,background:C.ink}}/>
+              <span style={{display:"block",width:22,height:2,background:C.ink}}/>
             </button>
-          ))}
-          <div style={{width:1,height:20,background:C.border,margin:"0 8px"}}/>
-          {user?(
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              {isPro&&<span style={{fontSize:9,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"2px 8px"}}>PRO</span>}
-              {!isPro&&<button onClick={openUpgrade} style={{padding:"6px 14px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",letterSpacing:".04em"}}>Upgrade</button>}
-              <button onClick={logout} style={{padding:"6px 12px",fontSize:11,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Sign out</button>
-            </div>
-          ):(
-            <div style={{display:"flex",gap:6}}>
-              <button onClick={()=>openAuth("login")}  style={{padding:"6px 14px",fontSize:11,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Sign in</button>
-              <button onClick={()=>openAuth("signup")} style={{padding:"6px 14px",fontSize:11,fontWeight:800,background:C.ink,color:C.white,border:"none",cursor:"pointer"}}>Sign up</button>
-            </div>
-          )}
-        </div>
+          </div>
+        ):(
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            {navItems.map(item=>(
+              <button key={item.id} onClick={()=>setPage(item.id)}
+                style={{padding:"8px 14px",fontSize:12,fontWeight:700,
+                  background:page===item.id?C.ink:"transparent",
+                  color:page===item.id?C.white:item.pro&&!isPro?C.gold:C.gray,
+                  border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s"}}>
+                {item.pro&&!isPro?"✦ "+item.label:item.label}
+              </button>
+            ))}
+            <div style={{width:1,height:20,background:C.border,margin:"0 8px"}}/>
+            {user?(
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                {isPro&&<span style={{fontSize:9,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"2px 8px"}}>PRO</span>}
+                {!isPro&&<button onClick={openUpgrade} style={{padding:"6px 14px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",letterSpacing:".04em"}}>Upgrade</button>}
+                <button onClick={logout} style={{padding:"6px 12px",fontSize:11,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Sign out</button>
+              </div>
+            ):(
+              <div style={{display:"flex",gap:6}}>
+                <button onClick={()=>openAuth("login")}  style={{padding:"6px 14px",fontSize:11,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Sign in</button>
+                <button onClick={()=>openAuth("signup")} style={{padding:"6px 14px",fontSize:11,fontWeight:800,background:C.ink,color:C.white,border:"none",cursor:"pointer"}}>Sign up</button>
+              </div>
+            )}
+          </div>
+        )}
       </nav>
 
       {page==="about"         &&<AboutPage/>}
@@ -548,24 +603,24 @@ function AppInner(){
       {page==="stack-builder" &&<StackBuilder onUpgrade={openUpgrade}/>}
 
       {page==="supplements"&&<>
-        <div style={{padding:"60px 24px 40px",textAlign:"center",borderBottom:`1px solid ${C.border}`}}>
-          <h1 style={{fontSize:48,fontWeight:900,lineHeight:1.12,letterSpacing:"-.04em",margin:"0 0 18px",color:C.ink,maxWidth:740,marginLeft:"auto",marginRight:"auto"}}>
+        <div style={{padding:isMobile?"32px 16px 28px":"60px 24px 40px",textAlign:"center",borderBottom:`1px solid ${C.border}`}}>
+          <h1 style={{fontSize:isMobile?28:48,fontWeight:900,lineHeight:1.12,letterSpacing:"-.04em",margin:"0 0 14px",color:C.ink,maxWidth:740,marginLeft:"auto",marginRight:"auto"}}>
             Supplement and peptide information you can trust.
           </h1>
-          <p style={{fontSize:15,color:C.gray,lineHeight:1.8,margin:"0 auto 24px",maxWidth:560}}>
+          <p style={{fontSize:isMobile?13:15,color:C.gray,lineHeight:1.8,margin:"0 auto 20px",maxWidth:560,padding:isMobile?"0 4px":0}}>
             Evidstack <strong style={{color:C.ink,fontWeight:700}}>analyzes and ranks supplements</strong> by actual efficacy and strength of evidence. More than <strong style={{color:C.ink,fontWeight:700}}>200+ compounds</strong>, sourced from PubMed and Cochrane.
           </p>
-          <div style={{display:"flex",justifyContent:"center",gap:32,marginBottom:32,flexWrap:"wrap"}}>
+          <div style={{display:"flex",justifyContent:"center",gap:isMobile?16:32,marginBottom:24,flexWrap:"wrap"}}>
             {[["153","compounds"],["4","evidence tiers"],["PubMed","primary source"],["Cochrane","systematic reviews"]].map(([val,label])=>(
-              <div key={label}><span style={{fontSize:15,fontWeight:900,color:C.ink}}>{val}</span><span style={{fontSize:11,color:C.gray,marginLeft:5}}>{label}</span></div>
+              <div key={label}><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>{val}</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>{label}</span></div>
             ))}
           </div>
-          <div style={{display:"flex",maxWidth:680,margin:"0 auto 24px",boxShadow:"0 2px 16px rgba(0,0,0,.08)"}}>
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="What do you want to learn about?"
-              style={{flex:1,padding:"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink}}/>
-            <button style={{padding:"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search</button>
+          <div style={{display:"flex",maxWidth:680,margin:"0 auto 20px",boxShadow:"0 2px 16px rgba(0,0,0,.08)"}}>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={isMobile?"Search a supplement...":"What do you want to learn about?"}
+              style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
+            <button style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search</button>
           </div>
-          <div style={{maxWidth:680,margin:"0 auto",background:C.ink,padding:"24px 32px"}}>
+          <div style={{maxWidth:680,margin:"0 auto",background:C.ink,padding:isMobile?"20px 16px":"24px 32px"}}>
             {user&&!isPro?(
               <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Unlock all 153 compounds + AI Stack Builder.</p>
               <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 16px",lineHeight:1.6}}>Tier 2-4 compounds and personalized protocols - $9.99/month.</p>
@@ -592,28 +647,40 @@ function AppInner(){
           </div>
         </div>
 
-        <div style={{padding:"12px 32px",display:"flex",gap:8,alignItems:"center",borderBottom:`1px solid ${C.border}`,flexWrap:"wrap",background:C.bg}}>
-          <span style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".1em"}}>TIER:</span>
-          <button onClick={()=>setFilterTier(0)} style={{padding:"4px 10px",fontSize:10,fontWeight:700,background:filterTier===0?C.ink:"transparent",color:filterTier===0?C.white:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>{T.controls.tierAll}</button>
-          {[1,2,3,4].map((ti,i)=>(
-            <button key={ti} onClick={()=>setFilterTier(filterTier===ti?0:ti)}
-              style={{padding:"4px 10px",fontSize:10,fontWeight:700,background:filterTier===ti?tierColor(ti):"transparent",color:filterTier===ti?C.white:tierColor(ti),border:`1px solid ${tierColor(ti)}`,cursor:"pointer"}}>
-              T{ti} / {T.controls.tiers[i]}
-            </button>
-          ))}
-          <div style={{marginLeft:"auto",display:"flex",gap:0}}>
-            <span style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".08em",padding:"4px 8px",alignSelf:"center"}}>SORT:</span>
+        <div style={{padding:isMobile?"10px 12px":"12px 32px",borderBottom:`1px solid ${C.border}`,background:C.bg}}>
+          <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:isMobile?8:0}}>
+            <span style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".1em"}}>TIER:</span>
+            <button onClick={()=>setFilterTier(0)} style={{padding:"4px 8px",fontSize:10,fontWeight:700,background:filterTier===0?C.ink:"transparent",color:filterTier===0?C.white:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>{isMobile?"All":T.controls.tierAll}</button>
+            {[1,2,3,4].map((ti,i)=>(
+              <button key={ti} onClick={()=>setFilterTier(filterTier===ti?0:ti)}
+                style={{padding:"4px 8px",fontSize:10,fontWeight:700,background:filterTier===ti?tierColor(ti):"transparent",color:filterTier===ti?C.white:tierColor(ti),border:`1px solid ${tierColor(ti)}`,cursor:"pointer"}}>
+                {isMobile?`T${ti}`:`T${ti} / ${T.controls.tiers[i]}`}
+              </button>
+            ))}
+            {!isMobile&&<div style={{marginLeft:"auto",display:"flex",gap:0,alignItems:"center"}}>
+              <span style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".08em",padding:"4px 8px"}}>SORT:</span>
+              {[["efficacy",T.controls.sortEfficacy],["evidence",T.controls.sortEvidence],["tier",T.controls.sortTier]].map(([id,label])=>(
+                <button key={id} onClick={()=>setSortBy(id)}
+                  style={{padding:"5px 12px",fontSize:10,fontWeight:700,letterSpacing:".04em",background:sortBy===id?C.ink:C.white,color:sortBy===id?C.white:C.gray,border:`1px solid ${C.border}`,marginLeft:-1,cursor:"pointer"}}>
+                  {label}
+                </button>
+              ))}
+              <span style={{fontSize:11,color:C.gray,fontWeight:600,padding:"4px 0 4px 12px"}}>{T.controls.result(filtered.length)}</span>
+            </div>}
+          </div>
+          {isMobile&&<div style={{display:"flex",gap:0,alignItems:"center"}}>
+            <span style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".08em",padding:"4px 8px 4px 0"}}>SORT:</span>
             {[["efficacy",T.controls.sortEfficacy],["evidence",T.controls.sortEvidence],["tier",T.controls.sortTier]].map(([id,label])=>(
               <button key={id} onClick={()=>setSortBy(id)}
-                style={{padding:"5px 12px",fontSize:10,fontWeight:700,letterSpacing:".04em",background:sortBy===id?C.ink:C.white,color:sortBy===id?C.white:C.gray,border:`1px solid ${C.border}`,marginLeft:-1,cursor:"pointer"}}>
+                style={{padding:"5px 10px",fontSize:10,fontWeight:700,background:sortBy===id?C.ink:C.white,color:sortBy===id?C.white:C.gray,border:`1px solid ${C.border}`,marginLeft:-1,cursor:"pointer"}}>
                 {label}
               </button>
             ))}
-            <span style={{fontSize:11,color:C.gray,fontWeight:600,padding:"4px 0 4px 12px",alignSelf:"center"}}>{T.controls.result(filtered.length)}</span>
-          </div>
+            <span style={{fontSize:10,color:C.gray,fontWeight:600,padding:"4px 0 4px 10px",marginLeft:"auto"}}>{T.controls.result(filtered.length)}</span>
+          </div>}
         </div>
 
-        <div style={{maxWidth:1000,margin:"0 auto",padding:"24px 48px 80px"}}>
+        <div style={{maxWidth:1000,margin:"0 auto",padding:isMobile?"16px 12px 60px":"24px 48px 80px"}}>
           {goal!=="all"&&(
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,padding:"10px 16px",background:C.white,border:`1px solid ${C.border}`}}>
               <span style={{fontSize:12,color:C.ink,fontWeight:700}}>
@@ -641,7 +708,7 @@ function AppInner(){
         </div>
       </>}
 
-      <div style={{borderTop:`1px solid ${C.border}`,padding:"24px 48px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+      <div style={{borderTop:`1px solid ${C.border}`,padding:isMobile?"16px":"24px 48px",display:"flex",flexDirection:isMobile?"column":"row",justifyContent:"space-between",alignItems:isMobile?"flex-start":"center",flexWrap:"wrap",gap:8}}>
         <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink}}>EVIDSTACK</span>
         <p style={{fontSize:10,color:C.gray,textAlign:"center",lineHeight:1.6,maxWidth:500}}>{T.footer}</p>
         <span style={{fontSize:10,color:C.gray}}>v1.0 BETA</span>

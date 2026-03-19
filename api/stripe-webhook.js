@@ -1,7 +1,8 @@
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import Stripe from "stripe";
 
-export const config = { runtime: "nodejs18.x" };
+export const config = { runtime: "nodejs" };
 
 function initAdmin() {
   if (getApps().length > 0) return;
@@ -23,18 +24,14 @@ async function getRawBody(req) {
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const Stripe = (await import("stripe")).default;
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" });
-
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const rawBody = await getRawBody(req);
-  const sig     = req.headers["stripe-signature"];
+  const sig = req.headers["stripe-signature"];
 
   let event;
   try {
     event = stripe.webhooks.constructEvent(
-      rawBody,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET,
+      rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -42,50 +39,38 @@ export default async function handler(req, res) {
 
   initAdmin();
   const db = getFirestore();
-
   const getUid = (obj) => obj?.metadata?.uid;
 
   try {
     switch (event.type) {
-
       case "checkout.session.completed": {
         const session = event.data.object;
-        const uid     = getUid(session);
+        const uid = getUid(session);
         if (!uid) break;
         if (session.mode === "subscription" && session.payment_status === "paid") {
           await db.doc(`users/${uid}`).set(
             { isPro: true, proExpiresAt: null, stripeSubscriptionId: session.subscription },
-            { merge: true },
+            { merge: true }
           );
         }
         break;
       }
-
       case "invoice.paid": {
-        const invoice = event.data.object;
-        const uid     = getUid(invoice.subscription_details);
+        const uid = getUid(event.data.object.subscription_details);
         if (!uid) break;
-        await db.doc(`users/${uid}`).set(
-          { isPro: true, proExpiresAt: null },
-          { merge: true },
-        );
+        await db.doc(`users/${uid}`).set({ isPro: true, proExpiresAt: null }, { merge: true });
         break;
       }
-
       case "customer.subscription.deleted":
       case "invoice.payment_failed": {
         const obj = event.data.object;
         const uid = getUid(obj.metadata ? obj : obj.subscription_details);
         if (!uid) break;
-        await db.doc(`users/${uid}`).set(
-          { isPro: false },
-          { merge: true },
-        );
+        await db.doc(`users/${uid}`).set({ isPro: false }, { merge: true });
         break;
       }
     }
   } catch (err) {
-    console.error("Webhook handler error:", err);
     return res.status(500).end();
   }
 

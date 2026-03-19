@@ -479,6 +479,8 @@ function AppInner(){
   const [showAuth,setShowAuth]=useState(false);
   const [authMode,setAuthMode]=useState("login");
   const [showUpgrade,setShowUpgrade]=useState(false);
+  const isMobile=useIsMobile();
+  const [mobileMenu,setMobileMenu]=useState(false);
 
   const openAuth=(mode="login")=>{setAuthMode(mode);setShowAuth(true);};
   const openUpgrade=()=>setShowUpgrade(true);
@@ -515,9 +517,6 @@ function AppInner(){
     {id:"stack-builder",label:"Stack Builder",pro:true},
     {id:"about",label:"About"},
   ];
-
-  const isMobile=useIsMobile();
-  const [mobileMenu,setMobileMenu]=useState(false);
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>

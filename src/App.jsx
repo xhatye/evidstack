@@ -5,6 +5,24 @@ function useIsMobile(){
   useEffect(()=>{const h=()=>setM(window.innerWidth<768);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h);},[]);
   return m;
 }
+
+const ROUTES = {
+  "/":"supplements",
+  "/supplements":"supplements",
+  "/protocols":"protocols",
+  "/stack-builder":"stack-builder",
+  "/about":"about",
+  "/legal":"legal",
+};
+
+function getPageFromPath(){
+  return ROUTES[window.location.pathname]||"supplements";
+}
+
+function navigate(page){
+  const path = page==="supplements"?"/":`/${page}`;
+  window.history.pushState({},"",path);
+}
 import { SUPPLEMENTS, GOALS, TIERS } from "./data.js";
 import { AuthProvider, useAuth } from "./AuthContext.jsx";
 
@@ -409,6 +427,75 @@ function StackBuilder({onUpgrade}){
   );
 }
 
+/* LEGAL */
+function LegalPage(){
+  const isMob=useIsMobile();
+  return(
+    <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"32px 16px 60px":"64px 48px 100px"}}>
+      <h1 style={{fontSize:isMob?26:36,fontWeight:900,letterSpacing:"-.04em",color:"#1a1a1a",margin:"0 0 8px"}}>Terms of Service & Privacy Policy</h1>
+      <p style={{fontSize:12,color:"#6b7280",margin:"0 0 48px"}}>Last updated: March 2026</p>
+
+      <div style={{height:1,background:"#d4d0c8",margin:"0 0 40px"}}/>
+
+      {[
+        {
+          title:"1. Acceptance of Terms",
+          body:"By accessing or using Evidstack (evidstack.com), you agree to be bound by these Terms of Service. If you do not agree to these terms, do not use the service."
+        },
+        {
+          title:"2. Description of Service",
+          body:"Evidstack provides an evidence-based supplement database, research summaries, and an AI-powered stack builder. Content is for informational purposes only and does not constitute medical advice. Always consult a qualified healthcare professional before starting any supplementation protocol."
+        },
+        {
+          title:"3. Pro Subscription",
+          body:"Evidstack Pro is a paid subscription at $9.99/month. Your subscription renews automatically each month until cancelled. You may cancel at any time through your account settings. No refunds are issued for partial subscription periods. We reserve the right to change pricing with 30 days notice."
+        },
+        {
+          title:"4. Prohibited Use",
+          body:"You may not use Evidstack to distribute false medical information, reverse-engineer or scrape our database, share your account credentials, or use the platform in any way that violates applicable law."
+        },
+        {
+          title:"5. Disclaimer of Medical Advice",
+          body:"All content on Evidstack is strictly for informational and educational purposes. Nothing on this platform constitutes medical advice, diagnosis, or treatment. The AI Stack Builder generates suggestions based on published research  - these suggestions are not personalized medical recommendations. Always consult a licensed healthcare provider before changing your supplementation routine."
+        },
+        {
+          title:"6. Limitation of Liability",
+          body:"Evidstack and its operators are not liable for any direct, indirect, incidental, or consequential damages arising from your use of the platform or reliance on its content. Use the information at your own risk."
+        },
+        {
+          title:"7. Privacy Policy  - Data We Collect",
+          body:"We collect your email address and authentication data when you create an account. We store your subscription status in our database (Firebase Firestore). We do not sell your personal data to third parties. Payment processing is handled by Stripe  - we do not store your credit card information."
+        },
+        {
+          title:"8. Cookies and Analytics",
+          body:"Evidstack may use cookies for authentication purposes. We may use analytics tools to understand how users interact with the platform. No advertising cookies are used."
+        },
+        {
+          title:"9. Third-Party Services",
+          body:"Evidstack uses Firebase (Google) for authentication and database, Stripe for payment processing, and Vercel for hosting. Each of these services has its own privacy policy and terms of service."
+        },
+        {
+          title:"10. Data Retention and Deletion",
+          body:"You may request deletion of your account and associated data at any time by emailing hello@evidstack.com. We will process deletion requests within 30 days."
+        },
+        {
+          title:"11. Changes to These Terms",
+          body:"We reserve the right to update these terms at any time. Continued use of the platform after changes constitutes acceptance of the new terms. We will notify users of significant changes by email."
+        },
+        {
+          title:"12. Contact",
+          body:"For any questions regarding these terms or your privacy, contact us at: hello@evidstack.com"
+        },
+      ].map(s=>(
+        <div key={s.title} style={{marginBottom:32}}>
+          <p style={{fontSize:13,fontWeight:800,color:"#1a1a1a",margin:"0 0 8px"}}>{s.title}</p>
+          <p style={{fontSize:13,color:"#6b7280",lineHeight:1.8,margin:0}}>{s.body}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ABOUT */
 function AboutPage(){
   const isMob=useIsMobile();
@@ -471,7 +558,7 @@ function ProtocolsPage({onGoToSupplements}){
 /* ROOT */
 function AppInner(){
   const {user,isPro,loading,logout}=useAuth();
-  const [page,setPage]=useState("supplements");
+  const [page,setPage]=useState(()=>getPageFromPath());
   const [goal,setGoal]=useState("all");
   const [search,setSearch]=useState("");
   const [selected,setSelected]=useState(null);
@@ -483,6 +570,12 @@ function AppInner(){
   const isMobile=useIsMobile();
   const [mobileMenu,setMobileMenu]=useState(false);
 
+  const navigateTo=(p)=>{navigate(p);navigateTo(p);};
+  useEffect(()=>{
+    const onPop=()=>navigateTo(getPageFromPath());
+    window.addEventListener("popstate",onPop);
+    return()=>window.removeEventListener("popstate",onPop);
+  },[]);
   const openAuth=(mode="login")=>{setAuthMode(mode);setShowAuth(true);};
   const openUpgrade=()=>setShowUpgrade(true);
   const toggle=(id)=>setSelected(p=>p===id?null:id);
@@ -532,8 +625,8 @@ function AppInner(){
               <span style={{fontSize:14,fontWeight:900,letterSpacing:"-.04em"}}>EVIDSTACK</span>
               <button onClick={()=>setMobileMenu(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:C.gray}}>x</button>
             </div>
-            {navItems.map(item=>(
-              <button key={item.id} onClick={()=>{setPage(item.id);setMobileMenu(false);}}
+            {[...navItems,{id:"legal",label:"Terms & Privacy"}].map(item=>(
+              <button key={item.id} onClick={()=>{navigateTo(item.id);setMobileMenu(false);}}
                 style={{padding:"14px 16px",fontSize:14,fontWeight:700,background:page===item.id?C.ink:"transparent",color:page===item.id?C.white:item.pro&&!isPro?C.gold:C.gray,border:"none",cursor:"pointer",textAlign:"left",borderRadius:4}}>
                 {item.pro&&!isPro?"✦ "+item.label:item.label}
               </button>
@@ -556,9 +649,9 @@ function AppInner(){
       )}
 
       <nav style={{borderBottom:`1px solid ${C.border}`,padding:isMobile?"0 16px":"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:56,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
-        <div onClick={()=>setPage("supplements")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+        <div onClick={()=>navigateTo("supplements")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
           <div style={{width:30,height:30,border:`2px solid ${C.black}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:10,fontWeight:900}}>E</span></div>
-          <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink}}>EVIDSTACK</span>
+          <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink,cursor:"pointer"}} onClick={()=>navigateTo("supplements")}>EVIDSTACK</span>
         </div>
         {isMobile?(
           <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -573,7 +666,7 @@ function AppInner(){
         ):(
           <div style={{display:"flex",alignItems:"center",gap:4}}>
             {navItems.map(item=>(
-              <button key={item.id} onClick={()=>setPage(item.id)}
+              <button key={item.id} onClick={()=>navigateTo(item.id)}
                 style={{padding:"8px 14px",fontSize:12,fontWeight:700,
                   background:page===item.id?C.ink:"transparent",
                   color:page===item.id?C.white:item.pro&&!isPro?C.gold:C.gray,
@@ -599,7 +692,8 @@ function AppInner(){
       </nav>
 
       {page==="about"         &&<AboutPage/>}
-      {page==="protocols"     &&<ProtocolsPage onGoToSupplements={()=>setPage("supplements")}/>}
+      {page==="legal"          &&<LegalPage/>}
+      {page==="protocols"     &&<ProtocolsPage onGoToSupplements={()=>navigateTo("supplements")}/>}
       {page==="stack-builder" &&<StackBuilder onUpgrade={openUpgrade}/>}
 
       {page==="supplements"&&<>
@@ -709,9 +803,9 @@ function AppInner(){
       </>}
 
       <div style={{borderTop:`1px solid ${C.border}`,padding:isMobile?"16px":"24px 48px",display:"flex",flexDirection:isMobile?"column":"row",justifyContent:"space-between",alignItems:isMobile?"flex-start":"center",flexWrap:"wrap",gap:8}}>
-        <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink}}>EVIDSTACK</span>
+        <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink,cursor:"pointer"}} onClick={()=>navigateTo("supplements")}>EVIDSTACK</span>
         <p style={{fontSize:10,color:C.gray,textAlign:"center",lineHeight:1.6,maxWidth:500}}>{T.footer}</p>
-        <span style={{fontSize:10,color:C.gray}}>v1.0 BETA</span>
+<span onClick={()=>navigateTo("legal")} style={{fontSize:10,color:C.gray,cursor:"pointer",textDecoration:"underline"}}>Terms & Privacy</span>
       </div>
     </div>
   );

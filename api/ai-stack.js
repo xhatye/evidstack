@@ -5,7 +5,6 @@ export default async function handler(req) {
     return new Response("Method not allowed", { status: 405 });
   }
 
-  // Rate limit header check (uid passed from client — actual auth validation done server-side via Firestore in production)
   const { goals, budget, existing, restrictions } = await req.json();
 
   if (!goals || goals.length === 0) {
@@ -32,39 +31,39 @@ INSTRUCTIONS:
 - For each compound include: exact dose, timing, why it fits their goals
 - Check interactions between all recommended compounds
 - Fit within their budget (include estimated cost)
-- Format your response as clean JSON only, no markdown, no preamble
+- Respond ONLY with valid JSON, no markdown, no explanation outside the JSON
 
-RESPONSE FORMAT (strict JSON):
+RESPONSE FORMAT (strict JSON only):
 {
-  "stack_name": "string — a compelling name for their stack",
-  "total_cost": "string — e.g. $45-65/month",
-  "summary": "string — 2 sentence rationale",
+  "stack_name": "string",
+  "total_cost": "string e.g. $45-65/month",
+  "summary": "string 2 sentences",
   "compounds": [
     {
       "name": "string",
-      "dose": "string — e.g. 5g/day",
-      "timing": "string — e.g. Post-workout",
-      "reason": "string — 1 sentence why it fits their goals",
+      "dose": "string e.g. 5g/day",
+      "timing": "string e.g. Post-workout",
+      "reason": "string 1 sentence",
       "tier": 1,
-      "cost": "string — e.g. $10-15/month"
+      "cost": "string e.g. $10-15/month"
     }
   ],
-  "interactions": "string — any notable interactions to watch, or 'None identified'",
-  "progression": "string — what to add or change after 8 weeks"
+  "interactions": "string or None identified",
+  "progression": "string what to add after 8 weeks"
 }`;
 
   try {
-    const aiRes = await fetch("https://api.anthropic.com/v1/messages", {
+    const aiRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "x-api-key":         process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "Content-Type":      "application/json",
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model:      "claude-sonnet-4-20250514",
+        model: "llama-3.3-70b-versatile",
         max_tokens: 1500,
-        messages:   [{ role: "user", content: prompt }],
+        temperature: 0.3,
+        messages: [{ role: "user", content: prompt }],
       }),
     });
 
@@ -74,18 +73,16 @@ RESPONSE FORMAT (strict JSON):
     }
 
     const data = await aiRes.json();
-    const text = data.content?.[0]?.text || "{}";
-
-    // Strip any markdown fences if the model adds them
+    const text = data.choices?.[0]?.message?.content || "{}";
     const clean = text.replace(/```json|```/g, "").trim();
 
     return new Response(clean, {
-      status:  200,
+      status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), {
-      status:  500,
+      status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }

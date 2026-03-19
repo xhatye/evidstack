@@ -17,6 +17,9 @@ export const GOALS = [
   { id: "longevity", label: "Longévité",       icon: "❤️" },
   { id: "skin",      label: "Peau/Cheveux",    icon: "✨" },
   { id: "cardio",    label: "Cardio",          icon: "🫀" },
+  { id: "weight",    label: "Weight Loss",      icon: "⚖️" },
+  { id: "hair",      label: "Hair Health",      icon: "💈" },
+  { id: "liver",     label: "Liver / Detox",    icon: "🫁" },
 
 ];
 export const TIERS = {
@@ -2443,6 +2446,339 @@ export const SUPPLEMENTS = [
     effects: [
       { goal: "longevity",efficacy: 2, evidence: 2, studies: 8, type: "RCT",
         summary: "Reduces heavy metal load (lead, cadmium, arsenic) in controlled trials. Improves gut barrier integrity. Antioxidant effects via free radical trapping.", sources: ["PMID:16019562"] },
+    ],
+  },
+
+
+  // ── GLP-1 / WEIGHT LOSS PEPTIDES ─────────────────────────────────────────
+
+  {
+    id: "semaglutide",
+    name: "Semaglutide (Ozempic / Wegovy)",
+    aliases: ["semaglutide","ozempic","wegovy","GLP-1","rybelsus"],
+    tier: 4, safety: 2, legal: "FDA-approved prescription drug. Not legal to obtain without prescription.", cost: "$800-$1500/month (brand) or $100-$300/month (compounded)",
+    dosage: { amount: "0.25-2.4mg/week subcutaneous (weight loss protocol)", timing: "Weekly injection, same day each week", note: "Start at 0.25mg/week and titrate slowly over 16-20 weeks to minimize GI side effects. Compounded versions are significantly cheaper but less regulated." },
+    interactions: ["Insulin and antidiabetics (severe hypoglycemia risk)", "Oral medications (absorption delay)"],
+    effects: [
+      { goal: "weight",   efficacy: 5, evidence: 5, studies: 80, type: "Phase III RCT",
+        summary: "STEP trials: 15-17% body weight reduction over 68 weeks vs 2-3% placebo. FDA-approved for chronic weight management. Most effective pharmacological weight loss agent ever approved.", sources: ["PMID:34879163","PMID:33567185"] },
+      { goal: "cardio",   efficacy: 4, evidence: 5, studies: 40, type: "RCT",
+        summary: "SELECT trial: 20% reduction in major cardiovascular events in non-diabetic obese patients. Significant cardiovascular protection beyond weight loss alone.", sources: ["PMID:37952131"] },
+      { goal: "longevity",efficacy: 3, evidence: 3, studies: 15, type: "RCT",
+        summary: "Reduces inflammation, improves metabolic markers, liver fat reduction. Emerging data on neuroprotection and kidney disease.", sources: ["PMID:34879163"] },
+    ],
+  },
+
+  {
+    id: "tirzepatide",
+    name: "Tirzepatide (Mounjaro / Zepbound)",
+    aliases: ["tirzepatide","mounjaro","zepbound","GIP/GLP-1","twincretin"],
+    tier: 4, safety: 2, legal: "FDA-approved prescription drug. Not legal to obtain without prescription.", cost: "$900-$1600/month (brand) or $150-$400/month (compounded)",
+    dosage: { amount: "2.5-15mg/week subcutaneous", timing: "Weekly injection, same day each week", note: "Dual GIP/GLP-1 agonist. Titrate from 2.5mg over 20 weeks. Currently the most effective approved weight loss drug available." },
+    interactions: ["Insulin and antidiabetics (hypoglycemia risk)", "Oral medications (absorption delay)"],
+    effects: [
+      { goal: "weight",   efficacy: 5, evidence: 5, studies: 50, type: "Phase III RCT",
+        summary: "SURMOUNT-1 trial: up to 22.5% body weight reduction. Surpasses semaglutide in head-to-head comparisons. Currently the most effective approved weight loss medication.", sources: ["PMID:35658024"] },
+      { goal: "cardio",   efficacy: 4, evidence: 4, studies: 20, type: "RCT",
+        summary: "SURPASS-CVOT trial ongoing. Significant improvements in cardiometabolic markers including blood pressure, lipids, and glycemic control.", sources: ["PMID:35658024"] },
+    ],
+  },
+
+  {
+    id: "retatrutide",
+    name: "Retatrutide",
+    aliases: ["retatrutide","LY3437943","GLP-1/GIP/glucagon triple agonist"],
+    tier: 4, safety: 2, legal: "Phase III clinical trials. Not yet FDA-approved. Research compound.", cost: "Not commercially available",
+    dosage: { amount: "Phase II: 4-12mg/week subcutaneous", timing: "Weekly injection", note: "Triple agonist (GLP-1, GIP, glucagon). Phase II data shows unprecedented weight loss. Not yet available commercially." },
+    interactions: [],
+    effects: [
+      { goal: "weight",   efficacy: 5, evidence: 2, studies: 3, type: "Phase II RCT",
+        summary: "Phase II trial: up to 24.2% body weight reduction at 48 weeks - exceeding all existing approved agents. Triple mechanism may provide superior efficacy. Phase III ongoing.", sources: ["PMID:37557886"] },
+    ],
+  },
+
+  {
+    id: "cagrilintide",
+    name: "Cagrilintide",
+    aliases: ["cagrilintide","amylin analogue","CagriSema"],
+    tier: 4, safety: 2, legal: "Phase III clinical trials with semaglutide (CagriSema). Not yet approved.", cost: "Not commercially available",
+    dosage: { amount: "2.4mg/week subcutaneous (in CagriSema combination)", timing: "Weekly injection combined with semaglutide", note: "Long-acting amylin analogue. Being developed as fixed-dose combination with semaglutide (CagriSema). Phase III showing strong results." },
+    interactions: [],
+    effects: [
+      { goal: "weight",   efficacy: 4, evidence: 2, studies: 3, type: "Phase II/III RCT",
+        summary: "REDEFINE trial (CagriSema combination): up to 22.7% weight loss at 68 weeks. Amylin pathway complements GLP-1 mechanism for additive weight reduction.", sources: ["PMID:36669562"] },
+    ],
+  },
+
+  {
+    id: "mazdutide",
+    name: "Mazdutide (IBI362)",
+    aliases: ["mazdutide","IBI362","GLP-1/glucagon dual agonist"],
+    tier: 4, safety: 2, legal: "Phase III in China. Not approved outside China. Research compound in most countries.", cost: "Not commercially available outside China",
+    dosage: { amount: "3-9mg/week subcutaneous", timing: "Weekly injection", note: "Dual GLP-1/glucagon agonist developed in China. Phase III data promising. Limited English-language literature." },
+    interactions: [],
+    effects: [
+      { goal: "weight",   efficacy: 4, evidence: 2, studies: 3, type: "Phase II/III RCT",
+        summary: "Phase II: 11.3% weight reduction at 24 weeks. Glucagon component adds thermogenic effect to GLP-1 appetite suppression. Phase III ongoing in China.", sources: [] },
+    ],
+  },
+
+  // ── HAIR HEALTH ───────────────────────────────────────────────────────────
+
+  {
+    id: "finasteride",
+    name: "Finasteride (Propecia)",
+    aliases: ["finasteride","propecia","proscar","5-alpha reductase inhibitor"],
+    tier: 3, safety: 2, legal: "FDA-approved prescription drug for male pattern baldness and BPH.", cost: "$10-$50/month (generic)",
+    dosage: { amount: "1mg/day oral (hair loss) or 5mg/day (BPH)", timing: "Daily at any time", note: "5-alpha reductase inhibitor. Reduces DHT by 70%. Risk of sexual side effects in 1-2% of men (some potentially persistent - Post-Finasteride Syndrome). Blood test recommended before starting." },
+    interactions: ["PSA tests (reduces PSA levels - inform your doctor)", "Other 5-alpha reductase inhibitors"],
+    effects: [
+      { goal: "hair",     efficacy: 4, evidence: 5, studies: 60, type: "RCT + Meta-analyses",
+        summary: "FDA-approved for male pattern baldness. RCTs show 83% of men maintain or improve hair count vs 28% placebo after 2 years. Most evidence-backed pharmacological hair loss treatment.", sources: ["PMID:9777765","PMID:12196747"] },
+    ],
+  },
+
+  {
+    id: "minoxidil",
+    name: "Minoxidil",
+    aliases: ["minoxidil","rogaine","regaine","minoxidil foam","oral minoxidil"],
+    tier: 2, safety: 3, legal: "OTC topical everywhere. Oral requires prescription in most countries.", cost: "$10-$30/month (topical) or $15-$40/month (oral)",
+    dosage: { amount: "Topical: 5% solution/foam 1ml twice daily. Oral: 0.625-5mg/day", timing: "Topical: morning and evening on dry scalp. Oral: once daily.", note: "Vasodilator mechanism. Oral minoxidil at low doses (0.25-1.25mg) is increasingly popular as highly effective alternative to topical. Requires 6-12 months to see results." },
+    interactions: ["Antihypertensives (additive blood pressure lowering)", "Topical retinoids may increase absorption"],
+    effects: [
+      { goal: "hair",     efficacy: 4, evidence: 5, studies: 50, type: "RCT + Meta-analyses",
+        summary: "FDA-approved for androgenetic alopecia in men and women. 5% topical superior to 2%. Oral minoxidil meta-analysis shows equivalent or superior efficacy to topical at low doses.", sources: ["PMID:15304185","PMID:34822175"] },
+    ],
+  },
+
+  {
+    id: "pyrilutamide",
+    name: "Pyrilutamide (KX-826)",
+    aliases: ["pyrilutamide","KX-826","androgen receptor inhibitor topical"],
+    tier: 4, safety: 3, legal: "Phase III in China and USA. Not yet approved anywhere.", cost: "Not commercially available",
+    dosage: { amount: "0.5% topical solution once daily (in trials)", timing: "Applied to scalp daily", note: "Topical androgen receptor antagonist. Selectively blocks DHT at the hair follicle without systemic 5-AR inhibition. Promising Phase III data. Potential to replace finasteride with fewer side effects." },
+    interactions: [],
+    effects: [
+      { goal: "hair",     efficacy: 4, evidence: 2, studies: 3, type: "Phase II/III RCT",
+        summary: "Phase II: significantly superior hair count vs placebo at 24 weeks. Phase III ongoing. Local mechanism minimizes systemic side effects seen with finasteride.", sources: [] },
+    ],
+  },
+
+  {
+    id: "ru-58841",
+    name: "RU-58841",
+    aliases: ["RU-58841","RU58841","PSK-3841","HMR-3841"],
+    tier: 4, safety: 1, legal: "Research compound. Not approved anywhere. Sold as research chemical.", cost: "$30-$80/month",
+    dosage: { amount: "50mg/day topical (research dosing)", timing: "Applied to scalp once daily", note: "EXTREME CAUTION: Research chemical never studied in human clinical trials for safety. Potential systemic absorption. No long-term safety data exists. Some researchers report cardiac side effects." },
+    interactions: [],
+    effects: [
+      { goal: "hair",     efficacy: 3, evidence: 1, studies: 1, type: "Animal studies + anecdotal",
+        summary: "Potent topical androgen receptor antagonist. Stump-tailed macaque studies showed strong hair regrowth. No human clinical trial data. Widely used in biohacking community despite complete absence of human safety data.", sources: ["PMID:10189788"] },
+    ],
+  },
+
+  // ── LIVER / DETOX ─────────────────────────────────────────────────────────
+
+  {
+    id: "tudca",
+    name: "TUDCA (Tauroursodeoxycholic Acid)",
+    aliases: ["TUDCA","tauroursodeoxycholic acid","bile acid","taurine ursodeoxycholic"],
+    tier: 2, safety: 4, legal: "OTC in most countries. Prescription drug in some EU countries for liver disease.", cost: "$30-$60/month",
+    dosage: { amount: "250-1000mg/day", timing: "With meals. Split 2-3x/day for higher doses.", note: "Bile acid with potent hepatoprotective properties. Used clinically for cholestatic liver disease. Popular in biohacking and bodybuilding for liver protection during oral steroid use." },
+    interactions: ["Oral medications (may reduce absorption - take 2h apart)", "Antidiabetics (may improve insulin sensitivity)"],
+    effects: [
+      { goal: "liver",    efficacy: 5, evidence: 4, studies: 25, type: "RCT",
+        summary: "Approved drug in some countries for primary biliary cholangitis. Significantly reduces liver enzymes (ALT/AST), improves bile flow, and protects hepatocytes from apoptosis. Strong evidence for NAFLD and liver protection.", sources: ["PMID:25956834","PMID:32044390"] },
+      { goal: "longevity",efficacy: 3, evidence: 3, studies: 12, type: "RCT",
+        summary: "ER stress reduction and mitochondrial protection. Anti-apoptotic effects in multiple tissues. Emerging data on neuroprotection and metabolic health.", sources: ["PMID:32044390"] },
+    ],
+  },
+
+  {
+    id: "milk-thistle",
+    name: "Milk Thistle (Silymarin)",
+    aliases: ["milk thistle","silymarin","silybum marianum","silibinin","silybin"],
+    tier: 1, safety: 5, legal: "OTC everywhere", cost: "$8-$20/month",
+    dosage: { amount: "420-600mg/day standardized extract (70-80% silymarin)", timing: "With meals, split 3x/day", note: "Silymarin is the active flavonoid complex. Most studied hepatoprotective herb. Phosphatidylcholine-bound form (silybin-phosphatidylcholine) has 4-5x better bioavailability." },
+    interactions: ["CYP450 substrates (mild inhibition at high doses)", "Anticoagulants (mild interaction)"],
+    effects: [
+      { goal: "liver",    efficacy: 4, evidence: 4, studies: 40, type: "Meta-analyses",
+        summary: "Meta-analysis confirms significant reduction in ALT, AST, and GGT in liver disease patients. Antioxidant, anti-inflammatory, and antifibrotic properties. Most used liver supplement worldwide.", sources: ["PMID:22920804","PMID:25163491"] },
+      { goal: "longevity",efficacy: 2, evidence: 3, studies: 15, type: "RCT",
+        summary: "Antioxidant and anti-inflammatory effects. Reduces oxidative stress markers in diabetic and liver disease patients.", sources: [] },
+    ],
+  },
+
+  {
+    id: "amla",
+    name: "Amla (Indian Gooseberry)",
+    aliases: ["amla","indian gooseberry","emblica officinalis","phyllanthus emblica","amalaki"],
+    tier: 2, safety: 5, legal: "OTC everywhere", cost: "$10-$20/month",
+    dosage: { amount: "500-3000mg/day standardized extract", timing: "With meals", note: "Richest natural source of vitamin C (20x more than oranges by weight). Also contains tannins and polyphenols with independent antioxidant activity. Traditional Ayurvedic rasayana." },
+    interactions: ["Anticoagulants (vitamin C at high doses may affect)"],
+    effects: [
+      { goal: "liver",    efficacy: 3, evidence: 3, studies: 12, type: "RCT",
+        summary: "Reduces liver enzymes and hepatic fat. Anti-fibrotic effects in NAFLD. Protects against drug-induced liver toxicity in animal models with some human data.", sources: ["PMID:21671579"] },
+      { goal: "cardio",   efficacy: 3, evidence: 3, studies: 15, type: "RCT",
+        summary: "Reduces LDL, total cholesterol, and triglycerides in multiple RCTs. Improves endothelial function. May be as effective as statin drugs for cholesterol in some studies.", sources: ["PMID:21671579"] },
+      { goal: "longevity",efficacy: 3, evidence: 3, studies: 12, type: "RCT",
+        summary: "Exceptionally high antioxidant capacity. Reduces oxidative stress, inflammation, and glycation markers. Telomere protection in preliminary studies.", sources: [] },
+    ],
+  },
+
+  // ── PERFORMANCE / SEXUAL HEALTH ───────────────────────────────────────────
+
+  {
+    id: "tadalafil",
+    name: "Tadalafil (Cialis)",
+    aliases: ["tadalafil","cialis","adcirca","PDE5 inhibitor"],
+    tier: 3, safety: 3, legal: "FDA-approved prescription drug. Generic available OTC in some countries.", cost: "$10-$60/month (generic)",
+    dosage: { amount: "5mg/day (daily dosing) or 10-20mg as needed", timing: "Daily: same time each day. As needed: 30-60 min before activity.", note: "Longest-acting PDE5 inhibitor (36hr). Daily low-dose protocol increasingly used for cardiovascular, athletic, and general health benefits beyond sexual function." },
+    interactions: ["Nitrates (life-threatening hypotension - absolute contraindication)", "Antihypertensives (additive)", "Alpha-blockers"],
+    effects: [
+      { goal: "hormones", efficacy: 4, evidence: 5, studies: 60, type: "RCT + Meta-analyses",
+        summary: "FDA-approved for erectile dysfunction. Improves sexual function via PDE5 inhibition and nitric oxide enhancement. Meta-analysis confirms superiority to other PDE5 inhibitors for 36hr window.", sources: ["PMID:15177095"] },
+      { goal: "cardio",   efficacy: 3, evidence: 3, studies: 20, type: "RCT",
+        summary: "Improves endothelial function, reduces pulmonary arterial pressure, and has emerging data for cardiovascular protection. Daily dosing reduces cardiovascular event risk in some populations.", sources: ["PMID:22948093"] },
+      { goal: "recovery", efficacy: 2, evidence: 2, studies: 8, type: "RCT",
+        summary: "Emerging data on improved muscle oxygenation and nutrient delivery during exercise. Some studies show modest ergogenic effects.", sources: [] },
+    ],
+  },
+
+  {
+    id: "hcg",
+    name: "HCG (Human Chorionic Gonadotropin)",
+    aliases: ["HCG","human chorionic gonadotropin","pregnyl","novarel","gonadotropin"],
+    tier: 4, safety: 2, legal: "FDA-approved prescription drug. Banned by FDA as OTC in 2020. Requires prescription.", cost: "$50-$200/month",
+    dosage: { amount: "250-500 IU every other day subcutaneous (TRT adjunct)", timing: "Every other day injections", note: "Mimics LH, stimulating testicular testosterone and maintaining fertility during TRT. Required prescription since 2020 FDA OTC ban. Used off-label for PCT and fertility." },
+    interactions: ["Testosterone (used together in TRT protocols)", "Estrogen modulators"],
+    effects: [
+      { goal: "hormones", efficacy: 4, evidence: 3, studies: 20, type: "RCT",
+        summary: "Maintains testicular function, size, and fertility during testosterone replacement therapy. Restores testosterone production post-cycle. FDA-approved for hypogonadism and cryptorchidism.", sources: ["PMID:23268602"] },
+    ],
+  },
+
+  // ── COGNITION / RUSSIAN PHARMA ────────────────────────────────────────────
+
+  {
+    id: "meldonium",
+    name: "Meldonium (Mildronate)",
+    aliases: ["meldonium","mildronate","MET-88","THP","trimethylhydrazinium propionate"],
+    tier: 3, safety: 2, legal: "Approved drug in Latvia, Russia, Ukraine. Not approved in EU or USA. Banned by WADA.", cost: "$15-$40/month",
+    dosage: { amount: "500-1000mg/day", timing: "Morning, cycle 4-6 weeks on with breaks", note: "WADA-banned substance. Gained notoriety after Maria Sharapova case. Cardioprotective mechanism via GABA-like action and improved mitochondrial function. Approved drug in Eastern Europe." },
+    interactions: ["Vasodilators (additive)", "Anticoagulants"],
+    effects: [
+      { goal: "energy",   efficacy: 3, evidence: 2, studies: 8, type: "RCT (Eastern European)",
+        summary: "Improves exercise tolerance in heart failure patients. Increases endurance and reduces fatigue. Mechanism involves optimizing fatty acid vs glucose metabolism in cardiac and skeletal muscle.", sources: ["PMID:25692791"] },
+      { goal: "cardio",   efficacy: 3, evidence: 3, studies: 12, type: "RCT",
+        summary: "Cardioprotective in ischemia-reperfusion injury. Approved treatment for angina and chronic heart failure in several countries.", sources: ["PMID:25692791"] },
+    ],
+  },
+
+  {
+    id: "fabomotizole",
+    name: "Fabomotizole (Afobazole)",
+    aliases: ["fabomotizole","afobazole","afobazol","anxiolytic Russia"],
+    tier: 3, safety: 4, legal: "OTC in Russia. Not approved in EU or USA. Research compound.", cost: "$10-$25/month",
+    dosage: { amount: "10mg 3x/day (30mg/day total)", timing: "With meals, 2-4 week course", note: "Sigma-1 receptor agonist and MT1/MT3 melatonin receptor agonist. Anxiolytic without sedation or dependency risk. Approved OTC drug in Russia. Very clean safety profile in Russian clinical trials." },
+    interactions: [],
+    effects: [
+      { goal: "stress",   efficacy: 3, evidence: 2, studies: 10, type: "RCT (Russian)",
+        summary: "Reduces anxiety and irritability without sedation or dependency. Phase III Russian trials showed efficacy comparable to benzodiazepines for generalized anxiety without side effects.", sources: [] },
+      { goal: "mood",     efficacy: 2, evidence: 2, studies: 6, type: "RCT",
+        summary: "Modest antidepressant-adjacent effects. Reduces somatic symptoms of anxiety including palpitations and sweating.", sources: [] },
+    ],
+  },
+
+  {
+    id: "pantogam",
+    name: "Pantogam (Hopantenic Acid)",
+    aliases: ["pantogam","hopantenic acid","pantocalcin","hopa","GABA vitamin B5 derivative"],
+    tier: 3, safety: 4, legal: "Approved drug in Russia. Not approved in EU or USA.", cost: "$10-$25/month",
+    dosage: { amount: "500-3000mg/day", timing: "Split into 3 doses with meals", note: "Synthetic analogue of GABA and pantothenic acid (B5). Nootropic with anticonvulsant properties. Approved pediatric and adult neurological drug in Russia." },
+    interactions: ["Anticonvulsants (additive)", "CNS depressants (mild)"],
+    effects: [
+      { goal: "focus",    efficacy: 3, evidence: 2, studies: 8, type: "RCT (Russian)",
+        summary: "Improves cognitive performance, attention, and mental endurance. Used clinically in Russia for cognitive dysfunction, ADHD, and neurological conditions.", sources: [] },
+      { goal: "stress",   efficacy: 2, evidence: 2, studies: 5, type: "RCT",
+        summary: "GABA-mimetic effect reduces anxiety without sedation. Anti-stress and mildly neuroprotective properties.", sources: [] },
+    ],
+  },
+
+  {
+    id: "emoxypine",
+    name: "Emoxypine (Mexidol)",
+    aliases: ["emoxypine","mexidol","mexicor","emoxipine","3-hydroxypyridine"],
+    tier: 3, safety: 4, legal: "Approved drug in Russia. Not approved in EU or USA.", cost: "$15-$35/month",
+    dosage: { amount: "125-600mg/day", timing: "Split 2-3x daily with meals", note: "Antioxidant anxiolytic. Combination of antioxidant and GABA-A modulator. Used clinically in Russia for acute cerebrovascular accidents, anxiety, and cognitive dysfunction." },
+    interactions: ["Benzodiazepines (potentiates)", "Anxiolytics (additive)"],
+    effects: [
+      { goal: "stress",   efficacy: 3, evidence: 2, studies: 8, type: "RCT (Russian)",
+        summary: "Anxiolytic and antioxidant via GABA-A modulation and free radical scavenging. Reduces anxiety with additional neuroprotective properties vs pure GABA modulators.", sources: [] },
+      { goal: "longevity",efficacy: 2, evidence: 2, studies: 6, type: "RCT",
+        summary: "Antioxidant effects reduce lipid peroxidation and protect mitochondrial membranes. Used clinically for post-stroke and post-ischemic recovery.", sources: [] },
+    ],
+  },
+
+  // ── METABOLIC / MISC ──────────────────────────────────────────────────────
+
+  {
+    id: "l-ornithine",
+    name: "L-Ornithine",
+    aliases: ["L-ornithine","ornithine","ornithine HCl","urea cycle"],
+    tier: 2, safety: 5, legal: "OTC everywhere", cost: "$10-$20/month",
+    dosage: { amount: "2-6g/day", timing: "Before sleep on empty stomach (sleep effects) or pre-workout (performance)", note: "Non-essential amino acid. Key component of the urea cycle - removes ammonia. Sleep quality and growth hormone studies done with 400-800mg. Performance effects at higher doses 2-6g." },
+    interactions: [],
+    effects: [
+      { goal: "sleep",    efficacy: 3, evidence: 3, studies: 8, type: "RCT",
+        summary: "400mg ornithine before sleep significantly improves sleep quality and reduces cortisol in Japanese RCT. Reduces stress-related sleep disruption.", sources: ["PMID:24681419"] },
+      { goal: "recovery", efficacy: 2, evidence: 2, studies: 6, type: "RCT",
+        summary: "Reduces exercise-induced fatigue via ammonia clearance through urea cycle. Modest improvement in endurance and recovery time.", sources: [] },
+    ],
+  },
+
+  {
+    id: "msm",
+    name: "MSM (Methylsulfonylmethane)",
+    aliases: ["MSM","methylsulfonylmethane","dimethyl sulfone","DMSO2","organic sulfur"],
+    tier: 2, safety: 5, legal: "OTC everywhere", cost: "$8-$15/month",
+    dosage: { amount: "1.5-6g/day", timing: "With meals. Split into 2-3 doses.", note: "Organic sulfur compound. Anti-inflammatory and antioxidant. Often combined with glucosamine and chondroitin for joint health. Effects build over 4-6 weeks." },
+    interactions: [],
+    effects: [
+      { goal: "recovery", efficacy: 3, evidence: 3, studies: 15, type: "RCT",
+        summary: "Reduces exercise-induced muscle damage, oxidative stress, and joint pain. Multiple RCTs confirm reduction in DOMS markers and improved recovery.", sources: ["PMID:27169225"] },
+      { goal: "skin",     efficacy: 2, evidence: 2, studies: 6, type: "RCT",
+        summary: "Improves skin hydration, firmness, and reduces wrinkle depth. Sulfur is essential for collagen and keratin synthesis.", sources: [] },
+    ],
+  },
+
+  {
+    id: "apple-cider-vinegar",
+    name: "Apple Cider Vinegar",
+    aliases: ["apple cider vinegar","ACV","acetic acid","mother vinegar"],
+    tier: 1, safety: 3, legal: "OTC everywhere (food product)", cost: "$3-$8/month",
+    dosage: { amount: "1-2 tablespoons (15-30ml) diluted in water, 1-3x/day", timing: "Before meals for glucose effects", note: "Always dilute in water - acetic acid damages tooth enamel and esophagus undiluted. Capsule forms available for convenience. Modest but real effects on blood glucose." },
+    interactions: ["Insulin and antidiabetics (may lower glucose further)", "Diuretics (potassium depletion risk at high doses)"],
+    effects: [
+      { goal: "weight",   efficacy: 2, evidence: 3, studies: 10, type: "RCT",
+        summary: "Japanese RCT: 750-1500mg acetic acid/day for 12 weeks reduced body weight by 1.2kg vs placebo. Modest but real effect via satiety and reduced fat accumulation.", sources: ["PMID:19661687"] },
+      { goal: "longevity",efficacy: 2, evidence: 2, studies: 8, type: "RCT",
+        summary: "Reduces post-meal blood glucose by 20-30% when taken before starchy meals. Improves insulin sensitivity in pre-diabetic patients.", sources: ["PMID:15701823"] },
+    ],
+  },
+
+  {
+    id: "injectable-b12",
+    name: "Injectable Vitamin B12 (Methylcobalamin)",
+    aliases: ["injectable B12","B12 injection","methylcobalamin injection","cyanocobalamin injection"],
+    tier: 2, safety: 4, legal: "Prescription in most EU countries. OTC in USA. Widely available online.", cost: "$20-$50/month",
+    dosage: { amount: "1mg (1000mcg) weekly or monthly intramuscular injection", timing: "Weekly for deficiency correction, monthly for maintenance", note: "Bioavailability essentially 100% vs ~1% oral absorption. Methylcobalamin preferred over cyanocobalamin. Particularly useful for those with absorption issues, vegans, or low stomach acid." },
+    interactions: ["Metformin (reduces B12 absorption - may need higher doses)"],
+    effects: [
+      { goal: "energy",   efficacy: 4, evidence: 4, studies: 25, type: "RCT",
+        summary: "Injectable B12 bypasses gut absorption entirely. Dramatically corrects B12 deficiency symptoms including fatigue, weakness, and neurological issues faster than oral supplementation.", sources: ["PMID:12643357"] },
+      { goal: "mood",     efficacy: 3, evidence: 3, studies: 12, type: "RCT",
+        summary: "B12 deficiency is a common and reversible cause of depression and cognitive decline. Injectable correction rapidly normalizes neurological B12-dependent pathways.", sources: [] },
     ],
   },
 

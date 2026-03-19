@@ -35,7 +35,7 @@ const C = {
 
 const T = {
   nav: { supplements:"Supplements", protocols:"Protocols", about:"About" },
-  controls: { search:"Search a supplement...", sortEfficacy:"Efficacy", sortEvidence:"Evidence", sortTier:"Tier", tierAll:"All Tiers", tiers:["Fundamentals","Advanced","Expert","Biohacking"], result:(n)=>`${n} result${n!==1?"s":""}`, goals:["All","Sleep","Focus","Memory","Mood","Strength","Recovery","Energy","Testosterone","Stress","Longevity","Skin","Cardio"] },
+  controls: { search:"Search a supplement...", sortEfficacy:"Efficacy", sortEvidence:"Evidence", sortTier:"Tier", tierAll:"All Tiers", tiers:["Fundamentals","Advanced","Expert","Biohacking"], result:(n)=>`${n} result${n!==1?"s":""}`, goals:["All","Sleep","Focus","Memory","Mood","Strength","Recovery","Energy","Testosterone","Stress","Longevity","Skin","Cardio","Endurance","Weight Loss","Hair Health","Liver / Detox"] },
   card: { dosage:"Dosage", interactions:"Interactions", noInteractions:"None known", negative:"NEGATIVE", efficacy:"Efficacy", evidence:"Evidence", avgEfficacy:"Avg. efficacy", avgEvidence:"Avg. evidence", safety:["","RISKY","CAUTION","CAUTION","SAFE","VERY SAFE"], studies:(n,tp)=>`${n} studies / ${tp}` },
   footer:"Data sourced from PubMed meta-analyses and Cochrane reviews. For informational purposes only. Consult a healthcare professional before supplementing.",
   noResults:"No results",

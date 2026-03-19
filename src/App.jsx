@@ -284,6 +284,7 @@ const GOAL_OPTIONS=[
 
 function StackBuilder({onUpgrade}){
   const {isPro}=useAuth();
+  const isMob=useIsMobile();
   const [goals,setGoals]=useState([]);
   const [budget,setBudget]=useState(80);
   const [existing,setExisting]=useState("");

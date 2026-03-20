@@ -20,6 +20,8 @@ export const GOALS = [
   { id: "weight",    label: "Weight Loss",      icon: "⚖️" },
   { id: "hair",      label: "Hair Health",      icon: "💈" },
   { id: "liver",     label: "Liver / Detox",    icon: "🫁" },
+  { id: "recomp",    label: "Body Recomp",      icon: "🔥" },
+  { id: "eyes",      label: "Eye Health",       icon: "👁️" },
 
 ];
 export const TIERS = {
@@ -2779,6 +2781,80 @@ export const SUPPLEMENTS = [
         summary: "Injectable B12 bypasses gut absorption entirely. Dramatically corrects B12 deficiency symptoms including fatigue, weakness, and neurological issues faster than oral supplementation.", sources: ["PMID:12643357"] },
       { goal: "mood",     efficacy: 3, evidence: 3, studies: 12, type: "RCT",
         summary: "B12 deficiency is a common and reversible cause of depression and cognitive decline. Injectable correction rapidly normalizes neurological B12-dependent pathways.", sources: [] },
+    ],
+  },
+
+
+  // ── COMPOUNDMAXXING — MISSING COMPOUNDS ──────────────────────────────────
+
+  {
+    id: "biotin",
+    name: "Biotin (Vitamin B7)",
+    aliases: ["biotin","vitamin b7","vitamin h","coenzyme r"],
+    tier: 1, safety: 5, legal: "OTC everywhere", cost: "$5-10/month",
+    dosage: { amount: "2.5-10mg/day", timing: "With meals", note: "Doses above 5mg have limited additional benefit. High doses can interfere with thyroid lab tests — inform your doctor. Best results after 3-6 months." },
+    interactions: ["Thyroid lab tests (false results at high doses)"],
+    effects: [
+      { goal: "hair", efficacy: 3, evidence: 3, studies: 18, type: "RCT",
+        summary: "Significantly improves hair growth in patients with biotin deficiency (common). RCTs show improved hair thickness and reduced shedding. Effect is most pronounced in those deficient, which is more common than assumed.", sources: ["PMID:28879195"] },
+      { goal: "skin", efficacy: 2, evidence: 2, studies: 8, type: "RCT",
+        summary: "Supports keratin infrastructure. Improves nail strength and brittleness in multiple RCTs. Skin effects less studied but mechanistically plausible.", sources: [] },
+    ],
+  },
+
+  {
+    id: "hyaluronic-acid",
+    name: "Hyaluronic Acid",
+    aliases: ["hyaluronic acid","hyaluronate","HA","sodium hyaluronate","oral HA"],
+    tier: 2, safety: 5, legal: "OTC everywhere", cost: "$15-30/month",
+    dosage: { amount: "120-240mg/day oral", timing: "With meals", note: "Oral HA is well absorbed and reaches skin tissue. Higher doses (240mg) show superior results. Topical HA has different mechanism — both can be combined." },
+    interactions: [],
+    effects: [
+      { goal: "skin", efficacy: 4, evidence: 4, studies: 20, type: "RCT",
+        summary: "Oral supplementation significantly increases skin hydration, reduces wrinkle depth, and improves skin elasticity. 60-day RCT showed 28% reduction in wrinkle area vs placebo. Strong evidence for oral bioavailability.", sources: ["PMID:25883005","PMID:33742704"] },
+    ],
+  },
+
+  {
+    id: "mastic-gum",
+    name: "Mastic Gum (Pistacia lentiscus)",
+    aliases: ["mastic gum","chios mastic","mastiha","pistacia lentiscus","jaw mastic"],
+    tier: 3, safety: 4, legal: "OTC everywhere (food supplement)", cost: "$15-30/month",
+    dosage: { amount: "350-1000mg/day", timing: "Before meals", note: "Widely used in looksmaxxing community for masseter hypertrophy via chewing. Research on jaw muscle effects is anecdotal — clinical evidence focuses on GI and anti-inflammatory benefits. Chewing raw mastic resin may have mechanical jaw training effect." },
+    interactions: [],
+    effects: [
+      { goal: "skin", efficacy: 2, evidence: 2, studies: 6, type: "RCT",
+        summary: "Anti-inflammatory and antioxidant effects. Reduces acne-causing bacteria and sebum oxidation. Some evidence for skin texture improvement.", sources: [] },
+      { goal: "longevity", efficacy: 2, evidence: 3, studies: 12, type: "RCT",
+        summary: "Potent H. pylori inhibitor. Anti-inflammatory via COX inhibition. Reduces LDL and liver enzymes in metabolic syndrome patients.", sources: ["PMID:20487209"] },
+    ],
+  },
+
+  {
+    id: "lutein-zeaxanthin",
+    name: "Lutein + Zeaxanthin",
+    aliases: ["lutein","zeaxanthin","marigold extract","macular pigment","eye carotenoids"],
+    tier: 1, safety: 5, legal: "OTC everywhere", cost: "$10-20/month",
+    dosage: { amount: "Lutein 10-20mg + Zeaxanthin 2mg/day", timing: "With fat-containing meal for absorption", note: "Carotenoids are fat-soluble. Take with avocado, olive oil, or eggs. Blood levels take 4-6 weeks to stabilize. Egg yolks are a natural source." },
+    interactions: [],
+    effects: [
+      { goal: "skin", efficacy: 2, evidence: 3, studies: 10, type: "RCT",
+        summary: "Protects skin from UV-induced damage and photoaging. Improves skin hydration and elasticity. Particularly beneficial for periorbital skin (under-eye area).", sources: ["PMID:16614420"] },
+      { goal: "longevity", efficacy: 3, evidence: 4, studies: 30, type: "RCT + Meta-analyses",
+        summary: "Protects macular pigment and reduces age-related macular degeneration risk by 25-40%. FDA-qualified health claim. Strong evidence for eye health and visual performance.", sources: ["PMID:26447482"] },
+    ],
+  },
+
+  {
+    id: "pumpkin-seed-oil",
+    name: "Pumpkin Seed Oil",
+    aliases: ["pumpkin seed oil","cucurbita pepo","PSO","beta-sitosterol pumpkin"],
+    tier: 2, safety: 5, legal: "OTC everywhere", cost: "$15-25/month",
+    dosage: { amount: "400-1000mg/day", timing: "With meals, split 2x", note: "Natural source of beta-sitosterol and delta-7 sterols. Inhibits 5-alpha reductase mildly. Less potent than finasteride but with excellent safety profile and no sexual side effects documented." },
+    interactions: [],
+    effects: [
+      { goal: "hair", efficacy: 3, evidence: 3, studies: 5, type: "RCT",
+        summary: "Korean double-blind RCT: 400mg/day for 24 weeks increased hair count by 40% vs 10% in placebo group in men with androgenetic alopecia. Inhibits 5-alpha reductase, reducing scalp DHT.", sources: ["PMID:24864154"] },
     ],
   },
 

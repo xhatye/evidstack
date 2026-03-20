@@ -16,6 +16,7 @@ const ROUTES = {
   "/tracker":"tracker",
   "/about":"about",
   "/legal":"legal",
+  "/compoundmaxxing":"compoundmaxxing",
 };
 
 function getPageFromPath(){
@@ -39,7 +40,7 @@ const C = {
 
 const T = {
   nav: { supplements:"Supplements", protocols:"Protocols", about:"About" },
-  controls: { search:"Search a supplement...", sortEfficacy:"Efficacy", sortEvidence:"Evidence", sortTier:"Tier", tierAll:"All Tiers", tiers:["Fundamentals","Advanced","Expert","Biohacking"], result:(n)=>`${n} result${n!==1?"s":""}`, goals:["All","Sleep","Focus","Memory","Mood","Strength","Recovery","Energy","Testosterone","Stress","Longevity","Skin","Cardio","Weight Loss","Hair Health","Liver / Detox"] },
+  controls: { search:"Search a supplement...", sortEfficacy:"Efficacy", sortEvidence:"Evidence", sortTier:"Tier", tierAll:"All Tiers", tiers:["Fundamentals","Advanced","Expert","Biohacking"], result:(n)=>`${n} result${n!==1?"s":""}`, goals:["All","Sleep","Focus","Memory","Mood","Strength","Recovery","Energy","Testosterone","Stress","Longevity","Skin","Cardio","Weight Loss","Hair Health","Liver / Detox","Body Recomp","Eye Health"] },
   card: { dosage:"Dosage", interactions:"Interactions", noInteractions:"None known", negative:"NEGATIVE", efficacy:"Efficacy", evidence:"Evidence", avgEfficacy:"Avg. efficacy", avgEvidence:"Avg. evidence", safety:["","RISKY","CAUTION","CAUTION","SAFE","VERY SAFE"], studies:(n,tp)=>`${n} studies / ${tp}` },
   footer:"Data sourced from PubMed meta-analyses and Cochrane reviews. For informational purposes only. Consult a healthcare professional before supplementing.",
   noResults:"No results",
@@ -872,6 +873,269 @@ function MyTracker({onUpgrade}){
   );
 }
 
+/* COMPOUNDMAXXING */
+function CompoundmaxxingPage({onUpgrade,onNavigate}){
+  const {isPro}=useAuth();
+  const isMob=useIsMobile();
+
+  const stacks=[
+    {
+      id:"healing-beginner",
+      category:"Healing",
+      level:"Beginner",
+      name:"The Gold Standard Healing Stack",
+      desc:"Comprehensive tissue repair from two complementary pathways. BPC-157 works systemically on soft tissue, TB-500 on structural repair and angiogenesis.",
+      compounds:["BPC-157","TB-500"],
+      color:"#16a34a",
+      icon:"🩹",
+      note:"Inject subcutaneously or IM. Cycle 8-12 weeks, assess results.",
+    },
+    {
+      id:"healing-advanced",
+      category:"Healing",
+      level:"Advanced",
+      name:"Complete Recovery Stack",
+      desc:"Maximum healing support with GH enhancement. GHK-Cu adds cellular regeneration and collagen synthesis. Ipamorelin pulses GH for accelerated tissue repair.",
+      compounds:["BPC-157","TB-500","GHK-Cu","Ipamorelin"],
+      color:"#16a34a",
+      icon:"🧬",
+      note:"Run Ipamorelin at night, peptides morning and evening.",
+    },
+    {
+      id:"gh-beginner",
+      category:"GH Release",
+      level:"Beginner",
+      name:"Ipamorelin + CJC-1295",
+      desc:"Classic GHRP + GHRH combination. Synergistic GH release without disrupting natural pulsatile patterns. The most popular GH peptide stack for a reason.",
+      compounds:["Ipamorelin","CJC-1295 (no DAC)"],
+      color:"#7c3aed",
+      icon:"📈",
+      note:"Inject 30 min before sleep on empty stomach for maximum GH pulse.",
+    },
+    {
+      id:"gh-advanced",
+      category:"GH Release",
+      level:"Advanced",
+      name:"Full GH Optimization",
+      desc:"Comprehensive GH optimization combining pulsatile release (Ipamorelin + CJC) with sustained elevation (MK-677). Covers all GH secretion mechanisms.",
+      compounds:["Ipamorelin","CJC-1295 (no DAC)","MK-677"],
+      color:"#7c3aed",
+      icon:"🚀",
+      note:"MK-677 orally before bed, peptides injected 2-3x daily. Expect significant water retention initially.",
+    },
+    {
+      id:"weightloss-advanced",
+      category:"Weight Loss",
+      level:"Advanced",
+      name:"Semaglutide + Tesamorelin",
+      desc:"Appetite control + visceral fat targeting for comprehensive body recomposition. Tesamorelin specifically reduces visceral adipose tissue — FDA approved for HIV lipodystrophy.",
+      compounds:["Semaglutide","Tesamorelin"],
+      color:"#d97706",
+      icon:"⚖️",
+      note:"Requires prescription in most countries. Medical supervision strongly recommended.",
+    },
+    {
+      id:"weightloss-beginner",
+      category:"Weight Loss",
+      level:"Beginner",
+      name:"GLP-1 + AOD-9604",
+      desc:"Appetite management with HGH-fragment fat metabolism support. AOD-9604 is the lipolytic fragment of HGH without anabolic effects — excellent safety profile.",
+      compounds:["Semaglutide","AOD-9604"],
+      color:"#d97706",
+      icon:"🔥",
+      note:"AOD-9604 injected subcutaneously 250-500mcg/day, separate from Semaglutide timing.",
+    },
+    {
+      id:"longevity-advanced",
+      category:"Anti-Aging",
+      level:"Advanced",
+      name:"Longevity Peptide Stack",
+      desc:"Multi-target approach: Epithalon activates telomerase for telomere maintenance, BPC-157 provides systemic repair, GHK-Cu drives cellular regeneration and collagen synthesis.",
+      compounds:["Epithalon","BPC-157","GHK-Cu"],
+      color:"#dc2626",
+      icon:"♾️",
+      note:"Epithalon typically cycled 10-20 days, 1-2x per year. Others can be run continuously.",
+    },
+    {
+      id:"cognitive-longevity",
+      category:"Cognitive",
+      level:"Advanced",
+      name:"Cognitive Longevity Stack",
+      desc:"Neuroprotection, cognitive enhancement, and longevity support. Semax drives BDNF and cognitive performance, Selank reduces anxiety without sedation, Epithalon addresses neurological aging.",
+      compounds:["Semax","Selank","Epithalon"],
+      color:"#2563eb",
+      icon:"🧠",
+      note:"Semax and Selank can be administered as nasal sprays. Epithalon subcutaneous.",
+    },
+  ];
+
+  const looksStacks=[
+    {
+      id:"skin-peptide",
+      category:"Skin",
+      level:"Beginner",
+      name:"Skin Peptide Protocol",
+      desc:"GHK-Cu drives collagen and elastin synthesis. Epithalon addresses cellular aging. Combined with oral Hyaluronic Acid for maximum skin quality.",
+      compounds:["GHK-Cu","Hyaluronic Acid","Astaxanthin"],
+      color:"#ec4899",
+      icon:"✨",
+      note:"GHK-Cu topical or injectable. HA oral 120-240mg/day. Astaxanthin 12mg/day.",
+    },
+    {
+      id:"hair-stack",
+      category:"Hair",
+      level:"Advanced",
+      name:"Hair Retention Stack",
+      desc:"Multi-mechanism DHT blocking combined with follicle stimulation. Finasteride inhibits 5-AR systemically, Pumpkin Seed Oil adds topical DHT inhibition, Minoxidil stimulates follicles directly.",
+      compounds:["Finasteride","Minoxidil","Pumpkin Seed Oil","Biotin"],
+      color:"#f59e0b",
+      icon:"💈",
+      note:"Finasteride requires prescription. Blood work recommended before starting. Results in 6-12 months.",
+    },
+    {
+      id:"face-recomp",
+      category:"Face Recomp",
+      level:"Beginner",
+      name:"Face Fat Protocol",
+      desc:"GLP-1 for systemic fat loss with bias toward facial fat. Tesamorelin specifically targets visceral and subcutaneous fat. Collagen supports skin elasticity during fat loss.",
+      compounds:["Semaglutide","Collagen Peptides","Pycnogenol"],
+      color:"#06b6d4",
+      icon:"💆",
+      note:"Lose face fat gradually — too rapid loss causes loose skin. Collagen counters this.",
+    },
+  ];
+
+  const categories=[...new Set(stacks.map(s=>s.category))];
+  const [activeCategory,setActiveCategory]=useState("All");
+
+  const filtered = activeCategory==="All" ? stacks : stacks.filter(s=>s.category===activeCategory);
+
+  const levelColor={Beginner:C.green,Advanced:C.purple};
+
+  return(
+    <div style={{minHeight:"60vh"}}>
+      {/* Hero */}
+      <div style={{background:C.ink,padding:isMob?"40px 16px":"64px 48px"}}>
+        <div style={{maxWidth:960,margin:"0 auto"}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".2em",color:C.gold,margin:"0 0 10px",textTransform:"uppercase"}}>Evidstack — Compoundmaxxing</p>
+          <h1 style={{fontSize:isMob?28:48,fontWeight:900,letterSpacing:"-.04em",color:C.white,margin:"0 0 16px",lineHeight:1.05}}>Peptide stacks.<br/>Evidence-based.</h1>
+          <p style={{fontSize:isMob?13:15,color:"#9ca3af",margin:"0 0 32px",maxWidth:580,lineHeight:1.8}}>
+            Every stack curated from published research and clinical data. Dosing, timing, mechanisms — no bro science.
+          </p>
+          <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
+            {[["180+","compounds"],["Peptides","fully documented"],["PubMed","primary source"]].map(([val,label])=>(
+              <div key={label} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 20px",border:"1px solid #374151"}}>
+                <span style={{fontSize:14,fontWeight:900,color:C.white}}>{val}</span>
+                <span style={{fontSize:11,color:"#6b7280"}}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Looksmaxxing stacks */}
+      <div style={{padding:isMob?"32px 16px":"48px 48px",borderBottom:`1px solid ${C.border}`}}>
+        <div style={{maxWidth:960,margin:"0 auto"}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 8px",textTransform:"uppercase"}}>Aesthetics protocols</p>
+          <h2 style={{fontSize:isMob?22:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 24px"}}>Looksmaxxing stacks.</h2>
+          <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"repeat(3,1fr)",gap:16,marginBottom:16}}>
+            {looksStacks.map(s=>(
+              <div key={s.id} style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${s.color}`}}>
+                <div style={{padding:"20px 20px 16px"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+                    <span style={{fontSize:24}}>{s.icon}</span>
+                    <div style={{display:"flex",gap:6}}>
+                      <span style={{fontSize:8,fontWeight:800,color:levelColor[s.level],border:`1px solid ${levelColor[s.level]}`,padding:"2px 7px",letterSpacing:".08em"}}>{s.level.toUpperCase()}</span>
+                      <span style={{fontSize:8,fontWeight:800,color:s.color,background:`${s.color}12`,border:`1px solid ${s.color}30`,padding:"2px 7px",letterSpacing:".06em"}}>{s.category.toUpperCase()}</span>
+                    </div>
+                  </div>
+                  <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:"0 0 8px",letterSpacing:"-.02em"}}>{s.name}</p>
+                  <p style={{fontSize:11,color:C.gray,lineHeight:1.6,margin:"0 0 14px"}}>{s.desc}</p>
+                  <div style={{display:"flex",flexDirection:"column",gap:5,marginBottom:12}}>
+                    {s.compounds.map(c=>(
+                      <div key={c} style={{display:"flex",alignItems:"center",gap:8}}>
+                        <span style={{width:4,height:4,background:s.color,borderRadius:2,flexShrink:0}}/>
+                        <span style={{fontSize:11,fontWeight:700,color:C.ink}}>{c}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{padding:"8px 10px",background:C.bg,borderLeft:`2px solid ${s.color}`}}>
+                    <p style={{fontSize:10,color:C.gray,margin:0,lineHeight:1.5}}>{s.note}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Peptide stacks */}
+      <div style={{padding:isMob?"32px 16px":"48px 48px"}}>
+        <div style={{maxWidth:960,margin:"0 auto"}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 8px",textTransform:"uppercase"}}>Peptide protocols</p>
+          <h2 style={{fontSize:isMob?22:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 24px"}}>Research stacks.</h2>
+
+          {/* Category filter */}
+          <div style={{display:"flex",gap:0,marginBottom:28,overflowX:"auto"}}>
+            {["All",...categories].map(cat=>(
+              <button key={cat} onClick={()=>setActiveCategory(cat)}
+                style={{padding:"9px 18px",fontSize:11,fontWeight:700,background:activeCategory===cat?C.ink:"transparent",color:activeCategory===cat?C.white:C.gray,border:`1px solid ${C.border}`,marginLeft:-1,cursor:"pointer",fontFamily:"Montserrat,sans-serif",whiteSpace:"nowrap"}}>
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:16}}>
+            {filtered.map(s=>(
+              <div key={s.id} style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${s.color}`}}>
+                <div style={{padding:"22px 22px 18px"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+                    <span style={{fontSize:26}}>{s.icon}</span>
+                    <div style={{display:"flex",gap:6}}>
+                      <span style={{fontSize:8,fontWeight:800,color:levelColor[s.level],border:`1px solid ${levelColor[s.level]}`,padding:"2px 7px",letterSpacing:".08em"}}>{s.level.toUpperCase()}</span>
+                      <span style={{fontSize:8,fontWeight:800,color:s.color,background:`${s.color}12`,border:`1px solid ${s.color}30`,padding:"2px 7px",letterSpacing:".06em"}}>{s.category.toUpperCase()}</span>
+                    </div>
+                  </div>
+                  <p style={{fontSize:15,fontWeight:900,color:C.ink,margin:"0 0 8px",letterSpacing:"-.02em"}}>{s.name}</p>
+                  <p style={{fontSize:12,color:C.gray,lineHeight:1.7,margin:"0 0 14px"}}>{s.desc}</p>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12}}>
+                    {s.compounds.map(c=>(
+                      <span key={c} style={{fontSize:10,fontWeight:700,color:C.ink,background:C.bg,border:`1px solid ${C.border}`,padding:"4px 10px"}}>{c}</span>
+                    ))}
+                  </div>
+                  <div style={{padding:"8px 12px",background:`${s.color}08`,borderLeft:`2px solid ${s.color}50`}}>
+                    <p style={{fontSize:10,color:C.gray,margin:0,lineHeight:1.5,fontStyle:"italic"}}>{s.note}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Pro CTA */}
+          {!isPro&&(
+            <div style={{marginTop:32,padding:"28px 32px",background:C.ink,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16}}>
+              <div>
+                <p style={{fontSize:14,fontWeight:900,color:C.white,margin:"0 0 4px"}}>Unlock the full database + AI Stack Builder.</p>
+                <p style={{fontSize:12,color:"#9ca3af",margin:0}}>All 180+ compounds with dosing, interactions, and evidence scores.</p>
+              </div>
+              <button onClick={onUpgrade} style={{padding:"12px 28px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>
+                Upgrade to Pro
+              </button>
+            </div>
+          )}
+
+          {/* Disclaimer */}
+          <div style={{marginTop:24,padding:"14px 16px",background:C.bg,border:`1px solid ${C.border}`}}>
+            <p style={{fontSize:10,color:C.gray,margin:0,lineHeight:1.6}}>
+              <strong>Research purposes only.</strong> Peptides listed are unscheduled research compounds in most jurisdictions. This is not medical advice. Some compounds require prescriptions in certain countries. Always consult a qualified healthcare provider before starting any peptide protocol.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* COMPARE MODAL */
 function CompareModal({compA,compB,onClose}){
   const isMob=useIsMobile();
@@ -1567,6 +1831,7 @@ function AppInner(){
   const navItems=[
     {id:"supplements",label:"Supplements"},
     {id:"protocols",label:"Protocols"},
+    {id:"compoundmaxxing",label:"Compoundmaxxing"},
     {id:"about",label:"About"},
   ];
   const proTools=[
@@ -1696,6 +1961,7 @@ function AppInner(){
       </nav>
 
       {page==="about"         &&<AboutPage/>}
+      {page==="compoundmaxxing"&&<CompoundmaxxingPage onUpgrade={openUpgrade} onNavigate={navigateTo}/>}
       {page==="legal"          &&<LegalPage/>}
       {page==="interactions"   &&<InteractionChecker onUpgrade={openUpgrade}/>}
       {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}

@@ -1257,7 +1257,7 @@ function AccountCenter({onClose,onUpgrade}){
   };
 
   const inputStyle={width:"100%",padding:"10px 12px",border:`1px solid ${C.border}`,marginBottom:8,fontSize:12,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"};
-  const tabs=[{id:"overview",label:"Overview"},{id:"security",label:"Security"}];
+  const tabs=[{id:"overview",label:"Overview"},{id:"billing",label:"Billing"},{id:"security",label:"Security"}];
 
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
@@ -1331,6 +1331,69 @@ function AccountCenter({onClose,onUpgrade}){
                 style={{width:"100%",padding:"11px",background:"transparent",border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,color:C.gray,cursor:"pointer",letterSpacing:".04em"}}>
                 Sign out
               </button>
+            </div>
+          )}
+
+          {tab==="billing"&&(
+            <div>
+              {/* Comparison table */}
+              <div style={{marginBottom:24}}>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",marginBottom:0}}>
+                  {/* Header */}
+                  <div style={{padding:"12px 14px",background:C.bg,border:`1px solid ${C.border}`,borderRight:"none"}}/>
+                  <div style={{padding:"12px 14px",background:C.bg,border:`1px solid ${C.border}`,borderRight:"none",textAlign:"center"}}>
+                    <p style={{fontSize:10,fontWeight:800,color:C.gray,margin:0,letterSpacing:".1em",textTransform:"uppercase"}}>Free</p>
+                  </div>
+                  <div style={{padding:"12px 14px",background:C.ink,border:`1px solid ${C.ink}`,textAlign:"center"}}>
+                    <p style={{fontSize:10,fontWeight:800,color:C.gold,margin:0,letterSpacing:".1em",textTransform:"uppercase"}}>Pro</p>
+                  </div>
+                </div>
+                {[
+                  {feature:"Compounds",free:"Tier 1 only (33)",pro:"All 175+",highlight:true},
+                  {feature:"Peptides & GLP-1s",free:false,pro:true,highlight:false},
+                  {feature:"Biohacking tier",free:false,pro:true,highlight:false},
+                  {feature:"AI Stack Builder",free:false,pro:true,highlight:true},
+                  {feature:"Interaction Checker",free:false,pro:true,highlight:false},
+                  {feature:"Weekly Protocol AI",free:false,pro:true,highlight:false},
+                  {feature:"My Tracker",free:false,pro:true,highlight:false},
+                  {feature:"Compare compounds",free:false,pro:true,highlight:false},
+                  {feature:"Save your stacks",free:false,pro:true,highlight:true},
+                  {feature:"Price",free:"$0",pro:"$9.99/mo or $6.58/mo yearly",highlight:false},
+                ].map((row,i)=>(
+                  <div key={row.feature} style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr"}}>
+                    <div style={{padding:"11px 14px",background:row.highlight?`${C.gold}0a`:C.white,border:`1px solid ${C.border}`,borderTop:"none",borderRight:"none"}}>
+                      <span style={{fontSize:11,fontWeight:row.highlight?800:600,color:C.ink}}>{row.feature}</span>
+                    </div>
+                    <div style={{padding:"11px 14px",background:row.highlight?`${C.gold}0a`:C.white,border:`1px solid ${C.border}`,borderTop:"none",borderRight:"none",textAlign:"center"}}>
+                      {typeof row.free==="boolean"
+                        ?<span style={{fontSize:13,color:row.free?C.green:C.border}}>{row.free?"✓":"—"}</span>
+                        :<span style={{fontSize:11,fontWeight:600,color:C.gray}}>{row.free}</span>}
+                    </div>
+                    <div style={{padding:"11px 14px",background:row.highlight?`${C.gold}15`:C.ink,border:`1px solid ${C.ink}`,borderTop:"none",textAlign:"center"}}>
+                      {typeof row.pro==="boolean"
+                        ?<span style={{fontSize:13,color:row.pro?C.gold:"#374151"}}>{row.pro?"✓":"—"}</span>
+                        :<span style={{fontSize:11,fontWeight:700,color:row.highlight?C.gold:C.white}}>{row.pro}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {!isPro&&(
+                <div>
+                  <button onClick={()=>{onClose();onUpgrade();}}
+                    style={{width:"100%",padding:"14px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:900,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",marginBottom:8}}>
+                    Upgrade to Pro
+                  </button>
+                  <p style={{fontSize:11,color:C.gray,textAlign:"center",margin:0}}>Cancel anytime. No questions asked.</p>
+                </div>
+              )}
+
+              {isPro&&(
+                <div style={{padding:"16px",background:`${C.green}0a`,border:`1px solid ${C.green}20`,textAlign:"center"}}>
+                  <p style={{fontSize:12,fontWeight:800,color:C.green,margin:"0 0 4px"}}>You are a Pro member</p>
+                  <p style={{fontSize:11,color:C.gray,margin:0}}>Full access to all features. To manage your subscription, contact hello@evidstack.com</p>
+                </div>
+              )}
             </div>
           )}
 

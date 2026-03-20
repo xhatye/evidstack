@@ -5,6 +5,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  sendPasswordResetEmail,
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db, googleProvider } from "./firebase.js";
@@ -12,7 +16,7 @@ import { auth, db, googleProvider } from "./firebase.js";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user,    setUser]    = useState(undefined); // undefined = loading
+  const [user,    setUser]    = useState(undefined);
   const [isPro,   setIsPro]   = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -20,22 +24,15 @@ export function AuthProvider({ children }) {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
-        // Fetch pro status from Firestore
         const ref  = doc(db, "users", firebaseUser.uid);
         const snap = await getDoc(ref);
         if (snap.exists()) {
           const data = snap.data();
           const now  = Date.now();
-          const pro  = data.isPro === true &&
-            (!data.proExpiresAt || data.proExpiresAt > now);
+          const pro  = data.isPro === true && (!data.proExpiresAt || data.proExpiresAt > now);
           setIsPro(pro);
         } else {
-          // Create user doc on first sign in
-          await setDoc(ref, {
-            email:     firebaseUser.email,
-            createdAt: Date.now(),
-            isPro:     false,
-          });
+          await setDoc(ref, { email: firebaseUser.email, createdAt: Date.now(), isPro: false });
           setIsPro(false);
         }
       } else {
@@ -47,13 +44,19 @@ export function AuthProvider({ children }) {
     return unsub;
   }, []);
 
-  const loginEmail  = (email, pw) => signInWithEmailAndPassword(auth, email, pw);
-  const signupEmail = (email, pw) => createUserWithEmailAndPassword(auth, email, pw);
-  const loginGoogle = ()          => signInWithPopup(auth, googleProvider);
-  const logout      = ()          => signOut(auth);
+  const loginEmail   = (email, pw) => signInWithEmailAndPassword(auth, email, pw);
+  const signupEmail  = (email, pw) => createUserWithEmailAndPassword(auth, email, pw);
+  const loginGoogle  = ()          => signInWithPopup(auth, googleProvider);
+  const logout       = ()          => signOut(auth);
+  const resetPassword = (email)    => sendPasswordResetEmail(auth, email);
+  const changePassword = async (currentPw, newPw) => {
+    const cred = EmailAuthProvider.credential(auth.currentUser.email, currentPw);
+    await reauthenticateWithCredential(auth.currentUser, cred);
+    await updatePassword(auth.currentUser, newPw);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, isPro, loading, loginEmail, signupEmail, loginGoogle, logout }}>
+    <AuthContext.Provider value={{ user, isPro, loading, loginEmail, signupEmail, loginGoogle, logout, resetPassword, changePassword }}>
       {children}
     </AuthContext.Provider>
   );

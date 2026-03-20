@@ -64,56 +64,98 @@ function WaitlistForm(){
 
 /* AUTH MODAL */
 function AuthModal({onClose,initialMode="login"}){
-  const {loginEmail,signupEmail,loginGoogle}=useAuth();
-  const [mode,setMode]=useState(initialMode);
+  const {loginEmail,signupEmail,loginGoogle,resetPassword}=useAuth();
+  const [mode,setMode]=useState(initialMode); // login | signup | forgot
   const [email,setEmail]=useState("");
   const [pw,setPw]=useState("");
+  const [pw2,setPw2]=useState("");
   const [error,setError]=useState("");
+  const [info,setInfo]=useState("");
   const [loading,setLoading]=useState(false);
+
+  const switchMode=(m)=>{setMode(m);setError("");setInfo("");setPw("");setPw2("");};
+
   const submit=async()=>{
-    setError("");setLoading(true);
+    setError("");setInfo("");
+    if(mode==="signup"&&pw!==pw2){setError("Passwords do not match.");return;}
+    if(mode==="signup"&&pw.length<6){setError("Password must be at least 6 characters.");return;}
+    setLoading(true);
     try{
       if(mode==="login")await loginEmail(email,pw);
-      else await signupEmail(email,pw);
+      else if(mode==="signup")await signupEmail(email,pw);
       onClose();
     }catch(e){
       setError(e.code==="auth/invalid-credential"?"Incorrect email or password.":
-               e.code==="auth/email-already-in-use"?"Email already registered.":
+               e.code==="auth/email-already-in-use"?"This email is already registered.":
                e.code==="auth/weak-password"?"Password must be at least 6 characters.":
+               e.code==="auth/invalid-email"?"Invalid email address.":
                "Something went wrong. Try again.");
     }finally{setLoading(false);}
   };
+
+  const submitForgot=async()=>{
+    if(!email.includes("@")){setError("Enter a valid email address.");return;}
+    setLoading(true);setError("");
+    try{
+      await resetPassword(email);
+      setInfo("Password reset email sent. Check your inbox.");
+    }catch(e){
+      setError(e.code==="auth/user-not-found"?"No account found with this email.":"Something went wrong.");
+    }finally{setLoading(false);}
+  };
+
   const google=async()=>{
     setError("");setLoading(true);
     try{await loginGoogle();onClose();}
     catch(e){setError("Google sign-in failed.");setLoading(false);}
   };
+
+  const inputStyle={width:"100%",padding:"11px 14px",border:`1px solid ${C.border}`,marginBottom:10,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"};
+
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
       <div onClick={e=>e.stopPropagation()} style={{background:C.white,width:"100%",maxWidth:400,padding:"40px 36px",position:"relative"}}>
         <button onClick={onClose} style={{position:"absolute",top:16,right:16,background:"none",border:"none",fontSize:20,cursor:"pointer",color:C.gray}}>x</button>
         <p style={{fontSize:9,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 8px",textTransform:"uppercase"}}>Evidstack</p>
-        <h2 style={{fontSize:24,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 24px"}}>{mode==="login"?"Sign in":"Create account"}</h2>
-        <button onClick={google} disabled={loading} style={{width:"100%",padding:"12px",display:"flex",alignItems:"center",justifyContent:"center",gap:10,border:`1px solid ${C.border}`,background:C.white,cursor:"pointer",fontSize:13,fontWeight:700,marginBottom:20,fontFamily:"Montserrat,sans-serif"}}>
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Continue with Google
-        </button>
-        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
-          <div style={{flex:1,height:1,background:C.border}}/><span style={{fontSize:11,color:C.gray}}>or</span><div style={{flex:1,height:1,background:C.border}}/>
-        </div>
-        <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" type="email"
-          style={{width:"100%",padding:"11px 14px",border:`1px solid ${C.border}`,marginBottom:10,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"}}/>
-        <input value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()} placeholder="Password" type="password"
-          style={{width:"100%",padding:"11px 14px",border:`1px solid ${C.border}`,marginBottom:16,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"}}/>
+        <h2 style={{fontSize:24,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 24px"}}>
+          {mode==="login"?"Sign in":mode==="signup"?"Create account":"Reset password"}
+        </h2>
+
+        {mode!=="forgot"&&<>
+          <button onClick={google} disabled={loading} style={{width:"100%",padding:"12px",display:"flex",alignItems:"center",justifyContent:"center",gap:10,border:`1px solid ${C.border}`,background:C.white,cursor:"pointer",fontSize:13,fontWeight:700,marginBottom:20,fontFamily:"Montserrat,sans-serif"}}>
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continue with Google
+          </button>
+          <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
+            <div style={{flex:1,height:1,background:C.border}}/><span style={{fontSize:11,color:C.gray}}>or</span><div style={{flex:1,height:1,background:C.border}}/>
+          </div>
+        </>}
+
+        <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" type="email" style={inputStyle}/>
+
+        {mode!=="forgot"&&<>
+          <input value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&(mode==="login"?submit():null)} placeholder="Password" type="password" style={inputStyle}/>
+          {mode==="signup"&&<input value={pw2} onChange={e=>setPw2(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()} placeholder="Confirm password" type="password" style={{...inputStyle,marginBottom:mode==="login"?0:10}}/>}
+        </>}
+
+        {mode==="login"&&(
+          <div style={{textAlign:"right",marginBottom:16,marginTop:2}}>
+            <span onClick={()=>switchMode("forgot")} style={{fontSize:11,color:C.gray,cursor:"pointer",textDecoration:"underline"}}>Forgot password?</span>
+          </div>
+        )}
+
         {error&&<p style={{fontSize:12,color:C.red,margin:"0 0 12px"}}>{error}</p>}
-        <button onClick={submit} disabled={loading} style={{width:"100%",padding:"13px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif"}}>
-          {loading?"...":(mode==="login"?"Sign in":"Create account")}
+        {info&&<p style={{fontSize:12,color:C.green,margin:"0 0 12px"}}>{info}</p>}
+
+        <button onClick={mode==="forgot"?submitForgot:submit} disabled={loading}
+          style={{width:"100%",padding:"13px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",marginTop:mode==="login"?0:6}}>
+          {loading?"...":(mode==="login"?"Sign in":mode==="signup"?"Create account":"Send reset email")}
         </button>
+
         <p style={{fontSize:12,color:C.gray,textAlign:"center",margin:"16px 0 0"}}>
-          {mode==="login"?"No account? ":"Already have one? "}
-          <span onClick={()=>setMode(mode==="login"?"signup":"login")} style={{color:C.ink,fontWeight:700,cursor:"pointer",textDecoration:"underline"}}>
-            {mode==="login"?"Sign up":"Sign in"}
-          </span>
+          {mode==="login"&&<>No account? <span onClick={()=>switchMode("signup")} style={{color:C.ink,fontWeight:700,cursor:"pointer",textDecoration:"underline"}}>Sign up</span></>}
+          {mode==="signup"&&<>Already have an account? <span onClick={()=>switchMode("login")} style={{color:C.ink,fontWeight:700,cursor:"pointer",textDecoration:"underline"}}>Sign in</span></>}
+          {mode==="forgot"&&<><span onClick={()=>switchMode("login")} style={{color:C.ink,fontWeight:700,cursor:"pointer",textDecoration:"underline"}}>&larr; Back to sign in</span></>}
         </p>
       </div>
     </div>
@@ -556,6 +598,142 @@ function ProtocolsPage({onGoToSupplements}){
   );
 }
 
+/* ACCOUNT CENTER */
+function AccountCenter({onClose,onUpgrade}){
+  const {user,isPro,logout,changePassword}=useAuth();
+  const isMob=useIsMobile();
+  const [tab,setTab]=useState("overview"); // overview | security
+  const [oldPw,setOldPw]=useState("");
+  const [newPw,setNewPw]=useState("");
+  const [newPw2,setNewPw2]=useState("");
+  const [pwError,setPwError]=useState("");
+  const [pwSuccess,setPwSuccess]=useState("");
+  const [pwLoading,setPwLoading]=useState(false);
+  const isGoogle=user?.providerData?.[0]?.providerId==="google.com";
+
+  const handleChangePw=async()=>{
+    setPwError("");setPwSuccess("");
+    if(newPw!==newPw2){setPwError("New passwords do not match.");return;}
+    if(newPw.length<6){setPwError("Password must be at least 6 characters.");return;}
+    setPwLoading(true);
+    try{
+      await changePassword(oldPw,newPw);
+      setPwSuccess("Password updated successfully.");
+      setOldPw("");setNewPw("");setNewPw2("");
+    }catch(e){
+      setPwError(e.code==="auth/wrong-password"||e.code==="auth/invalid-credential"?"Current password is incorrect.":"Something went wrong.");
+    }finally{setPwLoading(false);}
+  };
+
+  const inputStyle={width:"100%",padding:"10px 12px",border:`1px solid ${C.border}`,marginBottom:8,fontSize:12,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"};
+  const tabs=[{id:"overview",label:"Overview"},{id:"security",label:"Security"}];
+
+  return(
+    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:C.white,width:"100%",maxWidth:480,position:"relative",maxHeight:"90vh",overflow:"auto"}}>
+        <div style={{padding:"24px 28px 0",borderBottom:`1px solid ${C.border}`}}>
+          <button onClick={onClose} style={{position:"absolute",top:16,right:20,background:"none",border:"none",fontSize:20,cursor:"pointer",color:C.gray}}>x</button>
+          <p style={{fontSize:9,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 4px",textTransform:"uppercase"}}>Account</p>
+          <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:"0 0 20px",letterSpacing:"-.02em"}}>{user?.email}</p>
+          <div style={{display:"flex",gap:0}}>
+            {tabs.map(t=>(
+              <button key={t.id} onClick={()=>setTab(t.id)}
+                style={{padding:"10px 18px",fontSize:11,fontWeight:700,background:"transparent",color:tab===t.id?C.ink:C.gray,border:"none",borderBottom:tab===t.id?`2px solid ${C.ink}`:"2px solid transparent",cursor:"pointer",letterSpacing:".04em"}}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{padding:"28px"}}>
+          {tab==="overview"&&(
+            <div>
+              {/* Plan status */}
+              <div style={{background:isPro?C.ink:C.bg,border:`1px solid ${isPro?C.ink:C.border}`,padding:"20px 22px",marginBottom:16}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                  <span style={{fontSize:11,fontWeight:800,letterSpacing:".12em",color:isPro?C.gold:C.gray}}>{isPro?"PRO MEMBER":"FREE PLAN"}</span>
+                  {!isPro&&<button onClick={()=>{onClose();onUpgrade();}} style={{padding:"6px 14px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
+                </div>
+                <p style={{fontSize:12,color:isPro?"#9ca3af":C.gray,margin:0,lineHeight:1.6}}>
+                  {isPro?"Full access to all 175+ compounds, peptides, GLP-1s, and AI Stack Builder.":"Tier 1 compounds only. Upgrade to unlock all 175+ compounds and AI Stack Builder."}
+                </p>
+              </div>
+
+              {/* Account info */}
+              <div style={{marginBottom:16}}>
+                <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Account Info</p>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                  {[
+                    ["Email",user?.email||"—"],
+                    ["Sign-in method",isGoogle?"Google":"Email / Password"],
+                    ["Member since",user?.metadata?.creationTime?new Date(user.metadata.creationTime).toLocaleDateString("en-GB",{month:"short",year:"numeric"}):"—"],
+                    ["Plan",isPro?"Evidstack Pro":"Free"],
+                  ].map(([label,value])=>(
+                    <div key={label} style={{background:C.bg,padding:"12px 14px"}}>
+                      <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 4px",textTransform:"uppercase"}}>{label}</p>
+                      <p style={{fontSize:12,fontWeight:700,color:C.ink,margin:0,wordBreak:"break-all"}}>{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick links */}
+              <div style={{marginBottom:20}}>
+                <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Quick Links</p>
+                <div style={{display:"flex",flexDirection:"column",gap:1}}>
+                  {[
+                    {label:"AI Stack Builder",action:()=>{onClose();}},
+                    {label:"Browse all compounds",action:()=>{onClose();}},
+                    {label:"Terms & Privacy",action:()=>{onClose();}},
+                  ].map(item=>(
+                    <button key={item.label} onClick={item.action}
+                      style={{padding:"11px 14px",background:C.bg,border:"none",fontSize:12,fontWeight:600,color:C.ink,cursor:"pointer",textAlign:"left",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                      {item.label}<span style={{color:C.gray,fontSize:14}}>›</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button onClick={()=>{logout();onClose();}}
+                style={{width:"100%",padding:"11px",background:"transparent",border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,color:C.gray,cursor:"pointer",letterSpacing:".04em"}}>
+                Sign out
+              </button>
+            </div>
+          )}
+
+          {tab==="security"&&(
+            <div>
+              {isGoogle?(
+                <div style={{background:C.bg,padding:"20px",textAlign:"center"}}>
+                  <p style={{fontSize:13,color:C.gray,margin:0,lineHeight:1.7}}>You signed in with Google.<br/>Password management is handled by your Google account.</p>
+                </div>
+              ):(
+                <div>
+                  <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 14px",textTransform:"uppercase"}}>Change Password</p>
+                  <input value={oldPw} onChange={e=>setOldPw(e.target.value)} placeholder="Current password" type="password" style={inputStyle}/>
+                  <input value={newPw} onChange={e=>setNewPw(e.target.value)} placeholder="New password" type="password" style={inputStyle}/>
+                  <input value={newPw2} onChange={e=>setNewPw2(e.target.value)} placeholder="Confirm new password" type="password" style={{...inputStyle,marginBottom:14}}/>
+                  {pwError&&<p style={{fontSize:12,color:C.red,margin:"0 0 10px"}}>{pwError}</p>}
+                  {pwSuccess&&<p style={{fontSize:12,color:C.green,margin:"0 0 10px"}}>{pwSuccess}</p>}
+                  <button onClick={handleChangePw} disabled={pwLoading}
+                    style={{width:"100%",padding:"11px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif"}}>
+                    {pwLoading?"...":"Update password"}
+                  </button>
+                </div>
+              )}
+
+              <div style={{marginTop:28,paddingTop:20,borderTop:`1px solid ${C.border}`}}>
+                <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Danger Zone</p>
+                <p style={{fontSize:12,color:C.gray,margin:"0 0 12px",lineHeight:1.6}}>To cancel your subscription or delete your account, contact us at <strong>hello@evidstack.com</strong></p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ROOT */
 function AppInner(){
   const {user,isPro,loading,logout}=useAuth();
@@ -568,6 +746,7 @@ function AppInner(){
   const [showAuth,setShowAuth]=useState(false);
   const [authMode,setAuthMode]=useState("login");
   const [showUpgrade,setShowUpgrade]=useState(false);
+  const [showAccount,setShowAccount]=useState(false);
   const isMobile=useIsMobile();
   const [mobileMenu,setMobileMenu]=useState(false);
 
@@ -617,6 +796,7 @@ function AppInner(){
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} initialMode={authMode}/>}
       {showUpgrade&&<UpgradeModal onClose={()=>setShowUpgrade(false)} onAuthNeeded={()=>openAuth("signup")}/>}
+      {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
 
       {/* Mobile menu drawer */}
       {isMobile&&mobileMenu&&(
@@ -637,6 +817,7 @@ function AppInner(){
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
                 {isPro&&<span style={{fontSize:11,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px",alignSelf:"flex-start"}}>PRO MEMBER</span>}
                 {!isPro&&<button onClick={()=>{openUpgrade();setMobileMenu(false);}} style={{padding:"12px 16px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",width:"100%"}}>Upgrade to Pro</button>}
+                <button onClick={()=>{setShowAccount(true);setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:C.bg,color:C.ink,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>My Account</button>
                 <button onClick={()=>{logout();setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>Sign out</button>
               </div>
             ):(
@@ -680,7 +861,7 @@ function AppInner(){
               <div style={{display:"flex",alignItems:"center",gap:8}}>
                 {isPro&&<span style={{fontSize:10,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px"}}>PRO</span>}
                 {!isPro&&<button onClick={openUpgrade} style={{padding:"8px 16px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",letterSpacing:".04em"}}>Upgrade</button>}
-                <button onClick={logout} style={{padding:"8px 14px",fontSize:11,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Sign out</button>
+                <button onClick={()=>setShowAccount(true)} style={{padding:"8px 14px",fontSize:11,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Sign out</button>
               </div>
             ):(
               <div style={{display:"flex",gap:6}}>

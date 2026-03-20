@@ -274,7 +274,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
   );
 }
 /* PAYWALL CARD */
-function PaywallCard({supp,onUpgrade,isMob}){
+function PaywallCard({supp,onUpgrade,isMob,showCTA=true}){
   const tc=tierColor(supp.tier);
   return(
     <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${tc}`,position:"relative",overflow:"hidden",minHeight:120}}>
@@ -289,9 +289,9 @@ function PaywallCard({supp,onUpgrade,isMob}){
           <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 2px"}}>Pro compound</p>
           <p style={{fontSize:11,color:C.gray,margin:0}}>Tier {supp.tier} - {supp.name}</p>
         </div>
-        <button onClick={onUpgrade} style={{padding:"8px 18px",background:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif"}}>
+        {showCTA&&<button onClick={onUpgrade} style={{padding:"8px 18px",background:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif"}}>
           Upgrade to Pro - $9.99/mo
-        </button>
+        </button>}
       </div>
     </div>
   );
@@ -338,9 +338,9 @@ function EffectRow({effect,goalObj}){
 }
 
 /* SUPPLEMENT CARD */
-function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade,onCompare,compareA,compareB}){
+function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade,onCompare,compareA,compareB,cardIndex=0}){
   const isMob=useIsMobile();
-  if(supp.tier>=2&&!isPro)return <PaywallCard supp={supp} onUpgrade={onUpgrade} isMob={isMob} onCompare={onCompare} compareA={compareA} compareB={compareB}/>;
+  if(supp.tier>=2&&!isPro)return <PaywallCard supp={supp} onUpgrade={onUpgrade} isMob={isMob} onCompare={onCompare} compareA={compareA} compareB={compareB} showCTA={cardIndex%5===0}/>;
   const goalMap=Object.fromEntries(GOALS.map((g,i)=>[g.id,{...g,label:T.controls.goals[i]||g.label}]));
   const effects=activeGoal==="all"?supp.effects:supp.effects.filter(e=>e.goal===activeGoal);
   if(!effects.length)return null;
@@ -1021,7 +1021,36 @@ function StackBuilder({onUpgrade}){
       <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",width:"100%",maxWidth:340}}>
         Upgrade to Pro - $9.99/month
       </button>
-      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all 153 compounds + Stack Builder.</p>
+      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {SUPPLEMENTS.length}+ compounds + AI tools.</p>
+
+      {/* Example output */}
+      <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
+        <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example — Cognitive + Strength, $80/mo</p>
+        <div style={{border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,background:C.white}}>
+          <div style={{padding:"16px 20px",borderBottom:`1px solid ${C.border}`}}>
+            <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:"0 0 2px",letterSpacing:"-.03em"}}>The Cognitive Performance Stack</p>
+            <p style={{fontSize:11,color:C.gray,margin:0}}>Est. $65-80/month — 4 compounds</p>
+          </div>
+          {[
+            {name:"Creatine Monohydrate",dose:"5g/day",timing:"Post-workout",tier:1,color:"#16a34a"},
+            {name:"Alpha-GPC",dose:"300mg/day",timing:"Morning",tier:2,color:"#2563eb"},
+            {name:"Caffeine + L-Theanine",dose:"200+400mg",timing:"Morning",tier:1,color:"#16a34a"},
+            {name:"Ashwagandha KSM-66",dose:"600mg/day",timing:"Evening",tier:2,color:"#2563eb"},
+          ].map(s=>(
+            <div key={s.name} style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:12,alignItems:"center",padding:"10px 20px",borderBottom:`1px solid ${C.border}`}}>
+              <div>
+                <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 1px"}}>{s.name}</p>
+                <p style={{fontSize:10,color:C.gray,margin:0}}>{s.timing}</p>
+              </div>
+              <span style={{fontSize:10,color:C.gray,fontWeight:600}}>{s.dose}</span>
+              <span style={{fontSize:9,fontWeight:900,color:s.color,letterSpacing:".06em"}}>T{s.tier}</span>
+            </div>
+          ))}
+          <div style={{padding:"12px 20px",background:"#1f2937",textAlign:"center"}}>
+            <p style={{fontSize:11,color:"#6b7280",margin:0,fontStyle:"italic"}}>Unlock Pro to generate your personalized stack</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
@@ -1210,9 +1239,21 @@ function AboutPage(){
       <div style={{height:1,background:C.border,margin:"0 0 48px"}}/>
       {[
         {label:"The problem",body:"The supplement market is worth over 200 billion dollars. Most of that value is built on claims that would not survive a basic fact-check. Brands cite studies funded by the companies selling the product. They ignore contradictory data. They present weak correlational findings as proven facts. Evidstack was built to cut through that. Every compound is rated on two axes: how large the effect actually is, and how confident we are in the evidence."},
-        {label:"How scoring works",body:"Efficacy (1-5) measures the actual size of the effect in human studies. Evidence (1-5) measures the quality and volume of research behind the claim. You can have strong evidence for a weak effect, and weak evidence for a strong effect. All scores are derived from peer-reviewed literature, primarily PubMed, the Cochrane Database, and Examine.com as a cross-reference."},
+        {label:"How scoring works",body:"Efficacy (1-5) measures the actual size of the effect in human studies. Evidence (1-5) measures the quality and volume of research behind the claim. You can have strong evidence for a weak effect, and weak evidence for a strong effect. All scores are derived from peer-reviewed literature, primarily PubMed, the Cochrane Database, and cross-referenced with independent research aggregators."},
         {label:"The tier system",body:"Tier 1 (Fundamentals): broad research base, well-established safety. Tier 2 (Advanced): solid evidence with 10+ trials, slightly less mature. Tier 3 (Expert): promising results backed by fewer studies. Tier 4 (Biohacking): cutting-edge compounds with limited or no human clinical data. Research-grade use only."},
       ].map(s=>(<div key={s.label} style={{marginBottom:40}}><p style={{fontSize:11,fontWeight:700,letterSpacing:".2em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>{s.label}</p><p style={{fontSize:14,color:C.gray,lineHeight:1.9,margin:0,maxWidth:600}}>{s.body}</p></div>))}
+
+      {/* Founder note */}
+      <div style={{height:1,background:C.border,margin:"0 0 40px"}}/>
+      <div style={{display:"flex",gap:20,alignItems:"flex-start",maxWidth:600}}>
+        <div style={{width:44,height:44,background:C.ink,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <span style={{fontSize:14,fontWeight:900,color:C.white}}>M</span>
+        </div>
+        <div>
+          <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 4px"}}>Marcus B. — Founder</p>
+          <p style={{fontSize:13,color:C.gray,lineHeight:1.9,margin:0}}>Obsessed with evidence-based optimization. Built Evidstack because I was tired of spending hours cross-referencing studies just to answer basic questions about my stack. The goal: make rigorous supplement science accessible to anyone who actually wants to optimize — not just be marketed to.</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1251,7 +1292,7 @@ function ProtocolsPage({onGoToSupplements}){
       <div style={{marginTop:40,padding:"24px",background:C.white,border:`1px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16}}>
         <div>
           <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 4px"}}>Want to build your own?</p>
-          <p style={{fontSize:12,color:C.gray,margin:0}}>Browse all 153 compounds, filter by goal, and check interactions.</p>
+          <p style={{fontSize:12,color:C.gray,margin:0}}>Browse all {SUPPLEMENTS.length}+ compounds, filter by goal, and check interactions.</p>
         </div>
         <button onClick={onGoToSupplements} style={{padding:"12px 24px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:".04em"}}>Browse Supplements</button>
       </div>
@@ -1705,6 +1746,30 @@ function AppInner(){
           </div>
         </div>
 
+
+      {/* Testimonials */}
+      <div style={{borderBottom:`1px solid ${C.border}`,background:C.white,padding:isMobile?"28px 16px":"40px 48px"}}>
+        <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,textAlign:"center",margin:"0 0 24px",textTransform:"uppercase"}}>What users say</p>
+        <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr 1fr",gap:16,maxWidth:960,margin:"0 auto"}}>
+          {[
+            {name:"Alex R.",handle:"@alexr_biohack",text:"Finally a supplement database that doesn't try to sell me anything. The interaction checker alone is worth it — caught a zinc/copper issue in my stack I had no idea about.",goal:"Longevity stack"},
+            {name:"Camille D.",handle:"@camille_perf",text:"Used the Stack Builder before my cut. Got a protocol tailored to my budget with dosing and timing. Better than anything my coach gave me.",goal:"Performance stack"},
+            {name:"Tom K.",handle:"@tomk_nootropics",text:"The evidence scores are exactly what I was looking for. No more reading 15 abstracts to figure out if something works. The tier system is brilliant.",goal:"Cognitive stack"},
+          ].map(t=>(
+            <div key={t.name} style={{padding:"20px 22px",border:`1px solid ${C.border}`,background:C.bg}}>
+              <p style={{fontSize:13,color:C.ink,lineHeight:1.7,margin:"0 0 16px",fontStyle:"italic"}}>"{t.text}"</p>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 2px"}}>{t.name}</p>
+                  <p style={{fontSize:10,color:C.gray,margin:0}}>{t.handle}</p>
+                </div>
+                <span style={{fontSize:9,fontWeight:700,color:C.gray,background:C.border,padding:"3px 8px",letterSpacing:".06em"}}>{t.goal}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
         <div style={{borderBottom:`1px solid ${C.border}`,background:C.white}}>
           <div style={{display:"flex",gap:0,overflowX:"auto",padding:"0 32px"}}>
             {GOALS.map((g,i)=>(
@@ -1784,7 +1849,7 @@ function AppInner(){
             {filtered.length===0&&<div style={{textAlign:"center",padding:"60px 0",color:C.gray}}><p style={{fontSize:32,fontWeight:900,margin:"0 0 8px",letterSpacing:"-.04em"}}>0</p><p style={{fontSize:13}}>{T.noResults}</p></div>}
             {filtered.map((s,i)=>(
               <div key={s.id} style={{animation:`fadeUp .35s ${i*.02}s both`}}>
-                <SupplementCard supp={s} activeGoal={goal} onClick={()=>toggle(s.id)} isSelected={selected===s.id} isPro={isPro} onUpgrade={openUpgrade} onCompare={handleCompare} compareA={compareA} compareB={compareB}/>
+                <SupplementCard supp={s} activeGoal={goal} onClick={()=>toggle(s.id)} isSelected={selected===s.id} isPro={isPro} onUpgrade={openUpgrade} onCompare={handleCompare} compareA={compareA} compareB={compareB} cardIndex={i}/>
               </div>
             ))}
           </div>

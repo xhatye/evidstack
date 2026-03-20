@@ -29,6 +29,7 @@ function navigate(page){
 import { SUPPLEMENTS, GOALS, TIERS } from "./data.js";
 import { AuthProvider, useAuth } from "./AuthContext.jsx";
 
+// v2
 const C = {
   bg:"#f4f2ee",white:"#ffffff",black:"#0a0a0a",ink:"#1a1a1a",
   gray:"#6b7280",light:"#e8e5df",border:"#d4d0c8",
@@ -1477,7 +1478,6 @@ function AppInner(){
   const [showCompareModal,setShowCompareModal]=useState(false);
   const isMobile=useIsMobile();
   const [mobileMenu,setMobileMenu]=useState(false);
-  const [showTools,setShowTools]=useState(false);
 
   const navigateTo=(p)=>{navigate(p);setPage(p);};
   useEffect(()=>{
@@ -1525,14 +1525,13 @@ function AppInner(){
   const navItems=[
     {id:"supplements",label:"Supplements"},
     {id:"protocols",label:"Protocols"},
+    {id:"stack-builder",label:"Stack Builder",pro:true},
+    {id:"interactions",label:"Interactions",pro:true},
+    {id:"weekly-protocol",label:"Protocol AI",pro:true},
+    {id:"tracker",label:"Tracker",pro:true},
     {id:"about",label:"About"},
   ];
-  const proTools=[
-    {id:"stack-builder",label:"Stack Builder AI"},
-    {id:"interactions",label:"Interaction Checker"},
-    {id:"weekly-protocol",label:"Weekly Protocol AI"},
-    {id:"tracker",label:"My Tracker"},
-  ];
+  const proTools=navItems.filter(i=>i.pro);
   const proPages=proTools.map(t=>t.id);
 
   return(
@@ -1550,11 +1549,10 @@ function AppInner(){
               <span style={{fontSize:14,fontWeight:900,letterSpacing:"-.04em"}}>EVIDSTACK</span>
               <button onClick={()=>setMobileMenu(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:C.gray}}>x</button>
             </div>
-            {[...navItems,...proTools,{id:"legal",label:"Terms & Privacy"}].map(item=>(
+            {[...navItems,{id:"legal",label:"Terms & Privacy"}].map(item=>(
               <button key={item.id} onClick={()=>{navigateTo(item.id);setMobileMenu(false);}}
-                style={{padding:"14px 16px",fontSize:14,fontWeight:700,background:page===item.id?C.ink:"transparent",color:page===item.id?C.white:C.gray,border:"none",cursor:"pointer",textAlign:"left",borderRadius:4}}>
-                {item.label}
-                {proTools.some(t=>t.id===item.id)&&!isPro&&<span style={{fontSize:9,color:C.gold,fontWeight:900,marginLeft:8,letterSpacing:".06em"}}>PRO</span>}
+                style={{padding:"14px 16px",fontSize:14,fontWeight:700,background:page===item.id?C.ink:"transparent",color:page===item.id?C.white:item.pro&&!isPro?C.gold:C.gray,border:"none",cursor:"pointer",textAlign:"left",borderRadius:4}}>
+                {item.pro&&!isPro?"✦ "+item.label:item.label}
               </button>
             ))}
             <div style={{height:1,background:C.border,margin:"12px 0"}}/>

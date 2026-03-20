@@ -881,6 +881,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
   const stacks=[
     {
       id:"healing-beginner",
+      free:true,
       category:"Healing",
       level:"Beginner",
       name:"The Gold Standard Healing Stack",
@@ -892,6 +893,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
     },
     {
       id:"healing-advanced",
+      free:false,
       category:"Healing",
       level:"Advanced",
       name:"Complete Recovery Stack",
@@ -903,6 +905,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
     },
     {
       id:"gh-beginner",
+      free:true,
       category:"GH Release",
       level:"Beginner",
       name:"Ipamorelin + CJC-1295",
@@ -914,6 +917,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
     },
     {
       id:"gh-advanced",
+      free:false,
       category:"GH Release",
       level:"Advanced",
       name:"Full GH Optimization",
@@ -925,6 +929,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
     },
     {
       id:"weightloss-advanced",
+      free:false,
       category:"Weight Loss",
       level:"Advanced",
       name:"Semaglutide + Tesamorelin",
@@ -936,6 +941,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
     },
     {
       id:"weightloss-beginner",
+      free:true,
       category:"Weight Loss",
       level:"Beginner",
       name:"GLP-1 + AOD-9604",
@@ -947,6 +953,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
     },
     {
       id:"longevity-advanced",
+      free:false,
       category:"Anti-Aging",
       level:"Advanced",
       name:"Longevity Peptide Stack",
@@ -958,6 +965,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
     },
     {
       id:"cognitive-longevity",
+      free:false,
       category:"Cognitive",
       level:"Advanced",
       name:"Cognitive Longevity Stack",
@@ -1008,7 +1016,8 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
   const categories=[...new Set(stacks.map(s=>s.category))];
   const [activeCategory,setActiveCategory]=useState("All");
 
-  const filtered = activeCategory==="All" ? stacks : stacks.filter(s=>s.category===activeCategory);
+  const displayStacks = isPro ? stacks : stacks.filter(s=>s.free);
+  const filtered = activeCategory==="All" ? displayStacks : displayStacks.filter(s=>s.category===activeCategory);
 
   const levelColor={Beginner:C.green,Advanced:C.purple};
 
@@ -1038,8 +1047,14 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
         <div style={{maxWidth:960,margin:"0 auto"}}>
           <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 8px",textTransform:"uppercase"}}>Aesthetics protocols</p>
           <h2 style={{fontSize:isMob?22:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 24px"}}>Looksmaxxing stacks.</h2>
+          {!isPro&&(
+            <div style={{padding:"10px 16px",background:`${C.gold}12`,border:`1px solid ${C.gold}40`,marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+              <p style={{fontSize:12,color:C.ink,margin:0}}><strong>Looksmaxxing stacks are Pro-only.</strong> Skin peptides, hair retention, face recomp protocols.</p>
+              <button onClick={onUpgrade} style={{padding:"7px 16px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",flexShrink:0}}>Unlock Pro</button>
+            </div>
+          )}
           <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"repeat(3,1fr)",gap:16,marginBottom:16}}>
-            {looksStacks.map(s=>(
+            {(isPro?looksStacks:[]).map(s=>(
               <div key={s.id} style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${s.color}`}}>
                 <div style={{padding:"20px 20px 16px"}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
@@ -1085,6 +1100,12 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
             ))}
           </div>
 
+          {!isPro&&(
+            <div style={{padding:"10px 16px",background:`${C.gold}12`,border:`1px solid ${C.gold}40`,marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+              <p style={{fontSize:12,color:C.ink,margin:0}}><strong>5 more stacks locked</strong> — Full GH Optimization, Longevity, Cognitive, Weight Loss Advanced and more.</p>
+              <button onClick={onUpgrade} style={{padding:"7px 16px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",flexShrink:0}}>Unlock Pro</button>
+            </div>
+          )}
           <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:16}}>
             {filtered.map(s=>(
               <div key={s.id} style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${s.color}`}}>

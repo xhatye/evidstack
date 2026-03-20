@@ -1692,11 +1692,11 @@ function AppInner(){
               <div>
                 <p style={{fontSize:15,color:"#e8e5df",margin:"0 0 6px",fontWeight:900,letterSpacing:"-.02em"}}>Evidstack Pro is here.</p>
                 <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 20px",lineHeight:1.7}}>Stack Builder AI, Interaction Checker, Weekly Protocol AI, Tracker, and 175+ compounds including peptides, GLP-1s, and biohacking tier.</p>
-                <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-                  <button onClick={()=>{openUpgrade();}} style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+                <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"stretch"}}>
+                  <button onClick={()=>{openUpgrade();}} style={{padding:"12px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",lineHeight:1}}>
                     Start for $9.99/mo
                   </button>
-                  <button onClick={()=>{openAuth("signup");}} style={{padding:"11px 24px",background:"transparent",color:"#9ca3af",border:"1px solid #374151",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+                  <button onClick={()=>{openAuth("signup");}} style={{padding:"12px 24px",background:"transparent",color:"#9ca3af",border:"1px solid #374151",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",lineHeight:1}}>
                     Create free account
                   </button>
                 </div>

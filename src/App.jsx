@@ -1477,6 +1477,7 @@ function AppInner(){
   const [showCompareModal,setShowCompareModal]=useState(false);
   const isMobile=useIsMobile();
   const [mobileMenu,setMobileMenu]=useState(false);
+  const [showTools,setShowTools]=useState(false);
 
   const navigateTo=(p)=>{navigate(p);setPage(p);};
   useEffect(()=>{
@@ -1524,12 +1525,15 @@ function AppInner(){
   const navItems=[
     {id:"supplements",label:"Supplements"},
     {id:"protocols",label:"Protocols"},
-    {id:"stack-builder",label:"Stack Builder",pro:true},
-    {id:"interactions",label:"Interactions",pro:true},
-    {id:"weekly-protocol",label:"Protocol AI",pro:true},
-    {id:"tracker",label:"Tracker",pro:true},
     {id:"about",label:"About"},
   ];
+  const proTools=[
+    {id:"stack-builder",label:"Stack Builder AI"},
+    {id:"interactions",label:"Interaction Checker"},
+    {id:"weekly-protocol",label:"Weekly Protocol AI"},
+    {id:"tracker",label:"My Tracker"},
+  ];
+  const proPages=proTools.map(t=>t.id);
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
@@ -1546,10 +1550,11 @@ function AppInner(){
               <span style={{fontSize:14,fontWeight:900,letterSpacing:"-.04em"}}>EVIDSTACK</span>
               <button onClick={()=>setMobileMenu(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:C.gray}}>x</button>
             </div>
-            {[...navItems,{id:"legal",label:"Terms & Privacy"}].map(item=>(
+            {[...navItems,...proTools,{id:"legal",label:"Terms & Privacy"}].map(item=>(
               <button key={item.id} onClick={()=>{navigateTo(item.id);setMobileMenu(false);}}
-                style={{padding:"14px 16px",fontSize:14,fontWeight:700,background:page===item.id?C.ink:"transparent",color:page===item.id?C.white:item.pro&&!isPro?C.gold:C.gray,border:"none",cursor:"pointer",textAlign:"left",borderRadius:4}}>
-                {item.pro&&!isPro?"✦ "+item.label:item.label}
+                style={{padding:"14px 16px",fontSize:14,fontWeight:700,background:page===item.id?C.ink:"transparent",color:page===item.id?C.white:C.gray,border:"none",cursor:"pointer",textAlign:"left",borderRadius:4}}>
+                {item.label}
+                {proTools.some(t=>t.id===item.id)&&!isPro&&<span style={{fontSize:9,color:C.gold,fontWeight:900,marginLeft:8,letterSpacing:".06em"}}>PRO</span>}
               </button>
             ))}
             <div style={{height:1,background:C.border,margin:"12px 0"}}/>
@@ -1641,8 +1646,8 @@ function AppInner(){
           </div>
           <div style={{maxWidth:680,margin:"0 auto 0",background:C.ink,padding:isMobile?"20px 16px":"24px 32px"}}>
             {user&&!isPro?(
-              <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Unlock all 153 compounds + AI Stack Builder.</p>
-              <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 16px",lineHeight:1.6}}>Tier 2-4 compounds and personalized protocols - $9.99/month.</p>
+              <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Unlock all {SUPPLEMENTS.length}+ compounds + AI Stack Builder.</p>
+              <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 16px",lineHeight:1.6}}>Tier 2-4 compounds, peptides, AI tools - $9.99/month.</p>
               <button onClick={openUpgrade} style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Upgrade to Pro</button></>
             ):user&&isPro?(
               <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 4px",fontWeight:700}}>Welcome back, Pro member.</p>

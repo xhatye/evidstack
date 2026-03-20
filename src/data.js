@@ -2858,4 +2858,286 @@ export const SUPPLEMENTS = [
     ],
   },
 
+
+  // ── EUGEROICS / WAKEFULNESS ───────────────────────────────────────────────
+
+  {
+    id: "armodafinil",
+    name: "Armodafinil (Nuvigil)",
+    aliases: ["armodafinil","nuvigil","r-modafinil","R-modafinil","waklert","artvigil"],
+    tier: 3, safety: 3, legal: "Schedule IV controlled substance in USA. Prescription-only in most countries. Widely available without prescription in India under brand names.", cost: "$30-80/month (generic)",
+    dosage: { amount: "75-150mg/day", timing: "Morning on empty stomach. Do NOT take after noon — half-life 15h.", note: "R-enantiomer of modafinil. Same mechanism but longer-acting and more potent per mg. Lower dose needed vs modafinil. Start at 75mg. Avoid combining with caffeine — pronounced anxiety risk." },
+    interactions: ["Hormonal contraceptives (reduces efficacy — use backup method)", "CYP3A4 substrates (moderate inhibitor)", "Alcohol (unpredictable)", "Other stimulants"],
+    effects: [
+      { goal: "focus", efficacy: 4, evidence: 4, studies: 30, type: "RCT",
+        summary: "FDA-approved for narcolepsy, shift work disorder, and obstructive sleep apnea. Promotes wakefulness and enhances executive function, working memory, and decision-making in sleep-deprived individuals. Off-label cognitive enhancement widely studied.", sources: ["PMID:17681159","PMID:22193565"] },
+      { goal: "energy", efficacy: 4, evidence: 4, studies: 25, type: "RCT",
+        summary: "Significantly reduces subjective fatigue and improves alertness. Superior to placebo and comparable to amphetamines for wakefulness with substantially lower abuse potential.", sources: ["PMID:20633494"] },
+    ],
+  },
+
+  {
+    id: "modafinil",
+    name: "Modafinil (Provigil)",
+    aliases: ["modafinil","provigil","modalert","modvigil","alertec"],
+    tier: 3, safety: 3, legal: "Schedule IV in USA. Prescription-only in most countries. Legal OTC in some jurisdictions.", cost: "$20-60/month (generic India brands)",
+    dosage: { amount: "100-200mg/day", timing: "Morning, ideally before 10am. Racemic mixture — 1:1 R/S enantiomers.", note: "The parent compound of armodafinil. Well-studied, well-tolerated. 200mg is standard clinical dose. Start at 100mg to assess sensitivity. Do not combine with MAOIs." },
+    interactions: ["Hormonal contraceptives (CYP3A4 induction reduces efficacy)", "Cyclosporine", "Warfarin", "Other stimulants"],
+    effects: [
+      { goal: "focus", efficacy: 4, evidence: 5, studies: 70, type: "RCT + Meta-analyses",
+        summary: "Most studied cognitive enhancer. Meta-analyses confirm improvements in attention, planning, decision-making, and learning in healthy subjects. Cochrane review confirms wakefulness efficacy. Most widely used smart drug worldwide.", sources: ["PMID:25677353","PMID:15892316"] },
+      { goal: "energy", efficacy: 4, evidence: 5, studies: 60, type: "RCT",
+        summary: "Reduces fatigue and promotes wakefulness. Effective for shift workers, jet lag, and sleep deprivation. Lower addiction potential vs amphetamines with comparable wakefulness effects.", sources: ["PMID:25677353"] },
+    ],
+  },
+
+  {
+    id: "adrafinil",
+    name: "Adrafinil",
+    aliases: ["adrafinil","olmifon","CRL-40028","prodrug modafinil"],
+    tier: 3, safety: 2, legal: "Unscheduled in most countries including USA, UK, Canada. Discontinued as prescription drug. Sold as supplement.", cost: "$20-40/month",
+    dosage: { amount: "300-600mg/day", timing: "Morning only, maximum 3x per week. Not for daily use.", note: "Prodrug that metabolizes to modafinil in the liver. Slower onset (45-60 min) but longer duration. Hepatotoxic at high doses or frequent use — liver enzymes should be monitored. Not recommended for daily use. Prefer modafinil if available." },
+    interactions: ["Hepatotoxic compounds (additive liver stress)", "CYP3A4 substrates"],
+    effects: [
+      { goal: "focus", efficacy: 3, evidence: 2, studies: 8, type: "Clinical + anecdotal",
+        summary: "Converts to modafinil in vivo — effects comparable but onset slower and liver burden present. Original research compound used in elderly patients in France before modafinil approval.", sources: [] },
+      { goal: "energy", efficacy: 3, evidence: 2, studies: 6, type: "Clinical",
+        summary: "Promotes wakefulness and reduces fatigue via modafinil metabolite. Available OTC where modafinil requires prescription.", sources: [] },
+    ],
+  },
+
+  {
+    id: "flmodafinil",
+    name: "Flmodafinil (CRL-40,940)",
+    aliases: ["flmodafinil","CRL-40940","CRL-40,940","bisfluoromodafinil","lauflumide"],
+    tier: 4, safety: 2, legal: "Unscheduled research compound in most countries. No prescription required. Not approved anywhere.", cost: "$30-60/month",
+    dosage: { amount: "50-200mg/day", timing: "Morning only", note: "Bis-fluoro analogue of modafinil — reported 4x more potent per mg. Very limited human safety data. No clinical trials. Use with extreme caution. Effects highly individual." },
+    interactions: [],
+    effects: [
+      { goal: "focus", efficacy: 4, evidence: 1, studies: 1, type: "Animal + anecdotal",
+        summary: "Fluorinated modafinil analogue with reportedly superior potency and duration. Widely reported in biohacking community as more effective than modafinil at lower doses. No human clinical trial data exists.", sources: [] },
+    ],
+  },
+
+  // ── ADVANCED NOOTROPICS ───────────────────────────────────────────────────
+
+  {
+    id: "sunifiram",
+    name: "Sunifiram (DM-235)",
+    aliases: ["sunifiram","DM-235","ampakine","glutamatergic nootropic"],
+    tier: 4, safety: 1, legal: "Unscheduled research compound. No human clinical trials. Not approved anywhere.", cost: "$20-40/month",
+    dosage: { amount: "5-10mg/day", timing: "Morning", note: "EXTREME CAUTION: Extremely potent ampakine — active at microgram doses. No human clinical trial data. Potential for neurotoxicity at high doses in animal models. Only for experienced researchers." },
+    interactions: [],
+    effects: [
+      { goal: "memory", efficacy: 4, evidence: 1, studies: 1, type: "Animal studies only",
+        summary: "Potent AMPA receptor agonist and acetylcholinesterase inhibitor. Dramatically improves memory acquisition and retrieval in rodent models. No human data. Considered one of the most potent nootropics in animal research.", sources: ["PMID:23538152"] },
+    ],
+  },
+
+  {
+    id: "nsi-189",
+    name: "NSI-189 Phosphate",
+    aliases: ["NSI-189","NSI189","neurogenesis nootropic","neurotech pharma"],
+    tier: 4, safety: 2, legal: "Research compound. Phase II clinical trial completed for MDD. Not approved. Sold as research chemical.", cost: "$40-80/month",
+    dosage: { amount: "40-80mg/day", timing: "Split into 2 doses, morning and afternoon", note: "Stimulates neurogenesis in the hippocampus. Phase II trial for major depressive disorder showed mixed results on primary endpoints but improvements in cognitive measures. Most promising neurogenic compound in development." },
+    interactions: [],
+    effects: [
+      { goal: "mood", efficacy: 3, evidence: 2, studies: 3, type: "Phase I/II clinical",
+        summary: "Phase II RCT showed significant improvements in depressive symptoms in subset of patients. Promotes hippocampal neurogenesis — mechanism distinct from all antidepressants.", sources: ["PMID:28903113"] },
+      { goal: "memory", efficacy: 3, evidence: 2, studies: 3, type: "Phase II clinical",
+        summary: "Hippocampal volume increase and improvements in spatial memory reported in Phase II. Cognitive benefits appear secondary to neurogenic mechanism.", sources: ["PMID:28903113"] },
+    ],
+  },
+
+  {
+    id: "9-me-bc",
+    name: "9-Methyl-beta-carboline (9-MBC)",
+    aliases: ["9-me-bc","9-MBC","9-methyl-beta-carboline","beta-carboline nootropic"],
+    tier: 4, safety: 1, legal: "Research compound. Unscheduled in most countries. No human clinical trials.", cost: "$20-40/month",
+    dosage: { amount: "5-25mg/day sublingual or intranasal", timing: "Morning, avoid evening — stimulating", note: "CAUTION: Research compound with no human safety data. Potent MAO-B inhibitor and dopaminergic enhancer. Potential neurotrophic effects via BDNF upregulation. Strict dietary restrictions needed (MAO inhibition) — avoid tyramine-rich foods." },
+    interactions: ["Tyramine-containing foods (potential hypertensive crisis)", "Serotonergic compounds (serotonin syndrome risk)", "Stimulants"],
+    effects: [
+      { goal: "focus", efficacy: 4, evidence: 1, studies: 1, type: "Animal + in vitro",
+        summary: "Promotes dopaminergic neuron regeneration, inhibits MAO-B, and upregulates BDNF. Dramatic cognitive enhancement reported in animal models. No human data. Considered one of the most promising but least-studied dopaminergic nootropics.", sources: [] },
+    ],
+  },
+
+  {
+    id: "tianeptine",
+    name: "Tianeptine (Stablon)",
+    aliases: ["tianeptine","stablon","coaxil","tianaa","tianeptine sodium","tianeptine sulfate"],
+    tier: 3, safety: 2, legal: "Prescription antidepressant in France and several countries. Unscheduled and sold as supplement in some US states. Schedule III in some states. Banned in others.", cost: "$15-40/month",
+    dosage: { amount: "12.5mg 3x/day (sodium) or 35mg once daily (sulfate)", timing: "With meals", note: "SERIOUS ADDICTION WARNING: High-dose tianeptine sodium has extreme addiction and withdrawal potential. The sulfate form has slower onset and lower abuse potential. Do not exceed therapeutic doses. Abrupt discontinuation causes severe withdrawal. Increasingly banned due to abuse epidemic." },
+    interactions: ["MAOIs (absolute contraindication)", "Opioids (additive)", "Alcohol"],
+    effects: [
+      { goal: "mood", efficacy: 4, evidence: 4, studies: 40, type: "RCT",
+        summary: "Approved antidepressant in 60+ countries. Unique mechanism: modulates glutamate (AMPA) receptors and mu-opioid receptors. RCTs show efficacy comparable to SSRIs for depression and anxiety with different side effect profile.", sources: ["PMID:9169253","PMID:18425905"] },
+      { goal: "stress", efficacy: 3, evidence: 3, studies: 20, type: "RCT",
+        summary: "Reduces anxiety and stress. Particularly effective for anxiety with depressive features. Improves HPA axis dysregulation in chronic stress models.", sources: [] },
+    ],
+  },
+
+  // ── SARMs ─────────────────────────────────────────────────────────────────
+
+  {
+    id: "rad-140",
+    name: "RAD-140 (Testolone)",
+    aliases: ["RAD-140","RAD140","testolone","sarm rad","selective androgen receptor modulator"],
+    tier: 4, safety: 2, legal: "Research compound. Not approved anywhere. WADA-banned. Legal to possess in most countries but not for human consumption.", cost: "$40-80/month",
+    dosage: { amount: "5-20mg/day oral", timing: "Once daily, with or without food", note: "Most potent SARM for muscle building. Anabolic:androgenic ratio 80:1 vs testosterone. Blood work mandatory: lipids, LFTs, testosterone every 4 weeks. PCT required after any cycle >4 weeks. Hepatotoxic risk. Long-term safety data nonexistent." },
+    interactions: ["Testosterone (do not combine)", "Other androgens", "Hepatotoxic compounds"],
+    effects: [
+      { goal: "force", efficacy: 4, evidence: 2, studies: 5, type: "Phase I/II clinical + anecdotal",
+        summary: "Phase I completed — tolerable safety profile. Significant lean mass gains and strength increases documented. Superior anabolic effect per mg vs testosterone with lower androgenic side effects in preliminary data.", sources: ["PMID:32745118"] },
+      { goal: "recovery", efficacy: 3, evidence: 2, studies: 4, type: "Research",
+        summary: "Accelerates muscle protein synthesis and reduces recovery time. Neuroprotective effects documented — may protect against androgen-induced brain damage.", sources: [] },
+    ],
+  },
+
+  {
+    id: "lgd-4033",
+    name: "LGD-4033 (Ligandrol)",
+    aliases: ["LGD-4033","LGD4033","ligandrol","VK5211","anabolicum"],
+    tier: 4, safety: 2, legal: "Research compound. Not approved. WADA-banned. Phase II completed.", cost: "$30-60/month",
+    dosage: { amount: "5-10mg/day oral", timing: "Once daily", note: "Most-studied SARM. Phase II showed lean mass gains of ~2-3kg over 21 days at 1mg dose. Blood work mandatory. Suppresses endogenous testosterone dose-dependently. PCT recommended after cycles >4 weeks." },
+    interactions: ["Testosterone", "Other androgens", "Hormonal medications"],
+    effects: [
+      { goal: "force", efficacy: 4, evidence: 3, studies: 8, type: "Phase I/II RCT",
+        summary: "Phase II RCT: dose-dependent lean mass gains with favorable safety at doses up to 22mg. FDA fast-track designation for muscle wasting. Most clinically validated SARM to date.", sources: ["PMID:23995181"] },
+    ],
+  },
+
+  {
+    id: "mk-2866",
+    name: "MK-2866 (Ostarine)",
+    aliases: ["ostarine","MK-2866","MK2866","enobosarm","GTx-024"],
+    tier: 4, safety: 2, legal: "Research compound. Not approved. WADA-banned. Phase III completed for cachexia.", cost: "$25-50/month",
+    dosage: { amount: "12.5-25mg/day oral", timing: "Once daily", note: "Most-researched SARM. Phase III completed for muscle wasting. Mildest suppression of all SARMs at low doses. Popular entry point for SARM users. Blood work still mandatory." },
+    interactions: ["Testosterone", "Warfarin (slight INR increase)", "Other androgens"],
+    effects: [
+      { goal: "force", efficacy: 3, evidence: 3, studies: 15, type: "Phase II/III RCT",
+        summary: "Phase III for cancer cachexia — significant lean mass preservation. Phase II showed dose-dependent muscle gains. Most studied SARM. Lower potency than RAD-140 or LGD-4033 but better characterized safety profile.", sources: ["PMID:21484884"] },
+      { goal: "recovery", efficacy: 3, evidence: 2, studies: 8, type: "RCT",
+        summary: "Accelerates recovery from injury. Bone-anabolic effects documented — potentially useful for stress fractures. Joint healing anecdotally strong.", sources: [] },
+    ],
+  },
+
+  {
+    id: "cardarine",
+    name: "GW-501516 (Cardarine)",
+    aliases: ["cardarine","GW501516","GW-501516","endurobol","PPARdelta agonist"],
+    tier: 4, safety: 1, legal: "Research compound. Not approved. WADA-banned. Development discontinued by GSK due to carcinogenicity in animal studies.", cost: "$25-50/month",
+    dosage: { amount: "10-20mg/day oral", timing: "Once daily before exercise", note: "CRITICAL WARNING: Development abandoned by GSK after accelerated carcinogenicity in multiple organ systems in animal studies at doses approaching human equivalents. Risk-benefit ratio highly unfavorable. Community continues using despite these findings. Not recommended." },
+    interactions: [],
+    effects: [
+      { goal: "cardio", efficacy: 5, evidence: 2, studies: 4, type: "Animal + Phase I",
+        summary: "Dramatic endurance improvements in animals (40-70%). PPARdelta agonist activates same pathways as aerobic exercise. Anecdotally the most effective endurance-enhancing compound known. Animal carcinogenicity data is a serious concern.", sources: ["PMID:15383540"] },
+      { goal: "weight", efficacy: 4, evidence: 2, studies: 4, type: "Animal + anecdotal",
+        summary: "Strong fat oxidation promotion. Activates fatty acid catabolism via PPARdelta. Reduces visceral fat in animal models.", sources: [] },
+    ],
+  },
+
+  {
+    id: "sr9009",
+    name: "SR9009 (Stenabolic)",
+    aliases: ["SR9009","stenabolic","rev-erb agonist","circadian rhythm compound"],
+    tier: 4, safety: 1, legal: "Research compound. Unscheduled in most countries. Not approved.", cost: "$30-60/month",
+    dosage: { amount: "20-30mg/day oral, split into 3-4 doses", timing: "Every 4-6 hours due to very short half-life (~4h)", note: "Rev-ErbA agonist that regulates circadian rhythm and metabolic gene expression. Very short half-life requires frequent dosing. Poor oral bioavailability in some studies — some users inject. No human clinical data." },
+    interactions: [],
+    effects: [
+      { goal: "cardio", efficacy: 4, evidence: 1, studies: 2, type: "Animal studies only",
+        summary: "Dramatically increases endurance (50%) and mitochondrial biogenesis in mice. Activates same gene pathways as exercise. No human pharmacokinetic or efficacy data.", sources: ["PMID:23177082"] },
+      { goal: "weight", efficacy: 3, evidence: 1, studies: 2, type: "Animal studies only",
+        summary: "Reduces fat mass, inflammation, and improves metabolic parameters in obese mice. Modulates circadian metabolic rhythm.", sources: [] },
+    ],
+  },
+
+  // ── ANTI-AGING / ADVANCED LONGEVITY ──────────────────────────────────────
+
+  {
+    id: "rapamycin",
+    name: "Rapamycin (Sirolimus)",
+    aliases: ["rapamycin","sirolimus","rapamune","mTOR inhibitor","longevity rapamycin"],
+    tier: 4, safety: 2, legal: "FDA-approved immunosuppressant. Prescription only. Off-label anti-aging use requires physician.", cost: "$50-200/month (low-dose off-label)",
+    dosage: { amount: "1-6mg/week (intermittent, anti-aging protocol)", timing: "Once weekly, with or without food", note: "FDA-approved transplant immunosuppressant used off-label at low intermittent doses for anti-aging. mTOR1 inhibition extends lifespan in all model organisms tested. Physician supervision mandatory. Immunosuppressive — avoid during infections or illness." },
+    interactions: ["CYP3A4 inhibitors (dramatically increase levels)", "Immunosuppressants", "Live vaccines (contraindicated)", "Grapefruit"],
+    effects: [
+      { goal: "longevity", efficacy: 5, evidence: 3, studies: 20, type: "Animal RCT + human observational",
+        summary: "Extends lifespan 14-25% in mice even when started in old age. Only compound proven to extend lifespan in all major model organisms. Human data: reduces aging biomarkers, improves immune response to vaccines in elderly. The most evidence-backed anti-aging intervention known.", sources: ["PMID:19587680","PMID:31461517"] },
+    ],
+  },
+
+  {
+    id: "metformin",
+    name: "Metformin (Anti-Aging Protocol)",
+    aliases: ["metformin","glucophage","metformin HCl","biguanide","TAME trial"],
+    tier: 3, safety: 3, legal: "FDA-approved for type 2 diabetes. Prescription only. Widely prescribed off-label for anti-aging.", cost: "$5-15/month (generic)",
+    dosage: { amount: "500-1500mg/day", timing: "With meals to minimize GI side effects. Start at 500mg.", note: "AMPK activator and mTOR inhibitor. The TAME trial is testing it specifically for aging. May reduce athletic adaptation when combined with exercise — separate timing from training. Depletes B12 long-term — supplement methylcobalamin." },
+    interactions: ["B12 (depletes — supplement)", "Contrast dyes (temporarily stop)", "Alcohol (lactic acidosis risk)", "Exercise (may blunt adaptations)"],
+    effects: [
+      { goal: "longevity", efficacy: 4, evidence: 4, studies: 50, type: "RCT + large cohort studies",
+        summary: "Diabetics on metformin outlive age-matched non-diabetics in large epidemiological studies. AMPK activation mimics caloric restriction. Reduces cancer incidence, cardiovascular events, and all-cause mortality. TAME trial (n=3000) ongoing specifically for aging indication.", sources: ["PMID:26552168","PMID:29457958"] },
+      { goal: "weight", efficacy: 3, evidence: 4, studies: 30, type: "RCT",
+        summary: "Modest weight reduction via appetite suppression and reduced hepatic glucose production. Not a weight loss drug but produces consistent modest reductions.", sources: [] },
+    ],
+  },
+
+  {
+    id: "low-dose-naltrexone",
+    name: "Low Dose Naltrexone (LDN)",
+    aliases: ["LDN","low dose naltrexone","naltrexone low dose","OGF receptor"],
+    tier: 3, safety: 4, legal: "Naltrexone FDA-approved at 50mg for addiction. LDN (1.5-4.5mg) is off-label compounded. Requires prescription.", cost: "$30-60/month (compounded)",
+    dosage: { amount: "1.5-4.5mg/day", timing: "Before sleep (opioid antagonism peak 4h later)", note: "Transient opioid receptor blockade at night triggers upregulation of endorphins and endogenous opioid system. Must use low dose (NOT standard 50mg). Available from compounding pharmacies. Effects build over 4-8 weeks." },
+    interactions: ["Opioid medications (complete contraindication)", "Immunosuppressants (may reduce efficacy)"],
+    effects: [
+      { goal: "mood", efficacy: 3, evidence: 3, studies: 15, type: "RCT",
+        summary: "Significant improvements in fatigue, mood, and quality of life in fibromyalgia and autoimmune RCTs. Emerging evidence for treatment-resistant depression. Anti-inflammatory via TLR4 antagonism.", sources: ["PMID:23359405"] },
+      { goal: "longevity", efficacy: 3, evidence: 2, studies: 10, type: "RCT + observational",
+        summary: "Anti-inflammatory immunomodulation. Reduces pro-inflammatory cytokines. Used off-label for autoimmune conditions, cancer adjuvant therapy, and general immune optimization.", sources: [] },
+    ],
+  },
+
+  {
+    id: "acarbose",
+    name: "Acarbose",
+    aliases: ["acarbose","precose","glucobay","alpha-glucosidase inhibitor","ITP compound"],
+    tier: 3, safety: 4, legal: "FDA-approved for type 2 diabetes. Prescription only in USA. OTC in some countries.", cost: "$10-30/month",
+    dosage: { amount: "25-100mg with each meal", timing: "At the start of each main meal — must be taken with food", note: "Inhibits alpha-glucosidase in the intestine, slowing carbohydrate absorption. Reduces post-meal glucose spikes. The Interventions Testing Program (ITP) showed lifespan extension in male mice. Side effects: significant GI gas and bloating — start low (25mg) and increase gradually." },
+    interactions: ["Digestive enzymes (reduces acarbose effect)", "Other antidiabetics (hypoglycemia risk)"],
+    effects: [
+      { goal: "longevity", efficacy: 3, evidence: 3, studies: 15, type: "ITP mouse studies + human RCT",
+        summary: "ITP: 22% male mouse lifespan extension. Reduces post-prandial glucose spikes and associated glycation damage. Human data shows cardiovascular event reduction. Caloric restriction mimetic mechanism.", sources: ["PMID:24245565"] },
+    ],
+  },
+
+  {
+    id: "nicotine",
+    name: "Nicotine (Sublingual / Patches)",
+    aliases: ["nicotine","nicotine patch","nicotine gum","nicotinic agonist","cognitive nicotine"],
+    tier: 2, safety: 3, legal: "OTC in most countries (patches, gum, lozenges). Not associated with cancer risk when used without tobacco.", cost: "$15-30/month",
+    dosage: { amount: "1-4mg (gum/lozenge) or 7-14mg patch", timing: "Gum/lozenge: on demand pre-cognitive task. Patch: morning.", note: "Nicotine WITHOUT tobacco has no carcinogenic risk. The drug itself is a potent cognitive enhancer and neuroprotectant. Addiction potential is real but substantially lower without tobacco. Use strategically, not habitually." },
+    interactions: ["Stimulants (additive cardiovascular effects)", "Insulin (may increase insulin resistance at high doses)"],
+    effects: [
+      { goal: "focus", efficacy: 4, evidence: 4, studies: 40, type: "RCT + Meta-analyses",
+        summary: "Dose-dependent improvements in attention, reaction time, working memory, and fine motor performance across multiple meta-analyses. Activates nicotinic acetylcholine receptors. Protective against Parkinson's and Alzheimer's in epidemiological data.", sources: ["PMID:20414766","PMID:16177056"] },
+      { goal: "mood", efficacy: 2, evidence: 3, studies: 15, type: "RCT",
+        summary: "Modest mood enhancement and anxiolytic effects at low doses via dopamine and serotonin modulation. Effects are dependency-mediated at higher doses.", sources: [] },
+    ],
+  },
+
+  {
+    id: "oxaloacetate",
+    name: "Oxaloacetate (benaGene)",
+    aliases: ["oxaloacetate","OAA","benaGene","thermal stabilized OAA","caloric restriction mimetic"],
+    tier: 3, safety: 4, legal: "OTC as supplement (stabilized form). Natural metabolite.", cost: "$50-100/month",
+    dosage: { amount: "100-300mg/day", timing: "Morning on empty stomach or before exercise", note: "TCA cycle intermediate that activates AMPK similarly to caloric restriction. Thermal-stabilized form required for oral bioavailability. Crosses blood-brain barrier and supports mitochondrial function. Expensive per dose." },
+    interactions: [],
+    effects: [
+      { goal: "longevity", efficacy: 3, evidence: 2, studies: 8, type: "Animal + Phase I human",
+        summary: "C. elegans lifespan extension 25%. Activates AMPK, upregulates NAD+, and mimics caloric restriction gene expression profile. Phase I human safety confirmed. Reduces inflammatory markers.", sources: ["PMID:17293040"] },
+      { goal: "energy", efficacy: 3, evidence: 2, studies: 6, type: "Human pilot",
+        summary: "Improves mitochondrial function and energy metabolism. Crosses blood-brain barrier to support neuronal energy production.", sources: [] },
+    ],
+  },
+
 ];

@@ -2039,9 +2039,9 @@ function AppInner(){
         <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,textAlign:"center",margin:"0 0 24px",textTransform:"uppercase"}}>What users say</p>
         <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr 1fr",gap:16,maxWidth:960,margin:"0 auto"}}>
           {[
-            {name:"Alex R.",handle:"@alexr_biohack",text:"Finally a supplement database that doesn't try to sell me anything. The interaction checker alone is worth it — caught a zinc/copper issue in my stack I had no idea about.",goal:"Longevity stack"},
-            {name:"Camille D.",handle:"@camille_perf",text:"Used the Stack Builder before my cut. Got a protocol tailored to my budget with dosing and timing. Better than anything my coach gave me.",goal:"Performance stack"},
-            {name:"Tom K.",handle:"@tomk_nootropics",text:"The evidence scores are exactly what I was looking for. No more reading 15 abstracts to figure out if something works. The tier system is brilliant.",goal:"Cognitive stack"},
+            {name:"Alex R.",text:"Finally a supplement database that doesn't try to sell me anything. The interaction checker alone is worth it — caught a zinc/copper issue in my stack I had no idea about.",goal:"Longevity stack"},
+            {name:"Camille D.",text:"Used the Stack Builder before my cut. Got a protocol tailored to my budget with dosing and timing. Better than anything my coach gave me.",goal:"Performance stack"},
+            {name:"Tom K.",text:"The evidence scores are exactly what I was looking for. No more reading 15 abstracts to figure out if something works. The tier system is brilliant.",goal:"Cognitive stack"},
           ].map(t=>(
             <div key={t.name} style={{padding:"20px 22px",border:`1px solid ${C.border}`,background:C.bg}}>
               <p style={{fontSize:13,color:C.ink,lineHeight:1.7,margin:"0 0 16px",fontStyle:"italic"}}>"{t.text}"</p>

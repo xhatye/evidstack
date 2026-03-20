@@ -1,34 +1,74 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EVIDSTACK — Evidence-Based Supplementation</title>
-    <meta name="description" content="Chaque supplément classé par efficacité et niveau d'évidence scientifique. Données PubMed et Cochrane." />
+    <meta name="description" content="175+ supplements and peptides ranked by actual efficacy and strength of evidence. Data sourced from PubMed meta-analyses and Cochrane reviews." />
+    <meta name="keywords" content="supplements, evidence-based, peptides, creatine, ashwagandha, GLP-1, semaglutide, PubMed, Cochrane, stack builder" />
     <meta name="theme-color" content="#f4f2ee" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
-    <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #060810; min-height: 100vh; }
-    </style>
+    <link rel="canonical" href="https://evidstack.com" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://evidstack.com" />
+    <meta property="og:title" content="EVIDSTACK — Evidence-Based Supplementation" />
+    <meta property="og:description" content="175+ supplements and peptides ranked by actual efficacy and strength of evidence. Data sourced from PubMed and Cochrane." />
+    <meta property="og:image" content="https://evidstack.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Evidstack" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@XVVISV" />
+    <meta name="twitter:title" content="EVIDSTACK — Evidence-Based Supplementation" />
+    <meta name="twitter:description" content="175+ supplements ranked by actual efficacy and evidence. PubMed + Cochrane data." />
+    <meta name="twitter:image" content="https://evidstack.com/og-image.png" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,900&display=swap" rel="stylesheet">
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    body{background:#f4f2ee;-webkit-font-smoothing:antialiased;font-family:'Montserrat',sans-serif;}
-    input::placeholder{color:#6b7280;font-family:'Montserrat',sans-serif;}
-    ::-webkit-scrollbar{width:4px;height:4px;}
-    ::-webkit-scrollbar-track{background:#f4f2ee;}
-    ::-webkit-scrollbar-thumb{background:#d4d0c8;}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-    button{transition:opacity .15s;cursor:pointer;}
-    button:hover{opacity:.8;}
-  </style>
-</head>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,900&display=swap" rel="stylesheet">
+    <style>
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+      body{background:#f4f2ee;-webkit-font-smoothing:antialiased;font-family:'Montserrat',sans-serif;}
+      input::placeholder{color:#6b7280;font-family:'Montserrat',sans-serif;}
+      ::-webkit-scrollbar{width:4px;height:4px;}
+      ::-webkit-scrollbar-track{background:#f4f2ee;}
+      ::-webkit-scrollbar-thumb{background:#d4d0c8;}
+      @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+      button{transition:opacity .15s;cursor:pointer;}
+      button:hover{opacity:.8;}
+      #cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#0a0a0a;color:#e8e5df;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:'Montserrat',sans-serif;font-size:12px;line-height:1.6;border-top:1px solid #1f2937;}
+      #cookie-banner p{flex:1;min-width:200px;color:#9ca3af;}
+      #cookie-banner a{color:#e2c97e;text-decoration:underline;}
+      #cookie-banner .cookie-btns{display:flex;gap:8px;flex-shrink:0;}
+      #cookie-banner button{padding:8px 18px;font-size:11px;font-weight:800;font-family:'Montserrat',sans-serif;letter-spacing:.04em;border:none;cursor:pointer;}
+      #cookie-accept{background:#e2c97e;color:#0a0a0a;}
+      #cookie-decline{background:transparent;color:#9ca3af;border:1px solid #374151!important;}
+    </style>
+  </head>
   <body>
     <div id="root"></div>
+    <div id="cookie-banner" style="display:none;">
+      <p>We use cookies for authentication and anonymous analytics. No advertising cookies. <a href="/legal">Learn more</a></p>
+      <div class="cookie-btns">
+        <button id="cookie-decline">Decline</button>
+        <button id="cookie-accept">Accept</button>
+      </div>
+    </div>
+    <script>
+      (function(){
+        if(!localStorage.getItem('cookie-consent')){
+          var b=document.getElementById('cookie-banner');
+          b.style.display='flex';
+          document.getElementById('cookie-accept').onclick=function(){localStorage.setItem('cookie-consent','accepted');b.style.display='none';};
+          document.getElementById('cookie-decline').onclick=function(){localStorage.setItem('cookie-consent','declined');b.style.display='none';};
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

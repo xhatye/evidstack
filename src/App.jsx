@@ -141,7 +141,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
         <button onClick={onClose} style={{position:"absolute",top:16,right:16,background:"none",border:"none",fontSize:20,cursor:"pointer",color:C.gray}}>x</button>
         <div style={{borderTop:`4px solid ${C.gold}`,padding:"36px"}}>
           <p style={{fontSize:9,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Evidstack Pro</p>
-          <h2 style={{fontSize:28,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 6px"}}>Unlock all 175 compounds</h2>
+          <h2 style={{fontSize:28,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 6px"}}>Unlock all 153 compounds</h2>
           <p style={{fontSize:14,color:C.gray,margin:"0 0 28px",lineHeight:1.6}}>Full access to Tier 2, 3, and 4 compounds plus the AI Stack Builder.</p>
           {[
             "Full database access - all tiers unlocked",
@@ -342,7 +342,7 @@ function StackBuilder({onUpgrade}){
       <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",width:"100%",maxWidth:340}}>
         Upgrade to Pro - $9.99/month
       </button>
-      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all 175 compounds + Stack Builder.</p>
+      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all 153 compounds + Stack Builder.</p>
     </div>
   );
 
@@ -548,7 +548,7 @@ function ProtocolsPage({onGoToSupplements}){
       <div style={{marginTop:40,padding:"24px",background:C.white,border:`1px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16}}>
         <div>
           <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 4px"}}>Want to build your own?</p>
-          <p style={{fontSize:12,color:C.gray,margin:0}}>Browse all 175 compounds, filter by goal, and check interactions.</p>
+          <p style={{fontSize:12,color:C.gray,margin:0}}>Browse all 153 compounds, filter by goal, and check interactions.</p>
         </div>
         <button onClick={onGoToSupplements} style={{padding:"12px 24px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:".04em"}}>Browse Supplements</button>
       </div>
@@ -703,10 +703,10 @@ function AppInner(){
             Supplement and peptide information you can trust.
           </h1>
           <p style={{fontSize:isMobile?13:15,color:C.gray,lineHeight:1.8,margin:"0 auto 20px",maxWidth:560,padding:isMobile?"0 4px":0}}>
-            Evidstack <strong style={{color:C.ink,fontWeight:700}}>analyzes and ranks supplements</strong> by actual efficacy and strength of evidence. More than <strong style={{color:C.ink,fontWeight:700}}>175+ compounds</strong>, sourced from PubMed and Cochrane.
+            Evidstack <strong style={{color:C.ink,fontWeight:700}}>analyzes and ranks supplements</strong> by actual efficacy and strength of evidence. More than <strong style={{color:C.ink,fontWeight:700}}>{SUPPLEMENTS.length}+ compounds</strong>, sourced from PubMed and Cochrane.
           </p>
           <div style={{display:"flex",justifyContent:"center",gap:isMobile?16:32,marginBottom:24,flexWrap:"wrap"}}>
-            {[["175","compounds"],["4","evidence tiers"],["PubMed","primary source"],["Cochrane","systematic reviews"]].map(([val,label])=>(
+            {[[SUPPLEMENTS.length.toString(),"compounds"],["4","evidence tiers"],["PubMed","primary source"],["Cochrane","systematic reviews"]].map(([val,label])=>(
               <div key={label}><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>{val}</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>{label}</span></div>
             ))}
           </div>
@@ -717,7 +717,7 @@ function AppInner(){
           </div>
           <div style={{maxWidth:680,margin:"0 auto 0",background:C.ink,padding:isMobile?"20px 16px":"24px 32px"}}>
             {user&&!isPro?(
-              <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Unlock all 175 compounds + AI Stack Builder.</p>
+              <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Unlock all 153 compounds + AI Stack Builder.</p>
               <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 16px",lineHeight:1.6}}>Tier 2-4 compounds and personalized protocols - $9.99/month.</p>
               <button onClick={openUpgrade} style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Upgrade to Pro</button></>
             ):user&&isPro?(

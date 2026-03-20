@@ -1535,8 +1535,6 @@ function AppInner(){
     {id:"tracker",label:"My Tracker"},
   ];
   const proPages=proTools.map(t=>t.id);
-  const proTools=navItems.filter(i=>i.pro);
-  const proPages=proTools.map(t=>t.id);
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>

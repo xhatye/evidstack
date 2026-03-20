@@ -1478,6 +1478,7 @@ function AppInner(){
   const [showCompareModal,setShowCompareModal]=useState(false);
   const isMobile=useIsMobile();
   const [mobileMenu,setMobileMenu]=useState(false);
+  const [showTools,setShowTools]=useState(false);
 
   const navigateTo=(p)=>{navigate(p);setPage(p);};
   useEffect(()=>{
@@ -1525,12 +1526,15 @@ function AppInner(){
   const navItems=[
     {id:"supplements",label:"Supplements"},
     {id:"protocols",label:"Protocols"},
-    {id:"stack-builder",label:"Stack Builder",pro:true},
-    {id:"interactions",label:"Interactions",pro:true},
-    {id:"weekly-protocol",label:"Protocol AI",pro:true},
-    {id:"tracker",label:"Tracker",pro:true},
     {id:"about",label:"About"},
   ];
+  const proTools=[
+    {id:"stack-builder",label:"Stack Builder AI"},
+    {id:"interactions",label:"Interaction Checker"},
+    {id:"weekly-protocol",label:"Weekly Protocol AI"},
+    {id:"tracker",label:"My Tracker"},
+  ];
+  const proPages=proTools.map(t=>t.id);
   const proTools=navItems.filter(i=>i.pro);
   const proPages=proTools.map(t=>t.id);
 
@@ -1549,10 +1553,15 @@ function AppInner(){
               <span style={{fontSize:14,fontWeight:900,letterSpacing:"-.04em"}}>EVIDSTACK</span>
               <button onClick={()=>setMobileMenu(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:C.gray}}>x</button>
             </div>
-            {[...navItems,{id:"legal",label:"Terms & Privacy"}].map(item=>(
+            {[...navItems,...proTools,{id:"legal",label:"Terms & Privacy"}].map(item=>(
               <button key={item.id} onClick={()=>{navigateTo(item.id);setMobileMenu(false);}}
-                style={{padding:"14px 16px",fontSize:14,fontWeight:700,background:page===item.id?C.ink:"transparent",color:page===item.id?C.white:item.pro&&!isPro?C.gold:C.gray,border:"none",cursor:"pointer",textAlign:"left",borderRadius:4}}>
-                {item.pro&&!isPro?"✦ "+item.label:item.label}
+                style={{padding:"14px 16px",fontSize:14,fontWeight:700,
+                  background:page===item.id?C.ink:"transparent",
+                  color:page===item.id?C.white:C.gray,
+                  border:"none",cursor:"pointer",textAlign:"left",borderRadius:4,
+                  display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <span>{item.label}</span>
+                {proTools.some(t=>t.id===item.id)&&!isPro&&<span style={{fontSize:9,color:C.gold,fontWeight:900,letterSpacing:".06em"}}>PRO</span>}
               </button>
             ))}
             <div style={{height:1,background:C.border,margin:"12px 0"}}/>
@@ -1594,11 +1603,42 @@ function AppInner(){
               <button key={item.id} onClick={()=>navigateTo(item.id)}
                 style={{padding:"8px 14px",fontSize:12,fontWeight:700,
                   background:page===item.id?C.ink:"transparent",
-                  color:page===item.id?C.white:item.pro&&!isPro?C.gold:C.gray,
+                  color:page===item.id?C.white:C.gray,
                   border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s"}}>
-                {item.pro&&!isPro?"✦ "+item.label:item.label}
+                {item.label}
               </button>
             ))}
+            <div style={{position:"relative"}}
+              onMouseEnter={()=>setShowTools(true)}
+              onMouseLeave={()=>setShowTools(false)}>
+              <button
+                style={{padding:"8px 14px",fontSize:12,fontWeight:700,
+                  background:proPages.includes(page)?C.ink:"transparent",
+                  color:proPages.includes(page)?C.white:isPro?C.gray:C.gold,
+                  border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s",
+                  display:"flex",alignItems:"center",gap:5}}>
+                {isPro?"Tools ":"✦ Tools "}<span style={{fontSize:8}}>{showTools?"▲":"▼"}</span>
+              </button>
+              {showTools&&(
+                <div style={{position:"absolute",top:"100%",left:0,background:C.white,
+                  border:`1px solid ${C.border}`,boxShadow:"0 8px 24px rgba(0,0,0,.12)",
+                  zIndex:500,minWidth:210}}>
+                  {proTools.map(t=>(
+                    <button key={t.id} onClick={()=>{navigateTo(t.id);setShowTools(false);}}
+                      style={{width:"100%",padding:"12px 16px",fontSize:12,fontWeight:700,
+                        background:page===t.id?C.bg:"transparent",
+                        color:C.ink,border:"none",
+                        borderBottom:`1px solid ${C.border}`,
+                        cursor:"pointer",textAlign:"left",
+                        fontFamily:"Montserrat,sans-serif",
+                        display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                      {t.label}
+                      {!isPro&&<span style={{fontSize:8,color:C.gold,fontWeight:900,letterSpacing:".08em"}}>PRO</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <div style={{width:1,height:24,background:C.border,margin:"0 10px"}}/>
             {user?(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -1651,9 +1691,18 @@ function AppInner(){
               <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 4px",fontWeight:700}}>Welcome back, Pro member.</p>
               <p style={{fontSize:12,color:"#9ca3af",margin:0}}>Full access to all compounds and the AI Stack Builder.</p></>
             ):(
-              <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Evidstack Pro is coming.</p>
-              <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 16px",lineHeight:1.6}}>Stack builder, interaction checker, personalized protocols. Get early access.</p>
-              <WaitlistForm/></>
+              <div>
+                <p style={{fontSize:15,color:"#e8e5df",margin:"0 0 6px",fontWeight:900,letterSpacing:"-.02em"}}>Evidstack Pro is here.</p>
+                <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 20px",lineHeight:1.7}}>Stack Builder AI, Interaction Checker, Weekly Protocol AI, Tracker, and 175+ compounds including peptides, GLP-1s, and biohacking tier.</p>
+                <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+                  <button onClick={()=>{openUpgrade();}} style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+                    Start for $9.99/mo
+                  </button>
+                  <button onClick={()=>{openAuth("signup");}} style={{padding:"11px 24px",background:"transparent",color:"#9ca3af",border:"1px solid #374151",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+                    Create free account
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>

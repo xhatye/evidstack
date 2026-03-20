@@ -221,13 +221,42 @@ function UpgradeModal({onClose,onAuthNeeded}){
 
           {plan==="annual"&&<p style={{fontSize:11,color:C.green,fontWeight:700,margin:"-12px 0 16px",textAlign:"center"}}>$79/year  - billed annually. Save $40.88 vs monthly.</p>}
 
-          {/* Features */}
-          <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
-            {features.map(f=>(
-              <div key={f.text} style={{display:"flex",alignItems:"center",gap:12}}>
-                <span style={{fontSize:16,flexShrink:0}}>{f.icon}</span>
-                <span style={{fontSize:12,color:C.ink,fontWeight:600,lineHeight:1.4}}>{f.text}</span>
-                <span style={{marginLeft:"auto",color:C.green,fontSize:14,flexShrink:0}}>✓</span>
+          {/* Comparison table */}
+          <div style={{marginBottom:20}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",marginBottom:0}}>
+              <div style={{padding:"10px 12px",background:C.bg,border:`1px solid ${C.border}`,borderRight:"none"}}/>
+              <div style={{padding:"10px 12px",background:C.bg,border:`1px solid ${C.border}`,borderRight:"none",textAlign:"center"}}>
+                <p style={{fontSize:9,fontWeight:800,color:C.gray,margin:0,letterSpacing:".1em",textTransform:"uppercase"}}>Free</p>
+              </div>
+              <div style={{padding:"10px 12px",background:C.ink,border:`1px solid ${C.ink}`,textAlign:"center"}}>
+                <p style={{fontSize:9,fontWeight:800,color:C.gold,margin:0,letterSpacing:".1em",textTransform:"uppercase"}}>Pro</p>
+              </div>
+            </div>
+            {[
+              {feature:"Compounds",free:"Tier 1 only (33)",pro:"All 175+",highlight:true},
+              {feature:"Peptides & GLP-1s",free:false,pro:true},
+              {feature:"Biohacking tier",free:false,pro:true},
+              {feature:"AI Stack Builder",free:false,pro:true,highlight:true},
+              {feature:"Interaction Checker",free:false,pro:true},
+              {feature:"Weekly Protocol AI",free:false,pro:true},
+              {feature:"My Tracker",free:false,pro:true},
+              {feature:"Compare compounds",free:false,pro:true},
+              {feature:"Save your stacks",free:false,pro:true,highlight:true},
+            ].map((row,i)=>(
+              <div key={row.feature} style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr"}}>
+                <div style={{padding:"9px 12px",background:row.highlight?`${C.gold}0a`:C.white,border:`1px solid ${C.border}`,borderTop:"none",borderRight:"none"}}>
+                  <span style={{fontSize:11,fontWeight:row.highlight?800:600,color:C.ink}}>{row.feature}</span>
+                </div>
+                <div style={{padding:"9px 12px",background:row.highlight?`${C.gold}0a`:C.white,border:`1px solid ${C.border}`,borderTop:"none",borderRight:"none",textAlign:"center"}}>
+                  {typeof row.free==="boolean"
+                    ?<span style={{fontSize:13,color:row.free?C.green:"#d4d0c8"}}>{row.free?"✓":"—"}</span>
+                    :<span style={{fontSize:10,fontWeight:600,color:C.gray}}>{row.free}</span>}
+                </div>
+                <div style={{padding:"9px 12px",background:row.highlight?`${C.gold}15`:C.ink,border:`1px solid ${C.ink}`,borderTop:"none",textAlign:"center"}}>
+                  {typeof row.pro==="boolean"
+                    ?<span style={{fontSize:13,color:row.pro?C.gold:"#374151"}}>{row.pro?"✓":"—"}</span>
+                    :<span style={{fontSize:10,fontWeight:700,color:row.highlight?C.gold:C.white}}>{row.pro}</span>}
+                </div>
               </div>
             ))}
           </div>

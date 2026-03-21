@@ -1369,9 +1369,10 @@ function CompoundPage({compoundId,onUpgrade,onBack}){
             <div>
               <p style={{fontSize:9,fontWeight:800,color:tc,letterSpacing:".16em",margin:"0 0 8px",textTransform:"uppercase"}}>TIER {supp.tier} / {tierLabel.toUpperCase()}</p>
               <h1 style={{fontSize:isMob?24:38,fontWeight:900,color:C.ink,margin:"0 0 4px",letterSpacing:"-.03em",lineHeight:1.05}}>{supp.name}</h1>
-              {supp.aliases&&supp.aliases.length>1&&(
-                <p style={{fontSize:11,color:C.gray,margin:"6px 0 0"}}>Also known as: {supp.aliases.slice(1,4).join(", ")}</p>
-              )}
+              {(()=>{
+                const filtered=supp.aliases?.filter(a=>a.toLowerCase()!==supp.name.toLowerCase()&&a.toLowerCase()!==supp.id.toLowerCase()).slice(0,3)||[];
+                return filtered.length>0?<p style={{fontSize:11,color:C.gray,margin:"6px 0 0"}}>Also known as: {filtered.join(", ")}</p>:null;
+              })()}
             </div>
             <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
               <div style={{padding:"8px 14px",background:C.bg,border:`1px solid ${C.border}`,textAlign:"center"}}>
@@ -2386,7 +2387,7 @@ function AppInner(){
                   color:proPages.includes(page)?C.white:isPro?C.gray:C.gold,
                   border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s",
                   display:"flex",alignItems:"center",gap:5}}>
-                <span>✦ Pro Tools</span><span style={{fontSize:8,marginLeft:4}}>{showTools?"▲":"▼"}</span>
+                <span style={{color:proPages.includes(page)?C.white:C.gold,marginRight:2}}>+</span><span>Pro Tools</span><span style={{fontSize:8,marginLeft:4}}>{showTools?"▲":"▼"}</span>
               </button>
               {showTools&&(
                 <div style={{position:"absolute",top:"100%",left:0,background:C.white,

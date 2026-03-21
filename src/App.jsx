@@ -1336,6 +1336,8 @@ function CompoundPage({compoundId,onUpgrade,onBack}){
   const isMob=useIsMobile();
   const supp=SUPPLEMENTS.find(s=>s.id===compoundId);
 
+  useEffect(()=>{window.scrollTo({top:0,behavior:"instant"});},[compoundId]);
+
   if(!supp)return(
     <div style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
       <p style={{fontSize:48,marginBottom:20}}>404</p>
@@ -1490,6 +1492,57 @@ function CompoundPage({compoundId,onUpgrade,onBack}){
           )}
         </>
       )}
+
+          {/* Who it's for */}
+          <div style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"28px 36px",marginBottom:16}}>
+            <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Quick Facts</p>
+            <div style={{display:"grid",gridTemplateColumns:isMob?"1fr 1fr":"repeat(4,1fr)",gap:10}}>
+              {[
+                ["Tier",`${supp.tier} / ${TIERS[supp.tier]?.label||""}`,tc],
+                ["Safety",safetyLabel,safetyColor],
+                ["Goals covered",`${supp.effects.length} goal${supp.effects.length>1?"s":""}`,C.blue],
+                ["Avg Efficacy",`${(supp.effects.reduce((s,e)=>s+Math.abs(e.efficacy),0)/supp.effects.length).toFixed(1)}/5`,C.green],
+              ].map(([label,val,color])=>(
+                <div key={label} style={{padding:"14px 14px",background:C.bg,textAlign:"center"}}>
+                  <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 4px",textTransform:"uppercase"}}>{label}</p>
+                  <p style={{fontSize:16,fontWeight:900,color:color||C.ink,margin:0}}>{val}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Related compounds */}
+          {(()=>{
+            const goalIds=supp.effects.map(e=>e.goal);
+            const related=SUPPLEMENTS.filter(s=>
+              s.id!==supp.id&&
+              s.effects.some(e=>goalIds.includes(e.goal))&&
+              (isPro||s.tier===1)
+            ).slice(0,4);
+            if(!related.length)return null;
+            return(
+              <div style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"28px 36px",marginBottom:16}}>
+                <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Related Compounds</p>
+                <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:10}}>
+                  {related.map(r=>{
+                    const tc2=tierColor(r.tier);
+                    const avgEff2=(r.effects.reduce((s,e)=>s+Math.abs(e.efficacy),0)/r.effects.length).toFixed(1);
+                    return(
+                      <div key={r.id}
+                        onClick={()=>{window.history.pushState({},"","/compound/"+r.id);window.dispatchEvent(new PopStateEvent("popstate"));}}
+                        style={{padding:"14px 16px",border:`1px solid ${C.border}`,borderLeft:`3px solid ${tc2}`,cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                        <div>
+                          <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 2px"}}>{r.name}</p>
+                          <p style={{fontSize:9,fontWeight:700,color:tc2,letterSpacing:".08em",margin:0,textTransform:"uppercase"}}>T{r.tier}</p>
+                        </div>
+                        <span style={{fontSize:14,fontWeight:900,color:C.green}}>{avgEff2}/5</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
       {/* Disclaimer */}
       <div style={{padding:"14px 16px",background:C.bg,border:`1px solid ${C.border}`,marginTop:8}}>
@@ -2197,7 +2250,7 @@ function AppInner(){
   const [mobileMenu,setMobileMenu]=useState(false);
   const [showTools,setShowTools]=useState(false);
 
-  const navigateTo=(p)=>{navigate(p);setPage(p);;setCompoundId(null);};
+  const navigateTo=(p)=>{navigate(p);setPage(p);setCompoundId(null);window.scrollTo({top:0,behavior:"instant"});};
   useEffect(()=>{
     const onPop=()=>{setPage(getPageFromPath());setCompoundId(getCompoundIdFromPath());};
     window.addEventListener("popstate",onPop);

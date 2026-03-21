@@ -35,7 +35,7 @@ export const SUPPLEMENTS = [
   {
     id: "magnesium-bisglycinate",
     name: "Magnesium Bisglycinate",
-    aliases: ["Mg", "magnésium glycinate"],
+    aliases: ["Mg", "magnesium glycinate"],
     tier: 1,
     safety: 5,
     legal: "OTC everywhere",
@@ -61,7 +61,7 @@ export const SUPPLEMENTS = [
   {
     id: "creatine-monohydrate",
     name: "Creatine Monohydrate",
-    aliases: ["creatine", "créatine"],
+    aliases: ["creatine", "creatine"],
     tier: 1,
     safety: 5,
     legal: "OTC everywhere",
@@ -85,13 +85,13 @@ export const SUPPLEMENTS = [
   {
     id: "vitamine-d3-k2",
     name: "Vitamin D3 + K2",
-    aliases: ["D3","vitamine D","cholécalciférol","MK-7"],
+    aliases: ["D3","vitamine D","cholecalciferol","MK-7"],
     tier: 1,
     safety: 4,
     legal: "OTC everywhere",
     cost: "$10-$20/month",
     dosage: { amount: "2000-5000 UI D3 + 100-200 µg K2 (MK-7)", timing: "With a fatty meal (fat-soluble)", note: "K2 essential to direct calcium to bones (avoids arterial calcification)" },
-    interactions: ["Anticoagulants (warfarine) : K2 peut interférer"],
+    interactions: ["Anticoagulants (warfarin): K2 may interfere"],
     effects: [
       { goal: "hormones", efficacy: 3, evidence: 4, studies: 22, type: "RCT",
         summary: "Supplementation in deficient individuals: +25% testosterone on average. Reduced effects when levels are already normal.", sources: ["PMID:21154195","PMID:30873843"] },
@@ -164,7 +164,7 @@ export const SUPPLEMENTS = [
     safety: 4,
     legal: "OTC everywhere",
     cost: "$15-$25/month",
-    dosage: { amount: "300-600 mg/day (extrait standardisé)", timing: "Morning or evening depending on goal (evening for sleep)", note: "KSM-66 and Sensoril are the most studied standardized extracts. Avoid non-standardized root products." },
+    dosage: { amount: "300-600 mg/day (standardized extract)", timing: "Morning or evening depending on goal (evening for sleep)", note: "KSM-66 and Sensoril are the most studied standardized extracts. Avoid non-standardized root products." },
     interactions: ["Immunosuppressants (may amplify)","Sedatives (additive effect)","Thyroid medications (may alter TSH)"],
     effects: [
       { goal: "stress",   efficacy: 4, evidence: 4, studies: 24, type: "RCT",
@@ -185,7 +185,7 @@ export const SUPPLEMENTS = [
   {
     id: "l-theanine",
     name: "L-Theanine",
-    aliases: ["theanine","théanine"],
+    aliases: ["theanine","theanine"],
     tier: 1,
     safety: 5,
     legal: "OTC everywhere",
@@ -207,13 +207,13 @@ export const SUPPLEMENTS = [
   {
     id: "caffeine",
     name: "Caffeine",
-    aliases: ["caffeine","café","cafeine"],
+    aliases: ["caffeine","coffee","cafeine"],
     tier: 1,
     safety: 3,
     legal: "OTC everywhere (high dose banned in competitive sport)",
     cost: "$1-$5/month",
     dosage: { amount: "100-200 mg (3-6 mg/kg max)", timing: "90 min after waking. Avoid after 2pm.", note: "Tolerance builds quickly. Cycling recommended." },
-    interactions: ["L-théanine (synergie)", "MAOIs (dangerous interactions)"],
+    interactions: ["L-Theanine (synergy)", "MAOIs (dangerous interactions)"],
     effects: [
       { goal: "focus",    efficacy: 5, evidence: 5, studies: 500, type: "Meta-analyses",
         summary: "The most documented effect in behavioral pharmacology. Improves alertness, reaction time, and working memory. Incontestable.", sources: ["PMID:24861208","PMID:16541243"] },
@@ -295,7 +295,7 @@ export const SUPPLEMENTS = [
   {
     id: "vitamin-b12",
     name: "Vitamin B12",
-    aliases: ["cobalamine","méthylcobalamine","B12"],
+    aliases: ["cobalamine","methylcobalamin","B12"],
     tier: 1, safety: 5, legal: "OTC everywhere", cost: "$5-$10/month",
     dosage: { amount: "500-1000 µg/day", timing: "Morning fasted", note: "Methylcobalamin > cyanocobalamin. Essential for vegetarians and vegans." },
     interactions: ["Metformin (reduces B12 absorption long-term)"],
@@ -331,7 +331,7 @@ export const SUPPLEMENTS = [
     name: "Glycine",
     aliases: ["glycine","glycocolle"],
     tier: 1, safety: 5, legal: "OTC everywhere", cost: "$5-$10/month",
-    dosage: { amount: "3-5 g", timing: "30 min avant le coucher", note: "Non-essential amino acid. Combined with NAC for glutathione synthesis (GlyNAC). No dependency risk." },
+    dosage: { amount: "3-5 g", timing: "30 min before bedtime", note: "Non-essential amino acid. Combined with NAC for glutathione synthesis (GlyNAC). No dependency risk." },
     interactions: [],
     effects: [
       { goal: "sleep",    efficacy: 4, evidence: 4, studies: 15, type: "RCT",
@@ -346,9 +346,9 @@ export const SUPPLEMENTS = [
   {
     id: "melatonin",
     name: "Melatonin",
-    aliases: ["melatonin","mélatonine"],
+    aliases: ["melatonin","melatonin"],
     tier: 1, safety: 4, legal: "OTC (prescription required at high dose in some countries)", cost: "$5-$15/month",
-    dosage: { amount: "0.3-1 mg", timing: "30-60 min avant le coucher, lumière tamisée", note: "Popular doses (5-10mg) are too high. 0.3mg is equally effective with fewer residual effects." },
+    dosage: { amount: "0.3-1 mg", timing: "30-60 min before bedtime, in dim light", note: "Popular doses (5-10mg) are too high. 0.3mg is equally effective with fewer residual effects." },
     interactions: ["Sedatives (additive effect)","Anticoagulants"],
     effects: [
       { goal: "sleep",    efficacy: 4, evidence: 5, studies: 80, type: "Cochrane meta-analyses",
@@ -410,7 +410,7 @@ export const SUPPLEMENTS = [
   {
     id: "collagen",
     name: "Hydrolyzed Collagen",
-    aliases: ["collagen peptides","collagène","gélatine"],
+    aliases: ["collagen peptides","collagen","gelatin"],
     tier: 2, safety: 5, legal: "OTC everywhere", cost: "$15-$30/month",
     dosage: { amount: "10-15 g/day", timing: "Morning with vitamin C", note: "Type I for skin/hair. Type II for cartilage. Vitamin C essential for synthesis." },
     interactions: [],
@@ -427,7 +427,7 @@ export const SUPPLEMENTS = [
     name: "Curcumin (Bioavailable)",
     aliases: ["curcuma","turmeric","curcumin","BCM-95"],
     tier: 2, safety: 4, legal: "OTC everywhere", cost: "$20-$40/month",
-    dosage: { amount: "500-1000 mg/day + pipérine", timing: "With a fatty meal + piperine required", note: "Pure curcumin = very low absorption. BCM-95, Theracurmin, or + piperine required." },
+    dosage: { amount: "500-1000 mg/day + piperine", timing: "With a fatty meal + piperine required", note: "Pure curcumin = very low absorption. BCM-95, Theracurmin, or + piperine required." },
     interactions: ["Anticoagulants (high dose)"],
     effects: [
       { goal: "longevity",efficacy: 4, evidence: 4, studies: 45, type: "Meta-analyses",
@@ -444,7 +444,7 @@ export const SUPPLEMENTS = [
     name: "Bacopa Monnieri",
     aliases: ["brahmi","bacopa"],
     tier: 2, safety: 4, legal: "OTC everywhere", cost: "$15-$25/month",
-    dosage: { amount: "300-600 mg/day (extrait 20% bacosides)", timing: "Avec un repas gras. Effets en 8-12 semaines.", note: "Neuroprotectant. Cognitive effects are slow to appear - patience required." },
+    dosage: { amount: "300-600 mg/day (extrait 20% bacosides)", timing: "With a fatty meal. Effects visible after 8-12 weeks.", note: "Neuroprotectant. Cognitive effects are slow to appear - patience required." },
     interactions: [],
     effects: [
       { goal: "memory",   efficacy: 4, evidence: 4, studies: 20, type: "Meta-analyses",
@@ -462,7 +462,7 @@ export const SUPPLEMENTS = [
     aliases: ["coenzyme Q10","ubiquinone","ubiquinol"],
     tier: 2, safety: 5, legal: "OTC everywhere", cost: "$25-$50/month",
     dosage: { amount: "100-300 mg/day (ubiquinol)", timing: "With a fatty meal", note: "Ubiquinol = reduced form, better bioavailability. Essential if taking statins." },
-    interactions: ["Statines (épuisent CoQ10  - supplémenter obligatoirement)","Anticoagulants"],
+    interactions: ["Statins (deplete CoQ10 - supplementation strongly recommended)","Anticoagulants"],
     effects: [
       { goal: "energy",   efficacy: 4, evidence: 4, studies: 30, type: "RCT",
         summary: "Cofactor in the mitochondrial respiratory chain. Improves energy and endurance, especially in 40+ where endogenous CoQ10 declines.", sources: ["PMID:20970427"] },
@@ -478,7 +478,7 @@ export const SUPPLEMENTS = [
     name: "L-Citrulline",
     aliases: ["citrulline malate","citrulline"],
     tier: 2, safety: 5, legal: "OTC everywhere", cost: "$15-$25/month",
-    dosage: { amount: "6-8 g citrulline malate 2:1", timing: "30-45 min avant l'effort", note: "Citrulline > arginine for nitric oxide conversion." },
+    dosage: { amount: "6-8 g citrulline malate 2:1", timing: "30-45 min before training", note: "Citrulline > arginine for nitric oxide conversion." },
     interactions: [],
     effects: [
       { goal: "force",    efficacy: 3, evidence: 3, studies: 20, type: "RCT",
@@ -541,7 +541,7 @@ export const SUPPLEMENTS = [
 
   {
     id: "nac",
-    name: "N-Acétylcystéine (NAC)",
+    name: "N-Acetylcysteine (NAC)",
     aliases: ["NAC","N-acetylcysteine","acetylcysteine"],
     tier: 2, safety: 4, legal: "OTC (zone grise FDA USA)", cost: "$10-$20/month",
     dosage: { amount: "600-1200 mg/day", timing: "With meals, avoid immediately post-exercise", note: "Glutathione precursor. NAC+Glycine combo = GlyNAC, synergistic for longevity." },
@@ -559,7 +559,7 @@ export const SUPPLEMENTS = [
     name: "Beta-Alanine",
     aliases: ["beta alanine","carnosine precursor"],
     tier: 2, safety: 5, legal: "OTC everywhere", cost: "$10-$20/month",
-    dosage: { amount: "3.2-6.4 g/day (fractionné en doses de 1.6g)", timing: "Split across the day", note: "Picotements cutanés normaux (paresthésies). Saturation carnosine musculaire en 4 semaines." },
+    dosage: { amount: "3.2-6.4 g/day (split into 1.6g doses)", timing: "Split across the day", note: "Normal skin tingling (paresthesia). Muscle carnosine saturation reached after 4 weeks." },
     interactions: [],
     effects: [
       { goal: "endurance",efficacy: 4, evidence: 4, studies: 40, type: "Meta-analyses",
@@ -574,7 +574,7 @@ export const SUPPLEMENTS = [
     name: "Panax Ginseng",
     aliases: ["panax ginseng","korean ginseng","ginsenosides","KRG"],
     tier: 2, safety: 3, legal: "OTC everywhere", cost: "$20-$40/month",
-    dosage: { amount: "200-400 mg/day (4-7% ginsénosides)", timing: "Morning, cycle 3 months ON / 1 month OFF", note: "Korean Red Ginseng (KRG) = most studied for libido and cognition. Panax (Korean) is different from Siberian ginseng." },
+    dosage: { amount: "200-400 mg/day (4-7% ginsenosides)", timing: "Morning, cycle 3 months ON / 1 month OFF", note: "Korean Red Ginseng (KRG) = most studied for libido and cognition. Panax (Korean) is different from Siberian ginseng." },
     interactions: ["Anticoagulants","Antidiabetics","MAOIs"],
     effects: [
       { goal: "energy",   efficacy: 3, evidence: 3, studies: 18, type: "RCT",
@@ -591,7 +591,7 @@ export const SUPPLEMENTS = [
     name: "Maca (Lepidium Meyenii)",
     aliases: ["maca","lepidium meyenii","maca root"],
     tier: 2, safety: 5, legal: "OTC everywhere", cost: "$15-$25/month",
-    dosage: { amount: "1.5-3 g/day (racine séchée)", timing: "With meals", note: "Gelatinized maca = better digestibility. Black for cognition, red for prostate." },
+    dosage: { amount: "1.5-3 g/day (dried root)", timing: "With meals", note: "Gelatinized maca = better digestibility. Black for cognition, red for prostate." },
     interactions: [],
     effects: [
       { goal: "hormones", efficacy: 3, evidence: 3, studies: 14, type: "RCT",
@@ -606,7 +606,7 @@ export const SUPPLEMENTS = [
     name: "Resveratrol",
     aliases: ["resveratrol","pterostilbene","trans-resveratrol"],
     tier: 3, safety: 4, legal: "OTC everywhere", cost: "$20-$40/month",
-    dosage: { amount: "150-500 mg/day (trans-resvératrol)", timing: "With meals. Avoid immediately before or after exercise.", note: "Pterostilbene = better bioavailability. Synergistic with NMN/NR via SIRT1." },
+    dosage: { amount: "150-500 mg/day (trans-resveratrol)", timing: "With meals. Avoid immediately before or after exercise.", note: "Pterostilbene = better bioavailability. Synergistic with NMN/NR via SIRT1." },
     interactions: ["Anticoagulants (high dose)"],
     effects: [
       { goal: "longevity",efficacy: 3, evidence: 3, studies: 25, type: "RCT + mechanistic",
@@ -623,8 +623,8 @@ export const SUPPLEMENTS = [
     name: "Huperzine A",
     aliases: ["huperzine","huperzia serrata"],
     tier: 3, safety: 3, legal: "OTC everywhere", cost: "$15-$30/month",
-    dosage: { amount: "100-200 µg/day", timing: "Matin, cycles 2 semaines ON / 2 semaines OFF", note: "Acetylcholinesterase inhibitor. Accumulation requires cycling. Interacts with Alzheimer medications." },
-    interactions: ["Médicaments Alzheimer (rivastigmine, donepezil  - accumulation dangereuse)"],
+    dosage: { amount: "100-200 µg/day", timing: "Morning, cycle 2 weeks ON / 2 weeks OFF", note: "Acetylcholinesterase inhibitor. Accumulation requires cycling. Interacts with Alzheimer medications." },
+    interactions: ["Alzheimer medications (rivastigmine, donepezil - dangerous accumulation risk)"],
     effects: [
       { goal: "memory",   efficacy: 4, evidence: 3, studies: 14, type: "RCT",
         summary: "Inhibits acetylcholinesterase -> increases acetylcholine. Improves memory and learning. Positive RCTs in Alzheimer patients and students.", sources: ["PMID:9527169","PMID:24788139"] },
@@ -699,7 +699,7 @@ export const SUPPLEMENTS = [
     id: "bpc-157",
     name: "BPC-157",
     aliases: ["body protection compound","BPC157"],
-    tier: 4, safety: 2, legal: "Non approuvé humain  - recherche uniquement", cost: "$50-$150/month",
+    tier: 4, safety: 2, legal: "Not approved for human use - research only", cost: "$50-$150/month",
     dosage: { amount: "250-500mcg/day (injectable) or 500-1000mcg/day (oral)", timing: "Morning fasted", note: "⚠️ Research peptide. Not approved for human use by FDA or EMA. Long-term safety profile unknown." },
     interactions: [],
     effects: [
@@ -713,8 +713,8 @@ export const SUPPLEMENTS = [
     name: "Cerebrolysin",
     aliases: ["cerebrolysin"],
     tier: 4, safety: 2, legal: "Prescription drug in Eastern Europe. Grey area import in France/EU/USA.", cost: "$80-$300/month",
-    dosage: { amount: "5-30 mL/day (IV ou IM)", timing: "Cures de 10-20 jours", note: "WARNING: Mix of neurotrophic peptides. Medical use in Russia and China. Difficult to obtain legally in most Western countries. Popular in advanced biohacking circles." },
-    interactions: ["MAOIs","Antidépresseurs (interactions potentielles)"],
+    dosage: { amount: "5-30 mL/day (IV ou IM)", timing: "10-20 day courses", note: "WARNING: Mix of neurotrophic peptides. Medical use in Russia and China. Difficult to obtain legally in most Western countries. Popular in advanced biohacking." },
+    interactions: ["MAOIs","Antidepressants (potential interactions)"],
     effects: [
       { goal: "memory",   efficacy: 4, evidence: 3, studies: 18, type: "RCT (clinical populations)",
         summary: "Exogenous NGF, BDNF, and CNTF. Cognitive improvement documented in Alzheimer's and post-stroke. Limited data in healthy adults but remarkable biohacking anecdotes.", sources: ["PMID:24954684","PMID:26504987"] },
@@ -730,7 +730,7 @@ export const SUPPLEMENTS = [
     name: "Semax",
     aliases: ["semax","ACTH(4-7)"],
     tier: 4, safety: 2, legal: "Approved in Russia/Ukraine. Unscheduled research compound in France/EU/USA.", cost: "$40-$100/month",
-    dosage: { amount: "200-600 µg/day (spray nasal)", timing: "Morning, fast-acting", note: "WARNING: Synthetic peptide. Medically approved in Russia. Not legally available in most Western countries. Import is a legal grey area." },
+    dosage: { amount: "200-600 mcg/day (nasal spray)", timing: "Morning, fast-acting", note: "WARNING: Synthetic peptide. Medically approved in Russia. Not legally available in most Western countries. Import is a legal grey area." },
     interactions: [],
     effects: [
       { goal: "focus",    efficacy: 4, evidence: 2, studies: 5, type: "RCT + anecdotal",
@@ -744,15 +744,15 @@ export const SUPPLEMENTS = [
     id: "methylene-blue",
     name: "Methylene Blue",
     aliases: ["methylene blue","MB","methylthioninium"],
-    tier: 4, safety: 2, legal: "Usage médical réglementé  - OTC ultra-faible dose", cost: "$15-$40/month",
-    dosage: { amount: "0.5-2 mg/kg/day (ultra-faible dose)", timing: "Morning, avoid evening (stimulant)", note: "⚠️ Colore urines bleu/vert. Interactions IMAO GRAVES. Effets nootropiques aux ultra-faibles doses seulement." },
-    interactions: ["IMAO (syndrome sérotoninergique GRAVE)","SSRIs (serotonergic interaction)"],
+    tier: 4, safety: 2, legal: "Regulated medical use - OTC at ultra-low doses", cost: "$15-$40/month",
+    dosage: { amount: "0.5-2 mg/kg/day (ultra-low dose)", timing: "Morning, avoid evening (stimulant)", note: "WARNING: Colors urine blue/green. MAOI interactions SEVERE. Nootropic effects only at ultra-low doses." },
+    interactions: ["MAOIs (severe serotonin syndrome risk)","SSRIs (serotonergic interaction)"],
     effects: [
       { goal: "memory",   efficacy: 3, evidence: 2, studies: 6, type: "RCT",
         summary: "Improves episodic memory and consolidation. Cofactor in the mitochondrial respiratory chain.", sources: ["PMID:18606648"] },
       { goal: "energy",   efficacy: 3, evidence: 2, studies: 4, type: "RCT",
         summary: "Improves mitochondrial efficiency as an electron bypass. Reduces brain fatigue.", sources: ["PMID:21443475"] },
-      { goal: "longevity",efficacy: 3, evidence: 2, studies: 5, type: "Mécanistique",
+      { goal: "longevity",efficacy: 3, evidence: 2, studies: 5, type: "Mechanistic",
         summary: "Reduces cellular senescence in vitro. Mitochondrial anti-aging effects documented in basic research.", sources: ["PMID:28504957"] },
     ],
   },
@@ -2356,7 +2356,7 @@ export const SUPPLEMENTS = [
     id: "sulbutiamine",
     name: "Sulbutiamine",
     aliases: ["sulbutiamine","arcalion","enerion","bisibuthiamine"],
-    tier: 3, safety: 3, legal: "Prescription in France. OTC in USA.", cost: "$15-$30/month",
+    tier: 3, safety: 3, legal: "Prescription drug in France. OTC in USA.", cost: "$15-$30/month",
     dosage: { amount: "400-600mg/day", timing: "Morning, not in evenings (stimulating)", note: "Fat-soluble thiamine (B1) analogue that crosses blood-brain barrier much better. Cycle: 5 days ON, 2 days OFF. Tolerance builds within weeks." },
     interactions: ["Do not combine with central stimulants"],
     effects: [

@@ -2508,6 +2508,26 @@ function AppInner(){
         </div>
       </div>
 
+      {/* Scroll indicator */}
+      <div style={{background:C.white,display:"flex",flexDirection:"column",alignItems:"center",padding:"20px 0 8px",borderBottom:"none"}}>
+        <p style={{fontSize:10,fontWeight:700,letterSpacing:".16em",color:C.gray,margin:"0 0 14px",textTransform:"uppercase"}}>Browse the database</p>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:0}}>
+          <style>{`
+            @keyframes chevronBounce {
+              0%,100%{transform:translateY(0);opacity:.25}
+              50%{transform:translateY(6px);opacity:1}
+            }
+            .chev1{animation:chevronBounce 1.6s ease-in-out infinite;}
+            .chev2{animation:chevronBounce 1.6s ease-in-out .25s infinite;}
+          `}</style>
+          {[1,2].map(n=>(
+            <svg key={n} className={n===1?"chev1":"chev2"} width="28" height="16" viewBox="0 0 28 16" fill="none" style={{display:"block"}}>
+              <polyline points="3,3 14,13 25,3" stroke="#0a0a0a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            </svg>
+          ))}
+        </div>
+      </div>
+
         <div style={{borderBottom:`1px solid ${C.border}`,background:C.white}}>
           <div style={{display:"flex",gap:0,overflowX:"auto",padding:"0 32px"}}>
             {GOALS.map((g,i)=>(

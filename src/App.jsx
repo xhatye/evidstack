@@ -21,7 +21,14 @@ const ROUTES = {
 };
 
 function getPageFromPath(){
-  return ROUTES[window.location.pathname]||"supplements";
+  const path=window.location.pathname;
+  if(path.startsWith("/compound/"))return "compound";
+  return ROUTES[path]||"supplements";
+}
+function getCompoundIdFromPath(){
+  const path=window.location.pathname;
+  if(path.startsWith("/compound/"))return path.replace("/compound/","");
+  return null;
 }
 
 function navigate(page){
@@ -398,6 +405,13 @@ function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade,onCo
               {supp.interactions.length?supp.interactions.map((it,idx)=><p key={idx} style={{fontSize:11,color:C.amber,margin:"0 0 6px",lineHeight:1.5}}>! {it}</p>):<p style={{fontSize:11,color:C.green,margin:0,fontWeight:700}}>{T.card.noInteractions}</p>}
               <p style={{fontSize:10,color:C.gray,marginTop:10}}>{supp.legal}</p>
             </div>
+          </div>
+          <div style={{padding:"14px 28px",borderTop:`1px solid ${C.border}`,display:"flex",justifyContent:"flex-end"}}>
+            <button
+              onClick={e=>{e.stopPropagation();window.history.pushState({},"","/compound/"+supp.id);window.dispatchEvent(new PopStateEvent("popstate"));}}
+              style={{padding:"9px 20px",background:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".06em"}}>
+              View Full Profile →
+            </button>
           </div>
         </div>
       )}
@@ -1316,6 +1330,175 @@ function AffiliatePage(){
   );
 }
 
+/* COMPOUND PAGE */
+function CompoundPage({compoundId,onUpgrade,onBack}){
+  const {isPro}=useAuth();
+  const isMob=useIsMobile();
+  const supp=SUPPLEMENTS.find(s=>s.id===compoundId);
+
+  if(!supp)return(
+    <div style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
+      <p style={{fontSize:48,marginBottom:20}}>404</p>
+      <h2 style={{fontSize:24,fontWeight:900,color:C.ink,margin:"0 0 12px"}}>Compound not found</h2>
+      <p style={{fontSize:14,color:C.gray,marginBottom:24}}>This compound does not exist in our database.</p>
+      <button onClick={onBack} style={{padding:"11px 24px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Back to Supplements</button>
+    </div>
+  );
+
+  const isLocked=supp.tier>=2&&!isPro;
+  const tc=tierColor(supp.tier);
+  const tierLabel=TIERS[supp.tier]?.label||"";
+  const safetyLabel=["","Risky","Caution","Caution","Safe","Very Safe"][supp.safety]||"";
+  const safetyColor=[null,C.red,C.amber,C.amber,C.green,C.green][supp.safety]||C.gray;
+  const efColor=(v)=>v>=4?C.green:v===3?C.blue:v===2?C.amber:C.red;
+
+  return(
+    <div style={{maxWidth:900,margin:"0 auto",padding:isMob?"24px 16px 80px":"48px 48px 100px"}}>
+      {/* Back */}
+      <button onClick={onBack}
+        style={{display:"flex",alignItems:"center",gap:8,fontSize:12,fontWeight:700,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",marginBottom:28,padding:0}}>
+        ← Back to supplements
+      </button>
+
+      {/* Header */}
+      <div style={{borderTop:`4px solid ${tc}`,background:C.white,border:`1px solid ${C.border}`,borderTop:`4px solid ${tc}`,marginBottom:24}}>
+        <div style={{padding:isMob?"20px 18px":"32px 36px"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:16}}>
+            <div>
+              <p style={{fontSize:9,fontWeight:800,color:tc,letterSpacing:".16em",margin:"0 0 8px",textTransform:"uppercase"}}>TIER {supp.tier} / {tierLabel.toUpperCase()}</p>
+              <h1 style={{fontSize:isMob?24:38,fontWeight:900,color:C.ink,margin:"0 0 4px",letterSpacing:"-.03em",lineHeight:1.05}}>{supp.name}</h1>
+              {supp.aliases&&supp.aliases.length>1&&(
+                <p style={{fontSize:11,color:C.gray,margin:"6px 0 0"}}>Also known as: {supp.aliases.slice(1,4).join(", ")}</p>
+              )}
+            </div>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              <div style={{padding:"8px 14px",background:C.bg,border:`1px solid ${C.border}`,textAlign:"center"}}>
+                <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 2px",textTransform:"uppercase"}}>Safety</p>
+                <p style={{fontSize:13,fontWeight:900,color:safetyColor,margin:0}}>{safetyLabel}</p>
+              </div>
+              <div style={{padding:"8px 14px",background:C.bg,border:`1px solid ${C.border}`,textAlign:"center"}}>
+                <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 2px",textTransform:"uppercase"}}>Est. Cost</p>
+                <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:0}}>{supp.cost||"Varies"}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Legal */}
+          <div style={{padding:"10px 14px",background:`${tc}0a`,borderLeft:`3px solid ${tc}`,marginBottom:0}}>
+            <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}><strong style={{color:C.ink}}>Legal status:</strong> {supp.legal}</p>
+          </div>
+        </div>
+      </div>
+
+      {isLocked?(
+        <div style={{background:C.ink,padding:"40px 36px",textAlign:"center",marginBottom:24}}>
+          <p style={{fontSize:11,fontWeight:800,color:C.gold,letterSpacing:".16em",margin:"0 0 8px",textTransform:"uppercase"}}>Pro Feature</p>
+          <h2 style={{fontSize:24,fontWeight:900,color:C.white,margin:"0 0 12px",letterSpacing:"-.03em"}}>Full profile locked</h2>
+          <p style={{fontSize:13,color:"#9ca3af",margin:"0 0 24px",lineHeight:1.7}}>Unlock dosing protocols, evidence scores, interactions, and detailed research summaries for all {SUPPLEMENTS.length}+ compounds.</p>
+          <button onClick={onUpgrade} style={{padding:"13px 32px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+            Unlock with Pro - $9.99/mo
+          </button>
+        </div>
+      ):(
+        <>
+          {/* Dosage */}
+          {supp.dosage&&(
+            <div style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"28px 36px",marginBottom:16}}>
+              <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Dosing Protocol</p>
+              <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:16,marginBottom:supp.dosage.note?16:0}}>
+                {supp.dosage.amount&&(
+                  <div style={{padding:"16px 18px",background:C.bg}}>
+                    <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".12em",margin:"0 0 6px",textTransform:"uppercase"}}>Amount</p>
+                    <p style={{fontSize:14,fontWeight:800,color:C.ink,margin:0}}>{supp.dosage.amount}</p>
+                  </div>
+                )}
+                {supp.dosage.timing&&(
+                  <div style={{padding:"16px 18px",background:C.bg}}>
+                    <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".12em",margin:"0 0 6px",textTransform:"uppercase"}}>Timing</p>
+                    <p style={{fontSize:14,fontWeight:800,color:C.ink,margin:0}}>{supp.dosage.timing}</p>
+                  </div>
+                )}
+              </div>
+              {supp.dosage.note&&(
+                <div style={{padding:"14px 16px",background:`${C.blue}08`,borderLeft:`3px solid ${C.blue}`,marginTop:supp.dosage.amount?16:0}}>
+                  <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.7}}>{supp.dosage.note}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Evidence by goal */}
+          <div style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"28px 36px",marginBottom:16}}>
+            <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 20px",textTransform:"uppercase"}}>Evidence by Goal</p>
+            <div style={{display:"flex",flexDirection:"column",gap:24}}>
+              {supp.effects.map((e,i)=>{
+                const goal=GOALS.find(g=>g.id===e.goal);
+                return(
+                  <div key={i} style={{paddingBottom:24,borderBottom:i<supp.effects.length-1?`1px solid ${C.border}`:"none"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8,marginBottom:12}}>
+                      <div style={{display:"flex",alignItems:"center",gap:10}}>
+                        <span style={{fontSize:18}}>{goal?.icon||"•"}</span>
+                        <span style={{fontSize:14,fontWeight:900,color:C.ink,textTransform:"capitalize"}}>{e.goal}</span>
+                        <span style={{fontSize:9,fontWeight:700,color:C.gray,background:C.bg,border:`1px solid ${C.border}`,padding:"2px 8px",letterSpacing:".06em"}}>{e.type}</span>
+                      </div>
+                      <div style={{display:"flex",gap:12}}>
+                        {[["Efficacy",e.efficacy],["Evidence",e.evidence]].map(([label,val])=>(
+                          <div key={label} style={{textAlign:"center"}}>
+                            <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 2px",textTransform:"uppercase"}}>{label}</p>
+                            <p style={{fontSize:18,fontWeight:900,color:efColor(val),margin:0}}>{Math.abs(val)}/5</p>
+                          </div>
+                        ))}
+                        <div style={{textAlign:"center"}}>
+                          <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 2px",textTransform:"uppercase"}}>Studies</p>
+                          <p style={{fontSize:18,fontWeight:900,color:C.ink,margin:0}}>{e.studies||"?"}</p>
+                        </div>
+                      </div>
+                    </div>
+                    {e.efficacy<0&&<p style={{fontSize:11,fontWeight:800,color:C.red,margin:"0 0 8px"}}>WARNING: Negative effect on this goal</p>}
+                    <p style={{fontSize:13,color:C.gray,lineHeight:1.8,margin:"0 0 8px"}}>{e.summary}</p>
+                    {e.sources&&e.sources.length>0&&(
+                      <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:8}}>
+                        {e.sources.map(src=>(
+                          <a key={src} href={src.startsWith("PMID:")?`https://pubmed.ncbi.nlm.nih.gov/${src.replace("PMID:","")}`:src.startsWith("Cochrane:")?`https://www.cochranelibrary.com/`:"#"}
+                            target="_blank" rel="noopener noreferrer"
+                            onClick={ev=>ev.stopPropagation()}
+                            style={{fontSize:9,fontWeight:800,color:C.blue,background:`${C.blue}0a`,border:`1px solid ${C.blue}20`,padding:"3px 8px",textDecoration:"none",letterSpacing:".06em"}}>
+                            {src}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Interactions */}
+          {supp.interactions&&supp.interactions.length>0&&(
+            <div style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"28px 36px",marginBottom:16}}>
+              <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Known Interactions</p>
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                {supp.interactions.map((it,i)=>(
+                  <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"10px 14px",background:`${C.amber}08`,borderLeft:`3px solid ${C.amber}`}}>
+                    <span style={{color:C.amber,fontWeight:900,fontSize:13,flexShrink:0,marginTop:1}}>!</span>
+                    <span style={{fontSize:12,color:C.ink,lineHeight:1.6}}>{it}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Disclaimer */}
+      <div style={{padding:"14px 16px",background:C.bg,border:`1px solid ${C.border}`,marginTop:8}}>
+        <p style={{fontSize:10,color:C.gray,margin:0,lineHeight:1.6}}>For informational and research purposes only. Not medical advice. Consult a qualified healthcare provider before starting any supplementation protocol.</p>
+      </div>
+    </div>
+  );
+}
+
 /* COMPARE MODAL */
 function CompareModal({compA,compB,onClose}){
   const isMob=useIsMobile();
@@ -1976,6 +2159,7 @@ function AccountCenter({onClose,onUpgrade}){
 function AppInner(){
   const {user,isPro,loading,logout}=useAuth();
   const [page,setPage]=useState(()=>getPageFromPath());
+  const [compoundId,setCompoundId]=useState(()=>getCompoundIdFromPath());
   const [goal,setGoal]=useState("all");
   const [search,setSearch]=useState("");
   const [selected,setSelected]=useState(null);
@@ -2013,9 +2197,9 @@ function AppInner(){
   const [mobileMenu,setMobileMenu]=useState(false);
   const [showTools,setShowTools]=useState(false);
 
-  const navigateTo=(p)=>{navigate(p);setPage(p);};
+  const navigateTo=(p)=>{navigate(p);setPage(p);;setCompoundId(null);};
   useEffect(()=>{
-    const onPop=()=>setPage(getPageFromPath());
+    const onPop=()=>{setPage(getPageFromPath());setCompoundId(getCompoundIdFromPath());};
     window.addEventListener("popstate",onPop);
     return()=>window.removeEventListener("popstate",onPop);
   },[]);
@@ -2191,6 +2375,7 @@ function AppInner(){
       {page==="about"         &&<AboutPage/>}
       {page==="compoundmaxxing"&&<CompoundmaxxingPage onUpgrade={openUpgrade} onNavigate={navigateTo}/>}
       {page==="affiliate"&&<AffiliatePage/>}
+      {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
       {page==="legal"          &&<LegalPage/>}
       {page==="interactions"   &&<InteractionChecker onUpgrade={openUpgrade}/>}
       {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}

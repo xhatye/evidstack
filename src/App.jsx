@@ -2211,10 +2211,14 @@ function AppInner(){
               <div key={label}><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>{val}</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>{label}</span></div>
             ))}
           </div>
-          <div style={{display:"flex",maxWidth:680,margin:"0 auto 20px",boxShadow:"0 2px 16px rgba(0,0,0,.08)"}}>
-            <input value={search} onChange={e=>setSearch(e.target.value)}
-              placeholder={isMobile?"Search a supplement...":PLACEHOLDERS[phIdx]}
-              style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,opacity:phFade?1:0,transition:"opacity .4s",fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
+          <div style={{display:"flex",maxWidth:680,margin:"0 auto 20px",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
+            {!search&&(
+              <div style={{position:"absolute",left:isMobile?14:20,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",zIndex:1,opacity:phFade?1:0,transition:"opacity .4s",fontSize:isMobile?13:14,color:"#9ca3af",fontFamily:"Montserrat,sans-serif",whiteSpace:"nowrap",overflow:"hidden",maxWidth:"calc(100% - 110px)"}}>
+                {isMobile?"Search a supplement...":PLACEHOLDERS[phIdx]}
+              </div>
+            )}
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder=""
+              style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
             <button style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search</button>
           </div>
           <div style={{maxWidth:680,margin:"0 auto 0",background:C.ink,padding:isMobile?"20px 16px":"24px 32px"}}>

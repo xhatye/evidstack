@@ -1988,6 +1988,27 @@ function AppInner(){
   const [compareA,setCompareA]=useState(null);
   const [compareB,setCompareB]=useState(null);
   const [showCompareModal,setShowCompareModal]=useState(false);
+  const PLACEHOLDERS=[
+    "Search by compound name...",
+    "Try \"creatine\" for strength and muscle",
+    "Try \"sleep\" to filter by goal",
+    "Try \"semaglutide\" for weight loss",
+    "Try \"BPC-157\" for healing peptides",
+    "Try \"hair\" for hair retention compounds",
+    "Try \"focus\" for cognitive enhancers",
+    "Try \"longevity\" for anti-aging compounds",
+    "Try \"modafinil\" for wakefulness",
+    "Try \"skin\" for aesthetics compounds",
+  ];
+  const [phIdx,setPhIdx]=useState(0);
+  const [phFade,setPhFade]=useState(true);
+  useEffect(()=>{
+    const iv=setInterval(()=>{
+      setPhFade(false);
+      setTimeout(()=>{setPhIdx(i=>(i+1)%PLACEHOLDERS.length);setPhFade(true);},400);
+    },4000);
+    return()=>clearInterval(iv);
+  },[]);
   const isMobile=useIsMobile();
   const [mobileMenu,setMobileMenu]=useState(false);
   const [showTools,setShowTools]=useState(false);
@@ -2191,8 +2212,9 @@ function AppInner(){
             ))}
           </div>
           <div style={{display:"flex",maxWidth:680,margin:"0 auto 20px",boxShadow:"0 2px 16px rgba(0,0,0,.08)"}}>
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={isMobile?"Search a supplement...":"What do you want to learn about?"}
-              style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
+            <input value={search} onChange={e=>setSearch(e.target.value)}
+              placeholder={isMobile?"Search a supplement...":PLACEHOLDERS[phIdx]}
+              style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,opacity:phFade?1:0,transition:"opacity .4s",fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
             <button style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search</button>
           </div>
           <div style={{maxWidth:680,margin:"0 auto 0",background:C.ink,padding:isMobile?"20px 16px":"24px 32px"}}>

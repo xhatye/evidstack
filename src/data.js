@@ -3140,4 +3140,80 @@ export const SUPPLEMENTS = [
     ],
   },
 
+
+  // ── LOOKSMAXXING / SKIN / HAIR ────────────────────────────────────────────
+
+  {
+    id: "potassium-chloride",
+    name: "Potassium Chloride (KCl)",
+    aliases: ["potassium chloride","KCl","potassium supplement","electrolyte potassium","NoSalt","Nu-Salt"],
+    tier: 1, safety: 3, legal: "OTC everywhere (sold as salt substitute — NoSalt, Nu-Salt brands)", cost: "$3-8/month",
+    dosage: { amount: "1-3g/day elemental potassium (from KCl powder)", timing: "Mixed in water as a 'shot' or spread across meals. Start low — 500mg/day and titrate.", note: "Target sodium:potassium ratio of 1:2 to 1:3 for cardiovascular health and reduced water retention. Most people are significantly potassium deficient on Western diets. Tastes bitter/metallic — mix with food or chase quickly. CAUTION: Never take high doses at once — hyperkalemia risk with kidney disease or ACE inhibitors." },
+    interactions: ["ACE inhibitors (hyperkalemia risk)", "Potassium-sparing diuretics (dangerous)", "NSAIDs (may reduce excretion)"],
+    effects: [
+      { goal: "cardio", efficacy: 4, evidence: 5, studies: 60, type: "RCT + Meta-analyses",
+        summary: "Meta-analysis of 30+ RCTs: potassium supplementation reduces systolic BP by 3-5 mmHg independent of sodium restriction. Reduces stroke risk by 24% in meta-analysis. Most underappreciated cardiovascular supplement.", sources: ["PMID:23558164","PMID:11475511"] },
+      { goal: "recovery", efficacy: 3, evidence: 3, studies: 15, type: "RCT",
+        summary: "Corrects sodium-potassium ratio, reducing subcutaneous water retention and bloating. Improves muscle contraction efficiency and reduces cramping. Essential electrolyte for muscle function.", sources: [] },
+    ],
+  },
+
+  {
+    id: "lycopene",
+    name: "Lycopene",
+    aliases: ["lycopene","tomato extract","lycopene carotenoid","lyc-o-mato"],
+    tier: 2, safety: 5, legal: "OTC everywhere", cost: "$8-20/month",
+    dosage: { amount: "15-30mg/day", timing: "With a fat-containing meal for absorption (fat-soluble carotenoid)", note: "Most concentrated in cooked tomato products — cooking increases bioavailability 3-4x. Supplement form preferred for consistent dosing. Can be stacked with Beta-Carotene for synergistic skin photoprotection. May suppress thyroid at mega-doses — keep under 30mg/day." },
+    interactions: ["Blood thinners (mild antiplatelet effect)", "Other carotenoids (synergistic)"],
+    effects: [
+      { goal: "skin", efficacy: 3, evidence: 3, studies: 18, type: "RCT",
+        summary: "Reduces UV-induced skin damage by building carotenoid skin density (measured by spectroscopy). Provides internal sun protection factor. Paired with beta-carotene for tanning enhancement while reducing burn risk. Skin color improvement (healthy yellowish tone) documented.", sources: ["PMID:11763339","PMID:17656046"] },
+      { goal: "longevity", efficacy: 3, evidence: 3, studies: 25, type: "Observational + RCT",
+        summary: "Inverse correlation with prostate cancer risk in large epidemiological studies. Potent antioxidant — reduces oxidative DNA damage. Cardiovascular protective effects via LDL oxidation reduction.", sources: ["PMID:17479168"] },
+    ],
+  },
+
+  {
+    id: "beta-carotene",
+    name: "Beta-Carotene",
+    aliases: ["beta-carotene","beta carotene","provitamin A","carotene","natural tanning supplement"],
+    tier: 2, safety: 3, legal: "OTC everywhere", cost: "$5-15/month",
+    dosage: { amount: "15-25mg/day (natural sources preferred)", timing: "With fat-containing meal", note: "IMPORTANT SAFETY NOTE: High-dose synthetic beta-carotene supplementation (>20mg/day) is associated with increased lung cancer risk in smokers (CARET trial). Natural mixed carotenoids from food or algae-sourced supplements are safer. Skin yellowing (carotenodermia) occurs at very high doses — harmless but noticeable. May mildly suppress thyroid at high doses." },
+    interactions: ["Vitamin A (combined excess toxic)", "Smokers: increased lung cancer risk at high synthetic doses"],
+    effects: [
+      { goal: "skin", efficacy: 4, evidence: 4, studies: 25, type: "RCT",
+        summary: "Deposits in skin and provides photoprotection equivalent to SPF 4. Imparts golden/tan skin tone measurably in multiple RCTs. Synergistic with lycopene. Most popular natural tanning supplement — builds actual carotenoid skin pigmentation over 8-12 weeks.", sources: ["PMID:15585762","PMID:17656046"] },
+      { goal: "longevity", efficacy: 2, evidence: 3, studies: 20, type: "RCT + epidemiological",
+        summary: "Antioxidant protection from dietary sources well-established. Synthetic supplementation in isolation shows mixed results in RCTs. Natural mixed carotenoids safer and more effective.", sources: [] },
+    ],
+  },
+
+  {
+    id: "isotretinoin",
+    name: "Isotretinoin (Accutane)",
+    aliases: ["isotretinoin","accutane","roaccutane","claravis","absorica","13-cis-retinoic acid"],
+    tier: 3, safety: 2, legal: "FDA-approved prescription drug. Tightly regulated under iPLEDGE program in USA. Requires monthly blood tests and pregnancy tests.", cost: "$50-300/month (generic varies widely)",
+    dosage: { amount: "0.5-1mg/kg/day oral, typically 40-80mg/day for standard course", timing: "With a fat-rich meal for absorption (highly lipophilic)", note: "Systemic retinoid. Gold standard for severe nodular acne — 85% achieve complete remission after one 20-week course. Requires iPLEDGE program enrollment in USA, monthly blood tests (lipids, LFTs), and pregnancy prevention. Common sides: severely dry lips (use Aquaphor), dry skin, possible initial flare. Some report mood effects — monitor carefully." },
+    interactions: ["Vitamin A supplements (toxic in combination — absolutely avoid)", "Tetracycline antibiotics (pseudotumor cerebri risk)", "Wax depilation (increased scarring risk)", "Tretinoin topicals"],
+    effects: [
+      { goal: "skin", efficacy: 5, evidence: 5, studies: 100, type: "RCT + 40 years clinical use",
+        summary: "The most effective acne treatment ever developed. 85-90% long-term remission rate after single course. Permanently reduces sebaceous gland size by 35-90%, sebum production by 70%, P. acnes colonization, and follicular hyperkeratinization. Superior to all topicals and antibiotics combined for moderate-severe acne.", sources: ["PMID:12393175","PMID:10809988"] },
+    ],
+  },
+
+  {
+    id: "dutasteride",
+    name: "Dutasteride (Avodart)",
+    aliases: ["dutasteride","avodart","dual 5-AR inhibitor","5-alpha reductase dutasteride"],
+    tier: 3, safety: 2, legal: "FDA-approved prescription drug for BPH. Widely prescribed off-label for androgenetic alopecia.", cost: "$15-60/month (generic)",
+    dosage: { amount: "0.5mg/day oral (standard) or 0.5mg 3x/week (reduced dose protocol)", timing: "Once daily at any time, with or without food", note: "Dual inhibitor of both type 1 AND type 2 5-alpha reductase — reduces DHT by 90-95% vs finasteride's 70%. More potent hair preservation than finasteride. Also significantly reduces sebaceous gland activity and oiliness. Half-life 5 weeks — effects persist long after stopping. Same sexual side effect risk as finasteride (~2% incidence). Blood test to baseline DHT and testosterone recommended." },
+    interactions: ["PSA tests (reduces PSA by 40-50% — inform urologist)", "Other 5-AR inhibitors", "CYP3A4 inhibitors (ketoconazole, ritonavir increase dutasteride levels)"],
+    effects: [
+      { goal: "hair", efficacy: 5, evidence: 5, studies: 40, type: "RCT + Meta-analyses",
+        summary: "Head-to-head RCTs show dutasteride superior to finasteride for hair count and thickness. Reduces scalp DHT by 90-95%. Meta-analyses confirm superiority. FDA-approved for hair loss in South Korea and Japan. Most effective pharmacological hair preservation agent.", sources: ["PMID:24684055","PMID:16354105"] },
+      { goal: "skin", efficacy: 3, evidence: 3, studies: 10, type: "RCT",
+        summary: "Reduces sebum production and sebaceous gland activity via DHT reduction. Useful for seborrheic dermatitis and oily skin. Acne improvement documented, particularly hormonal acne in men.", sources: [] },
+    ],
+  },
+
 ];

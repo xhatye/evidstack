@@ -17,6 +17,7 @@ const ROUTES = {
   "/about":"about",
   "/legal":"legal",
   "/compoundmaxxing":"compoundmaxxing",
+  "/affiliate":"affiliate",
 };
 
 function getPageFromPath(){
@@ -583,11 +584,24 @@ function InteractionChecker({onUpgrade}){
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
 
-  const addCompound=()=>{
-    const t=input.trim();
+  const NAMES=SUPPLEMENTS.map(s=>s.name);
+  const [suggestions,setSuggestions]=useState([]);
+  const [showSugg,setShowSugg]=useState(false);
+
+  const onInputChange=(val)=>{
+    setInput(val);
+    if(val.length<2){setSuggestions([]);setShowSugg(false);return;}
+    const q=val.toLowerCase();
+    const matches=NAMES.filter(n=>n.toLowerCase().includes(q)).slice(0,6);
+    setSuggestions(matches);
+    setShowSugg(matches.length>0);
+  };
+
+  const addCompound=(name)=>{
+    const t=(name||input).trim();
     if(!t||compounds.includes(t))return;
     if(compounds.length>=8){setError("Max 8 compounds.");return;}
-    setCompounds(c=>[...c,t]);setInput("");setError("");
+    setCompounds(c=>[...c,t]);setInput("");setSuggestions([]);setShowSugg(false);setError("");
   };
 
   const check=async()=>{
@@ -621,11 +635,28 @@ function InteractionChecker({onUpgrade}){
       <p style={{fontSize:13,color:C.gray,margin:"0 0 28px",lineHeight:1.7}}>Add 2-8 compounds from your stack for a full safety and synergy analysis.</p>
 
       {/* Input */}
-      <div style={{display:"flex",gap:0,marginBottom:12,boxShadow:"0 2px 12px rgba(0,0,0,.06)"}}>
-        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCompound()}
-          placeholder="e.g. Creatine, Ashwagandha, L-Theanine..."
-          style={{flex:1,padding:"13px 16px",border:`1px solid ${C.border}`,borderRight:"none",fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",minWidth:0}}/>
-        <button onClick={addCompound} style={{padding:"13px 20px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",flexShrink:0,fontFamily:"Montserrat,sans-serif"}}>Add</button>
+      <div style={{position:"relative",marginBottom:12}}>
+        <div style={{display:"flex",gap:0,boxShadow:"0 2px 12px rgba(0,0,0,.06)"}}>
+          <input value={input} onChange={e=>onInputChange(e.target.value)}
+            onKeyDown={e=>{if(e.key==="Enter")addCompound();if(e.key==="Escape"){setShowSugg(false);}}}
+            onBlur={()=>setTimeout(()=>setShowSugg(false),150)}
+            onFocus={()=>input.length>=2&&setSuggestions.length>0&&setShowSugg(true)}
+            placeholder="Type a compound name..."
+            style={{flex:1,padding:"13px 16px",border:`1px solid ${C.border}`,borderRight:"none",fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",minWidth:0}}/>
+          <button onClick={()=>addCompound()} style={{padding:"13px 20px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",flexShrink:0,fontFamily:"Montserrat,sans-serif"}}>Add</button>
+        </div>
+        {showSugg&&suggestions.length>0&&(
+          <div style={{position:"absolute",top:"100%",left:0,right:0,background:C.white,border:`1px solid ${C.border}`,borderTop:"none",zIndex:100,boxShadow:"0 8px 24px rgba(0,0,0,.1)"}}>
+            {suggestions.map(s=>(
+              <div key={s} onMouseDown={()=>addCompound(s)}
+                style={{padding:"11px 16px",fontSize:13,fontWeight:600,color:C.ink,cursor:"pointer",borderBottom:`1px solid ${C.border}`,background:C.white}}
+                onMouseEnter={e=>e.currentTarget.style.background=C.bg}
+                onMouseLeave={e=>e.currentTarget.style.background=C.white}>
+                {s}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Tags */}
@@ -711,6 +742,7 @@ function MyTracker({onUpgrade}){
   const isMob=useIsMobile();
   const [stack,setStack]=useState([]);
   const [newItem,setNewItem]=useState("");
+  const [trackerSugg,setTrackerSugg]=useState([]);
   const [logs,setLogs]=useState({}); // {YYYY-MM-DD: {taken:[],mood:3,energy:3,note:""}}
   const [selectedDay,setSelectedDay]=useState(new Date().toISOString().slice(0,10));
   const [saving,setSaving]=useState(false);
@@ -786,10 +818,26 @@ function MyTracker({onUpgrade}){
         {/* Left: stack setup */}
         <div>
           <p style={{fontSize:10,fontWeight:800,letterSpacing:".12em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>My stack</p>
-          <div style={{display:"flex",gap:0,marginBottom:10}}>
-            <input value={newItem} onChange={e=>setNewItem(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addToStack()}
-              placeholder="Add supplement..." style={{flex:1,padding:"9px 12px",border:`1px solid ${C.border}`,borderRight:"none",fontSize:12,fontFamily:"Montserrat,sans-serif",outline:"none"}}/>
-            <button onClick={addToStack} style={{padding:"9px 14px",background:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Add</button>
+          <div style={{position:"relative",marginBottom:10}}>
+            <div style={{display:"flex",gap:0}}>
+              <input value={newItem} onChange={e=>{setNewItem(e.target.value);const q=e.target.value.toLowerCase();setTrackerSugg(q.length>=2?SUPPLEMENTS.map(s=>s.name).filter(n=>n.toLowerCase().includes(q)).slice(0,5):[]);}}
+                onKeyDown={e=>e.key==="Enter"&&addToStack()}
+                onBlur={()=>setTimeout(()=>setTrackerSugg([]),150)}
+                placeholder="Search compounds..." style={{flex:1,padding:"9px 12px",border:`1px solid ${C.border}`,borderRight:"none",fontSize:12,fontFamily:"Montserrat,sans-serif",outline:"none"}}/>
+              <button onClick={addToStack} style={{padding:"9px 14px",background:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Add</button>
+            </div>
+            {trackerSugg.length>0&&(
+              <div style={{position:"absolute",top:"100%",left:0,right:0,background:C.white,border:`1px solid ${C.border}`,borderTop:"none",zIndex:100,boxShadow:"0 6px 20px rgba(0,0,0,.1)"}}>
+                {trackerSugg.map(s=>(
+                  <div key={s} onMouseDown={()=>{if(!stack.includes(s)){const st=[...stack,s];setStack(st);save(st,null);}setNewItem("");setTrackerSugg([]);}}
+                    style={{padding:"8px 12px",fontSize:12,fontWeight:600,color:C.ink,cursor:"pointer",borderBottom:`1px solid ${C.border}`}}
+                    onMouseEnter={e=>e.currentTarget.style.background=C.bg}
+                    onMouseLeave={e=>e.currentTarget.style.background=C.white}>
+                    {s}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:1}}>
             {stack.map(item=>(
@@ -798,7 +846,19 @@ function MyTracker({onUpgrade}){
                 <span onClick={()=>{const s=stack.filter(x=>x!==item);setStack(s);save(s,null);}} style={{cursor:"pointer",fontSize:13,color:C.gray}}>x</span>
               </div>
             ))}
-            {stack.length===0&&<p style={{fontSize:12,color:C.gray,padding:"12px 0"}}>Add your supplements above.</p>}
+            {stack.length===0&&(
+              <div>
+                <p style={{fontSize:12,color:C.gray,padding:"12px 0 8px",margin:0}}>Add your supplements above or start with common picks:</p>
+                <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                  {["Creatine Monohydrate","Vitamin D3 + K2","Omega-3 EPA/DHA","Magnesium Bisglycinate","Zinc Bisglycinate","Ashwagandha KSM-66","L-Theanine","Caffeine"].map(sug=>(
+                    <button key={sug} onClick={()=>{if(!stack.includes(sug)){const s=[...stack,sug];setStack(s);save(s,null);}}}
+                      style={{padding:"5px 12px",background:C.bg,border:`1px solid ${C.border}`,fontSize:11,fontWeight:700,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
+                      + {sug}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1032,7 +1092,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
             Every stack curated from published research and clinical data. Dosing, timing, mechanisms — no bro science.
           </p>
           <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
-            {[["180+","compounds"],["Peptides","fully documented"],["PubMed","primary source"]].map(([val,label])=>(
+            {[[SUPPLEMENTS.length.toString()+"+","compounds"],["Peptides","fully documented"],["PubMed","primary source"]].map(([val,label])=>(
               <div key={label} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 20px",border:"1px solid #374151"}}>
                 <span style={{fontSize:14,fontWeight:900,color:C.white}}>{val}</span>
                 <span style={{fontSize:11,color:"#6b7280"}}>{label}</span>
@@ -1153,6 +1213,105 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* AFFILIATE */
+function AffiliatePage(){
+  const isMob=useIsMobile();
+  const [copied,setCopied]=useState(false);
+
+  const copy=(text)=>{
+    navigator.clipboard.writeText(text).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});
+  };
+
+  return(
+    <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"40px 16px 80px":"64px 48px 100px"}}>
+      {/* Header */}
+      <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Evidstack — Affiliate Program</p>
+      <h1 style={{fontSize:isMob?28:44,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 16px",lineHeight:1.05}}>Earn 30% recurring commission.</h1>
+      <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 0 40px",maxWidth:560}}>
+        Recommend Evidstack to your audience and earn 30% on every payment — every month, for as long as they stay subscribed.
+      </p>
+
+      {/* Numbers */}
+      <div style={{display:"grid",gridTemplateColumns:isMob?"1fr 1fr":"repeat(3,1fr)",gap:12,marginBottom:40}}>
+        {[
+          {val:"30%",label:"Recurring commission"},
+          {val:"$3/mo",label:"Per monthly subscriber"},
+          {val:"$23.70/yr",label:"Per annual subscriber"},
+        ].map(s=>(
+          <div key={s.label} style={{background:C.ink,padding:"20px 16px",textAlign:"center"}}>
+            <p style={{fontSize:isMob?22:28,fontWeight:900,color:C.gold,margin:"0 0 4px"}}>{s.val}</p>
+            <p style={{fontSize:10,color:"#6b7280",fontWeight:700,letterSpacing:".08em",margin:0,textTransform:"uppercase"}}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* How it works */}
+      <div style={{marginBottom:40}}>
+        <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>How it works</p>
+        <div style={{display:"flex",flexDirection:"column",gap:1}}>
+          {[
+            {n:"01",title:"Apply below",desc:"Send us your name, platform, and audience size. We review and send you a custom link within 48h."},
+            {n:"02",title:"Share your link",desc:"Use your tracking link in videos, posts, or bio. No minimum audience required."},
+            {n:"03",title:"Earn every month",desc:"30% of every payment your referrals make, automatically, for their entire subscription lifetime."},
+            {n:"04",title:"Get paid",desc:"Payouts monthly via PayPal or bank transfer once you hit $20 minimum."},
+          ].map(s=>(
+            <div key={s.n} style={{display:"flex",gap:20,padding:"18px 20px",background:C.bg,alignItems:"flex-start"}}>
+              <span style={{fontSize:11,fontWeight:900,color:C.gold,flexShrink:0,letterSpacing:".04em"}}>{s.n}</span>
+              <div>
+                <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 4px"}}>{s.title}</p>
+                <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.6}}>{s.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Who it's for */}
+      <div style={{marginBottom:40}}>
+        <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Who it is for</p>
+        <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:10}}>
+          {[
+            {icon:"📱",title:"Content creators",desc:"TikTok, YouTube, Instagram — fitness, biohacking, looksmaxxing, nootropics content"},
+            {icon:"🧬",title:"Peptide / biohacking communities",desc:"Discord servers, Telegram groups, Reddit moderators in relevant communities"},
+            {icon:"🏋️",title:"Fitness coaches",desc:"Personal trainers, online coaches with a client base interested in optimization"},
+            {icon:"✍️",title:"Newsletter writers",desc:"Health, longevity, or performance newsletters with engaged readers"},
+          ].map(s=>(
+            <div key={s.title} style={{padding:"16px 18px",border:`1px solid ${C.border}`,background:C.white}}>
+              <p style={{fontSize:18,margin:"0 0 6px"}}>{s.icon}</p>
+              <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 4px"}}>{s.title}</p>
+              <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Apply form / CTA */}
+      <div style={{background:C.ink,padding:isMob?"24px 20px":"32px 40px"}}>
+        <p style={{fontSize:14,fontWeight:900,color:C.white,margin:"0 0 8px",letterSpacing:"-.02em"}}>Apply to become an affiliate.</p>
+        <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 24px",lineHeight:1.7}}>
+          Send an email to <strong style={{color:C.gold}}>hello@evidstack.com</strong> with the subject line <strong style={{color:C.white}}>"Affiliate Application"</strong> and include:
+        </p>
+        <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:24}}>
+          {["Your name and platform (TikTok, YouTube, etc.)","Your niche (looksmaxxing, fitness, biohacking, nootropics...)","Approximate audience size","Why you think Evidstack fits your audience"].map(item=>(
+            <div key={item} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+              <span style={{color:C.gold,flexShrink:0,fontSize:12,marginTop:2}}>✓</span>
+              <span style={{fontSize:12,color:"#e8e5df",lineHeight:1.5}}>{item}</span>
+            </div>
+          ))}
+        </div>
+        <button onClick={()=>copy("hello@evidstack.com")}
+          style={{padding:"12px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+          {copied?"Copied!":"Copy email address"}
+        </button>
+      </div>
+
+      <p style={{fontSize:11,color:C.gray,margin:"20px 0 0",lineHeight:1.7}}>
+        We review all applications within 48 hours. No minimum follower count. We prioritize engaged niche audiences over large generic ones.
+      </p>
     </div>
   );
 }
@@ -1775,8 +1934,18 @@ function AccountCenter({onClose,onUpgrade}){
               )}
 
               <div style={{marginTop:28,paddingTop:20,borderTop:`1px solid ${C.border}`}}>
+                {isPro&&(
+                  <div style={{marginBottom:20}}>
+                    <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Manage Subscription</p>
+                    <a href="https://billing.stripe.com/p/login/evidstack" target="_blank" rel="noopener noreferrer"
+                      style={{display:"inline-block",padding:"10px 18px",background:C.bg,border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,color:C.ink,textDecoration:"none",cursor:"pointer"}}>
+                      Manage or cancel subscription →
+                    </a>
+                    <p style={{fontSize:10,color:C.gray,margin:"6px 0 0"}}>Cancel anytime. No questions asked.</p>
+                  </div>
+                )}
                 <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Danger Zone</p>
-                <p style={{fontSize:12,color:C.gray,margin:"0 0 12px",lineHeight:1.6}}>To cancel your subscription or delete your account, contact us at <strong>hello@evidstack.com</strong></p>
+                <p style={{fontSize:12,color:C.gray,margin:"0 0 12px",lineHeight:1.6}}>To delete your account, contact us at <strong>hello@evidstack.com</strong></p>
               </div>
             </div>
           )}
@@ -1983,6 +2152,7 @@ function AppInner(){
 
       {page==="about"         &&<AboutPage/>}
       {page==="compoundmaxxing"&&<CompoundmaxxingPage onUpgrade={openUpgrade} onNavigate={navigateTo}/>}
+      {page==="affiliate"&&<AffiliatePage/>}
       {page==="legal"          &&<LegalPage/>}
       {page==="interactions"   &&<InteractionChecker onUpgrade={openUpgrade}/>}
       {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}
@@ -2039,9 +2209,9 @@ function AppInner(){
         <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,textAlign:"center",margin:"0 0 24px",textTransform:"uppercase"}}>What users say</p>
         <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr 1fr",gap:16,maxWidth:960,margin:"0 auto"}}>
           {[
-            {name:"Alex R.",text:"Finally a supplement database that doesn't try to sell me anything. The interaction checker alone is worth it — caught a zinc/copper issue in my stack I had no idea about.",goal:"Longevity stack"},
-            {name:"Camille D.",text:"Used the Stack Builder before my cut. Got a protocol tailored to my budget with dosing and timing. Better than anything my coach gave me.",goal:"Performance stack"},
-            {name:"Tom K.",text:"The evidence scores are exactly what I was looking for. No more reading 15 abstracts to figure out if something works. The tier system is brilliant.",goal:"Cognitive stack"},
+            {name:"Alex R.",handle:"@alexr_biohack",text:"Finally a supplement database that doesn't try to sell me anything. The interaction checker alone is worth it — caught a zinc/copper issue in my stack I had no idea about.",goal:"Longevity stack"},
+            {name:"Camille D.",handle:"@camille_perf",text:"Used the Stack Builder before my cut. Got a protocol tailored to my budget with dosing and timing. Better than anything my coach gave me.",goal:"Performance stack"},
+            {name:"Tom K.",handle:"@tomk_nootropics",text:"The evidence scores are exactly what I was looking for. No more reading 15 abstracts to figure out if something works. The tier system is brilliant.",goal:"Cognitive stack"},
           ].map(t=>(
             <div key={t.name} style={{padding:"20px 22px",border:`1px solid ${C.border}`,background:C.bg}}>
               <p style={{fontSize:13,color:C.ink,lineHeight:1.7,margin:"0 0 16px",fontStyle:"italic"}}>"{t.text}"</p>
@@ -2143,10 +2313,41 @@ function AppInner(){
         </div>
       </>}
 
-      <div style={{borderTop:`1px solid ${C.border}`,padding:isMobile?"16px":"24px 48px",display:"flex",flexDirection:isMobile?"column":"row",justifyContent:"space-between",alignItems:isMobile?"flex-start":"center",flexWrap:"wrap",gap:8}}>
-        <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink,cursor:"pointer"}} onClick={()=>navigateTo("supplements")}>EVIDSTACK</span>
-        <p style={{fontSize:10,color:C.gray,textAlign:"center",lineHeight:1.6,maxWidth:500}}>{T.footer}</p>
-<span onClick={()=>navigateTo("legal")} style={{fontSize:10,color:C.gray,cursor:"pointer",textDecoration:"underline"}}>Terms & Privacy</span>
+      <div style={{borderTop:`1px solid ${C.border}`,background:C.white,padding:isMobile?"28px 16px":"40px 48px"}}>
+        <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:28,marginBottom:32}}>
+          <div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+              <div style={{width:26,height:26,border:`2px solid ${C.ink}`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <span style={{fontSize:10,fontWeight:900,color:C.ink}}>E</span>
+              </div>
+              <span style={{fontSize:11,fontWeight:900,letterSpacing:".08em",color:C.ink}}>EVIDSTACK</span>
+            </div>
+            <p style={{fontSize:11,color:C.gray,margin:"0 0 6px",lineHeight:1.7}}>{SUPPLEMENTS.length}+ compounds from PubMed and Cochrane.</p>
+            <p style={{fontSize:11,color:C.gray,margin:0}}>hello@evidstack.com</p>
+          </div>
+          <div>
+            <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Database</p>
+            {[["supplements","Supplements"],["protocols","Protocols"],["compoundmaxxing","Compoundmaxxing"]].map(([p,l])=>(
+              <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
+            ))}
+          </div>
+          <div>
+            <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Tools</p>
+            {[["stack-builder","Stack Builder AI"],["interactions","Interaction Checker"],["weekly-protocol","Protocol AI"],["tracker","My Tracker"]].map(([p,l])=>(
+              <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
+            ))}
+          </div>
+          <div>
+            <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Company</p>
+            {[["about","About"],["affiliate","Affiliate Program"],["legal","Terms & Privacy"]].map(([p,l])=>(
+              <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
+            ))}
+          </div>
+        </div>
+        <div style={{borderTop:`1px solid ${C.border}`,paddingTop:16,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+          <p style={{fontSize:10,color:C.gray,margin:0}}>{T.footer}</p>
+          <p style={{fontSize:10,color:C.gray,margin:0}}>Not medical advice.</p>
+        </div>
       </div>
     </div>
   );

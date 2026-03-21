@@ -2386,7 +2386,7 @@ function AppInner(){
                   color:proPages.includes(page)?C.white:isPro?C.gray:C.gold,
                   border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s",
                   display:"flex",alignItems:"center",gap:5}}>
-                "✦ Pro Tools "<span style={{fontSize:8}}>{showTools?"▲":"▼"}</span>
+                <span>✦ Pro Tools</span><span style={{fontSize:8,marginLeft:4}}>{showTools?"▲":"▼"}</span>
               </button>
               {showTools&&(
                 <div style={{position:"absolute",top:"100%",left:0,background:C.white,
@@ -2437,7 +2437,7 @@ function AppInner(){
       {page==="stack-builder" &&<StackBuilder onUpgrade={openUpgrade}/>}
 
       {page==="supplements"&&<>
-        <div style={{padding:isMobile?"32px 16px 40px":"60px 24px 56px",textAlign:"center",borderBottom:`1px solid ${C.border}`}}>
+        <div style={{padding:isMobile?"32px 16px 40px":"60px 24px 56px",textAlign:"center"}}>
           <h1 style={{fontSize:isMobile?28:48,fontWeight:900,lineHeight:1.12,letterSpacing:"-.04em",margin:"0 0 14px",color:C.ink,maxWidth:740,marginLeft:"auto",marginRight:"auto"}}>
             Supplement and peptide information you can trust.
           </h1>

@@ -2386,7 +2386,7 @@ function AppInner(){
                   color:proPages.includes(page)?C.white:isPro?C.gray:C.gold,
                   border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s",
                   display:"flex",alignItems:"center",gap:5}}>
-                {isPro?"Tools ":"✦ Tools "}<span style={{fontSize:8}}>{showTools?"▲":"▼"}</span>
+                "✦ Pro Tools "<span style={{fontSize:8}}>{showTools?"▲":"▼"}</span>
               </button>
               {showTools&&(
                 <div style={{position:"absolute",top:"100%",left:0,background:C.white,
@@ -2485,47 +2485,19 @@ function AppInner(){
         </div>
 
 
-      {/* Testimonials */}
-      <div style={{borderBottom:`1px solid ${C.border}`,background:C.white,padding:isMobile?"28px 16px":"40px 48px"}}>
-        <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,textAlign:"center",margin:"0 0 24px",textTransform:"uppercase"}}>What users say</p>
-        <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr 1fr",gap:16,maxWidth:960,margin:"0 auto"}}>
-          {[
-            {name:"Alex R.",handle:"@alexr_biohack",text:"Finally a supplement database that doesn't try to sell me anything. The interaction checker alone is worth it  -  caught a zinc/copper issue in my stack I had no idea about.",goal:"Longevity stack"},
-            {name:"Camille D.",handle:"@camille_perf",text:"Used the Stack Builder before my cut. Got a protocol tailored to my budget with dosing and timing. Better than anything my coach gave me.",goal:"Performance stack"},
-            {name:"Tom K.",handle:"@tomk_nootropics",text:"The evidence scores are exactly what I was looking for. No more reading 15 abstracts to figure out if something works. The tier system is brilliant.",goal:"Cognitive stack"},
-          ].map(t=>(
-            <div key={t.name} style={{padding:"20px 22px",border:`1px solid ${C.border}`,background:C.bg}}>
-              <p style={{fontSize:13,color:C.ink,lineHeight:1.7,margin:"0 0 16px",fontStyle:"italic"}}>"{t.text}"</p>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <div>
-                  <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 2px"}}>{t.name}</p>
-                  <p style={{fontSize:10,color:C.gray,margin:0}}>{t.handle}</p>
-                </div>
-                <span style={{fontSize:9,fontWeight:700,color:C.gray,background:C.border,padding:"3px 8px",letterSpacing:".06em"}}>{t.goal}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Scroll indicator */}
-      <div style={{background:C.white,display:"flex",flexDirection:"column",alignItems:"center",padding:"20px 0 8px",borderBottom:"none"}}>
+      <div style={{background:C.bg,display:"flex",flexDirection:"column",alignItems:"center",padding:"20px 0 8px"}}>
         <p style={{fontSize:10,fontWeight:700,letterSpacing:".16em",color:C.gray,margin:"0 0 14px",textTransform:"uppercase"}}>Browse the database</p>
-        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:0}}>
-          <style>{`
-            @keyframes chevronBounce {
-              0%,100%{transform:translateY(0);opacity:.25}
-              50%{transform:translateY(6px);opacity:1}
-            }
-            .chev1{animation:chevronBounce 1.6s ease-in-out infinite;}
-            .chev2{animation:chevronBounce 1.6s ease-in-out .25s infinite;}
-          `}</style>
-          {[1,2].map(n=>(
-            <svg key={n} className={n===1?"chev1":"chev2"} width="28" height="16" viewBox="0 0 28 16" fill="none" style={{display:"block"}}>
-              <polyline points="3,3 14,13 25,3" stroke="#0a0a0a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-            </svg>
-          ))}
-        </div>
+        <style>{`
+          @keyframes chevBounce{0%,100%{transform:translateY(0);opacity:.2}50%{transform:translateY(7px);opacity:1}}
+          .chev1{animation:chevBounce 1.6s ease-in-out infinite;}
+          .chev2{animation:chevBounce 1.6s ease-in-out .28s infinite;}
+        `}</style>
+        {[1,2].map(n=>(
+          <svg key={n} className={n===1?"chev1":"chev2"} width="30" height="17" viewBox="0 0 30 17" fill="none" style={{display:"block"}}>
+            <polyline points="3,3 15,14 27,3" stroke="#0a0a0a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        ))}
       </div>
 
         <div style={{borderBottom:`1px solid ${C.border}`,background:C.white}}>

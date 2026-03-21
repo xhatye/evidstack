@@ -252,12 +252,12 @@ function UpgradeModal({onClose,onAuthNeeded}){
                 </div>
                 <div style={{padding:"9px 12px",background:row.highlight?`${C.gold}0a`:C.white,border:`1px solid ${C.border}`,borderTop:"none",borderRight:"none",textAlign:"center"}}>
                   {typeof row.free==="boolean"
-                    ?<span style={{fontSize:13,color:row.free?C.green:"#d4d0c8"}}>{row.free?"✓":"—"}</span>
+                    ?<span style={{fontSize:13,color:row.free?C.green:"#d4d0c8"}}>{row.free?"✓":" - "}</span>
                     :<span style={{fontSize:10,fontWeight:600,color:C.gray}}>{row.free}</span>}
                 </div>
                 <div style={{padding:"9px 12px",background:row.highlight?`${C.gold}15`:C.ink,border:`1px solid ${C.ink}`,borderTop:"none",textAlign:"center"}}>
                   {typeof row.pro==="boolean"
-                    ?<span style={{fontSize:13,color:row.pro?C.gold:"#374151"}}>{row.pro?"✓":"—"}</span>
+                    ?<span style={{fontSize:13,color:row.pro?C.gold:"#374151"}}>{row.pro?"✓":" - "}</span>
                     :<span style={{fontSize:10,fontWeight:700,color:row.highlight?C.gold:C.white}}>{row.pro}</span>}
                 </div>
               </div>
@@ -993,7 +993,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
       category:"Weight Loss",
       level:"Advanced",
       name:"Semaglutide + Tesamorelin",
-      desc:"Appetite control + visceral fat targeting for comprehensive body recomposition. Tesamorelin specifically reduces visceral adipose tissue — FDA approved for HIV lipodystrophy.",
+      desc:"Appetite control + visceral fat targeting for comprehensive body recomposition. Tesamorelin specifically reduces visceral adipose tissue  -  FDA approved for HIV lipodystrophy.",
       compounds:["Semaglutide","Tesamorelin"],
       color:"#d97706",
       icon:"⚖️",
@@ -1005,7 +1005,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
       category:"Weight Loss",
       level:"Beginner",
       name:"GLP-1 + AOD-9604",
-      desc:"Appetite management with HGH-fragment fat metabolism support. AOD-9604 is the lipolytic fragment of HGH without anabolic effects — excellent safety profile.",
+      desc:"Appetite management with HGH-fragment fat metabolism support. AOD-9604 is the lipolytic fragment of HGH without anabolic effects  -  excellent safety profile.",
       compounds:["Semaglutide","AOD-9604"],
       color:"#d97706",
       icon:"🔥",
@@ -1069,7 +1069,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
       compounds:["Semaglutide","Collagen Peptides","Pycnogenol"],
       color:"#06b6d4",
       icon:"💆",
-      note:"Lose face fat gradually — too rapid loss causes loose skin. Collagen counters this.",
+      note:"Lose face fat gradually  -  too rapid loss causes loose skin. Collagen counters this.",
     },
   ];
 
@@ -1086,10 +1086,10 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
       {/* Hero */}
       <div style={{background:C.ink,padding:isMob?"40px 16px":"64px 48px"}}>
         <div style={{maxWidth:960,margin:"0 auto"}}>
-          <p style={{fontSize:10,fontWeight:800,letterSpacing:".2em",color:C.gold,margin:"0 0 10px",textTransform:"uppercase"}}>Evidstack — Compoundmaxxing</p>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".2em",color:C.gold,margin:"0 0 10px",textTransform:"uppercase"}}>Evidstack  -  Compoundmaxxing</p>
           <h1 style={{fontSize:isMob?28:48,fontWeight:900,letterSpacing:"-.04em",color:C.white,margin:"0 0 16px",lineHeight:1.05}}>Peptide stacks.<br/>Evidence-based.</h1>
           <p style={{fontSize:isMob?13:15,color:"#9ca3af",margin:"0 0 32px",maxWidth:580,lineHeight:1.8}}>
-            Every stack curated from published research and clinical data. Dosing, timing, mechanisms — no bro science.
+            Every stack curated from published research and clinical data. Dosing, timing, mechanisms  -  no bro science.
           </p>
           <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
             {[[SUPPLEMENTS.length.toString()+"+","compounds"],["Peptides","fully documented"],["PubMed","primary source"]].map(([val,label])=>(
@@ -1162,7 +1162,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
 
           {!isPro&&(
             <div style={{padding:"10px 16px",background:`${C.gold}12`,border:`1px solid ${C.gold}40`,marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
-              <p style={{fontSize:12,color:C.ink,margin:0}}><strong>5 more stacks locked</strong> — Full GH Optimization, Longevity, Cognitive, Weight Loss Advanced and more.</p>
+              <p style={{fontSize:12,color:C.ink,margin:0}}><strong>5 more stacks locked</strong>  -  Full GH Optimization, Longevity, Cognitive, Weight Loss Advanced and more.</p>
               <button onClick={onUpgrade} style={{padding:"7px 16px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",flexShrink:0}}>Unlock Pro</button>
             </div>
           )}
@@ -1229,10 +1229,10 @@ function AffiliatePage(){
   return(
     <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"40px 16px 80px":"64px 48px 100px"}}>
       {/* Header */}
-      <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Evidstack — Affiliate Program</p>
+      <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Evidstack  -  Affiliate Program</p>
       <h1 style={{fontSize:isMob?28:44,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 16px",lineHeight:1.05}}>Earn 30% recurring commission.</h1>
       <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 0 40px",maxWidth:560}}>
-        Recommend Evidstack to your audience and earn 30% on every payment — every month, for as long as they stay subscribed.
+        Recommend Evidstack to your audience and earn 30% on every payment  -  every month, for as long as they stay subscribed.
       </p>
 
       {/* Numbers */}
@@ -1275,7 +1275,7 @@ function AffiliatePage(){
         <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Who it is for</p>
         <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:10}}>
           {[
-            {icon:"📱",title:"Content creators",desc:"TikTok, YouTube, Instagram — fitness, biohacking, looksmaxxing, nootropics content"},
+            {icon:"📱",title:"Content creators",desc:"TikTok, YouTube, Instagram  -  fitness, biohacking, looksmaxxing, nootropics content"},
             {icon:"🧬",title:"Peptide / biohacking communities",desc:"Discord servers, Telegram groups, Reddit moderators in relevant communities"},
             {icon:"🏋️",title:"Fitness coaches",desc:"Personal trainers, online coaches with a client base interested in optimization"},
             {icon:"✍️",title:"Newsletter writers",desc:"Health, longevity, or performance newsletters with engaged readers"},
@@ -1293,7 +1293,7 @@ function AffiliatePage(){
       <div style={{background:C.ink,padding:isMob?"24px 20px":"32px 40px"}}>
         <p style={{fontSize:14,fontWeight:900,color:C.white,margin:"0 0 8px",letterSpacing:"-.02em"}}>Apply to become an affiliate.</p>
         <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 24px",lineHeight:1.7}}>
-          Send an email to <strong style={{color:C.gold}}>hello@evidstack.com</strong> with the subject line <strong style={{color:C.white}}>"Affiliate Application"</strong> and include:
+          Send an email to <strong style={{color:C.gold}}>evidstack@protonmail.com</strong> with the subject line <strong style={{color:C.white}}>"Affiliate Application"</strong> and include:
         </p>
         <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:24}}>
           {["Your name and platform (TikTok, YouTube, etc.)","Your niche (looksmaxxing, fitness, biohacking, nootropics...)","Approximate audience size","Why you think Evidstack fits your audience"].map(item=>(
@@ -1303,7 +1303,7 @@ function AffiliatePage(){
             </div>
           ))}
         </div>
-        <button onClick={()=>copy("hello@evidstack.com")}
+        <button onClick={()=>copy("evidstack@protonmail.com")}
           style={{padding:"12px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
           {copied?"Copied!":"Copy email address"}
         </button>
@@ -1469,11 +1469,11 @@ function StackBuilder({onUpgrade}){
 
       {/* Example output */}
       <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
-        <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example — Cognitive + Strength, $80/mo</p>
+        <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example  -  Cognitive + Strength, $80/mo</p>
         <div style={{border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,background:C.white}}>
           <div style={{padding:"16px 20px",borderBottom:`1px solid ${C.border}`}}>
             <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:"0 0 2px",letterSpacing:"-.03em"}}>The Cognitive Performance Stack</p>
-            <p style={{fontSize:11,color:C.gray,margin:0}}>Est. $65-80/month — 4 compounds</p>
+            <p style={{fontSize:11,color:C.gray,margin:0}}>Est. $65-80/month  -  4 compounds</p>
           </div>
           {[
             {name:"Creatine Monohydrate",dose:"5g/day",timing:"Post-workout",tier:1,color:"#16a34a"},
@@ -1653,7 +1653,7 @@ function LegalPage(){
         },
         {
           title:"10. Data Retention and Deletion",
-          body:"You may request deletion of your account and associated data at any time by emailing hello@evidstack.com. We will process deletion requests within 30 days."
+          body:"You may request deletion of your account and associated data at any time by emailing evidstack@protonmail.com. We will process deletion requests within 30 days."
         },
         {
           title:"11. Changes to These Terms",
@@ -1661,7 +1661,7 @@ function LegalPage(){
         },
         {
           title:"12. Contact",
-          body:"For any questions regarding these terms or your privacy, contact us at: hello@evidstack.com"
+          body:"For any questions regarding these terms or your privacy, contact us at: evidstack@protonmail.com"
         },
       ].map(s=>(
         <div key={s.title} style={{marginBottom:32}}>
@@ -1682,10 +1682,27 @@ function AboutPage(){
       <p style={{fontSize:15,color:C.gray,lineHeight:1.9,margin:"0 0 48px",maxWidth:600}}>The supplement industry runs on marketing. Evidstack runs on data.</p>
       <div style={{height:1,background:C.border,margin:"0 0 48px"}}/>
       {[
-        {label:"The problem",body:"The supplement market is worth over 200 billion dollars. Most of that value is built on claims that would not survive a basic fact-check. Brands cite studies funded by the companies selling the product. They ignore contradictory data. They present weak correlational findings as proven facts. Evidstack was built to cut through that. Every compound is rated on two axes: how large the effect actually is, and how confident we are in the evidence."},
-        {label:"How scoring works",body:"Efficacy (1-5) measures the actual size of the effect in human studies. Evidence (1-5) measures the quality and volume of research behind the claim. You can have strong evidence for a weak effect, and weak evidence for a strong effect. All scores are derived from peer-reviewed literature, primarily PubMed, the Cochrane Database, and cross-referenced with independent research aggregators."},
-        {label:"The tier system",body:"Tier 1 (Fundamentals): broad research base, well-established safety. Tier 2 (Advanced): solid evidence with 10+ trials, slightly less mature. Tier 3 (Expert): promising results backed by fewer studies. Tier 4 (Biohacking): cutting-edge compounds with limited or no human clinical data. Research-grade use only."},
-      ].map(s=>(<div key={s.label} style={{marginBottom:40}}><p style={{fontSize:11,fontWeight:700,letterSpacing:".2em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>{s.label}</p><p style={{fontSize:14,color:C.gray,lineHeight:1.9,margin:0,maxWidth:600}}>{s.body}</p></div>))}
+        {
+          label:"The problem",
+          body:"The supplement market is worth over $200 billion globally. The vast majority of that revenue is built on marketing claims that would not survive basic scientific scrutiny. Brands routinely cite studies funded by their own companies, cherry-pick favorable outcomes, and present weak correlational findings as established facts. Influencers promote products based on sponsorship deals, not evidence. The result is an ecosystem where the loudest voices are almost always the least reliable ones. Most people end up cycling through dozens of supplements based on hype, spending hundreds of dollars on compounds with marginal or no real effect, while ignoring the handful that are genuinely transformative. Evidstack was built to fix that information problem. Every compound in the database is rated on exactly two dimensions: how large the actual effect is in human studies, and how confident we are in the body of evidence behind it."
+        },
+        {
+          label:"How scoring works",
+          body:"Efficacy scores (1 to 5) measure the magnitude of the real-world effect observed in human trials. A score of 5 means a large, clinically meaningful effect. A score of 1 means the effect exists but is too small to matter in practice. Evidence scores (1 to 5) measure the quality and volume of research behind the claim. A score of 5 means multiple large-scale RCTs and meta-analyses with consistent results. A score of 1 means animal data or isolated case reports only. These two dimensions are independent by design. A compound can have a 5/5 efficacy score with a 2/5 evidence score, meaning the effect is large but poorly studied in humans. That distinction is critical for making informed decisions. All scores are sourced from peer-reviewed literature on PubMed, Cochrane systematic reviews, and cross-referenced with independent research summaries. No brand partnerships influence the ratings."
+        },
+        {
+          label:"The tier system",
+          body:"Tier 1 (Fundamentals) covers compounds with a broad research base, well-established safety profiles, and consistent replication across independent labs. Think creatine, magnesium, omega-3. Tier 2 (Advanced) includes compounds with solid clinical evidence across 10 or more trials, but slightly newer or less mature research pipelines. Tier 3 (Expert) covers compounds showing genuine promise in early human studies, with fewer replications or smaller sample sizes. Use with awareness of the limitations. Tier 4 (Biohacking) includes cutting-edge research compounds, peptides, and experimental agents with limited or no formal human clinical trial data. These are documented for completeness and research purposes only. The tier system is not a recommendation to use or avoid any compound. It is a map of where the evidence currently stands."
+        },
+        {
+          label:"What we cover",
+          body:"Evidstack covers 204 compounds across the full spectrum of evidence-based supplementation: foundational supplements like vitamin D, zinc, and omega-3; advanced nootropics and cognitive enhancers including racetams, cholinergics, and dopaminergic agents; peptides spanning healing compounds like BPC-157 and TB-500, GH secretagogues like Ipamorelin and CJC-1295, and skin and longevity peptides like GHK-Cu and Epithalon; GLP-1 receptor agonists and metabolic compounds including semaglutide and tirzepatide; hair retention and aesthetic compounds including finasteride, dutasteride, and minoxidil; SARMs and performance compounds with available human trial data; anti-aging interventions including rapamycin, metformin, and senolytic compounds; and adaptogenic and stress-response compounds. Each entry includes clinical dosing ranges, timing recommendations, known interactions, safety rating, legal status, and estimated monthly cost."
+        },
+        {
+          label:"What we are not",
+          body:"Evidstack is not a medical provider, a pharmacy, or a clinical service. Nothing on this platform constitutes medical advice, diagnosis, or treatment. The information is compiled for educational and research purposes only. Dosing ranges reflect what has been used in published clinical literature, not personalized recommendations for you specifically. Some compounds covered on this platform are prescription medications, controlled substances, or research chemicals. Their inclusion in the database does not constitute an endorsement of their use outside of appropriate medical or research contexts. Always consult a qualified healthcare provider before starting, stopping, or modifying any supplementation or medication protocol."
+        },
+      ].map(s=>(<div key={s.label} style={{marginBottom:44}}><p style={{fontSize:11,fontWeight:700,letterSpacing:".2em",color:C.gray,margin:"0 0 14px",textTransform:"uppercase"}}>{s.label}</p><p style={{fontSize:14,color:C.gray,lineHeight:1.95,margin:0,maxWidth:640}}>{s.body}</p></div>))}
 
       {/* Founder note */}
       <div style={{height:1,background:C.border,margin:"0 0 40px"}}/>
@@ -1694,8 +1711,8 @@ function AboutPage(){
           <span style={{fontSize:14,fontWeight:900,color:C.white}}>M</span>
         </div>
         <div>
-          <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 4px"}}>Marcus B. — Founder</p>
-          <p style={{fontSize:13,color:C.gray,lineHeight:1.9,margin:0}}>Obsessed with evidence-based optimization. Built Evidstack because I was tired of spending hours cross-referencing studies just to answer basic questions about my stack. The goal: make rigorous supplement science accessible to anyone who actually wants to optimize — not just be marketed to.</p>
+          <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 4px"}}>Marcus B.  -  Founder</p>
+          <p style={{fontSize:13,color:C.gray,lineHeight:1.9,margin:0}}>Obsessed with evidence-based optimization. Built Evidstack because I was tired of spending hours cross-referencing studies just to answer basic questions about my stack. The goal: make rigorous supplement science accessible to anyone who actually wants to optimize  -  not just be marketed to.</p>
         </div>
       </div>
     </div>
@@ -1881,12 +1898,12 @@ function AccountCenter({onClose,onUpgrade}){
                     </div>
                     <div style={{padding:"11px 14px",background:row.highlight?`${C.gold}0a`:C.white,border:`1px solid ${C.border}`,borderTop:"none",borderRight:"none",textAlign:"center"}}>
                       {typeof row.free==="boolean"
-                        ?<span style={{fontSize:13,color:row.free?C.green:C.border}}>{row.free?"✓":"—"}</span>
+                        ?<span style={{fontSize:13,color:row.free?C.green:C.border}}>{row.free?"✓":" - "}</span>
                         :<span style={{fontSize:11,fontWeight:600,color:C.gray}}>{row.free}</span>}
                     </div>
                     <div style={{padding:"11px 14px",background:row.highlight?`${C.gold}15`:C.ink,border:`1px solid ${C.ink}`,borderTop:"none",textAlign:"center"}}>
                       {typeof row.pro==="boolean"
-                        ?<span style={{fontSize:13,color:row.pro?C.gold:"#374151"}}>{row.pro?"✓":"—"}</span>
+                        ?<span style={{fontSize:13,color:row.pro?C.gold:"#374151"}}>{row.pro?"✓":" - "}</span>
                         :<span style={{fontSize:11,fontWeight:700,color:row.highlight?C.gold:C.white}}>{row.pro}</span>}
                     </div>
                   </div>
@@ -1906,7 +1923,7 @@ function AccountCenter({onClose,onUpgrade}){
               {isPro&&(
                 <div style={{padding:"16px",background:`${C.green}0a`,border:`1px solid ${C.green}20`,textAlign:"center"}}>
                   <p style={{fontSize:12,fontWeight:800,color:C.green,margin:"0 0 4px"}}>You are a Pro member</p>
-                  <p style={{fontSize:11,color:C.gray,margin:0}}>Full access to all features. To manage your subscription, contact hello@evidstack.com</p>
+                  <p style={{fontSize:11,color:C.gray,margin:0}}>Full access to all features. To manage your subscription, contact evidstack@protonmail.com</p>
                 </div>
               )}
             </div>
@@ -1945,7 +1962,7 @@ function AccountCenter({onClose,onUpgrade}){
                   </div>
                 )}
                 <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Danger Zone</p>
-                <p style={{fontSize:12,color:C.gray,margin:"0 0 12px",lineHeight:1.6}}>To delete your account, contact us at <strong>hello@evidstack.com</strong></p>
+                <p style={{fontSize:12,color:C.gray,margin:"0 0 12px",lineHeight:1.6}}>To delete your account, contact us at <strong>evidstack@protonmail.com</strong></p>
               </div>
             </div>
           )}
@@ -2209,7 +2226,7 @@ function AppInner(){
         <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,textAlign:"center",margin:"0 0 24px",textTransform:"uppercase"}}>What users say</p>
         <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr 1fr",gap:16,maxWidth:960,margin:"0 auto"}}>
           {[
-            {name:"Alex R.",handle:"@alexr_biohack",text:"Finally a supplement database that doesn't try to sell me anything. The interaction checker alone is worth it — caught a zinc/copper issue in my stack I had no idea about.",goal:"Longevity stack"},
+            {name:"Alex R.",handle:"@alexr_biohack",text:"Finally a supplement database that doesn't try to sell me anything. The interaction checker alone is worth it  -  caught a zinc/copper issue in my stack I had no idea about.",goal:"Longevity stack"},
             {name:"Camille D.",handle:"@camille_perf",text:"Used the Stack Builder before my cut. Got a protocol tailored to my budget with dosing and timing. Better than anything my coach gave me.",goal:"Performance stack"},
             {name:"Tom K.",handle:"@tomk_nootropics",text:"The evidence scores are exactly what I was looking for. No more reading 15 abstracts to figure out if something works. The tier system is brilliant.",goal:"Cognitive stack"},
           ].map(t=>(
@@ -2323,7 +2340,7 @@ function AppInner(){
               <span style={{fontSize:11,fontWeight:900,letterSpacing:".08em",color:C.ink}}>EVIDSTACK</span>
             </div>
             <p style={{fontSize:11,color:C.gray,margin:"0 0 6px",lineHeight:1.7}}>{SUPPLEMENTS.length}+ compounds from PubMed and Cochrane.</p>
-            <p style={{fontSize:11,color:C.gray,margin:0}}>hello@evidstack.com</p>
+            <p style={{fontSize:11,color:C.gray,margin:0}}>evidstack@protonmail.com</p>
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Database</p>

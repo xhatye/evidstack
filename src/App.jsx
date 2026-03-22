@@ -79,6 +79,94 @@ function WaitlistForm(){
 }
 
 /* AUTH MODAL */
+/* ONBOARDING MODAL */
+const ONBOARDING_KEY="evidstack_onboarded";
+const ONBOARDING_MAX=3; // show at most 3 times total
+
+function OnboardingModal({onClose}){
+  const isMob=useIsMobile();
+  const [step,setStep]=useState(0);
+  const slides=[
+    {
+      icon:"🔬",
+      title:"204+ compounds, ranked by science",
+      desc:"Every supplement in our database is scored on two axes: how strong the effect is, and how solid the evidence is. No marketing, no guesswork.",
+      detail:"Browse by goal (Sleep, Testosterone, Focus, Weight Loss, Skin, and 14 more categories) or search directly.",
+    },
+    {
+      icon:"📋",
+      title:"Protocols and Compoundmaxxing",
+      desc:"Pre-built stacks curated by goal: healing peptides, GH optimization, longevity, looksmaxxing, and more.",
+      detail:"Each stack lists the compounds, the mechanism, and the rationale. Beginner and advanced options for every category.",
+    },
+    {
+      icon:"🧬",
+      title:"Pro AI tools",
+      desc:"Stack Builder AI builds a personalized protocol from your goals and budget. My Tracker logs your daily intake and spots patterns. AI Cycle Alerts tells you exactly when to stop and restart each compound. AI Bloodwork Analyzer turns your blood test into supplement recommendations.",
+      detail:"All AI tools are Pro-only and powered by the same evidence base as the database.",
+    },
+  ];
+  const slide=slides[step];
+  const isLast=step===slides.length-1;
+
+  const close=()=>{
+    const count=parseInt(localStorage.getItem(ONBOARDING_KEY)||"0")+1;
+    localStorage.setItem(ONBOARDING_KEY,String(count));
+    onClose();
+  };
+
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,fontFamily:"Montserrat,sans-serif"}}>
+      <div style={{background:C.white,maxWidth:520,width:"100%",position:"relative",boxShadow:"0 24px 60px rgba(0,0,0,.18)"}}>
+        {/* Top bar */}
+        <div style={{background:C.ink,padding:"16px 24px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <span style={{fontSize:10,fontWeight:800,letterSpacing:".18em",color:C.gold}}>EVIDSTACK</span>
+          <button onClick={close} style={{background:"none",border:"none",color:"#6b7280",fontSize:20,cursor:"pointer",lineHeight:1,padding:0}}>x</button>
+        </div>
+
+        {/* Step dots */}
+        <div style={{display:"flex",gap:6,justifyContent:"center",padding:"16px 0 0"}}>
+          {slides.map((_,i)=>(
+            <div key={i} style={{width:i===step?24:7,height:7,borderRadius:4,background:i===step?C.ink:C.border,transition:"all .3s"}}/>
+          ))}
+        </div>
+
+        {/* Content */}
+        <div style={{padding:isMob?"24px 20px 28px":"32px 40px 36px",textAlign:"center"}}>
+          <div style={{fontSize:52,marginBottom:20}}>{slide.icon}</div>
+          <h2 style={{fontSize:isMob?20:24,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 14px",lineHeight:1.2}}>{slide.title}</h2>
+          <p style={{fontSize:14,color:C.ink,lineHeight:1.7,margin:"0 0 12px"}}>{slide.desc}</p>
+          <p style={{fontSize:12,color:C.gray,lineHeight:1.6,margin:"0 0 28px"}}>{slide.detail}</p>
+
+          <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+            {step>0&&(
+              <button onClick={()=>setStep(s=>s-1)} style={{padding:"11px 22px",background:"transparent",border:`1.5px solid ${C.border}`,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",color:C.gray}}>
+                Back
+              </button>
+            )}
+            {!isLast?(
+              <button onClick={()=>setStep(s=>s+1)} style={{padding:"11px 28px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+                Next
+              </button>
+            ):(
+              <button onClick={close} style={{padding:"11px 28px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+                Browse the database
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Skip */}
+        <div style={{borderTop:`1px solid ${C.border}`,padding:"12px 24px",textAlign:"center"}}>
+          <button onClick={close} style={{background:"none",border:"none",fontSize:11,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
+            Skip intro
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AuthModal({onClose,initialMode="login"}){
   const {loginEmail,signupEmail,loginGoogle,resetPassword}=useAuth();
   const [mode,setMode]=useState(initialMode); // login | signup | forgot
@@ -804,8 +892,41 @@ function MyTracker({onUpgrade}){
     <div style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
       <span style={{fontSize:48,display:"block",marginBottom:20}}>📊</span>
       <h2 style={{fontSize:isMob?24:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>My Tracker</h2>
-      <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Log your daily supplements and track your energy and mood over time. See which compounds actually make a difference for you.</p>
-      <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:900,cursor:"pointer",letterSpacing:".04em"}}>Unlock with Pro</button>
+      <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Log your daily supplements and track mood and energy over time. See which compounds actually move the needle for you.</p>
+      <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"32px",marginBottom:32,textAlign:"left"}}>
+        {[["🗓️","Daily check-in","Log what you took each day in seconds"],["😴","Mood and energy scores","Rate 1-5 and spot patterns over time"],["📈","7-day chart","Visual breakdown of your weekly consistency"],["🔗","Correlation detection","See which days you feel best and why"]].map(([icon,title,desc])=>(
+          <div key={title} style={{display:"flex",gap:14,marginBottom:20}}>
+            <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
+            <div><p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{title}</p><p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{desc}</p></div>
+          </div>
+        ))}
+      </div>
+      <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",width:"100%",maxWidth:340}}>
+        Upgrade to Pro - $9.99/month
+      </button>
+      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {SUPPLEMENTS.length}+ compounds + AI tools.</p>
+      <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
+        <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example - Week log</p>
+        <div style={{border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,background:C.white}}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr repeat(7,28px)",gap:4,padding:"12px 16px",borderBottom:`1px solid ${C.border}`,alignItems:"center"}}>
+            <span style={{fontSize:10,fontWeight:800,color:C.gray}}>COMPOUND</span>
+            {["M","T","W","T","F","S","S"].map((d,i)=><span key={i} style={{fontSize:10,fontWeight:800,color:C.gray,textAlign:"center"}}>{d}</span>)}
+          </div>
+          {[["Creatine",[1,1,1,1,1,1,0]],["Vitamin D3",[1,1,1,1,1,1,1]],["Ashwagandha",[1,0,1,0,1,0,1]],["Omega-3",[1,1,0,1,1,1,0]]].map(([name,days])=>(
+            <div key={name} style={{display:"grid",gridTemplateColumns:"1fr repeat(7,28px)",gap:4,padding:"8px 16px",borderBottom:`1px solid ${C.border}`,alignItems:"center"}}>
+              <span style={{fontSize:11,fontWeight:700,color:C.ink}}>{name}</span>
+              {days.map((d,i)=><span key={i} style={{fontSize:14,textAlign:"center"}}>{d?"✓":""}</span>)}
+            </div>
+          ))}
+          <div style={{padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span style={{fontSize:11,color:C.gray}}>Avg mood this week</span>
+            <span style={{fontSize:13,fontWeight:900,color:C.ink}}>4.1 / 5</span>
+          </div>
+          <div style={{padding:"12px 20px",background:"#1f2937",textAlign:"center"}}>
+            <p style={{fontSize:11,color:"#6b7280",margin:0,fontStyle:"italic"}}>Unlock Pro to start tracking your stack</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
@@ -2229,6 +2350,10 @@ function AppInner(){
   const [compareA,setCompareA]=useState(null);
   const [compareB,setCompareB]=useState(null);
   const [showCompareModal,setShowCompareModal]=useState(false);
+  const [showOnboarding,setShowOnboarding]=useState(()=>{
+    const count=parseInt(localStorage.getItem(ONBOARDING_KEY)||"0");
+    return count<ONBOARDING_MAX;
+  });
   const PLACEHOLDERS=[
     "Search by compound name...",
     "Try \"creatine\" for strength and muscle",
@@ -2306,13 +2431,14 @@ function AppInner(){
   const proTools=[
     {id:"stack-builder",label:"Stack Builder AI"},
     {id:"tracker",label:"My Tracker"},
-    {id:"cycle-alerts",label:"Cycle Alerts"},
-    {id:"bloodwork",label:"Blood Work Analyzer"},
+    {id:"cycle-alerts",label:"AI Cycle Alerts"},
+    {id:"bloodwork",label:"AI Bloodwork Analyzer"},
   ];
   const proPages=proTools.map(t=>t.id);
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
+      {showOnboarding&&<OnboardingModal onClose={()=>setShowOnboarding(false)}/>}
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} initialMode={authMode}/>}
       {showUpgrade&&<UpgradeModal onClose={()=>setShowUpgrade(false)} onAuthNeeded={()=>openAuth("signup")}/>}
       {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
@@ -2613,7 +2739,7 @@ function AppInner(){
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Tools</p>
-            {[["stack-builder","Stack Builder AI"],["tracker","My Tracker"],["cycle-alerts","Cycle Alerts"],["bloodwork","Blood Work Analyzer"]].map(([p,l])=>(
+            {[["stack-builder","Stack Builder AI"],["tracker","My Tracker"],["cycle-alerts","AI Cycle Alerts"],["bloodwork","AI Bloodwork Analyzer"]].map(([p,l])=>(
               <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>
@@ -2682,18 +2808,49 @@ function CycleAlertsScreen({onUpgrade}){
   };
 
   if(!isPro)return(
-    <div style={Sp.page}><div style={{...Sp.inner,textAlign:"center",paddingTop:80}}>
-      <div style={{fontSize:48,marginBottom:16}}>🔄</div>
-      <h2 style={{fontWeight:900,fontSize:24,color:C.ink,marginBottom:8}}>Cycle Alerts is Pro only</h2>
-      <p style={{color:C.gray,fontSize:15,marginBottom:28}}>Track your compound cycles and get precise on/off phase alerts.</p>
-      <button style={Sp.btnGold} onClick={onUpgrade}>Upgrade to Pro</button>
-    </div></div>
+    <div style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center",fontFamily:"Montserrat,sans-serif"}}>
+      <span style={{fontSize:48,display:"block",marginBottom:20}}>🔄</span>
+      <h2 style={{fontSize:isMob?24:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>AI Cycle Alerts</h2>
+      <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Never lose track of your compound cycles again. Precise on/off phase alerts for every compound in your stack.</p>
+      <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"32px",marginBottom:32,textAlign:"left"}}>
+        {[["⏱️","Precise phase tracking","Exact day count for ON and OFF phases"],["🔔","Stop and restart dates","Know exactly when to stop and when to restart each compound"],["🔍","Autocomplete from 204 compounds","Search your stack directly from our database"],["♾️","Unlimited cycles","Track RAD-140, BPC-157, Ashwagandha, peptides, all at once"]].map(([icon,title,desc])=>(
+          <div key={title} style={{display:"flex",gap:14,marginBottom:20}}>
+            <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
+            <div><p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{title}</p><p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{desc}</p></div>
+          </div>
+        ))}
+      </div>
+      <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",width:"100%",maxWidth:340}}>
+        Upgrade to Pro - $9.99/month
+      </button>
+      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {SUPPLEMENTS.length}+ compounds + AI tools.</p>
+      <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
+        <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example - Active cycles</p>
+        <div style={{border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,background:C.white}}>
+          {[{name:"RAD-140",status:"ON",days:18,left:38,total:56,color:"#22c55e",badge:"ON",badgeBg:"#dcfce7",badgeColor:"#166534",msg:"38 days left in ON phase. Stop on May 29."},
+            {name:"Ashwagandha KSM-66",status:"OFF",days:3,left:25,total:28,color:"#f59e0b",badge:"OFF",badgeBg:"#fef3c7",badgeColor:"#92400e",msg:"25 days left in OFF phase. Restart on Apr 16."},
+            {name:"BPC-157",status:"ON",days:12,left:16,total:28,color:"#22c55e",badge:"ON",badgeBg:"#dcfce7",badgeColor:"#166534",msg:"16 days left in ON phase. Stop on Apr 7."},
+          ].map(r=>(
+            <div key={r.name} style={{padding:"14px 18px",borderBottom:`1px solid ${C.border}`,borderLeft:`4px solid ${r.color}`}}>
+              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                <span style={{fontWeight:900,fontSize:14,color:C.ink}}>{r.name}</span>
+                <span style={{fontSize:10,fontWeight:800,background:r.badgeBg,color:r.badgeColor,padding:"2px 8px",borderRadius:20}}>{r.badge}</span>
+              </div>
+              <p style={{fontSize:12,color:r.status==="ON"?"#166534":"#92400e",margin:0,fontWeight:600}}>{r.msg}</p>
+            </div>
+          ))}
+          <div style={{padding:"12px 20px",background:"#1f2937",textAlign:"center"}}>
+            <p style={{fontSize:11,color:"#6b7280",margin:0,fontStyle:"italic"}}>Unlock Pro to track your cycles</p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 
   return(
     <div style={Sp.page}><div style={Sp.inner}>
       <span style={Sp.tag}>PRO FEATURE</span>
-      <h1 style={Sp.h1}>Cycle Alerts</h1>
+      <h1 style={Sp.h1}>AI Cycle Alerts</h1>
       <p style={Sp.sub}>Track your compound cycles. Get precise alerts for when to start, stop, and restart.</p>
 
       {cycles.length===0&&!adding&&(
@@ -2970,18 +3127,53 @@ function BloodWorkScreen({onUpgrade}){
   };
 
   if(!isPro)return(
-    <div style={Sp.page}><div style={{...Sp.inner,textAlign:"center",paddingTop:80}}>
-      <div style={{fontSize:48,marginBottom:16}}>🩸</div>
-      <h2 style={{fontWeight:900,fontSize:24,color:C.ink,marginBottom:8}}>Blood Work Analyzer is Pro only</h2>
-      <p style={{color:C.gray,fontSize:15,marginBottom:28}}>Enter your blood test results and get evidence-based supplement recommendations personalized to your actual biology.</p>
-      <button style={Sp.btnGold} onClick={onUpgrade}>Upgrade to Pro</button>
-    </div></div>
+    <div style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center",fontFamily:"Montserrat,sans-serif"}}>
+      <span style={{fontSize:48,display:"block",marginBottom:20}}>🩸</span>
+      <h2 style={{fontSize:isMob?24:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>AI Bloodwork Analyzer</h2>
+      <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Enter your blood test results and get evidence-based supplement recommendations personalized to your actual biology.</p>
+      <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"32px",marginBottom:32,textAlign:"left"}}>
+        {[["🧬","16 biomarkers analyzed","Testosterone, Vitamin D, cortisol, IGF-1, CRP, and more"],["⚡","Instant flag detection","LOW/HIGH markers flagged with clinical context and urgency"],["💊","Ranked recommendations","Compounds ranked by priority, with exact doses and timing"],["🚫","What to avoid","Identifies compounds that could worsen your specific results"],["📁","History of 5 analyses","Compare your bloodwork evolution over time"]].map(([icon,title,desc])=>(
+          <div key={title} style={{display:"flex",gap:14,marginBottom:20}}>
+            <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
+            <div><p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{title}</p><p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{desc}</p></div>
+          </div>
+        ))}
+      </div>
+      <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",width:"100%",maxWidth:340}}>
+        Upgrade to Pro - $9.99/month
+      </button>
+      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {SUPPLEMENTS.length}+ compounds + AI tools.</p>
+      <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
+        <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example - Analysis output</p>
+        <div style={{border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,background:C.white}}>
+          <div style={{padding:"14px 18px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:C.ink}}>
+            <span style={{fontSize:12,color:"#9ca3af"}}>Optimization score</span>
+            <span style={{fontSize:28,fontWeight:900,color:C.gold}}>62</span>
+          </div>
+          {[{marker:"Vitamin D",val:"18 ng/mL",st:"LOW",color:"#b45309",bg:"#fffbeb",note:"Suppresses testosterone production and immune function"},
+            {marker:"hs-CRP",val:"2.4 mg/L",st:"HIGH",color:"#991b1b",bg:"#fef2f2",note:"Low-grade systemic inflammation detected"},
+            {marker:"Total Testosterone",val:"620 ng/dL",st:"OPTIMAL",color:"#166534",bg:"#f0fdf4",note:"In range, no intervention needed"},
+          ].map(r=>(
+            <div key={r.marker} style={{padding:"12px 18px",borderBottom:`1px solid ${C.border}`,borderLeft:`4px solid ${r.color}`,background:r.bg}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                <span style={{fontSize:12,fontWeight:800,color:C.ink}}>{r.marker}</span>
+                <span style={{fontSize:10,fontWeight:800,color:r.color}}>{r.st} - {r.val}</span>
+              </div>
+              <p style={{fontSize:11,color:r.color,margin:0}}>{r.note}</p>
+            </div>
+          ))}
+          <div style={{padding:"12px 20px",background:"#1f2937",textAlign:"center"}}>
+            <p style={{fontSize:11,color:"#6b7280",margin:0,fontStyle:"italic"}}>Unlock Pro to analyze your blood work</p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 
   return(
     <div style={Sp.page}><div style={Sp.inner}>
       <span style={Sp.tag}>PRO FEATURE</span>
-      <h1 style={Sp.h1}>Blood Work Analyzer</h1>
+      <h1 style={Sp.h1}>AI Bloodwork Analyzer</h1>
       <p style={Sp.sub}>Enter your blood test results and get supplement recommendations based on your actual biology.</p>
 
       <div style={{display:"flex",gap:8,marginBottom:28,flexWrap:"wrap"}}>

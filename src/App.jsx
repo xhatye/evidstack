@@ -904,7 +904,7 @@ function MyTracker({onUpgrade}){
       <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",width:"100%",maxWidth:340}}>
         Upgrade to Pro - $9.99/month
       </button>
-      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {SUPPLEMENTS.length}+ compounds + AI tools.</p>
+      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds + AI tools.</p>
       <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
         <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example - Week log</p>
         <div style={{border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,background:C.white}}>
@@ -1230,7 +1230,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
             Every stack curated from published research and clinical data. Dosing, timing, mechanisms  -  no bro science.
           </p>
           <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
-            {[[SUPPLEMENTS.length.toString()+"+","compounds"],["Peptides","fully documented"],["PubMed","primary source"]].map(([val,label])=>(
+            {[[(Math.floor(SUPPLEMENTS.length/10)*10).toString()+"+","compounds"],["Peptides","fully documented"],["PubMed","primary source"]].map(([val,label])=>(
               <div key={label} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 20px",border:"1px solid #374151"}}>
                 <span style={{fontSize:14,fontWeight:900,color:C.white}}>{val}</span>
                 <span style={{fontSize:11,color:"#6b7280"}}>{label}</span>
@@ -1521,7 +1521,7 @@ function CompoundPage({compoundId,onUpgrade,onBack}){
         <div style={{background:C.ink,padding:"40px 36px",textAlign:"center",marginBottom:24}}>
           <p style={{fontSize:11,fontWeight:800,color:C.gold,letterSpacing:".16em",margin:"0 0 8px",textTransform:"uppercase"}}>Pro Feature</p>
           <h2 style={{fontSize:24,fontWeight:900,color:C.white,margin:"0 0 12px",letterSpacing:"-.03em"}}>Full profile locked</h2>
-          <p style={{fontSize:13,color:"#9ca3af",margin:"0 0 24px",lineHeight:1.7}}>Unlock dosing protocols, evidence scores, interactions, and detailed research summaries for all {SUPPLEMENTS.length}+ compounds.</p>
+          <p style={{fontSize:13,color:"#9ca3af",margin:"0 0 24px",lineHeight:1.7}}>Unlock dosing protocols, evidence scores, interactions, and detailed research summaries for all {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds.</p>
           <button onClick={onUpgrade} style={{padding:"13px 32px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
             Unlock with Pro - $9.99/mo
           </button>
@@ -1826,7 +1826,7 @@ function StackBuilder({onUpgrade}){
       <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",width:"100%",maxWidth:340}}>
         Upgrade to Pro - $9.99/month
       </button>
-      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {SUPPLEMENTS.length}+ compounds + AI tools.</p>
+      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds + AI tools.</p>
 
       {/* Example output */}
       <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
@@ -2114,7 +2114,7 @@ function ProtocolsPage({onGoToSupplements}){
       <div style={{marginTop:40,padding:"24px",background:C.white,border:`1px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16}}>
         <div>
           <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 4px"}}>Want to build your own?</p>
-          <p style={{fontSize:12,color:C.gray,margin:0}}>Browse all {SUPPLEMENTS.length}+ compounds, filter by goal, and check interactions.</p>
+          <p style={{fontSize:12,color:C.gray,margin:0}}>Browse all {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds, filter by goal, and check interactions.</p>
         </div>
         <button onClick={onGoToSupplements} style={{padding:"12px 24px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:".04em"}}>Browse Supplements</button>
       </div>
@@ -2575,10 +2575,10 @@ function AppInner(){
             Supplement and peptide information you can trust.
           </h1>
           <p style={{fontSize:isMobile?13:15,color:C.gray,lineHeight:1.8,margin:"0 auto 20px",maxWidth:560,padding:isMobile?"0 4px":0}}>
-            Evidstack <strong style={{color:C.ink,fontWeight:700}}>analyzes and ranks supplements</strong> by actual efficacy and strength of evidence. More than <strong style={{color:C.ink,fontWeight:700}}>{SUPPLEMENTS.length}+ compounds</strong>, sourced from PubMed and Cochrane.
+            Evidstack <strong style={{color:C.ink,fontWeight:700}}>analyzes and ranks supplements</strong> by actual efficacy and strength of evidence. More than <strong style={{color:C.ink,fontWeight:700}}>{Math.floor(SUPPLEMENTS.length/10)*10}+ compounds</strong>, sourced from PubMed and Cochrane.
           </p>
           <div style={{display:"flex",justifyContent:"center",gap:isMobile?16:32,marginBottom:24,flexWrap:"wrap"}}>
-            {[[SUPPLEMENTS.length.toString(),"compounds"],["4","evidence tiers"],["PubMed","primary source"],["Cochrane","systematic reviews"]].map(([val,label])=>(
+            {[[(Math.floor(SUPPLEMENTS.length/10)*10).toString()+"+","compounds"],["4","evidence tiers"],["PubMed","primary source"],["Cochrane","systematic reviews"]].map(([val,label])=>(
               <div key={label}><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>{val}</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>{label}</span></div>
             ))}
           </div>
@@ -2594,7 +2594,7 @@ function AppInner(){
           </div>
           <div style={{maxWidth:680,margin:"0 auto 0",background:C.ink,padding:isMobile?"20px 16px":"24px 32px"}}>
             {user&&!isPro?(
-              <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Unlock all {SUPPLEMENTS.length}+ compounds + AI Stack Builder.</p>
+              <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Unlock all {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds + AI Stack Builder.</p>
               <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 16px",lineHeight:1.6}}>Tier 2-4 compounds, peptides, AI tools - $9.99/month.</p>
               <button onClick={openUpgrade} style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Upgrade to Pro</button></>
             ):user&&isPro?(
@@ -2728,7 +2728,7 @@ function AppInner(){
               </div>
               <span style={{fontSize:11,fontWeight:900,letterSpacing:".08em",color:C.ink}}>EVIDSTACK</span>
             </div>
-            <p style={{fontSize:11,color:C.gray,margin:"0 0 6px",lineHeight:1.7}}>{SUPPLEMENTS.length}+ compounds from PubMed and Cochrane.</p>
+            <p style={{fontSize:11,color:C.gray,margin:"0 0 6px",lineHeight:1.7}}>{Math.floor(SUPPLEMENTS.length/10)*10}+ compounds from PubMed and Cochrane.</p>
             <p style={{fontSize:11,color:C.gray,margin:0}}>evidstack@protonmail.com</p>
           </div>
           <div>
@@ -2823,7 +2823,7 @@ function CycleAlertsScreen({onUpgrade}){
       <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",width:"100%",maxWidth:340}}>
         Upgrade to Pro - $9.99/month
       </button>
-      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {SUPPLEMENTS.length}+ compounds + AI tools.</p>
+      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds + AI tools.</p>
       <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
         <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example - Active cycles</p>
         <div style={{border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,background:C.white}}>
@@ -3142,7 +3142,7 @@ function BloodWorkScreen({onUpgrade}){
       <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",width:"100%",maxWidth:340}}>
         Upgrade to Pro - $9.99/month
       </button>
-      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {SUPPLEMENTS.length}+ compounds + AI tools.</p>
+      <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds + AI tools.</p>
       <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
         <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example - Analysis output</p>
         <div style={{border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,background:C.white}}>

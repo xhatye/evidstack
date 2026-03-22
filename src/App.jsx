@@ -2305,11 +2305,8 @@ function AppInner(){
   ];
   const proTools=[
     {id:"stack-builder",label:"Stack Builder AI"},
-    {id:"interactions",label:"Interaction Checker"},
-    {id:"weekly-protocol",label:"Weekly Protocol AI"},
     {id:"tracker",label:"My Tracker"},
     {id:"cycle-alerts",label:"Cycle Alerts"},
-    {id:"stack-optimizer",label:"Stack Optimizer"},
     {id:"bloodwork",label:"Blood Work Analyzer"},
   ];
   const proPages=proTools.map(t=>t.id);
@@ -2616,7 +2613,7 @@ function AppInner(){
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Tools</p>
-            {[["stack-builder","Stack Builder AI"],["interactions","Interaction Checker"],["weekly-protocol","Protocol AI"],["tracker","My Tracker"],["cycle-alerts","Cycle Alerts"],["stack-optimizer","Stack Optimizer"],["bloodwork","Blood Work Analyzer"]].map(([p,l])=>(
+            {[["stack-builder","Stack Builder AI"],["tracker","My Tracker"],["cycle-alerts","Cycle Alerts"],["bloodwork","Blood Work Analyzer"]].map(([p,l])=>(
               <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>

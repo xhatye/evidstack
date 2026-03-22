@@ -2619,7 +2619,7 @@ function AppInner(){
 
 
 
-      <div style={{background:C.bg,display:"flex",flexDirection:"column",alignItems:"center",padding:"40px 0 40px"}}>
+      <div style={{background:C.bg,display:"flex",flexDirection:"column",alignItems:"center",padding:"16px 0 40px"}}>
         <p style={{fontSize:10,fontWeight:700,letterSpacing:".16em",color:C.gray,margin:"0 0 14px",textTransform:"uppercase"}}>Browse the database</p>
         <style>{`
           @keyframes chevBounce{0%,100%{transform:translateY(0);opacity:.2}50%{transform:translateY(7px);opacity:1}}

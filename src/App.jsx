@@ -18,6 +18,9 @@ const ROUTES = {
   "/legal":"legal",
   "/compoundmaxxing":"compoundmaxxing",
   "/affiliate":"affiliate",
+  "/cycle-alerts":"cycle-alerts",
+  "/stack-optimizer":"stack-optimizer",
+  "/bloodwork":"bloodwork",
 };
 
 function getPageFromPath(){
@@ -2305,6 +2308,9 @@ function AppInner(){
     {id:"interactions",label:"Interaction Checker"},
     {id:"weekly-protocol",label:"Weekly Protocol AI"},
     {id:"tracker",label:"My Tracker"},
+    {id:"cycle-alerts",label:"Cycle Alerts"},
+    {id:"stack-optimizer",label:"Stack Optimizer"},
+    {id:"bloodwork",label:"Blood Work Analyzer"},
   ];
   const proPages=proTools.map(t=>t.id);
 
@@ -2436,6 +2442,9 @@ function AppInner(){
       {page==="tracker"        &&<MyTracker onUpgrade={openUpgrade}/>}
       {page==="protocols"     &&<ProtocolsPage onGoToSupplements={()=>navigateTo("supplements")}/>}
       {page==="stack-builder" &&<StackBuilder onUpgrade={openUpgrade}/>}
+      {page==="cycle-alerts"  &&<CycleAlertsScreen onUpgrade={openUpgrade}/>}
+      {page==="stack-optimizer"&&<StackOptimizerScreen onUpgrade={openUpgrade}/>}
+      {page==="bloodwork"     &&<BloodWorkScreen onUpgrade={openUpgrade}/>}
 
       {page==="supplements"&&<>
         <div style={{padding:isMobile?"32px 16px 40px":"60px 24px 56px",textAlign:"center"}}>
@@ -2607,7 +2616,7 @@ function AppInner(){
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Tools</p>
-            {[["stack-builder","Stack Builder AI"],["interactions","Interaction Checker"],["weekly-protocol","Protocol AI"],["tracker","My Tracker"]].map(([p,l])=>(
+            {[["stack-builder","Stack Builder AI"],["interactions","Interaction Checker"],["weekly-protocol","Protocol AI"],["tracker","My Tracker"],["cycle-alerts","Cycle Alerts"],["stack-optimizer","Stack Optimizer"],["bloodwork","Blood Work Analyzer"]].map(([p,l])=>(
               <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>
@@ -2624,6 +2633,496 @@ function AppInner(){
         </div>
       </div>
     </div>
+  );
+}
+
+// ── CYCLE ALERTS ─────────────────────────────────────────────────────────────
+function CycleAlertsScreen({onUpgrade}){
+  const {isPro}=useAuth();
+  const STORAGE_KEY="evidstack_cycles";
+  const [cycles,setCycles]=useState(()=>{try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");}catch{return [];}});
+  const [form,setForm]=useState({compound:"",startDate:new Date().toISOString().slice(0,10),onWeeks:8,offWeeks:4});
+  const [adding,setAdding]=useState(false);
+  const [suggest,setSuggest]=useState([]);
+  const isMob=useIsMobile();
+
+  const save=(u)=>{setCycles(u);localStorage.setItem(STORAGE_KEY,JSON.stringify(u));};
+  const addCycle=()=>{
+    if(!form.compound.trim())return;
+    save([...cycles,{id:Date.now(),...form,onWeeks:parseInt(form.onWeeks),offWeeks:parseInt(form.offWeeks)}]);
+    setAdding(false);setForm({compound:"",startDate:new Date().toISOString().slice(0,10),onWeeks:8,offWeeks:4});
+  };
+  const deleteCycle=(id)=>save(cycles.filter(c=>c.id!==id));
+  const getStatus=(cycle)=>{
+    const start=new Date(cycle.startDate);
+    const daysSince=Math.floor((new Date()-start)/86400000);
+    const totalDays=(cycle.onWeeks+cycle.offWeeks)*7;
+    const pos=((daysSince%totalDays)+totalDays)%totalDays;
+    const onDays=cycle.onWeeks*7;
+    const isOn=pos<onDays;
+    const daysLeft=isOn?onDays-pos:totalDays-pos;
+    const nextDate=new Date(Date.now()+daysLeft*86400000);
+    return{isOn,daysLeft,nextDate:nextDate.toLocaleDateString("en-US",{month:"short",day:"numeric"}),daysSince};
+  };
+  const handleInput=(val)=>{
+    setForm(f=>({...f,compound:val}));
+    if(val.length<2){setSuggest([]);return;}
+    setSuggest(SUPPLEMENTS.filter(s=>s.name.toLowerCase().includes(val.toLowerCase())).slice(0,5));
+  };
+
+  const Sp={page:{minHeight:"100vh",background:C.bg,padding:isMob?"32px 16px":"48px 24px",fontFamily:"Montserrat,sans-serif"},
+    inner:{maxWidth:800,margin:"0 auto"},
+    tag:{fontSize:11,fontWeight:700,letterSpacing:".15em",color:C.gold,marginBottom:8,display:"block"},
+    h1:{fontSize:isMob?28:36,fontWeight:900,color:C.ink,margin:"0 0 8px"},
+    sub:{fontSize:14,color:C.gray,margin:"0 0 36px"},
+    card:{background:C.white,border:`1px solid ${C.border}`,borderRadius:4,padding:isMob?16:24,marginBottom:16},
+    btn:{background:C.ink,color:C.white,border:"none",borderRadius:3,padding:"11px 22px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"Montserrat,sans-serif"},
+    btnGold:{background:C.gold,color:C.ink,border:"none",borderRadius:3,padding:"11px 22px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"Montserrat,sans-serif"},
+    btnGhost:{background:"transparent",color:C.gray,border:`1px solid ${C.border}`,borderRadius:3,padding:"11px 22px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"Montserrat,sans-serif"},
+    input:{width:"100%",padding:"10px 14px",border:`1px solid ${C.border}`,borderRadius:3,fontSize:14,fontFamily:"Montserrat,sans-serif",background:C.white,boxSizing:"border-box"},
+    label:{fontSize:10,fontWeight:700,letterSpacing:".1em",color:C.gray,marginBottom:5,display:"block"},
+    badge:(on)=>({display:"inline-block",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:on?"#dcfce7":"#fef3c7",color:on?"#166534":"#92400e"}),
+  };
+
+  if(!isPro)return(
+    <div style={Sp.page}><div style={{...Sp.inner,textAlign:"center",paddingTop:80}}>
+      <div style={{fontSize:48,marginBottom:16}}>🔄</div>
+      <h2 style={{fontWeight:900,fontSize:24,color:C.ink,marginBottom:8}}>Cycle Alerts is Pro only</h2>
+      <p style={{color:C.gray,fontSize:15,marginBottom:28}}>Track your compound cycles and get precise on/off phase alerts.</p>
+      <button style={Sp.btnGold} onClick={onUpgrade}>Upgrade to Pro</button>
+    </div></div>
+  );
+
+  return(
+    <div style={Sp.page}><div style={Sp.inner}>
+      <span style={Sp.tag}>PRO FEATURE</span>
+      <h1 style={Sp.h1}>Cycle Alerts</h1>
+      <p style={Sp.sub}>Track your compound cycles. Get precise alerts for when to start, stop, and restart.</p>
+
+      {cycles.length===0&&!adding&&(
+        <div style={{...Sp.card,textAlign:"center",padding:48}}>
+          <div style={{fontSize:40,marginBottom:14}}>🔄</div>
+          <p style={{fontWeight:700,fontSize:16,marginBottom:8,color:C.ink}}>No cycles tracked yet</p>
+          <p style={{color:C.gray,fontSize:14,marginBottom:24}}>Add compounds that need cycling: RAD-140, Ashwagandha, Berberine, BPC-157, peptides.</p>
+          <button style={Sp.btnGold} onClick={()=>setAdding(true)}>Add first cycle</button>
+        </div>
+      )}
+
+      {cycles.map(cycle=>{
+        const st=getStatus(cycle);
+        return(
+          <div key={cycle.id} style={{...Sp.card,borderLeft:`4px solid ${st.isOn?"#22c55e":"#f59e0b"}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
+              <div>
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+                  <span style={{fontWeight:900,fontSize:18,color:C.ink}}>{cycle.compound}</span>
+                  <span style={Sp.badge(st.isOn)}>{st.isOn?"ON":"OFF"}</span>
+                </div>
+                <div style={{color:C.gray,fontSize:13,display:"flex",gap:16,flexWrap:"wrap"}}>
+                  <span>Started: {new Date(cycle.startDate).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</span>
+                  <span>{cycle.onWeeks}w ON / {cycle.offWeeks}w OFF</span>
+                  <span>Day {st.daysSince+1}</span>
+                </div>
+              </div>
+              <button onClick={()=>deleteCycle(cycle.id)} style={{background:"none",border:"none",cursor:"pointer",color:C.gray,fontSize:20,lineHeight:1}}>x</button>
+            </div>
+            <div style={{marginTop:14,padding:"12px 16px",background:st.isOn?"#f0fdf4":"#fffbeb",borderRadius:4}}>
+              <p style={{margin:0,fontWeight:700,fontSize:14,color:st.isOn?"#166534":"#92400e"}}>
+                {st.isOn
+                  ?`${st.daysLeft} day${st.daysLeft!==1?"s":""} left in ON phase. Stop on ${st.nextDate}.`
+                  :`${st.daysLeft} day${st.daysLeft!==1?"s":""} left in OFF phase. Restart on ${st.nextDate}.`}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+
+      {adding&&(
+        <div style={{...Sp.card,border:`2px solid ${C.gold}`}}>
+          <p style={{fontWeight:900,fontSize:15,margin:"0 0 18px",color:C.ink}}>Add a compound cycle</p>
+          <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:14,marginBottom:16}}>
+            <div style={{gridColumn:isMob?"1":"1 / -1",position:"relative"}}>
+              <label style={Sp.label}>COMPOUND NAME</label>
+              <input style={Sp.input} value={form.compound} onChange={e=>handleInput(e.target.value)} placeholder="e.g. RAD-140, Ashwagandha..."/>
+              {suggest.length>0&&(
+                <div style={{position:"absolute",top:"100%",left:0,right:0,background:C.white,border:`1px solid ${C.border}`,borderRadius:4,zIndex:10,boxShadow:"0 4px 12px rgba(0,0,0,.1)"}}>
+                  {suggest.map(s=>(
+                    <div key={s.id} onClick={()=>{setForm(f=>({...f,compound:s.name}));setSuggest([]);}} style={{padding:"10px 14px",cursor:"pointer",fontSize:14,fontWeight:600,borderBottom:`1px solid ${C.border}`}}
+                      onMouseEnter={e=>e.currentTarget.style.background=C.bg} onMouseLeave={e=>e.currentTarget.style.background=C.white}>{s.name}</div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div>
+              <label style={Sp.label}>START DATE</label>
+              <input type="date" style={Sp.input} value={form.startDate} onChange={e=>setForm(f=>({...f,startDate:e.target.value}))}/>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+              <div>
+                <label style={Sp.label}>ON (weeks)</label>
+                <input type="number" style={Sp.input} value={form.onWeeks} min={1} max={52} onChange={e=>setForm(f=>({...f,onWeeks:e.target.value}))}/>
+              </div>
+              <div>
+                <label style={Sp.label}>OFF (weeks)</label>
+                <input type="number" style={Sp.input} value={form.offWeeks} min={0} max={52} onChange={e=>setForm(f=>({...f,offWeeks:e.target.value}))}/>
+              </div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+            <button style={Sp.btnGold} onClick={addCycle}>Add cycle</button>
+            <button style={Sp.btnGhost} onClick={()=>setAdding(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {!adding&&cycles.length>0&&(
+        <button style={{...Sp.btn,marginTop:8}} onClick={()=>setAdding(true)}>+ Add cycle</button>
+      )}
+
+      <div style={{marginTop:36,padding:16,background:"#f9f7f4",borderRadius:4,border:`1px solid ${C.border}`}}>
+        <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.7}}>
+          <strong>Common cycles:</strong> Ashwagandha (8w on / 4w off), RAD-140 (8w on / 8w off), Berberine (8w on / 4w off), Tongkat Ali (5 days on / 2 days off), BPC-157 (4-6w on / 4w off), Ipamorelin (12w on / 4w off), Fadogia (8w on / 4w off).
+        </p>
+      </div>
+    </div></div>
+  );
+}
+
+// ── STACK OPTIMIZER ───────────────────────────────────────────────────────────
+function StackOptimizerScreen({onUpgrade}){
+  const {isPro}=useAuth();
+  const [logs]=useState(()=>{try{return JSON.parse(localStorage.getItem("evidstack_tracker")||"{}");}catch{return {};}});
+  const [stack]=useState(()=>{try{return JSON.parse(localStorage.getItem("evidstack_my_stack")||"[]");}catch{return [];}});
+  const [result,setResult]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [err,setErr]=useState("");
+  const isMob=useIsMobile();
+
+  const logEntries=Object.entries(logs).sort(([a],[b])=>new Date(a)-new Date(b)).map(([date,data])=>({date,...data}));
+
+  const analyze=async()=>{
+    setLoading(true);setErr("");setResult(null);
+    try{
+      const res=await fetch("/api/stack-optimizer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({logs:logEntries,stack})});
+      const data=await res.json();
+      if(data.error){setErr(data.error);return;}
+      setResult(data);
+    }catch{setErr("Analysis failed. Please try again.");}
+    finally{setLoading(false);}
+  };
+
+  const Sp={page:{minHeight:"100vh",background:C.bg,padding:isMob?"32px 16px":"48px 24px",fontFamily:"Montserrat,sans-serif"},
+    inner:{maxWidth:800,margin:"0 auto"},
+    tag:{fontSize:11,fontWeight:700,letterSpacing:".15em",color:C.gold,marginBottom:8,display:"block"},
+    h1:{fontSize:isMob?28:36,fontWeight:900,color:C.ink,margin:"0 0 8px"},
+    sub:{fontSize:14,color:C.gray,margin:"0 0 36px"},
+    card:{background:C.white,border:`1px solid ${C.border}`,borderRadius:4,padding:isMob?16:24,marginBottom:16},
+    btn:{background:C.ink,color:C.white,border:"none",borderRadius:3,padding:"13px 26px",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"Montserrat,sans-serif"},
+    btnGold:{background:C.gold,color:C.ink,border:"none",borderRadius:3,padding:"13px 26px",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"Montserrat,sans-serif"},
+    insType:{positive:{border:"1px solid #bbf7d0",background:"#f0fdf4",color:"#166534"},warning:{border:"1px solid #fde68a",background:"#fffbeb",color:"#92400e"},suggestion:{border:"1px solid #bfdbfe",background:"#eff6ff",color:"#1e40af"}},
+  };
+  const typeIcon={positive:"✓",warning:"!",suggestion:"+"};
+
+  if(!isPro)return(
+    <div style={Sp.page}><div style={{...Sp.inner,textAlign:"center",paddingTop:80}}>
+      <div style={{fontSize:48,marginBottom:16}}>📊</div>
+      <h2 style={{fontWeight:900,fontSize:24,color:C.ink,marginBottom:8}}>Stack Optimizer is Pro only</h2>
+      <p style={{color:C.gray,fontSize:15,marginBottom:28}}>AI analyzes your tracker logs and surfaces real correlations between your supplements, mood, and energy.</p>
+      <button style={Sp.btnGold} onClick={onUpgrade}>Upgrade to Pro</button>
+    </div></div>
+  );
+
+  return(
+    <div style={Sp.page}><div style={Sp.inner}>
+      <span style={Sp.tag}>PRO FEATURE</span>
+      <h1 style={Sp.h1}>Stack Optimizer</h1>
+      <p style={Sp.sub}>AI analyzes your tracker logs to detect what is working, what is not, and what to change.</p>
+
+      {logEntries.length<7?(
+        <div style={{...Sp.card,textAlign:"center",padding:48}}>
+          <div style={{fontSize:48,marginBottom:14}}>📊</div>
+          <p style={{fontWeight:700,fontSize:16,color:C.ink,marginBottom:8}}>Need more data</p>
+          <p style={{color:C.gray,fontSize:14}}>You have {logEntries.length} day{logEntries.length!==1?"s":""} logged. The optimizer needs at least 7 days to detect patterns. Keep logging in My Tracker.</p>
+        </div>
+      ):(
+        <>
+          <div style={{...Sp.card,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16}}>
+            <div>
+              <p style={{fontWeight:900,fontSize:15,margin:"0 0 4px",color:C.ink}}>{logEntries.length} days of data ready for analysis</p>
+              <p style={{color:C.gray,fontSize:13,margin:0}}>Stack: {stack.length>0?stack.join(", "):"No stack defined in My Tracker"}</p>
+            </div>
+            <button style={{...Sp.btn,opacity:loading?0.7:1}} onClick={analyze} disabled={loading}>{loading?"Analyzing...":"Run analysis"}</button>
+          </div>
+          {err&&<p style={{color:C.red,fontWeight:700,fontSize:14}}>{err}</p>}
+        </>
+      )}
+
+      {loading&&(
+        <div style={{...Sp.card,textAlign:"center",padding:48}}>
+          <div style={{fontSize:32,marginBottom:10}}>🧠</div>
+          <p style={{fontWeight:700,color:C.ink}}>Analyzing your data...</p>
+          <p style={{color:C.gray,fontSize:14}}>Looking for correlations between your supplements and mood/energy scores.</p>
+        </div>
+      )}
+
+      {result&&(<>
+        <div style={{...Sp.card,background:C.ink,color:C.white}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
+            <div>
+              <p style={{fontSize:11,letterSpacing:".15em",color:C.gold,margin:"0 0 6px",fontWeight:700}}>OVERALL SCORE</p>
+              <p style={{fontSize:15,color:"#d1d5db",margin:0}}>{result.headline}</p>
+            </div>
+            <div style={{fontSize:56,fontWeight:900,color:C.gold,lineHeight:1}}>{result.overallScore}</div>
+          </div>
+        </div>
+
+        <h3 style={{fontWeight:900,fontSize:15,color:C.ink,marginBottom:12}}>Insights ({result.insights?.length||0})</h3>
+        {result.insights?.map((ins,i)=>(
+          <div key={i} style={{...Sp.insType[ins.type]||{},padding:20,borderRadius:4,marginBottom:12}}>
+            <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
+              <span style={{fontWeight:900,fontSize:18,lineHeight:1,flexShrink:0}}>{typeIcon[ins.type]||"*"}</span>
+              <div>
+                <p style={{fontWeight:800,fontSize:14,margin:"0 0 6px"}}>{ins.title}</p>
+                <p style={{fontSize:13,margin:"0 0 6px",lineHeight:1.5}}>{ins.detail}</p>
+                {ins.compound&&<span style={{fontSize:11,fontWeight:700,background:"rgba(0,0,0,.08)",padding:"2px 8px",borderRadius:10}}>{ins.compound}</span>}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <div style={{...Sp.card,borderTop:`3px solid ${C.ink}`,marginTop:8}}>
+          <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 8px"}}>RECOMMENDATION</p>
+          <p style={{fontWeight:700,fontSize:15,color:C.ink,margin:0}}>{result.recommendation}</p>
+        </div>
+        {result.retestIn&&<p style={{fontSize:12,color:C.gray,textAlign:"center",marginTop:8}}>Suggested re-analysis in: {result.retestIn}</p>}
+      </>)}
+    </div></div>
+  );
+}
+
+// ── BLOOD WORK ANALYZER ───────────────────────────────────────────────────────
+const BLOOD_MARKERS=[
+  {key:"testosterone_total",label:"Total Testosterone",unit:"ng/dL",placeholder:"e.g. 650",ref_low:300,ref_high:1000},
+  {key:"testosterone_free",label:"Free Testosterone",unit:"pg/mL",placeholder:"e.g. 12",ref_low:5,ref_high:21},
+  {key:"vitamin_d",label:"Vitamin D (25-OH)",unit:"ng/mL",placeholder:"e.g. 35",ref_low:30,ref_high:100},
+  {key:"ferritin",label:"Ferritin",unit:"ng/mL",placeholder:"e.g. 80",ref_low:30,ref_high:300},
+  {key:"tsh",label:"TSH",unit:"mIU/L",placeholder:"e.g. 2.1",ref_low:0.4,ref_high:4.0},
+  {key:"cortisol",label:"Cortisol (morning)",unit:"mcg/dL",placeholder:"e.g. 14",ref_low:6,ref_high:23},
+  {key:"dhea_s",label:"DHEA-S",unit:"mcg/dL",placeholder:"e.g. 250",ref_low:70,ref_high:500},
+  {key:"igf1",label:"IGF-1",unit:"ng/mL",placeholder:"e.g. 180",ref_low:100,ref_high:300},
+  {key:"shbg",label:"SHBG",unit:"nmol/L",placeholder:"e.g. 28",ref_low:10,ref_high:57},
+  {key:"estradiol",label:"Estradiol (E2)",unit:"pg/mL",placeholder:"e.g. 22",ref_low:10,ref_high:40},
+  {key:"crp",label:"CRP (hs-CRP)",unit:"mg/L",placeholder:"e.g. 0.8",ref_low:0,ref_high:1.0},
+  {key:"homocysteine",label:"Homocysteine",unit:"mcmol/L",placeholder:"e.g. 8",ref_low:0,ref_high:10},
+  {key:"hba1c",label:"HbA1c",unit:"%",placeholder:"e.g. 5.2",ref_low:0,ref_high:5.7},
+  {key:"fasting_glucose",label:"Fasting Glucose",unit:"mg/dL",placeholder:"e.g. 88",ref_low:70,ref_high:99},
+  {key:"hdl",label:"HDL Cholesterol",unit:"mg/dL",placeholder:"e.g. 55",ref_low:40,ref_high:300},
+  {key:"triglycerides",label:"Triglycerides",unit:"mg/dL",placeholder:"e.g. 90",ref_low:0,ref_high:150},
+];
+
+function BloodWorkScreen({onUpgrade}){
+  const {isPro}=useAuth();
+  const [markers,setMarkers]=useState({});
+  const [goals,setGoals]=useState([]);
+  const [currentStack,setCurrentStack]=useState("");
+  const [result,setResult]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [err,setErr]=useState("");
+  const [view,setView]=useState("input");
+  const [saved,setSaved]=useState(()=>{try{return JSON.parse(localStorage.getItem("evidstack_bloodwork")||"[]");}catch{return [];}});
+  const isMob=useIsMobile();
+
+  const GOAL_OPTIONS=["Testosterone optimization","Fat loss","Muscle gain","Longevity","Cognitive performance","Energy","Sleep quality","Inflammation reduction"];
+  const statusStyle={LOW:{color:"#b45309",background:"#fffbeb",border:"1px solid #fde68a"},HIGH:{color:"#991b1b",background:"#fef2f2",border:"1px solid #fecaca"},OPTIMAL:{color:"#166534",background:"#f0fdf4",border:"1px solid #bbf7d0"}};
+  const priorityColor={1:"#dc2626",2:"#f59e0b",3:"#3b82f6"};
+
+  const getStatus=(key,val)=>{
+    if(val===""||val===undefined)return null;
+    const m=BLOOD_MARKERS.find(bm=>bm.key===key);if(!m)return null;
+    const n=parseFloat(val);
+    return n<m.ref_low?"LOW":n>m.ref_high?"HIGH":"OPTIMAL";
+  };
+  const filledCount=Object.values(markers).filter(v=>v!==""&&v!==undefined).length;
+
+  const analyze=async()=>{
+    if(filledCount<2){setErr("Please enter at least 2 blood markers.");return;}
+    setLoading(true);setErr("");setResult(null);
+    try{
+      const stackArr=currentStack.split(",").map(s=>s.trim()).filter(Boolean);
+      const res=await fetch("/api/bloodwork-analyzer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({markers,goals,currentStack:stackArr})});
+      const data=await res.json();
+      if(data.error){setErr(data.error);return;}
+      setResult(data);setView("result");
+      const ns=[{id:Date.now(),date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),result:data},...saved].slice(0,5);
+      setSaved(ns);localStorage.setItem("evidstack_bloodwork",JSON.stringify(ns));
+    }catch{setErr("Analysis failed. Please try again.");}
+    finally{setLoading(false);}
+  };
+
+  const Sp={page:{minHeight:"100vh",background:C.bg,padding:isMob?"32px 16px":"48px 24px",fontFamily:"Montserrat,sans-serif"},
+    inner:{maxWidth:900,margin:"0 auto"},
+    tag:{fontSize:11,fontWeight:700,letterSpacing:".15em",color:C.gold,marginBottom:8,display:"block"},
+    h1:{fontSize:isMob?28:36,fontWeight:900,color:C.ink,margin:"0 0 8px"},
+    sub:{fontSize:14,color:C.gray,margin:"0 0 32px"},
+    card:{background:C.white,border:`1px solid ${C.border}`,borderRadius:4,padding:isMob?16:24,marginBottom:16},
+    btn:{background:C.ink,color:C.white,border:"none",borderRadius:3,padding:"13px 26px",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"Montserrat,sans-serif"},
+    btnGold:{background:C.gold,color:C.ink,border:"none",borderRadius:3,padding:"13px 26px",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"Montserrat,sans-serif"},
+    btnOutline:(active)=>({background:"transparent",color:active?C.ink:C.gray,border:active?`2px solid ${C.ink}`:`1px solid ${C.border}`,borderRadius:3,padding:"9px 18px",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}),
+    input:{width:"100%",padding:"10px 14px",border:`1px solid ${C.border}`,borderRadius:3,fontSize:14,fontFamily:"Montserrat,sans-serif",background:C.white,boxSizing:"border-box"},
+    label:{fontSize:10,fontWeight:700,letterSpacing:".1em",color:C.gray,marginBottom:5,display:"block"},
+  };
+
+  if(!isPro)return(
+    <div style={Sp.page}><div style={{...Sp.inner,textAlign:"center",paddingTop:80}}>
+      <div style={{fontSize:48,marginBottom:16}}>🩸</div>
+      <h2 style={{fontWeight:900,fontSize:24,color:C.ink,marginBottom:8}}>Blood Work Analyzer is Pro only</h2>
+      <p style={{color:C.gray,fontSize:15,marginBottom:28}}>Enter your blood test results and get evidence-based supplement recommendations personalized to your actual biology.</p>
+      <button style={Sp.btnGold} onClick={onUpgrade}>Upgrade to Pro</button>
+    </div></div>
+  );
+
+  return(
+    <div style={Sp.page}><div style={Sp.inner}>
+      <span style={Sp.tag}>PRO FEATURE</span>
+      <h1 style={Sp.h1}>Blood Work Analyzer</h1>
+      <p style={Sp.sub}>Enter your blood test results and get supplement recommendations based on your actual biology.</p>
+
+      <div style={{display:"flex",gap:8,marginBottom:28,flexWrap:"wrap"}}>
+        {["input","history"].map(tab=>(
+          <button key={tab} onClick={()=>setView(tab)} style={Sp.btnOutline(view===tab)}>
+            {tab==="input"?"New analysis":`History (${saved.length})`}
+          </button>
+        ))}
+        {result&&<button onClick={()=>setView("result")} style={{...Sp.btnOutline(view==="result"),borderColor:C.gold,color:C.gold}}>Latest result</button>}
+      </div>
+
+      {view==="history"&&(
+        saved.length===0?(
+          <div style={{...Sp.card,textAlign:"center",padding:48}}><p style={{color:C.gray}}>No past analyses yet.</p></div>
+        ):(
+          saved.map(sr=>(
+            <div key={sr.id} style={{...Sp.card,cursor:"pointer"}} onClick={()=>{setResult(sr.result);setView("result");}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <p style={{fontWeight:800,fontSize:15,margin:"0 0 4px",color:C.ink}}>{sr.date}</p>
+                  <p style={{color:C.gray,fontSize:13,margin:0}}>{sr.result.summary?.slice(0,90)}...</p>
+                </div>
+                <span style={{fontSize:28,fontWeight:900,color:C.gold}}>{sr.result.priorityScore}</span>
+              </div>
+            </div>
+          ))
+        )
+      )}
+
+      {view==="input"&&(<>
+        <div style={Sp.card}>
+          <p style={{fontWeight:900,fontSize:14,margin:"0 0 18px",color:C.ink}}>1. Enter your blood markers ({filledCount} entered)</p>
+          <div style={{display:"grid",gridTemplateColumns:isMob?"1fr 1fr":"repeat(auto-fill,minmax(200px,1fr))",gap:14}}>
+            {BLOOD_MARKERS.map(bm=>{
+              const val=markers[bm.key]||"";const st=getStatus(bm.key,val);
+              return(
+                <div key={bm.key}>
+                  <label style={Sp.label}>{bm.label.toUpperCase()}</label>
+                  <div style={{position:"relative"}}>
+                    <input type="number" step="0.1" style={{...Sp.input,paddingRight:52,...(st?statusStyle[st]:{}),fontSize:12}} value={val} placeholder={bm.placeholder} onChange={e=>setMarkers(m=>({...m,[bm.key]:e.target.value}))}/>
+                    <span style={{position:"absolute",right:8,top:"50%",transform:"translateY(-50%)",fontSize:9,color:C.gray,pointerEvents:"none"}}>{bm.unit}</span>
+                  </div>
+                  {st&&<span style={{fontSize:9,fontWeight:700,color:statusStyle[st].color}}>{st}</span>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={Sp.card}>
+          <p style={{fontWeight:900,fontSize:14,margin:"0 0 14px",color:C.ink}}>2. Your goals</p>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+            {GOAL_OPTIONS.map(g=>(
+              <button key={g} onClick={()=>setGoals(prev=>prev.includes(g)?prev.filter(x=>x!==g):[...prev,g])} style={{padding:"7px 12px",borderRadius:3,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",border:goals.includes(g)?`2px solid ${C.ink}`:`1px solid ${C.border}`,background:goals.includes(g)?C.ink:C.white,color:goals.includes(g)?C.white:C.ink}}>
+                {g}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={Sp.card}>
+          <p style={{fontWeight:900,fontSize:14,margin:"0 0 10px",color:C.ink}}>3. Current supplements (optional)</p>
+          <input style={Sp.input} value={currentStack} onChange={e=>setCurrentStack(e.target.value)} placeholder="e.g. Creatine, Vitamin D, Omega-3..."/>
+        </div>
+
+        {err&&<p style={{color:C.red,fontWeight:700,fontSize:14,marginBottom:16}}>{err}</p>}
+        <button style={{...Sp.btn,opacity:loading?0.7:1}} onClick={analyze} disabled={loading}>
+          {loading?"Analyzing blood work...":"Analyze blood work"}
+        </button>
+        <p style={{fontSize:11,color:C.gray,marginTop:10}}>Your data is never stored on our servers. Analysis runs in your session only.</p>
+      </>)}
+
+      {view==="result"&&result&&(<>
+        <div style={{...Sp.card,background:C.ink,color:C.white,marginBottom:20}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
+            <div style={{flex:1}}>
+              <p style={{fontSize:11,letterSpacing:".15em",color:C.gold,margin:"0 0 8px",fontWeight:700}}>ANALYSIS SUMMARY</p>
+              <p style={{fontSize:14,color:"#d1d5db",margin:"0 0 8px",lineHeight:1.5}}>{result.summary}</p>
+              {result.retestIn&&<p style={{fontSize:12,color:C.gray,margin:0}}>Recommended retest: {result.retestIn}</p>}
+            </div>
+            <div style={{textAlign:"center"}}>
+              <div style={{fontSize:52,fontWeight:900,color:C.gold,lineHeight:1}}>{result.priorityScore}</div>
+              <div style={{fontSize:9,color:C.gray,letterSpacing:".1em"}}>OPTIMIZATION SCORE</div>
+            </div>
+          </div>
+        </div>
+
+        {result.flags?.length>0&&(<>
+          <h3 style={{fontWeight:900,fontSize:14,color:C.ink,marginBottom:12}}>Markers flagged ({result.flags.length})</h3>
+          <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:12,marginBottom:20}}>
+            {result.flags.map((flag,i)=>(
+              <div key={i} style={{...Sp.card,marginBottom:0,borderLeft:`4px solid ${flag.urgency==="high"?"#ef4444":"#f59e0b"}`}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+                  <span style={{fontWeight:800,fontSize:13,color:C.ink}}>{flag.marker}</span>
+                  <span style={{fontSize:10,fontWeight:700,...statusStyle[flag.status]||{},padding:"2px 8px",borderRadius:3}}>{flag.status} {flag.value}</span>
+                </div>
+                <p style={{fontSize:13,color:C.ink,margin:0,lineHeight:1.5}}>{flag.impact}</p>
+              </div>
+            ))}
+          </div>
+        </>)}
+
+        {result.recommendations?.length>0&&(<>
+          <h3 style={{fontWeight:900,fontSize:14,color:C.ink,marginBottom:12}}>Recommendations</h3>
+          {result.recommendations.map((rec,i)=>(
+            <div key={i} style={{...Sp.card,borderLeft:`4px solid ${priorityColor[rec.priority]||C.border}`}}>
+              <div style={{display:"flex",gap:14,alignItems:"flex-start",flexWrap:"wrap"}}>
+                <div style={{fontWeight:900,fontSize:22,color:priorityColor[rec.priority]||C.gray,minWidth:28}}>#{rec.priority}</div>
+                <div style={{flex:1}}>
+                  <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:8,flexWrap:"wrap"}}>
+                    <span style={{fontWeight:900,fontSize:15,color:C.ink}}>{rec.compound}</span>
+                    {rec.alreadyTaking&&<span style={{fontSize:9,background:"#dcfce7",color:"#166534",fontWeight:700,padding:"2px 8px",borderRadius:10}}>Already taking</span>}
+                  </div>
+                  <div style={{display:"flex",gap:16,marginBottom:8,flexWrap:"wrap"}}>
+                    <span style={{fontSize:12,color:C.gray}}><strong>Dose:</strong> {rec.dose}</span>
+                    <span style={{fontSize:12,color:C.gray}}><strong>Timing:</strong> {rec.timing}</span>
+                  </div>
+                  <p style={{fontSize:13,color:C.ink,margin:0,lineHeight:1.5}}>{rec.rationale}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </>)}
+
+        {result.avoid?.length>0&&(<>
+          <h3 style={{fontWeight:900,fontSize:14,color:C.ink,margin:"20px 0 12px"}}>What to avoid</h3>
+          {result.avoid.map((av,i)=>(
+            <div key={i} style={{...Sp.card,background:"#fef2f2",border:"1px solid #fecaca"}}>
+              <span style={{fontWeight:800,color:"#991b1b",fontSize:14}}>{av.compound}</span>
+              <p style={{fontSize:13,color:"#7f1d1d",margin:"6px 0 0",lineHeight:1.5}}>{av.reason}</p>
+            </div>
+          ))}
+        </>)}
+
+        <p style={{fontSize:11,color:C.gray,marginTop:20,lineHeight:1.6,padding:"12px 16px",background:"#f9f7f4",borderRadius:4}}>{result.disclaimer}</p>
+        <button style={{...Sp.btnOutline(false),marginTop:14}} onClick={()=>setView("input")}>Run new analysis</button>
+      </>)}
+    </div></div>
   );
 }
 

@@ -1,0 +1,4 @@
+Contact: mailto:evidstack@protonmail.com
+Expires: 2027-03-22T23:59:59z
+Preferred-Languages: en
+Policy: https://evidstack.com/legal

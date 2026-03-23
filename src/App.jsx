@@ -3752,13 +3752,14 @@ function PricingPage({onUpgrade,onAuth}){
     {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${count}+`,highlight:true},
     {feature:"Peptides & GLP-1s",free:false,pro:true},
     {feature:"Biohacking tier (T4)",free:false,pro:true},
-    {feature:"AI Stack Builder",free:false,pro:true,highlight:true},
-    {feature:"AI Cycle Alerts",free:false,pro:true},
+    {feature:"Compound pages (full profile)",free:false,pro:true},
+    {feature:"AI Compound Advisor",free:"1 free query",pro:"Unlimited",highlight:true},
+    {feature:"Conversation memory",free:false,pro:true},
+    {feature:"Synergy and protocol suggestions",free:false,pro:true},
     {feature:"AI Bloodwork Analyzer",free:false,pro:true},
     {feature:"My Tracker",free:false,pro:true},
     {feature:"Compare compounds",free:false,pro:true},
     {feature:"Save your stacks",free:false,pro:true,highlight:true},
-    {feature:"Compound pages (/compound/:id)",free:true,pro:true},
   ];
 
   const S={
@@ -3786,7 +3787,7 @@ function PricingPage({onUpgrade,onAuth}){
           </div>
           <p style={{fontSize:13,color:C.gray,margin:"0 0 24px"}}>Forever free. No credit card needed.</p>
           <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:28}}>
-            {["Tier 1 compounds (33)","Compound detail pages","Protocols library","3 free Compoundmaxxing stacks"].map(f=>(
+            {["Tier 1 compounds (33)","Browse the full database","1 free AI Compound Advisor query","Compound header info (name, tier, safety)"].map(f=>(
               <div key={f} style={{display:"flex",gap:10,alignItems:"center"}}>
                 <span style={{color:C.green,fontWeight:900,fontSize:14}}>✓</span>
                 <span style={{fontSize:13,color:C.ink}}>{f}</span>
@@ -3807,7 +3808,7 @@ function PricingPage({onUpgrade,onAuth}){
           <p style={{fontSize:12,color:C.green,fontWeight:700,margin:"0 0 4px"}}>Or $79/year - save 34%</p>
           <p style={{fontSize:13,color:C.gray,margin:"0 0 24px"}}>Full access. Cancel in one click.</p>
           <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:28}}>
-            {[`All ${count}+ compounds (Tier 1-4)`,"Peptides, GLP-1s, SARMs, nootropics","AI Stack Builder","AI Cycle Alerts","AI Bloodwork Analyzer","My Tracker","Compare compounds","Save your stacks"].map(f=>(
+            {[`All ${count}+ compounds (Tier 1-4)`,"Peptides, GLP-1s, SARMs, nootropics","AI Compound Advisor - unlimited queries","Conversation memory and follow-ups","AI Bloodwork Analyzer","My Tracker","Compare compounds","Save your stacks"].map(f=>(
               <div key={f} style={{display:"flex",gap:10,alignItems:"center"}}>
                 <span style={{color:C.gold,fontWeight:900,fontSize:14}}>✓</span>
                 <span style={{fontSize:13,color:C.ink,fontWeight:600}}>{f}</span>
@@ -3852,8 +3853,9 @@ function PricingPage({onUpgrade,onAuth}){
         {[
           ["Can I cancel anytime?","Yes. Cancel directly from your account in one click. You keep access until the end of your billing period."],
           ["Is my payment secure?","All payments processed by Stripe. We never see or store your card details."],
+          ["What is included in the free plan?","The free plan gives you access to all 33 Tier 1 compounds (the most widely studied), the ability to browse the full database, and 1 free query on the AI Compound Advisor so you can experience the tool before upgrading."],
           ["What counts as a Tier 1 compound?","Tier 1 covers the 33 most widely studied foundational compounds: Creatine, Magnesium, Vitamin D3, Omega-3, Zinc, and others with the strongest evidence base."],
-          ["Does the AI Stack Builder replace a doctor?","No. All tools provide informational context based on published research. Always consult a healthcare professional before making changes based on blood work or supplements."],
+          ["Does the AI Compound Advisor replace a doctor?","No. All tools provide informational context based on published research. Always consult a healthcare professional before making changes based on blood work or supplements."],
         ].map(([q,a])=>(
           <div key={q} style={{borderTop:`1px solid ${C.border}`,padding:"18px 0"}}>
             <p style={{fontWeight:800,fontSize:14,color:C.ink,margin:"0 0 8px"}}>{q}</p>

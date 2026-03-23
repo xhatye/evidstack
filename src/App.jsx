@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 
 function useIsMobile(){ 
   const [m,setM]=useState(()=>typeof window!=="undefined"&&window.innerWidth<768);
@@ -22,6 +22,7 @@ const ROUTES = {
   "/stack-optimizer":"stack-optimizer",
   "/bloodwork":"bloodwork",
   "/pricing":"pricing",
+  "/advisor":"advisor",
 };
 
 function getPageFromPath(){
@@ -103,7 +104,7 @@ function OnboardingModal({onClose}){
     {
       icon:"🧬",
       title:"Pro AI tools",
-      desc:"Stack Builder AI builds a personalized protocol from your goals and budget. My Tracker logs your daily intake and spots patterns. AI Cycle Alerts tells you exactly when to stop and restart each compound. AI Bloodwork Analyzer turns your blood test into supplement recommendations.",
+      desc:"Stack Builder AI builds a personalized protocol from your goals and budget. Compound Advisor AI lets you describe any issue and returns compounds ranked by evidence. My Tracker logs your daily intake and spots patterns. AI Cycle Alerts tells you exactly when to stop and restart each compound. AI Bloodwork Analyzer turns your blood test into supplement recommendations.",
       detail:"All AI tools are Pro-only and powered by the same evidence base as the database.",
     },
   ];
@@ -287,6 +288,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
 
   const features=[
     {icon:"🔬",text:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including Tier 2-4`},
+    {icon:"🔭",text:"Compound Advisor - AI chatbot ranked by evidence"},
     {icon:"🧬",text:"AI Stack Builder - personalized protocols"},
     {icon:"🔄",text:"AI Cycle Alerts - on/off phase tracking"},
     {icon:"🩸",text:"AI Bloodwork Analyzer - bio-personalized recs"},
@@ -337,6 +339,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
               {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+`,highlight:true},
               {feature:"Peptides & GLP-1s",free:false,pro:true},
               {feature:"Biohacking tier",free:false,pro:true},
+              {feature:"Compound Advisor AI",free:false,pro:true,highlight:true},
               {feature:"AI Stack Builder",free:false,pro:true,highlight:true},
               {feature:"AI Cycle Alerts",free:false,pro:true},
               {feature:"AI Bloodwork Analyzer",free:false,pro:true},
@@ -2256,6 +2259,7 @@ function AccountCenter({onClose,onUpgrade}){
                 <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Quick Links</p>
                 <div style={{display:"flex",flexDirection:"column",gap:1}}>
                   {[
+                    {label:"Compound Advisor",path:"advisor"},
                     {label:"AI Stack Builder",path:"stack-builder"},
                     {label:"AI Cycle Alerts",path:"cycle-alerts"},
                     {label:"AI Bloodwork Analyzer",path:"bloodwork"},
@@ -2295,6 +2299,7 @@ function AccountCenter({onClose,onUpgrade}){
                   {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+`,highlight:true},
                   {feature:"Peptides & GLP-1s",free:false,pro:true,highlight:false},
                   {feature:"Biohacking tier",free:false,pro:true,highlight:false},
+                  {feature:"Compound Advisor AI",free:false,pro:true,highlight:true},
                   {feature:"AI Stack Builder",free:false,pro:true,highlight:true},
                   {feature:"AI Cycle Alerts",free:false,pro:true,highlight:false},
                   {feature:"AI Bloodwork Analyzer",free:false,pro:true,highlight:false},
@@ -2481,6 +2486,7 @@ function AppInner(){
   ];
   const proTools=[
     {id:"stack-builder",label:"Stack Builder AI"},
+    {id:"advisor",label:"Compound Advisor"},
     {id:"tracker",label:"My Tracker"},
     {id:"cycle-alerts",label:"AI Cycle Alerts"},
     {id:"bloodwork",label:"AI Bloodwork Analyzer"},
@@ -2615,6 +2621,7 @@ function AppInner(){
       {page==="interactions"   &&<InteractionChecker onUpgrade={openUpgrade}/>}
       {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}
       {page==="tracker"        &&<MyTracker onUpgrade={openUpgrade}/>}
+      {page==="advisor"        &&<CompoundAdvisorScreen onUpgrade={openUpgrade}/>}
       {page==="protocols"     &&<ProtocolsPage onGoToSupplements={()=>navigateTo("supplements")}/>}
       {page==="stack-builder" &&<StackBuilder onUpgrade={openUpgrade}/>}
       {page==="cycle-alerts"  &&<CycleAlertsScreen onUpgrade={openUpgrade}/>}
@@ -2826,7 +2833,7 @@ function AppInner(){
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Tools</p>
-            {[["stack-builder","Stack Builder AI"],["tracker","My Tracker"],["cycle-alerts","AI Cycle Alerts"],["bloodwork","AI Bloodwork Analyzer"]].map(([p,l])=>(
+            {[["stack-builder","Stack Builder AI"],["advisor","Compound Advisor"],["tracker","My Tracker"],["cycle-alerts","AI Cycle Alerts"],["bloodwork","AI Bloodwork Analyzer"]].map(([p,l])=>(
               <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>
@@ -3403,6 +3410,310 @@ function BloodWorkScreen({onUpgrade}){
 }
 
 // ── PRICING PAGE ─────────────────────────────────────────────────────────────
+// ── COMPOUND ADVISOR ─────────────────────────────────────────────────────────
+function CompoundAdvisorScreen({onUpgrade}){
+  const {isPro}=useAuth();
+  const isMob=useIsMobile();
+  const [query,setQuery]=useState("");
+  const [history,setHistory]=useState([]); // [{role,content}]
+  const [result,setResult]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [err,setErr]=useState("");
+  const [revealedCount,setRevealedCount]=useState(0);
+  const [phase,setPhase]=useState("idle"); // idle | scanning | revealing | done
+  const inputRef=useRef(null);
+
+  const tierColor=(t)=>["",C.green,C.blue,C.purple,C.amber][t]||C.gray;
+  const tierLabel=(t)=>["","T1","T2","T3","T4"][t]||"T?";
+
+  const SCANNING_LINES=[
+    "Parsing query intent...",
+    "Searching 204 compounds...",
+    "Cross-referencing PubMed meta-analyses...",
+    "Scoring efficacy and evidence quality...",
+    "Checking compound interactions...",
+    "Ranking by combined score...",
+    "Generating protocol suggestion...",
+  ];
+  const [scanLine,setScanLine]=useState(0);
+
+  useEffect(()=>{
+    if(phase!=="scanning")return;
+    const iv=setInterval(()=>setScanLine(l=>l<SCANNING_LINES.length-1?l+1:l),420);
+    return()=>clearInterval(iv);
+  },[phase]);
+
+  // Cascade-reveal compounds one by one after response
+  useEffect(()=>{
+    if(phase!=="revealing"||!result?.compounds)return;
+    if(revealedCount>=result.compounds.length){setPhase("done");return;}
+    const t=setTimeout(()=>setRevealedCount(n=>n+1),180);
+    return()=>clearTimeout(t);
+  },[phase,revealedCount,result]);
+
+  const submit=async(overrideQuery)=>{
+    const q=(overrideQuery||query).trim();
+    if(!q||loading)return;
+    setLoading(true);setErr("");setResult(null);setRevealedCount(0);setPhase("scanning");setScanLine(0);
+    const newHistory=[...history,{role:"user",content:q}];
+    try{
+      const res=await fetch("/api/symptom-advisor",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({query:q,conversationHistory:history}),
+      });
+      const data=await res.json();
+      if(data.error){setErr(data.error);setPhase("idle");return;}
+      setResult(data);
+      setHistory([...newHistory,{role:"assistant",content:JSON.stringify(data)}]);
+      setPhase("revealing");
+    }catch{
+      setErr("Analysis failed. Please try again.");
+      setPhase("idle");
+    }finally{
+      setLoading(false);
+      setQuery("");
+    }
+  };
+
+  const reset=()=>{setResult(null);setHistory([]);setQuery("");setPhase("idle");setRevealedCount(0);setScanLine(0);setErr("");};
+
+  const SUGGESTIONS=["I want to improve my sleep quality","Best compounds for testosterone optimization","I feel low energy every afternoon","Help me focus better without caffeine dependency","I want to reduce inflammation and joint pain","I'm looking to maximize muscle recovery"];
+
+  const S={
+    page:{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"},
+    inner:{maxWidth:860,margin:"0 auto",padding:isMob?"32px 16px 80px":"56px 32px 100px"},
+    tag:{fontSize:11,fontWeight:700,letterSpacing:".15em",color:C.gold,marginBottom:8,display:"block"},
+    h1:{fontSize:isMob?28:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 10px"},
+    sub:{fontSize:14,color:C.gray,margin:"0 0 36px",lineHeight:1.6,maxWidth:520},
+    inputRow:{display:"flex",gap:0,border:`2px solid ${C.ink}`,background:C.white,marginBottom:28},
+    textarea:{flex:1,padding:"16px 18px",border:"none",fontSize:14,fontFamily:"Montserrat,sans-serif",resize:"none",outline:"none",background:"transparent",color:C.ink,minHeight:56,lineHeight:1.5},
+    sendBtn:{padding:"0 24px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0,minWidth:80},
+    chip:{padding:"8px 14px",border:`1px solid ${C.border}`,background:C.white,fontSize:11,fontWeight:600,cursor:"pointer",color:C.gray,fontFamily:"Montserrat,sans-serif",transition:"all .15s"},
+  };
+
+  if(!isPro)return(
+    <div style={S.page}><div style={{...S.inner,textAlign:"center",paddingTop:80}}>
+      <span style={{fontSize:52,display:"block",marginBottom:20}}>🔭</span>
+      <h2 style={{fontSize:isMob?24:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>Compound Advisor AI</h2>
+      <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Describe any health goal or issue and get a ranked list of compounds ordered by efficacy and strength of evidence. No generic answers.</p>
+      <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"32px",marginBottom:32,textAlign:"left",maxWidth:500,margin:"0 auto 32px"}}>
+        {[["🎯","Goal-aware ranking","Compounds ranked by combined efficacy + evidence score for your exact query"],["🔬","Evidence-first","Every compound backed by study count, study type, and dosing from published research"],["🔗","Synergy detection","Flags which compounds work better together and which conflict"],["💬","Conversational memory","Follow up with questions - the advisor remembers your full session"]].map(([icon,title,desc])=>(
+          <div key={title} style={{display:"flex",gap:14,marginBottom:20}}>
+            <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
+            <div><p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{title}</p><p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{desc}</p></div>
+          </div>
+        ))}
+      </div>
+      <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+        Upgrade to Pro - $9.99/month
+      </button>
+    </div></div>
+  );
+
+  return(
+    <div style={S.page}>
+      <style>{`
+        @keyframes advisorFadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes advisorSlideIn{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes advisorPulse{0%,100%{opacity:.4}50%{opacity:1}}
+        @keyframes advisorScan{0%{width:0%}100%{width:100%}}
+        @keyframes advisorScoreGrow{from{width:0}to{width:var(--w)}}
+        @keyframes advisorBlink{0%,100%{opacity:1}50%{opacity:0}}
+        .adv-card{animation:advisorFadeIn .4s ease both}
+        .adv-slide{animation:advisorSlideIn .3s ease both}
+        .adv-pulse{animation:advisorPulse 1.4s ease-in-out infinite}
+        .adv-score-bar{animation:advisorScoreGrow .8s cubic-bezier(.22,1,.36,1) both}
+      `}</style>
+
+      <div style={S.inner}>
+        <span style={S.tag}>PRO FEATURE</span>
+        <h1 style={S.h1}>Compound Advisor</h1>
+        <p style={S.sub}>Describe any health goal or issue. The advisor searches 204 compounds and returns the strongest evidence-based options, ranked by efficacy and study quality.</p>
+
+        {/* Input */}
+        <div style={S.inputRow}>
+          <textarea
+            ref={inputRef}
+            style={S.textarea}
+            rows={2}
+            value={query}
+            onChange={e=>setQuery(e.target.value)}
+            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}}
+            placeholder="e.g. I want better sleep quality without feeling groggy..."
+            disabled={loading}
+          />
+          <button style={{...S.sendBtn,opacity:loading||!query.trim()?0.4:1}} onClick={()=>submit()} disabled={loading||!query.trim()}>
+            {loading?"...":"Send"}
+          </button>
+        </div>
+
+        {/* Suggestions - only show when idle and no result */}
+        {phase==="idle"&&!result&&(
+          <div className="adv-card" style={{marginBottom:36}}>
+            <p style={{fontSize:10,fontWeight:700,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Try asking about</p>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+              {SUGGESTIONS.map(s=>(
+                <button key={s} className="chip" style={S.chip} onClick={()=>submit(s)}
+                  onMouseEnter={e=>Object.assign(e.currentTarget.style,{background:C.ink,color:C.white,borderColor:C.ink})}
+                  onMouseLeave={e=>Object.assign(e.currentTarget.style,{background:C.white,color:C.gray,borderColor:C.border})}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Scanning animation */}
+        {phase==="scanning"&&(
+          <div className="adv-card" style={{background:C.ink,padding:"32px",marginBottom:24}}>
+            {/* Scan bar */}
+            <div style={{height:2,background:"#1f2937",marginBottom:28,overflow:"hidden"}}>
+              <div style={{height:"100%",background:C.gold,animation:"advisorScan 2.4s ease-in-out infinite"}}/>
+            </div>
+            <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
+              <div style={{flexShrink:0,marginTop:2}}>
+                <div style={{width:8,height:8,borderRadius:"50%",background:C.gold,animation:"advisorBlink 1s ease-in-out infinite"}}/>
+              </div>
+              <div style={{flex:1}}>
+                {SCANNING_LINES.map((line,i)=>(
+                  <div key={line} style={{
+                    fontSize:12,fontWeight:i===scanLine?700:500,
+                    color:i<scanLine?"#374151":i===scanLine?C.gold:"#1f2937",
+                    marginBottom:6,
+                    transition:"all .3s",
+                    ...(i===scanLine?{letterSpacing:".02em"}:{})
+                  }}>
+                    {i<scanLine?"✓ ":i===scanLine?"→ ":"  "}{line}
+                  </div>
+                ))}
+              </div>
+              <div style={{fontSize:11,color:"#374151",fontWeight:700,textAlign:"right",flexShrink:0}}>
+                <span className="adv-pulse">Analyzing</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {err&&<p style={{color:C.red,fontWeight:700,fontSize:14,marginBottom:20}}>{err}</p>}
+
+        {/* Clarification */}
+        {result?.clarify&&(
+          <div className="adv-card" style={{border:`2px solid ${C.ink}`,padding:"24px",marginBottom:24}}>
+            <p style={{fontSize:11,fontWeight:800,letterSpacing:".12em",color:C.gray,margin:"0 0 8px",textTransform:"uppercase"}}>One question first</p>
+            <p style={{fontSize:15,fontWeight:700,color:C.ink,margin:"0 0 20px"}}>{result.clarify}</p>
+            <div style={{display:"flex",gap:0,border:`1.5px solid ${C.ink}`,background:C.white}}>
+              <input style={{flex:1,padding:"11px 14px",border:"none",fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none"}} placeholder="Your answer..." value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()}/>
+              <button style={{...S.sendBtn,minWidth:64}} onClick={()=>submit()}>Go</button>
+            </div>
+          </div>
+        )}
+
+        {/* Results */}
+        {(phase==="revealing"||phase==="done")&&result?.compounds?.length>0&&(
+          <>
+            {/* Intent header */}
+            <div className="adv-card" style={{borderLeft:`4px solid ${C.ink}`,paddingLeft:16,marginBottom:28}}>
+              <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 4px",textTransform:"uppercase"}}>Analysis</p>
+              <p style={{fontSize:15,fontWeight:700,color:C.ink,margin:0}}>{result.intent}</p>
+            </div>
+
+            {/* Compound cards */}
+            <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:28}}>
+              {result.compounds.slice(0,revealedCount).map((c,i)=>{
+                const tc=tierColor(c.tier);
+                const scoreMax=25;
+                const scorePct=Math.round((c.combined_score/scoreMax)*100);
+                return(
+                  <div key={c.name} className="adv-card" style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${tc}`,animationDelay:`${i*0.05}s`,overflow:"hidden"}}>
+                    {/* Top row */}
+                    <div style={{padding:isMob?"14px 14px 10px":"18px 24px 12px",display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap"}}>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,flexWrap:"wrap"}}>
+                          <span style={{fontSize:11,fontWeight:900,color:C.white,background:tc,padding:"2px 8px",letterSpacing:".06em",flexShrink:0}}>{tierLabel(c.tier)}</span>
+                          <span style={{fontSize:isMob?15:17,fontWeight:900,color:C.ink,letterSpacing:"-.02em"}}>{c.name}</span>
+                          <span style={{fontSize:10,fontWeight:700,color:C.gray,flexShrink:0}}>#{c.rank}</span>
+                        </div>
+                        <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{c.goal_match}</p>
+                      </div>
+                      {/* Combined score badge */}
+                      <div style={{textAlign:"center",flexShrink:0}}>
+                        <div style={{fontSize:26,fontWeight:900,color:tc,lineHeight:1}}>{c.combined_score}</div>
+                        <div style={{fontSize:8,color:C.gray,fontWeight:700,letterSpacing:".08em",textTransform:"uppercase"}}>Score</div>
+                      </div>
+                    </div>
+
+                    {/* Score bars */}
+                    <div style={{padding:isMob?"0 14px 12px":"0 24px 14px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                      {[["Efficacy",c.efficacy],["Evidence",c.evidence]].map(([label,val])=>(
+                        <div key={label}>
+                          <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+                            <span style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".1em",textTransform:"uppercase"}}>{label}</span>
+                            <span style={{fontSize:10,fontWeight:800,color:C.ink}}>{val}/5</span>
+                          </div>
+                          <div style={{height:4,background:C.bg,borderRadius:2,overflow:"hidden"}}>
+                            <div className="adv-score-bar" style={{"--w":`${val*20}%`,height:"100%",background:tc,borderRadius:2,animationDelay:`${i*0.05+0.2}s`}}/>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Bottom row - dose, timing, studies, synergy */}
+                    <div style={{borderTop:`1px solid ${C.border}`,padding:isMob?"10px 14px":"10px 24px",display:"flex",gap:isMob?12:24,flexWrap:"wrap",alignItems:"center"}}>
+                      {c.dose&&<span style={{fontSize:11,color:C.ink}}><strong>Dose:</strong> {c.dose}</span>}
+                      {c.timing&&<span style={{fontSize:11,color:C.ink}}><strong>When:</strong> {c.timing}</span>}
+                      {c.study_count&&<span style={{fontSize:11,color:C.gray}}>{c.study_count}+ studies ({c.study_type})</span>}
+                      {c.synergy?.length>0&&(
+                        <span style={{fontSize:10,background:"#f0fdf4",color:"#166534",border:"1px solid #bbf7d0",padding:"2px 8px",fontWeight:700,borderRadius:2}}>
+                          Synergizes: {c.synergy.join(", ")}
+                        </span>
+                      )}
+                      {c.conflict?.length>0&&(
+                        <span style={{fontSize:10,background:"#fef2f2",color:"#991b1b",border:"1px solid #fecaca",padding:"2px 8px",fontWeight:700,borderRadius:2}}>
+                          Separate from: {c.conflict.join(", ")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Synergy note + Stack suggestion */}
+            {phase==="done"&&(<>
+              {result.synergy_note&&(
+                <div className="adv-slide" style={{background:C.ink,color:C.white,padding:"20px 24px",marginBottom:12}}>
+                  <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Synergy and Interactions</p>
+                  <p style={{fontSize:13,color:"#d1d5db",margin:0,lineHeight:1.6}}>{result.synergy_note}</p>
+                </div>
+              )}
+              {result.stack_suggestion&&(
+                <div className="adv-slide" style={{border:`1.5px solid ${C.ink}`,padding:"20px 24px",marginBottom:12,animationDelay:".1s"}}>
+                  <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 8px",textTransform:"uppercase"}}>Suggested Protocol</p>
+                  <p style={{fontSize:13,color:C.ink,margin:0,lineHeight:1.6}}>{result.stack_suggestion}</p>
+                </div>
+              )}
+              {result.disclaimer&&(
+                <p style={{fontSize:11,color:C.gray,margin:"0 0 24px",lineHeight:1.5,padding:"10px 14px",background:"#f9f7f4",borderRadius:2}}>{result.disclaimer}</p>
+              )}
+
+              {/* Follow-up input */}
+              <div style={{marginTop:8}}>
+                <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 10px",letterSpacing:".06em"}}>FOLLOW UP</p>
+                <div style={{...S.inputRow,marginBottom:16}}>
+                  <textarea style={S.textarea} rows={1} value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}} placeholder="Ask a follow-up question..." disabled={loading}/>
+                  <button style={{...S.sendBtn,opacity:loading||!query.trim()?0.4:1}} onClick={()=>submit()} disabled={loading||!query.trim()}>Send</button>
+                </div>
+                <button onClick={reset} style={{fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:0}}>Start new search</button>
+              </div>
+            </>)}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function PricingPage({onUpgrade,onAuth}){
   const {user,isPro}=useAuth();
   const isMob=useIsMobile();

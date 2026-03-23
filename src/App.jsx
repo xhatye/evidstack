@@ -21,6 +21,7 @@ const ROUTES = {
   "/cycle-alerts":"cycle-alerts",
   "/stack-optimizer":"stack-optimizer",
   "/bloodwork":"bloodwork",
+  "/pricing":"pricing",
 };
 
 function getPageFromPath(){
@@ -285,14 +286,13 @@ function UpgradeModal({onClose,onAuthNeeded}){
   };
 
   const features=[
-    {icon:"🔬",text:"All 175+ compounds including Tier 2-4"},
-    {icon:"🧬",text:"AI Stack Builder  - personalized protocols"},
-    {icon:"⚗️",text:"Interaction Checker  - safety analysis"},
-    {icon:"📅",text:"Weekly Protocol AI  - 4-week progressive plan"},
-    {icon:"💾",text:"Save & name your stacks"},
+    {icon:"🔬",text:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including Tier 2-4`},
+    {icon:"🧬",text:"AI Stack Builder - personalized protocols"},
+    {icon:"🔄",text:"AI Cycle Alerts - on/off phase tracking"},
+    {icon:"🩸",text:"AI Bloodwork Analyzer - bio-personalized recs"},
+    {icon:"📊",text:"My Tracker - weekly supplement log"},
+    {icon:"💾",text:"Save and name your stacks"},
     {icon:"⚖️",text:"Compare any 2 compounds side-by-side"},
-    {icon:"📊",text:"My Tracker  - weekly supplement log"},
-    {icon:"🎯",text:"Stack Score on every compound"},
   ];
 
   return(
@@ -334,12 +334,12 @@ function UpgradeModal({onClose,onAuthNeeded}){
               </div>
             </div>
             {[
-              {feature:"Compounds",free:"Tier 1 only (33)",pro:"All 175+",highlight:true},
+              {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+`,highlight:true},
               {feature:"Peptides & GLP-1s",free:false,pro:true},
               {feature:"Biohacking tier",free:false,pro:true},
               {feature:"AI Stack Builder",free:false,pro:true,highlight:true},
-              {feature:"Interaction Checker",free:false,pro:true},
-              {feature:"Weekly Protocol AI",free:false,pro:true},
+              {feature:"AI Cycle Alerts",free:false,pro:true},
+              {feature:"AI Bloodwork Analyzer",free:false,pro:true},
               {feature:"My Tracker",free:false,pro:true},
               {feature:"Compare compounds",free:false,pro:true},
               {feature:"Save your stacks",free:false,pro:true,highlight:true},
@@ -2179,7 +2179,7 @@ function AccountCenter({onClose,onUpgrade}){
                   {!isPro&&<button onClick={()=>{onClose();onUpgrade();}} style={{padding:"6px 14px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
                 </div>
                 <p style={{fontSize:12,color:isPro?"#9ca3af":C.gray,margin:0,lineHeight:1.6}}>
-                  {isPro?"Full access to all 175+ compounds, peptides, GLP-1s, and AI Stack Builder.":"Tier 1 compounds only. Upgrade to unlock all 175+ compounds and AI Stack Builder."}
+                  {isPro?`Full access to all ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds, peptides, GLP-1s, and AI Stack Builder.`:`Tier 1 compounds only. Upgrade to unlock all ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds and AI Stack Builder.`}
                 </p>
               </div>
 
@@ -2207,8 +2207,8 @@ function AccountCenter({onClose,onUpgrade}){
                 <div style={{display:"flex",flexDirection:"column",gap:1}}>
                   {[
                     {label:"AI Stack Builder",path:"stack-builder"},
-                    {label:"Interaction Checker",path:"interactions"},
-                    {label:"Weekly Protocol AI",path:"weekly-protocol"},
+                    {label:"AI Cycle Alerts",path:"cycle-alerts"},
+                    {label:"AI Bloodwork Analyzer",path:"bloodwork"},
                     {label:"My Tracker",path:"tracker"},
                     {label:"Terms & Privacy",path:"legal"},
                   ].map(item=>(
@@ -2242,12 +2242,12 @@ function AccountCenter({onClose,onUpgrade}){
                   </div>
                 </div>
                 {[
-                  {feature:"Compounds",free:"Tier 1 only (33)",pro:"All 175+",highlight:true},
+                  {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+`,highlight:true},
                   {feature:"Peptides & GLP-1s",free:false,pro:true,highlight:false},
                   {feature:"Biohacking tier",free:false,pro:true,highlight:false},
                   {feature:"AI Stack Builder",free:false,pro:true,highlight:true},
-                  {feature:"Interaction Checker",free:false,pro:true,highlight:false},
-                  {feature:"Weekly Protocol AI",free:false,pro:true,highlight:false},
+                  {feature:"AI Cycle Alerts",free:false,pro:true,highlight:false},
+                  {feature:"AI Bloodwork Analyzer",free:false,pro:true,highlight:false},
                   {feature:"My Tracker",free:false,pro:true,highlight:false},
                   {feature:"Compare compounds",free:false,pro:true,highlight:false},
                   {feature:"Save your stacks",free:false,pro:true,highlight:true},
@@ -2426,6 +2426,7 @@ function AppInner(){
     {id:"supplements",label:"Supplements"},
     {id:"protocols",label:"Protocols"},
     {id:"compoundmaxxing",label:"Compoundmaxxing"},
+    {id:"pricing",label:"Pricing"},
     {id:"about",label:"About"},
   ];
   const proTools=[
@@ -2556,6 +2557,7 @@ function AppInner(){
       </nav>
 
       {page==="about"         &&<AboutPage/>}
+      {page==="pricing"        &&<PricingPage onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="compoundmaxxing"&&<CompoundmaxxingPage onUpgrade={openUpgrade} onNavigate={navigateTo}/>}
       {page==="affiliate"&&<AffiliatePage/>}
       {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
@@ -2592,6 +2594,21 @@ function AppInner(){
               style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
             <button style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search</button>
           </div>
+          {/* Social proof */}
+          <div style={{maxWidth:680,margin:"0 auto 16px",display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:1,background:C.border}}>
+            {[
+              {val:"204+",label:"Compounds"},
+              {val:"PubMed",label:"Primary source"},
+              {val:"4 tiers",label:"Evidence levels"},
+              {val:"Free",label:"No card needed"},
+            ].map(({val,label})=>(
+              <div key={label} style={{background:C.white,padding:"14px 12px",textAlign:"center"}}>
+                <p style={{fontSize:15,fontWeight:900,color:C.ink,margin:"0 0 2px",letterSpacing:"-.02em"}}>{val}</p>
+                <p style={{fontSize:10,color:C.gray,margin:0,fontWeight:600,letterSpacing:".06em",textTransform:"uppercase"}}>{label}</p>
+              </div>
+            ))}
+          </div>
+
           <div style={{maxWidth:680,margin:"0 auto 0",background:C.ink,padding:isMobile?"20px 16px":"24px 32px"}}>
             {user&&!isPro?(
               <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Unlock all {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds + AI Stack Builder.</p>
@@ -2603,7 +2620,7 @@ function AppInner(){
             ):(
               <div>
                 <p style={{fontSize:15,color:"#e8e5df",margin:"0 0 6px",fontWeight:900,letterSpacing:"-.02em"}}>Evidstack Pro is here.</p>
-                <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 20px",lineHeight:1.7}}>Stack Builder AI, Interaction Checker, Weekly Protocol AI, Tracker, and 175+ compounds including peptides, GLP-1s, and biohacking tier.</p>
+                <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 20px",lineHeight:1.7}}>Stack Builder AI, AI Cycle Alerts, AI Bloodwork Analyzer, My Tracker, and {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including peptides, GLP-1s, and biohacking tier.</p>
                 <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center",justifyContent:"center"}}>
                   <button onClick={()=>{openUpgrade();}} style={{padding:"12px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",lineHeight:1}}>
                     Start for $9.99/mo
@@ -2745,7 +2762,7 @@ function AppInner(){
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Company</p>
-            {[["about","About"],["affiliate","Affiliate Program"],["legal","Terms & Privacy"]].map(([p,l])=>(
+            {[["about","About"],["pricing","Pricing"],["affiliate","Affiliate Program"],["legal","Terms & Privacy"]].map(([p,l])=>(
               <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>
@@ -3311,6 +3328,131 @@ function BloodWorkScreen({onUpgrade}){
         <p style={{fontSize:11,color:C.gray,marginTop:20,lineHeight:1.6,padding:"12px 16px",background:"#f9f7f4",borderRadius:4}}>{result.disclaimer}</p>
         <button style={{...Sp.btnOutline(false),marginTop:14}} onClick={()=>setView("input")}>Run new analysis</button>
       </>)}
+    </div></div>
+  );
+}
+
+// ── PRICING PAGE ─────────────────────────────────────────────────────────────
+function PricingPage({onUpgrade,onAuth}){
+  const {user,isPro}=useAuth();
+  const isMob=useIsMobile();
+  const count=Math.floor(SUPPLEMENTS.length/10)*10;
+
+  const rows=[
+    {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${count}+`,highlight:true},
+    {feature:"Peptides & GLP-1s",free:false,pro:true},
+    {feature:"Biohacking tier (T4)",free:false,pro:true},
+    {feature:"AI Stack Builder",free:false,pro:true,highlight:true},
+    {feature:"AI Cycle Alerts",free:false,pro:true},
+    {feature:"AI Bloodwork Analyzer",free:false,pro:true},
+    {feature:"My Tracker",free:false,pro:true},
+    {feature:"Compare compounds",free:false,pro:true},
+    {feature:"Save your stacks",free:false,pro:true,highlight:true},
+    {feature:"Compound pages (/compound/:id)",free:true,pro:true},
+    {feature:"Protocols library",free:true,pro:true},
+    {feature:"Compoundmaxxing stacks",free:"3 free stacks",pro:`All stacks`,highlight:false},
+  ];
+
+  const S={
+    page:{minHeight:"100vh",background:C.bg,padding:isMob?"40px 16px 80px":"60px 24px 100px",fontFamily:"Montserrat,sans-serif"},
+    inner:{maxWidth:900,margin:"0 auto"},
+    h1:{fontSize:isMob?32:52,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px",textAlign:"center"},
+    sub:{fontSize:15,color:C.gray,textAlign:"center",margin:"0 auto 56px",maxWidth:480,lineHeight:1.7},
+    card:{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"24px 20px":"36px 32px"},
+    btnGold:{padding:"14px 32px",background:C.gold,color:C.ink,border:"none",fontSize:14,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",width:"100%"},
+    btnGhost:{padding:"14px 32px",background:"transparent",color:C.gray,border:`1px solid ${C.border}`,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",width:"100%"},
+  };
+
+  return(
+    <div style={S.page}><div style={S.inner}>
+      <h1 style={S.h1}>Simple, honest pricing.</h1>
+      <p style={S.sub}>One Pro plan. Everything included. Cancel anytime.</p>
+
+      {/* Plan cards */}
+      <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:16,marginBottom:48}}>
+        {/* Free */}
+        <div style={{...S.card}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".18em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Free</p>
+          <div style={{display:"flex",alignItems:"baseline",gap:4,marginBottom:6}}>
+            <span style={{fontSize:48,fontWeight:900,color:C.ink,lineHeight:1}}>$0</span>
+          </div>
+          <p style={{fontSize:13,color:C.gray,margin:"0 0 24px"}}>Forever free. No credit card needed.</p>
+          <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:28}}>
+            {["Tier 1 compounds (33)","Compound detail pages","Protocols library","3 free Compoundmaxxing stacks"].map(f=>(
+              <div key={f} style={{display:"flex",gap:10,alignItems:"center"}}>
+                <span style={{color:C.green,fontWeight:900,fontSize:14}}>✓</span>
+                <span style={{fontSize:13,color:C.ink}}>{f}</span>
+              </div>
+            ))}
+          </div>
+          <button style={S.btnGhost} onClick={()=>onAuth("signup")}>Create free account</button>
+        </div>
+
+        {/* Pro */}
+        <div style={{...S.card,borderTop:`3px solid ${C.gold}`,position:"relative"}}>
+          <div style={{position:"absolute",top:-1,left:24,background:C.gold,color:C.ink,fontSize:9,fontWeight:800,padding:"3px 10px",letterSpacing:".1em",textTransform:"uppercase"}}>Most popular</div>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".18em",color:C.gold,margin:"0 0 16px",textTransform:"uppercase"}}>Pro</p>
+          <div style={{display:"flex",alignItems:"baseline",gap:6,marginBottom:4}}>
+            <span style={{fontSize:48,fontWeight:900,color:C.ink,lineHeight:1}}>$9.99</span>
+            <span style={{fontSize:14,color:C.gray}}>/month</span>
+          </div>
+          <p style={{fontSize:12,color:C.green,fontWeight:700,margin:"0 0 4px"}}>Or $79/year - save 34%</p>
+          <p style={{fontSize:13,color:C.gray,margin:"0 0 24px"}}>Full access. Cancel in one click.</p>
+          <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:28}}>
+            {[`All ${count}+ compounds (Tier 1-4)`,"Peptides, GLP-1s, SARMs, nootropics","AI Stack Builder","AI Cycle Alerts","AI Bloodwork Analyzer","My Tracker","Compare compounds","Save your stacks"].map(f=>(
+              <div key={f} style={{display:"flex",gap:10,alignItems:"center"}}>
+                <span style={{color:C.gold,fontWeight:900,fontSize:14}}>✓</span>
+                <span style={{fontSize:13,color:C.ink,fontWeight:600}}>{f}</span>
+              </div>
+            ))}
+          </div>
+          {isPro
+            ?<div style={{padding:"13px",background:"#f0fdf4",border:"1px solid #bbf7d0",textAlign:"center",fontSize:13,fontWeight:700,color:"#166534"}}>You are a Pro member</div>
+            :<button style={S.btnGold} onClick={onUpgrade}>Start for $9.99/month</button>
+          }
+        </div>
+      </div>
+
+      {/* Comparison table */}
+      <h2 style={{fontSize:20,fontWeight:900,color:C.ink,margin:"0 0 20px",letterSpacing:"-.03em"}}>Full comparison</h2>
+      <div style={{border:`1px solid ${C.border}`,overflow:"hidden"}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 100px 100px",background:C.ink}}>
+          <div style={{padding:"12px 16px"}}/>
+          <div style={{padding:"12px 8px",textAlign:"center"}}><span style={{fontSize:10,fontWeight:800,letterSpacing:".12em",color:C.gray,textTransform:"uppercase"}}>Free</span></div>
+          <div style={{padding:"12px 8px",textAlign:"center"}}><span style={{fontSize:10,fontWeight:800,letterSpacing:".12em",color:C.gold,textTransform:"uppercase"}}>Pro</span></div>
+        </div>
+        {rows.map((row,i)=>(
+          <div key={row.feature} style={{display:"grid",gridTemplateColumns:"1fr 100px 100px",background:row.highlight?`${C.gold}08`:i%2===0?C.white:"#fafaf9",borderTop:`1px solid ${C.border}`}}>
+            <div style={{padding:"11px 16px"}}><span style={{fontSize:12,fontWeight:row.highlight?800:500,color:C.ink}}>{row.feature}</span></div>
+            <div style={{padding:"11px 8px",textAlign:"center"}}>
+              {typeof row.free==="string"
+                ?<span style={{fontSize:11,fontWeight:600,color:C.gray}}>{row.free}</span>
+                :<span style={{fontSize:14,color:row.free?C.green:"#d1d5db"}}>{row.free?"✓":"—"}</span>}
+            </div>
+            <div style={{padding:"11px 8px",textAlign:"center"}}>
+              {typeof row.pro==="string"
+                ?<span style={{fontSize:11,fontWeight:700,color:C.gold}}>{row.pro}</span>
+                :<span style={{fontSize:14,color:C.green}}>✓</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* FAQ */}
+      <div style={{marginTop:56}}>
+        <h2 style={{fontSize:20,fontWeight:900,color:C.ink,margin:"0 0 24px",letterSpacing:"-.03em"}}>Questions</h2>
+        {[
+          ["Can I cancel anytime?","Yes. Cancel directly from your account in one click. You keep access until the end of your billing period."],
+          ["Is my payment secure?","All payments processed by Stripe. We never see or store your card details."],
+          ["What counts as a Tier 1 compound?","Tier 1 covers the 33 most widely studied foundational compounds: Creatine, Magnesium, Vitamin D3, Omega-3, Zinc, and others with the strongest evidence base."],
+          ["Does the AI Stack Builder replace a doctor?","No. All tools provide informational context based on published research. Always consult a healthcare professional before making changes based on blood work or supplements."],
+        ].map(([q,a])=>(
+          <div key={q} style={{borderTop:`1px solid ${C.border}`,padding:"18px 0"}}>
+            <p style={{fontWeight:800,fontSize:14,color:C.ink,margin:"0 0 8px"}}>{q}</p>
+            <p style={{fontSize:13,color:C.gray,margin:0,lineHeight:1.6}}>{a}</p>
+          </div>
+        ))}
+      </div>
     </div></div>
   );
 }

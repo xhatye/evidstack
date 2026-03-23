@@ -3545,22 +3545,24 @@ function CompoundAdvisorScreen({onUpgrade}){
           </div>
         )}
 
-        {/* Input - disabled after free query for non-pro */}
+        {/* Input - hidden after free query used for non-pro */}
         {(!freeUsed||isPro||phase!=="idle"||result)&&(
-          <textarea
-            ref={inputRef}
-            style={S.textarea}
-            rows={2}
-            value={query}
-            onChange={e=>setQuery(e.target.value)}
-            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}}
-            placeholder="e.g. I want better sleep quality without feeling groggy..."
-            disabled={loading}
-          />
-          <button style={{...S.sendBtn,opacity:loading||!query.trim()?0.4:1}} onClick={()=>submit()} disabled={loading||!query.trim()}>
-            {loading?"...":"Send"}
-          </button>
-        </div>
+          <div style={S.inputRow}>
+            <textarea
+              ref={inputRef}
+              style={S.textarea}
+              rows={2}
+              value={query}
+              onChange={e=>setQuery(e.target.value)}
+              onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}}
+              placeholder="e.g. I want better sleep quality without feeling groggy..."
+              disabled={loading}
+            />
+            <button style={{...S.sendBtn,opacity:loading||!query.trim()?0.4:1}} onClick={()=>submit()} disabled={loading||!query.trim()}>
+              {loading?"...":"Send"}
+            </button>
+          </div>
+        )}
 
         {/* Suggestions - only show when idle and no result */}
         {phase==="idle"&&!result&&(
@@ -3577,7 +3579,6 @@ function CompoundAdvisorScreen({onUpgrade}){
             </div>
           </div>
         )}
-        )}{/* end free/pro input gate */}
 
         {/* Scanning animation */}
         {phase==="scanning"&&(

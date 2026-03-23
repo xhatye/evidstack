@@ -374,6 +374,46 @@ function UpgradeModal({onClose,onAuthNeeded}){
   );
 }
 /* PAYWALL CARD */
+const FREE_VISIBLE=4; // Tier 1 cards visible without account
+
+function FreeGateBanner({onAuth,isMob}){
+  return(
+    <div style={{border:`1.5px solid ${C.ink}`,background:C.white,padding:isMob?"20px 16px":"24px 28px",textAlign:"center",margin:"4px 0"}}>
+      <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:"0 0 6px",letterSpacing:"-.02em"}}>You have seen {FREE_VISIBLE} compounds.</p>
+      <p style={{fontSize:13,color:C.gray,margin:"0 0 20px",lineHeight:1.6}}>Create a free account to browse all 33 Tier 1 compounds. No credit card needed.</p>
+      <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+        <button onClick={()=>onAuth("signup")} style={{padding:"12px 28px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+          Create free account
+        </button>
+        <button onClick={()=>onAuth("login")} style={{padding:"12px 20px",background:"transparent",color:C.gray,border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
+          Sign in
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function FreeGateCard({supp,isMob}){
+  return(
+    <div style={{border:`1px solid ${C.border}`,background:C.white,padding:isMob?"14px 16px":"18px 24px",display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,filter:"blur(2px)",pointerEvents:"none",userSelect:"none",opacity:.55}}>
+      <div>
+        <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{supp.name}</p>
+        <p style={{fontSize:11,color:C.gray,margin:0}}>Tier {supp.tier} compound</p>
+      </div>
+      <div style={{display:"flex",gap:8,flexShrink:0}}>
+        <div style={{padding:"6px 12px",background:C.bg,border:`1px solid ${C.border}`}}>
+          <p style={{fontSize:9,color:C.gray,margin:"0 0 2px",fontWeight:700}}>EFFICACY</p>
+          <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:0}}>{supp.effects?.[0]?.efficacy||"-"}/5</p>
+        </div>
+        <div style={{padding:"6px 12px",background:C.bg,border:`1px solid ${C.border}`}}>
+          <p style={{fontSize:9,color:C.gray,margin:"0 0 2px",fontWeight:700}}>EVIDENCE</p>
+          <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:0}}>{supp.effects?.[0]?.evidence||"-"}/5</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PaywallCard({supp,onUpgrade,isMob,showCTA=true}){
   const tc=tierColor(supp.tier);
   return(
@@ -1455,8 +1495,8 @@ function AffiliatePage(){
 }
 
 /* COMPOUND PAGE */
-function CompoundPage({compoundId,onUpgrade,onBack}){
-  const {isPro}=useAuth();
+function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
+  const {user,isPro}=useAuth();
   const isMob=useIsMobile();
   const supp=SUPPLEMENTS.find(s=>s.id===compoundId);
 
@@ -1472,6 +1512,7 @@ function CompoundPage({compoundId,onUpgrade,onBack}){
   );
 
   const isLocked=supp.tier>=2&&!isPro;
+  const needsAccount=!user;
   const tc=tierColor(supp.tier);
   const tierLabel=TIERS[supp.tier]?.label||"";
   const safetyLabel=["","Risky","Caution","Caution","Safe","Very Safe"][supp.safety]||"";
@@ -1517,7 +1558,16 @@ function CompoundPage({compoundId,onUpgrade,onBack}){
         </div>
       </div>
 
-      {isLocked?(
+      {needsAccount?(
+        <div style={{border:`1.5px solid ${C.ink}`,background:C.white,padding:"36px",textAlign:"center",marginBottom:24}}>
+          <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 8px",letterSpacing:"-.02em"}}>Create a free account to see the full profile.</p>
+          <p style={{fontSize:13,color:C.gray,margin:"0 0 24px",lineHeight:1.6}}>Dosage protocol, evidence scores, study count, interactions, and related compounds. Free forever, no credit card.</p>
+          <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+            <button onClick={()=>onAuth("signup")} style={{padding:"12px 28px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Create free account</button>
+            <button onClick={()=>onAuth("login")} style={{padding:"12px 20px",background:"transparent",color:C.gray,border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Sign in</button>
+          </div>
+        </div>
+      ):isLocked?(
         <div style={{background:C.ink,padding:"40px 36px",textAlign:"center",marginBottom:24}}>
           <p style={{fontSize:11,fontWeight:800,color:C.gold,letterSpacing:".16em",margin:"0 0 8px",textTransform:"uppercase"}}>Pro Feature</p>
           <h2 style={{fontSize:24,fontWeight:900,color:C.white,margin:"0 0 12px",letterSpacing:"-.03em"}}>Full profile locked</h2>
@@ -2560,7 +2610,7 @@ function AppInner(){
       {page==="pricing"        &&<PricingPage onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="compoundmaxxing"&&<CompoundmaxxingPage onUpgrade={openUpgrade} onNavigate={navigateTo}/>}
       {page==="affiliate"&&<AffiliatePage/>}
-      {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
+      {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
       {page==="legal"          &&<LegalPage/>}
       {page==="interactions"   &&<InteractionChecker onUpgrade={openUpgrade}/>}
       {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}
@@ -2727,11 +2777,31 @@ function AppInner(){
           )}
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
             {filtered.length===0&&<div style={{textAlign:"center",padding:"60px 0",color:C.gray}}><p style={{fontSize:32,fontWeight:900,margin:"0 0 8px",letterSpacing:"-.04em"}}>0</p><p style={{fontSize:13}}>{T.noResults}</p></div>}
-            {filtered.map((s,i)=>(
-              <div key={s.id} style={{animation:`fadeUp .35s ${i*.02}s both`}}>
-                <SupplementCard supp={s} activeGoal={goal} onClick={()=>toggle(s.id)} isSelected={selected===s.id} isPro={isPro} onUpgrade={openUpgrade} onCompare={handleCompare} compareA={compareA} compareB={compareB} cardIndex={i}/>
-              </div>
-            ))}
+            {(()=>{
+              let tier1Seen=0;
+              const items=[];
+              for(let i=0;i<filtered.length;i++){
+                const s=filtered[i];
+                const isTier1=s.tier===1;
+                if(!user&&isTier1){
+                  if(tier1Seen===FREE_VISIBLE){
+                    items.push(<FreeGateBanner key="free-gate-banner" onAuth={openAuth} isMob={isMobile}/>);
+                  }
+                  if(tier1Seen>=FREE_VISIBLE){
+                    items.push(<div key={s.id} style={{animation:`fadeUp .35s ${i*.02}s both`}}><FreeGateCard supp={s} isMob={isMobile}/></div>);
+                    tier1Seen++;
+                    continue;
+                  }
+                  tier1Seen++;
+                }
+                items.push(
+                  <div key={s.id} style={{animation:`fadeUp .35s ${i*.02}s both`}}>
+                    <SupplementCard supp={s} activeGoal={goal} onClick={()=>toggle(s.id)} isSelected={selected===s.id} isPro={isPro} onUpgrade={openUpgrade} onCompare={handleCompare} compareA={compareA} compareB={compareB} cardIndex={i}/>
+                  </div>
+                );
+              }
+              return items;
+            })()}
           </div>
         </div>
       </>}
@@ -3427,7 +3497,7 @@ function PricingPage({onUpgrade,onAuth}){
             <div style={{padding:"11px 8px",textAlign:"center"}}>
               {typeof row.free==="string"
                 ?<span style={{fontSize:11,fontWeight:600,color:C.gray}}>{row.free}</span>
-                :<span style={{fontSize:14,color:row.free?C.green:"#d1d5db"}}>{row.free?"✓":"—"}</span>}
+                :<span style={{fontSize:14,color:row.free?C.green:"#d1d5db"}}>{row.free?"✓":"-"}</span>}
             </div>
             <div style={{padding:"11px 8px",textAlign:"center"}}>
               {typeof row.pro==="string"

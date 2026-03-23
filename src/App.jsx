@@ -2259,9 +2259,7 @@ function AccountCenter({onClose,onUpgrade}){
                 <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Quick Links</p>
                 <div style={{display:"flex",flexDirection:"column",gap:1}}>
                   {[
-                    {label:"Compound Advisor",path:"advisor"},
-                    {label:"AI Stack Builder",path:"stack-builder"},
-                    {label:"AI Cycle Alerts",path:"cycle-alerts"},
+                    {label:"AI Compound Advisor",path:"advisor"},
                     {label:"AI Bloodwork Analyzer",path:"bloodwork"},
                     {label:"My Tracker",path:"tracker"},
                     {label:"Terms & Privacy",path:"legal"},
@@ -2481,14 +2479,12 @@ function AppInner(){
     {id:"supplements",label:"Supplements"},
     {id:"protocols",label:"Protocols"},
     {id:"compoundmaxxing",label:"Compoundmaxxing"},
+    {id:"advisor",label:"AI Compound Advisor"},
     {id:"pricing",label:"Pricing"},
     {id:"about",label:"About"},
   ];
   const proTools=[
-    {id:"stack-builder",label:"Stack Builder AI"},
-    {id:"advisor",label:"Compound Advisor"},
     {id:"tracker",label:"My Tracker"},
-    {id:"cycle-alerts",label:"AI Cycle Alerts"},
     {id:"bloodwork",label:"AI Bloodwork Analyzer"},
   ];
   const proPages=proTools.map(t=>t.id);
@@ -2833,7 +2829,7 @@ function AppInner(){
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Tools</p>
-            {[["stack-builder","Stack Builder AI"],["advisor","Compound Advisor"],["tracker","My Tracker"],["cycle-alerts","AI Cycle Alerts"],["bloodwork","AI Bloodwork Analyzer"]].map(([p,l])=>(
+            {[["tracker","My Tracker"],["bloodwork","AI Bloodwork Analyzer"]].map(([p,l])=>(
               <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>
@@ -3495,7 +3491,7 @@ function CompoundAdvisorScreen({onUpgrade}){
   if(!isPro)return(
     <div style={S.page}><div style={{...S.inner,textAlign:"center",paddingTop:80}}>
       <span style={{fontSize:52,display:"block",marginBottom:20}}>🔭</span>
-      <h2 style={{fontSize:isMob?24:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>Compound Advisor AI</h2>
+      <h2 style={{fontSize:isMob?24:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>AI Compound Advisor</h2>
       <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Describe any health goal or issue and get a ranked list of compounds ordered by efficacy and strength of evidence. No generic answers.</p>
       <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"32px",marginBottom:32,textAlign:"left",maxWidth:500,margin:"0 auto 32px"}}>
         {[["🎯","Goal-aware ranking","Compounds ranked by combined efficacy + evidence score for your exact query"],["🔬","Evidence-first","Every compound backed by study count, study type, and dosing from published research"],["🔗","Synergy detection","Flags which compounds work better together and which conflict"],["💬","Conversational memory","Follow up with questions - the advisor remembers your full session"]].map(([icon,title,desc])=>(
@@ -3528,7 +3524,7 @@ function CompoundAdvisorScreen({onUpgrade}){
 
       <div style={S.inner}>
         <span style={S.tag}>PRO FEATURE</span>
-        <h1 style={S.h1}>Compound Advisor</h1>
+        <h1 style={S.h1}>AI Compound Advisor</h1>
         <p style={S.sub}>Describe any health goal or issue. The advisor searches 204 compounds and returns the strongest evidence-based options, ranked by efficacy and study quality.</p>
 
         {/* Input */}

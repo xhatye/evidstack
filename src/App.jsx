@@ -9,14 +9,12 @@ function useIsMobile(){
 const ROUTES = {
   "/":"supplements",
   "/supplements":"supplements",
-  "/protocols":"protocols",
   "/stack-builder":"stack-builder",
   "/interactions":"interactions",
   "/weekly-protocol":"weekly-protocol",
   "/tracker":"tracker",
   "/about":"about",
   "/legal":"legal",
-  "/compoundmaxxing":"compoundmaxxing",
   "/affiliate":"affiliate",
   "/cycle-alerts":"cycle-alerts",
   "/stack-optimizer":"stack-optimizer",
@@ -2477,8 +2475,6 @@ function AppInner(){
 
   const navItems=[
     {id:"supplements",label:"Supplements"},
-    {id:"protocols",label:"Protocols"},
-    {id:"compoundmaxxing",label:"Compoundmaxxing"},
     {id:"advisor",label:"AI Compound Advisor"},
     {id:"pricing",label:"Pricing"},
     {id:"about",label:"About"},
@@ -2610,7 +2606,6 @@ function AppInner(){
 
       {page==="about"         &&<AboutPage/>}
       {page==="pricing"        &&<PricingPage onUpgrade={openUpgrade} onAuth={openAuth}/>}
-      {page==="compoundmaxxing"&&<CompoundmaxxingPage onUpgrade={openUpgrade} onNavigate={navigateTo}/>}
       {page==="affiliate"&&<AffiliatePage/>}
       {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
       {page==="legal"          &&<LegalPage/>}
@@ -2618,7 +2613,6 @@ function AppInner(){
       {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}
       {page==="tracker"        &&<MyTracker onUpgrade={openUpgrade}/>}
       {page==="advisor"        &&<CompoundAdvisorScreen onUpgrade={openUpgrade}/>}
-      {page==="protocols"     &&<ProtocolsPage onGoToSupplements={()=>navigateTo("supplements")}/>}
       {page==="stack-builder" &&<StackBuilder onUpgrade={openUpgrade}/>}
       {page==="cycle-alerts"  &&<CycleAlertsScreen onUpgrade={openUpgrade}/>}
       {page==="stack-optimizer"&&<StackOptimizerScreen onUpgrade={openUpgrade}/>}
@@ -2823,7 +2817,7 @@ function AppInner(){
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Database</p>
-            {[["supplements","Supplements"],["protocols","Protocols"],["compoundmaxxing","Compoundmaxxing"]].map(([p,l])=>(
+            {[["supplements","Supplements"]].map(([p,l])=>(
               <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>
@@ -3408,16 +3402,21 @@ function BloodWorkScreen({onUpgrade}){
 // ── PRICING PAGE ─────────────────────────────────────────────────────────────
 // ── COMPOUND ADVISOR ─────────────────────────────────────────────────────────
 function CompoundAdvisorScreen({onUpgrade}){
-  const {isPro}=useAuth();
+  const {isPro,user}=useAuth();
   const isMob=useIsMobile();
   const [query,setQuery]=useState("");
-  const [history,setHistory]=useState([]); // [{role,content}]
+  const [history,setHistory]=useState([]);
   const [result,setResult]=useState(null);
   const [loading,setLoading]=useState(false);
   const [err,setErr]=useState("");
   const [revealedCount,setRevealedCount]=useState(0);
-  const [phase,setPhase]=useState("idle"); // idle | scanning | revealing | done
+  const [phase,setPhase]=useState("idle");
   const inputRef=useRef(null);
+
+  // Free query tracking - 1 free query per session (localStorage)
+  const FREE_KEY="evidstack_advisor_used";
+  const [freeUsed,setFreeUsed]=useState(()=>!!localStorage.getItem(FREE_KEY));
+  const [showUpgradeWall,setShowUpgradeWall]=useState(false);
 
   const tierColor=(t)=>["",C.green,C.blue,C.purple,C.amber][t]||C.gray;
   const tierLabel=(t)=>["","T1","T2","T3","T4"][t]||"T?";
@@ -3450,7 +3449,9 @@ function CompoundAdvisorScreen({onUpgrade}){
   const submit=async(overrideQuery)=>{
     const q=(overrideQuery||query).trim();
     if(!q||loading)return;
-    setLoading(true);setErr("");setResult(null);setRevealedCount(0);setPhase("scanning");setScanLine(0);
+    // Block if free user already used their 1 query
+    if(!isPro&&freeUsed){setShowUpgradeWall(true);return;}
+    setLoading(true);setErr("");setResult(null);setRevealedCount(0);setPhase("scanning");setScanLine(0);setShowUpgradeWall(false);
     const newHistory=[...history,{role:"user",content:q}];
     try{
       const res=await fetch("/api/symptom-advisor",{
@@ -3463,6 +3464,8 @@ function CompoundAdvisorScreen({onUpgrade}){
       setResult(data);
       setHistory([...newHistory,{role:"assistant",content:JSON.stringify(data)}]);
       setPhase("revealing");
+      // Mark free query as used for non-pro users
+      if(!isPro){localStorage.setItem(FREE_KEY,"1");setFreeUsed(true);}
     }catch{
       setErr("Analysis failed. Please try again.");
       setPhase("idle");
@@ -3472,7 +3475,7 @@ function CompoundAdvisorScreen({onUpgrade}){
     }
   };
 
-  const reset=()=>{setResult(null);setHistory([]);setQuery("");setPhase("idle");setRevealedCount(0);setScanLine(0);setErr("");};
+  const reset=()=>{setResult(null);setHistory([]);setQuery("");setPhase("idle");setRevealedCount(0);setScanLine(0);setErr("");setShowUpgradeWall(false);};
 
   const SUGGESTIONS=["I want to improve my sleep quality","Best compounds for testosterone optimization","I feel low energy every afternoon","Help me focus better without caffeine dependency","I want to reduce inflammation and joint pain","I'm looking to maximize muscle recovery"];
 
@@ -3487,25 +3490,6 @@ function CompoundAdvisorScreen({onUpgrade}){
     sendBtn:{padding:"0 24px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0,minWidth:80},
     chip:{padding:"8px 14px",border:`1px solid ${C.border}`,background:C.white,fontSize:11,fontWeight:600,cursor:"pointer",color:C.gray,fontFamily:"Montserrat,sans-serif",transition:"all .15s"},
   };
-
-  if(!isPro)return(
-    <div style={S.page}><div style={{...S.inner,textAlign:"center",paddingTop:80}}>
-      <span style={{fontSize:52,display:"block",marginBottom:20}}>🔭</span>
-      <h2 style={{fontSize:isMob?24:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>AI Compound Advisor</h2>
-      <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Describe any health goal or issue and get a ranked list of compounds ordered by efficacy and strength of evidence. No generic answers.</p>
-      <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"32px",marginBottom:32,textAlign:"left",maxWidth:500,margin:"0 auto 32px"}}>
-        {[["🎯","Goal-aware ranking","Compounds ranked by combined efficacy + evidence score for your exact query"],["🔬","Evidence-first","Every compound backed by study count, study type, and dosing from published research"],["🔗","Synergy detection","Flags which compounds work better together and which conflict"],["💬","Conversational memory","Follow up with questions - the advisor remembers your full session"]].map(([icon,title,desc])=>(
-          <div key={title} style={{display:"flex",gap:14,marginBottom:20}}>
-            <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
-            <div><p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{title}</p><p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{desc}</p></div>
-          </div>
-        ))}
-      </div>
-      <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
-        Upgrade to Pro - $9.99/month
-      </button>
-    </div></div>
-  );
 
   return(
     <div style={S.page}>
@@ -3523,12 +3507,46 @@ function CompoundAdvisorScreen({onUpgrade}){
       `}</style>
 
       <div style={S.inner}>
-        <span style={S.tag}>PRO FEATURE</span>
-        <h1 style={S.h1}>AI Compound Advisor</h1>
-        <p style={S.sub}>Describe any health goal or issue. The advisor searches 204 compounds and returns the strongest evidence-based options, ranked by efficacy and study quality.</p>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:8}}>
+          <h1 style={{...S.h1,margin:0}}>AI Compound Advisor</h1>
+          {!isPro&&(
+            <div style={{display:"flex",alignItems:"center",gap:8,background:freeUsed?"#fef3c7":"#f0fdf4",border:`1px solid ${freeUsed?"#fde68a":"#bbf7d0"}`,padding:"6px 12px",flexShrink:0}}>
+              <span style={{fontSize:12,fontWeight:800,color:freeUsed?"#92400e":"#166534"}}>{freeUsed?"0 / 1 free queries used":"1 free query available"}</span>
+              {freeUsed&&<button onClick={onUpgrade} style={{background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,padding:"4px 10px",cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Go Pro</button>}
+            </div>
+          )}
+          {isPro&&<span style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,border:`1px solid ${C.gold}`,padding:"4px 10px"}}>PRO</span>}
+        </div>
+        <p style={S.sub}>Describe any health goal or issue. The advisor searches {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds and returns the strongest evidence-based options, ranked by efficacy and study quality.{!isPro&&!freeUsed?" Try 1 query free, no account needed.":""}</p>
 
-        {/* Input */}
-        <div style={S.inputRow}>
+        {/* Upgrade wall - shown after free query used */}
+        {!isPro&&freeUsed&&phase==="idle"&&!result&&(
+          <div style={{border:`2px solid ${C.ink}`,background:C.white,padding:isMob?"24px 20px":"36px 40px",marginBottom:28,textAlign:"center"}}>
+            <div style={{fontSize:44,marginBottom:14}}>🔭</div>
+            <h2 style={{fontSize:isMob?20:26,fontWeight:900,color:C.ink,margin:"0 0 10px",letterSpacing:"-.03em"}}>You have used your free query.</h2>
+            <p style={{fontSize:14,color:C.gray,margin:"0 auto 28px",maxWidth:460,lineHeight:1.7}}>Upgrade to Pro for unlimited queries, follow-up conversations, synergy detection, and protocol suggestions.</p>
+            <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:12,maxWidth:480,margin:"0 auto 28px",textAlign:"left"}}>
+              {[["💬","Unlimited queries","Ask about anything, anytime"],["🔗","Synergy detection","See which compounds stack"],["📈","Protocol suggestions","Step-by-step intro plan"],["🧠","Conversation memory","Follow-up questions in context"]].map(([icon,title,desc])=>(
+                <div key={title} style={{display:"flex",gap:10,padding:"12px 14px",background:C.bg,border:`1px solid ${C.border}`}}>
+                  <span style={{fontSize:18,flexShrink:0}}>{icon}</span>
+                  <div><p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 2px"}}>{title}</p><p style={{fontSize:11,color:C.gray,margin:0}}>{desc}</p></div>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+              <button onClick={onUpgrade} style={{padding:"13px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+                Unlock Pro - $9.99/month
+              </button>
+              <button onClick={onUpgrade} style={{padding:"13px 22px",background:"transparent",color:C.gray,border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
+                Save 34% annually
+              </button>
+            </div>
+            <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Instant access.</p>
+          </div>
+        )}
+
+        {/* Input - disabled after free query for non-pro */}
+        {(!freeUsed||isPro||phase!=="idle"||result)&&(
           <textarea
             ref={inputRef}
             style={S.textarea}
@@ -3559,6 +3577,7 @@ function CompoundAdvisorScreen({onUpgrade}){
             </div>
           </div>
         )}
+        )}{/* end free/pro input gate */}
 
         {/* Scanning animation */}
         {phase==="scanning"&&(
@@ -3695,12 +3714,25 @@ function CompoundAdvisorScreen({onUpgrade}){
 
               {/* Follow-up input */}
               <div style={{marginTop:8}}>
-                <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 10px",letterSpacing:".06em"}}>FOLLOW UP</p>
-                <div style={{...S.inputRow,marginBottom:16}}>
-                  <textarea style={S.textarea} rows={1} value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}} placeholder="Ask a follow-up question..." disabled={loading}/>
-                  <button style={{...S.sendBtn,opacity:loading||!query.trim()?0.4:1}} onClick={()=>submit()} disabled={loading||!query.trim()}>Send</button>
-                </div>
-                <button onClick={reset} style={{fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:0}}>Start new search</button>
+                {isPro?(
+                  <>
+                    <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 10px",letterSpacing:".06em"}}>FOLLOW UP</p>
+                    <div style={{...S.inputRow,marginBottom:16}}>
+                      <textarea style={S.textarea} rows={1} value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}} placeholder="Ask a follow-up question..." disabled={loading}/>
+                      <button style={{...S.sendBtn,opacity:loading||!query.trim()?0.4:1}} onClick={()=>submit()} disabled={loading||!query.trim()}>Send</button>
+                    </div>
+                    <button onClick={reset} style={{fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:0}}>Start new search</button>
+                  </>
+                ):(
+                  <div style={{borderTop:`1px solid ${C.border}`,paddingTop:20,marginTop:8,textAlign:"center"}}>
+                    <p style={{fontSize:13,fontWeight:700,color:C.ink,margin:"0 0 6px"}}>Want to ask a follow-up?</p>
+                    <p style={{fontSize:12,color:C.gray,margin:"0 0 16px"}}>Pro members get unlimited queries and full conversation memory.</p>
+                    <button onClick={onUpgrade} style={{padding:"11px 28px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+                      Unlock Pro - $9.99/mo
+                    </button>
+                    <p style={{fontSize:11,color:C.gray,marginTop:8}}>Or save 34% with the annual plan.</p>
+                  </div>
+                )}
               </div>
             </>)}
           </>
@@ -3726,8 +3758,6 @@ function PricingPage({onUpgrade,onAuth}){
     {feature:"Compare compounds",free:false,pro:true},
     {feature:"Save your stacks",free:false,pro:true,highlight:true},
     {feature:"Compound pages (/compound/:id)",free:true,pro:true},
-    {feature:"Protocols library",free:true,pro:true},
-    {feature:"Compoundmaxxing stacks",free:"3 free stacks",pro:`All stacks`,highlight:false},
   ];
 
   const S={

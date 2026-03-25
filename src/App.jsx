@@ -95,14 +95,14 @@ function OnboardingModal({onClose}){
     },
     {
       icon:"📋",
-      title:"Protocols and Compoundmaxxing",
-      desc:"Pre-built stacks curated by goal: healing peptides, GH optimization, longevity, looksmaxxing, and more.",
-      detail:"Each stack lists the compounds, the mechanism, and the rationale. Beginner and advanced options for every category.",
+      title:"Browse 200+ compounds.",
+      desc:"Every supplement, peptide, GLP-1, SARM, and nootropic in the database is scored on two axes: how strong the effect is, and how solid the evidence is. No marketing, no guesswork.",
+      detail:"Browse by goal (Sleep, Testosterone, Focus, Weight Loss, Skin, and 14 more categories) or search directly.",
     },
     {
       icon:"🧬",
       title:"Pro AI tools",
-      desc:"Stack Builder AI builds a personalized protocol from your goals and budget. Compound Advisor AI lets you describe any issue and returns compounds ranked by evidence. My Tracker logs your daily intake and spots patterns. AI Cycle Alerts tells you exactly when to stop and restart each compound. AI Bloodwork Analyzer turns your blood test into supplement recommendations.",
+      desc:"AI Compound Advisor lets you describe any issue and returns compounds ranked by evidence - try 1 query free. My Tracker logs your daily intake. AI Bloodwork Analyzer turns your blood test into supplement recommendations.",
       detail:"All AI tools are Pro-only and powered by the same evidence base as the database.",
     },
   ];
@@ -286,10 +286,8 @@ function UpgradeModal({onClose,onAuthNeeded}){
 
   const features=[
     {icon:"🔬",text:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including Tier 2-4`},
-    {icon:"🔭",text:"Compound Advisor - AI chatbot ranked by evidence"},
-    {icon:"🧬",text:"AI Stack Builder - personalized protocols"},
-    {icon:"🔄",text:"AI Cycle Alerts - on/off phase tracking"},
-    {icon:"🩸",text:"AI Bloodwork Analyzer - bio-personalized recs"},
+    {icon:"🔭",text:"AI Compound Advisor - unlimited evidence-ranked queries"},
+    {icon:"🩸",text:"AI Bloodwork Analyzer - bio-personalized recommendations"},
     {icon:"📊",text:"My Tracker - weekly supplement log"},
     {icon:"💾",text:"Save and name your stacks"},
     {icon:"⚖️",text:"Compare any 2 compounds side-by-side"},
@@ -337,9 +335,8 @@ function UpgradeModal({onClose,onAuthNeeded}){
               {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+`,highlight:true},
               {feature:"Peptides & GLP-1s",free:false,pro:true},
               {feature:"Biohacking tier",free:false,pro:true},
-              {feature:"Compound Advisor AI",free:false,pro:true,highlight:true},
-              {feature:"AI Stack Builder",free:false,pro:true,highlight:true},
-              {feature:"AI Cycle Alerts",free:false,pro:true},
+              {feature:"AI Compound Advisor",free:"1 query",pro:"Unlimited",highlight:true},
+              {feature:"Conversation memory",free:false,pro:true},
               {feature:"AI Bloodwork Analyzer",free:false,pro:true},
               {feature:"My Tracker",free:false,pro:true},
               {feature:"Compare compounds",free:false,pro:true},
@@ -1375,7 +1372,7 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
           {!isPro&&(
             <div style={{marginTop:32,padding:"28px 32px",background:C.ink,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16}}>
               <div>
-                <p style={{fontSize:14,fontWeight:900,color:C.white,margin:"0 0 4px"}}>Unlock the full database + AI Stack Builder.</p>
+                <p style={{fontSize:14,fontWeight:900,color:C.white,margin:"0 0 4px"}}>Unlock the full database + AI Compound Advisor.</p>
                 <p style={{fontSize:12,color:"#9ca3af",margin:0}}>All 180+ compounds with dosing, interactions, and evidence scores.</p>
               </div>
               <button onClick={onUpgrade} style={{padding:"12px 28px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>
@@ -2045,7 +2042,7 @@ function LegalPage(){
         },
         {
           title:"5. Disclaimer of Medical Advice",
-          body:"All content on Evidstack is strictly for informational and educational purposes. Nothing on this platform constitutes medical advice, diagnosis, or treatment. The AI Stack Builder generates suggestions based on published research  - these suggestions are not personalized medical recommendations. Always consult a licensed healthcare provider before changing your supplementation routine."
+          body:"All content on Evidstack is strictly for informational and educational purposes. Nothing on this platform constitutes medical advice, diagnosis, or treatment. The AI Compound Advisor generates suggestions based on published research - these suggestions are not personalized medical recommendations. Always consult a licensed healthcare provider before changing your supplementation routine."
         },
         {
           title:"6. Limitation of Liability",
@@ -2230,7 +2227,7 @@ function AccountCenter({onClose,onUpgrade}){
                   {!isPro&&<button onClick={()=>{onClose();onUpgrade();}} style={{padding:"6px 14px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
                 </div>
                 <p style={{fontSize:12,color:isPro?"#9ca3af":C.gray,margin:0,lineHeight:1.6}}>
-                  {isPro?`Full access to all ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds, peptides, GLP-1s, and AI Stack Builder.`:`Tier 1 compounds only. Upgrade to unlock all ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds and AI Stack Builder.`}
+                  {isPro?`Full access to all ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds, peptides, GLP-1s, and AI Compound Advisor.`:`Tier 1 compounds only. Upgrade to unlock all ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds and AI Compound Advisor.`}
                 </p>
               </div>
 
@@ -2295,9 +2292,8 @@ function AccountCenter({onClose,onUpgrade}){
                   {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+`,highlight:true},
                   {feature:"Peptides & GLP-1s",free:false,pro:true,highlight:false},
                   {feature:"Biohacking tier",free:false,pro:true,highlight:false},
-                  {feature:"Compound Advisor AI",free:false,pro:true,highlight:true},
-                  {feature:"AI Stack Builder",free:false,pro:true,highlight:true},
-                  {feature:"AI Cycle Alerts",free:false,pro:true,highlight:false},
+                  {feature:"AI Compound Advisor",free:"1 query",pro:"Unlimited",highlight:true},
+                  {feature:"Conversation memory",free:false,pro:true,highlight:false},
                   {feature:"AI Bloodwork Analyzer",free:false,pro:true,highlight:false},
                   {feature:"My Tracker",free:false,pro:true,highlight:false},
                   {feature:"Compare compounds",free:false,pro:true,highlight:false},
@@ -2658,16 +2654,16 @@ function AppInner(){
 
           <div style={{maxWidth:680,margin:"0 auto 0",background:C.ink,padding:isMobile?"20px 16px":"24px 32px"}}>
             {user&&!isPro?(
-              <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Unlock all {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds + AI Stack Builder.</p>
+              <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Unlock all {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds + AI Compound Advisor.</p>
               <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 16px",lineHeight:1.6}}>Tier 2-4 compounds, peptides, AI tools - $9.99/month.</p>
               <button onClick={openUpgrade} style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Upgrade to Pro</button></>
             ):user&&isPro?(
               <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 4px",fontWeight:700}}>Welcome back, Pro member.</p>
-              <p style={{fontSize:12,color:"#9ca3af",margin:0}}>Full access to all compounds and the AI Stack Builder.</p></>
+              <p style={{fontSize:12,color:"#9ca3af",margin:0}}>Full access to all compounds and the AI Compound Advisor.</p></>
             ):(
               <div>
                 <p style={{fontSize:15,color:"#e8e5df",margin:"0 0 6px",fontWeight:900,letterSpacing:"-.02em"}}>Evidstack Pro is here.</p>
-                <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 20px",lineHeight:1.7}}>Stack Builder AI, AI Cycle Alerts, AI Bloodwork Analyzer, My Tracker, and {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including peptides, GLP-1s, and biohacking tier.</p>
+                <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 20px",lineHeight:1.7}}>AI Compound Advisor, AI Bloodwork Analyzer, My Tracker, and {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including peptides, GLP-1s, and biohacking tier.</p>
                 <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center",justifyContent:"center"}}>
                   <button onClick={()=>{openUpgrade();}} style={{padding:"12px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",lineHeight:1}}>
                     Start for $9.99/mo

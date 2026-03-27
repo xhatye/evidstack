@@ -3414,16 +3414,6 @@ function CompoundAdvisorScreen({onUpgrade}){
   const [voiceSupported]=useState(()=>typeof window!=="undefined"&&("SpeechRecognition" in window||"webkitSpeechRecognition" in window));
 
   const [voiceError,setVoiceError]=useState("");
-  const [permState,setPermState]=useState("unknown"); // unknown | granted | prompt | denied
-
-  // Check permission state on mount
-  useEffect(()=>{
-    if(typeof navigator==="undefined"||!navigator.permissions)return;
-    navigator.permissions.query({name:"microphone"}).then(p=>{
-      setPermState(p.state);
-      p.onchange=()=>setPermState(p.state);
-    }).catch(()=>{});
-  },[]);
 
   const startVoice=async()=>{
     if(listening){
@@ -3432,29 +3422,21 @@ function CompoundAdvisorScreen({onUpgrade}){
       return;
     }
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(!SR){setVoiceError("Voice input is not supported in this browser. Try Chrome.");return;}
-
-    // If denied, no point calling getUserMedia - Chrome won't re-prompt
-    if(permState==="denied"){
-      setVoiceError("Microphone is blocked. Click the lock icon in your browser address bar, set Microphone to 'Allow', then refresh the page.");
-      return;
-    }
-
-    // If not yet granted, request permission first (shows the browser popup)
-    if(permState!=="granted"){
-      try{
-        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-        stream.getTracks().forEach(t=>t.stop());
-        setPermState("granted");
-        setVoiceError("");
-      }catch(e){
-        setPermState("denied");
-        setVoiceError("Microphone access denied. Click the lock icon in your address bar, set Microphone to 'Allow', then refresh.");
-        return;
-      }
-    }
+    if(!SR){setVoiceError("Voice input requires Chrome or Edge.");return;}
 
     setVoiceError("");
+
+    // Always request permission fresh - handles granted/prompt/denied all in one
+    let stream;
+    try{
+      stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    }catch(e){
+      setVoiceError("Microphone blocked. In Chrome: click the lock icon in the address bar → Microphone → Allow → then try again.");
+      return;
+    }
+    // Release the stream immediately, we only needed the permission
+    stream.getTracks().forEach(t=>t.stop());
+
     const rec=new SR();
     rec.lang="en-US";
     rec.continuous=false;
@@ -3473,7 +3455,7 @@ function CompoundAdvisorScreen({onUpgrade}){
     };
     rec.onerror=(e)=>{
       setListening(false);
-      if(e.error==="not-allowed"){setPermState("denied");setVoiceError("Microphone blocked. Click the lock icon in the address bar to allow it.");}
+      if(e.error==="not-allowed")setVoiceError("Microphone blocked. Click the lock icon in the address bar to allow it.");
       else if(e.error!=="no-speech")setVoiceError("Voice error: "+e.error);
     };
     recognitionRef.current=rec;
@@ -3680,8 +3662,8 @@ function CompoundAdvisorScreen({onUpgrade}){
                     </svg>
                   )}
                 </button>
-                <span style={{fontSize:11,color:permState==="denied"?"#dc2626":listening?"#dc2626":C.gray,fontWeight:listening||permState==="denied"?700:400,transition:"color .2s"}}>
-                  {permState==="denied"?"Microphone blocked - see fix below":listening?"Recording - tap to stop":"Tap to speak"}
+                <span style={{fontSize:11,color:listening?"#dc2626":C.gray,fontWeight:listening?700:400,transition:"color .2s"}}>
+                  {listening?"Recording - tap to stop":"Tap to speak"}
                 </span>
               </div>
             )}

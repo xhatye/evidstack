@@ -3408,6 +3408,36 @@ function CompoundAdvisorScreen({onUpgrade}){
   const [revealedCount,setRevealedCount]=useState(0);
   const [phase,setPhase]=useState("idle");
   const inputRef=useRef(null);
+  const recognitionRef=useRef(null);
+  const [listening,setListening]=useState(false);
+  const [voiceSupported]=useState(()=>typeof window!=="undefined"&&("SpeechRecognition" in window||"webkitSpeechRecognition" in window));
+
+  const startVoice=()=>{
+    if(listening){
+      recognitionRef.current?.stop();
+      setListening(false);
+      return;
+    }
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR)return;
+    const rec=new SR();
+    rec.lang="en-US";
+    rec.continuous=false;
+    rec.interimResults=true;
+    rec.onstart=()=>setListening(true);
+    rec.onresult=(e)=>{
+      const transcript=Array.from(e.results).map(r=>r[0].transcript).join("");
+      setQuery(transcript);
+    };
+    rec.onend=()=>{
+      setListening(false);
+      // auto-submit if we got something
+      setQuery(q=>{if(q.trim().length>3){setTimeout(()=>submit(q),100);}return q;});
+    };
+    rec.onerror=()=>setListening(false);
+    recognitionRef.current=rec;
+    rec.start();
+  };
 
   // Free query tracking - 1 free query per session (localStorage)
   const FREE_KEY="evidstack_advisor_used";
@@ -3543,7 +3573,12 @@ function CompoundAdvisorScreen({onUpgrade}){
 
         {/* Input - hidden after free query used for non-pro */}
         {(!freeUsed||isPro||phase!=="idle"||result)&&(
-          <div style={S.inputRow}>
+          <div style={{...S.inputRow,position:"relative"}}>
+            <style>{`
+              @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.4)}70%{box-shadow:0 0 0 10px rgba(220,38,38,0)}}
+              @keyframes micRipple{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.2);opacity:0}}
+              .mic-listening{animation:micPulse 1.2s ease-in-out infinite}
+            `}</style>
             <textarea
               ref={inputRef}
               style={S.textarea}
@@ -3551,9 +3586,33 @@ function CompoundAdvisorScreen({onUpgrade}){
               value={query}
               onChange={e=>setQuery(e.target.value)}
               onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}}
-              placeholder="e.g. I want better sleep quality without feeling groggy..."
+              placeholder={listening?"Listening... speak now":"e.g. I want better sleep quality without feeling groggy..."}
               disabled={loading}
             />
+            {/* Mic button */}
+            {voiceSupported&&(
+              <button
+                onClick={startVoice}
+                disabled={loading}
+                className={listening?"mic-listening":""}
+                title={listening?"Stop recording":"Use voice input"}
+                style={{
+                  width:44,height:"100%",border:"none",borderLeft:`1px solid ${C.border}`,
+                  background:listening?"#dc2626":C.bg,
+                  color:listening?C.white:C.gray,
+                  cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",
+                  flexShrink:0,transition:"background .2s, color .2s",position:"relative",overflow:"hidden",
+                }}>
+                {listening&&<span style={{position:"absolute",inset:0,borderRadius:0,background:"rgba(220,38,38,.25)",animation:"micRipple 1s ease-out infinite"}}/>}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="22"/>
+                  <line x1="8" y1="22" x2="16" y2="22"/>
+                </svg>
+              </button>
+            )}
+            {/* Send button */}
             <button style={{...S.sendBtn,opacity:loading||!query.trim()?0.4:1}} onClick={()=>submit()} disabled={loading||!query.trim()}>
               {loading?"...":"Send"}
             </button>
@@ -3715,7 +3774,12 @@ function CompoundAdvisorScreen({onUpgrade}){
                   <>
                     <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 10px",letterSpacing:".06em"}}>FOLLOW UP</p>
                     <div style={{...S.inputRow,marginBottom:16}}>
-                      <textarea style={S.textarea} rows={1} value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}} placeholder="Ask a follow-up question..." disabled={loading}/>
+                      <textarea style={S.textarea} rows={1} value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}} placeholder={listening?"Listening...":"Ask a follow-up question..."} disabled={loading}/>
+                      {voiceSupported&&(
+                        <button onClick={startVoice} disabled={loading} className={listening?"mic-listening":""} title={listening?"Stop":"Voice input"} style={{width:40,height:"100%",border:"none",borderLeft:`1px solid ${C.border}`,background:listening?"#dc2626":C.bg,color:listening?C.white:C.gray,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"background .2s"}}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+                        </button>
+                      )}
                       <button style={{...S.sendBtn,opacity:loading||!query.trim()?0.4:1}} onClick={()=>submit()} disabled={loading||!query.trim()}>Send</button>
                     </div>
                     <button onClick={reset} style={{fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:0}}>Start new search</button>

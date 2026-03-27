@@ -3414,6 +3414,16 @@ function CompoundAdvisorScreen({onUpgrade}){
   const [voiceSupported]=useState(()=>typeof window!=="undefined"&&("SpeechRecognition" in window||"webkitSpeechRecognition" in window));
 
   const [voiceError,setVoiceError]=useState("");
+  const [permState,setPermState]=useState("unknown"); // unknown | granted | prompt | denied
+
+  // Check permission state on mount
+  useEffect(()=>{
+    if(typeof navigator==="undefined"||!navigator.permissions)return;
+    navigator.permissions.query({name:"microphone"}).then(p=>{
+      setPermState(p.state);
+      p.onchange=()=>setPermState(p.state);
+    }).catch(()=>{});
+  },[]);
 
   const startVoice=async()=>{
     if(listening){
@@ -3422,19 +3432,29 @@ function CompoundAdvisorScreen({onUpgrade}){
       return;
     }
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(!SR)return;
+    if(!SR){setVoiceError("Voice input is not supported in this browser. Try Chrome.");return;}
 
-    // Request mic permission explicitly first - this triggers the browser prompt
-    try{
-      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-      // Stop the stream immediately, we just needed the permission grant
-      stream.getTracks().forEach(t=>t.stop());
-      setVoiceError("");
-    }catch(e){
-      setVoiceError("Microphone access denied. Please allow microphone access in your browser settings and try again.");
+    // If denied, no point calling getUserMedia - Chrome won't re-prompt
+    if(permState==="denied"){
+      setVoiceError("Microphone is blocked. Click the lock icon in your browser address bar, set Microphone to 'Allow', then refresh the page.");
       return;
     }
 
+    // If not yet granted, request permission first (shows the browser popup)
+    if(permState!=="granted"){
+      try{
+        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+        stream.getTracks().forEach(t=>t.stop());
+        setPermState("granted");
+        setVoiceError("");
+      }catch(e){
+        setPermState("denied");
+        setVoiceError("Microphone access denied. Click the lock icon in your address bar, set Microphone to 'Allow', then refresh.");
+        return;
+      }
+    }
+
+    setVoiceError("");
     const rec=new SR();
     rec.lang="en-US";
     rec.continuous=false;
@@ -3453,9 +3473,8 @@ function CompoundAdvisorScreen({onUpgrade}){
     };
     rec.onerror=(e)=>{
       setListening(false);
-      if(e.error==="not-allowed")setVoiceError("Microphone access denied. Allow it in browser settings.");
-      else if(e.error==="no-speech")setVoiceError("");
-      else setVoiceError("Voice error: "+e.error);
+      if(e.error==="not-allowed"){setPermState("denied");setVoiceError("Microphone blocked. Click the lock icon in the address bar to allow it.");}
+      else if(e.error!=="no-speech")setVoiceError("Voice error: "+e.error);
     };
     recognitionRef.current=rec;
     rec.start();
@@ -3661,12 +3680,16 @@ function CompoundAdvisorScreen({onUpgrade}){
                     </svg>
                   )}
                 </button>
-                <span style={{fontSize:11,color:listening?"#dc2626":C.gray,fontWeight:listening?700:400,transition:"color .2s"}}>
-                  {listening?"Recording - tap to stop":"Tap to speak"}
+                <span style={{fontSize:11,color:permState==="denied"?"#dc2626":listening?"#dc2626":C.gray,fontWeight:listening||permState==="denied"?700:400,transition:"color .2s"}}>
+                  {permState==="denied"?"Microphone blocked - see fix below":listening?"Recording - tap to stop":"Tap to speak"}
                 </span>
               </div>
             )}
-            {voiceError&&<p style={{fontSize:12,color:"#dc2626",margin:"6px 0 0",fontWeight:600}}>{voiceError}</p>}
+            {voiceError&&(
+              <div style={{marginTop:8,padding:"10px 14px",background:"#fef2f2",border:"1px solid #fecaca",borderRadius:2}}>
+                <p style={{fontSize:12,color:"#991b1b",margin:0,lineHeight:1.6,fontWeight:600}}>{voiceError}</p>
+              </div>
+            )}
           </div>
         )}
 

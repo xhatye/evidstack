@@ -3408,59 +3408,6 @@ function CompoundAdvisorScreen({onUpgrade}){
   const [revealedCount,setRevealedCount]=useState(0);
   const [phase,setPhase]=useState("idle");
   const inputRef=useRef(null);
-  const recognitionRef=useRef(null);
-  const lastTranscriptRef=useRef("");
-  const [listening,setListening]=useState(false);
-  const [voiceSupported]=useState(()=>typeof window!=="undefined"&&("SpeechRecognition" in window||"webkitSpeechRecognition" in window));
-
-  const [voiceError,setVoiceError]=useState("");
-
-  const startVoice=async()=>{
-    if(listening){
-      recognitionRef.current?.stop();
-      setListening(false);
-      return;
-    }
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(!SR){setVoiceError("Voice input requires Chrome or Edge.");return;}
-
-    setVoiceError("");
-
-    // Always request permission fresh - handles granted/prompt/denied all in one
-    let stream;
-    try{
-      stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    }catch(e){
-      setVoiceError("Microphone blocked. In Chrome: click the lock icon in the address bar → Microphone → Allow → then try again.");
-      return;
-    }
-    // Release the stream immediately, we only needed the permission
-    stream.getTracks().forEach(t=>t.stop());
-
-    const rec=new SR();
-    rec.lang="en-US";
-    rec.continuous=false;
-    rec.interimResults=true;
-    lastTranscriptRef.current="";
-    rec.onstart=()=>setListening(true);
-    rec.onresult=(e)=>{
-      const transcript=Array.from(e.results).map(r=>r[0].transcript).join("");
-      lastTranscriptRef.current=transcript;
-      setQuery(transcript);
-    };
-    rec.onend=()=>{
-      setListening(false);
-      const t=lastTranscriptRef.current.trim();
-      if(t.length>3)setTimeout(()=>submit(t),150);
-    };
-    rec.onerror=(e)=>{
-      setListening(false);
-      if(e.error==="not-allowed")setVoiceError("Microphone blocked. Click the lock icon in the address bar to allow it.");
-      else if(e.error!=="no-speech")setVoiceError("Voice error: "+e.error);
-    };
-    recognitionRef.current=rec;
-    rec.start();
-  };
 
   // Free query tracking - 1 free query per session (localStorage)
   const FREE_KEY="evidstack_advisor_used";
@@ -3549,9 +3496,6 @@ function CompoundAdvisorScreen({onUpgrade}){
         @keyframes advisorScan{0%{width:0%}100%{width:100%}}
         @keyframes advisorScoreGrow{from{width:0}to{width:var(--w)}}
         @keyframes advisorBlink{0%,100%{opacity:1}50%{opacity:0}}
-        @keyframes micWave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(2.2)}}
-        @keyframes micRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.4);opacity:0}}
-        .adv-card{animation:advisorFadeIn .4s ease both}
         .adv-slide{animation:advisorSlideIn .3s ease both}
         .adv-pulse{animation:advisorPulse 1.4s ease-in-out infinite}
         .adv-score-bar{animation:advisorScoreGrow .8s cubic-bezier(.22,1,.36,1) both}
@@ -3608,70 +3552,13 @@ function CompoundAdvisorScreen({onUpgrade}){
                 value={query}
                 onChange={e=>setQuery(e.target.value)}
                 onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}}
-                placeholder={listening?"Listening... speak now":"e.g. I want better sleep quality without feeling groggy..."}
+                placeholder="e.g. I want better sleep quality without feeling groggy..."
                 disabled={loading}
               />
               <button style={{...S.sendBtn,opacity:loading||!query.trim()?0.4:1}} onClick={()=>submit()} disabled={loading||!query.trim()}>
                 {loading?"...":"Send"}
               </button>
             </div>
-
-            {/* Mic button row - below the input */}
-            {voiceSupported&&(
-              <div style={{display:"flex",alignItems:"center",gap:12}}>
-                <button
-                  onClick={startVoice}
-                  disabled={loading}
-                  title={listening?"Stop recording":"Use voice input"}
-                  style={{
-                    position:"relative",width:44,height:44,borderRadius:"50%",
-                    border:`2px solid ${listening?"#dc2626":C.border}`,
-                    background:listening?"#dc2626":C.white,
-                    color:listening?C.white:C.gray,
-                    cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",
-                    flexShrink:0,transition:"all .2s",outline:"none",
-                    boxShadow:listening?"0 0 0 4px rgba(220,38,38,.15)":"none",
-                  }}>
-                  {/* ripple rings when listening */}
-                  {listening&&[0,1].map(i=>(
-                    <span key={i} style={{
-                      position:"absolute",inset:-6-i*8,borderRadius:"50%",
-                      border:"1.5px solid #dc2626",opacity:.6,
-                      animation:`micRing 1.4s ease-out ${i*0.4}s infinite`,
-                      pointerEvents:"none",
-                    }}/>
-                  ))}
-                  {/* mic icon or animated bars when listening */}
-                  {listening?(
-                    <span style={{display:"flex",gap:2,alignItems:"center",height:16}}>
-                      {[0,1,2,3,4].map(i=>(
-                        <span key={i} style={{
-                          width:2.5,borderRadius:2,background:C.white,
-                          height:listening?`${8+Math.sin(i)*6}px`:"6px",
-                          animation:`micWave .6s ease-in-out ${i*0.1}s infinite alternate`,
-                          display:"block",
-                        }}/>
-                      ))}
-                    </span>
-                  ):(
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
-                      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                      <line x1="12" y1="19" x2="12" y2="22"/>
-                      <line x1="8" y1="22" x2="16" y2="22"/>
-                    </svg>
-                  )}
-                </button>
-                <span style={{fontSize:11,color:listening?"#dc2626":C.gray,fontWeight:listening?700:400,transition:"color .2s"}}>
-                  {listening?"Recording - tap to stop":"Tap to speak"}
-                </span>
-              </div>
-            )}
-            {voiceError&&(
-              <div style={{marginTop:8,padding:"10px 14px",background:"#fef2f2",border:"1px solid #fecaca",borderRadius:2}}>
-                <p style={{fontSize:12,color:"#991b1b",margin:0,lineHeight:1.6,fontWeight:600}}>{voiceError}</p>
-              </div>
-            )}
           </div>
         )}
 
@@ -3829,19 +3716,9 @@ function CompoundAdvisorScreen({onUpgrade}){
                 {isPro?(
                   <>
                     <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 10px",letterSpacing:".06em"}}>FOLLOW UP</p>
-                    <div style={{marginBottom:16}}>
-                      <div style={S.inputRow}>
-                        <textarea style={S.textarea} rows={1} value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}} placeholder={listening?"Listening...":"Ask a follow-up question..."} disabled={loading}/>
-                        <button style={{...S.sendBtn,opacity:loading||!query.trim()?0.4:1}} onClick={()=>submit()} disabled={loading||!query.trim()}>Send</button>
-                      </div>
-                      {voiceSupported&&(
-                        <div style={{display:"flex",alignItems:"center",gap:10,marginTop:8}}>
-                          <button onClick={startVoice} disabled={loading} style={{width:36,height:36,borderRadius:"50%",border:`2px solid ${listening?"#dc2626":C.border}`,background:listening?"#dc2626":C.white,color:listening?C.white:C.gray,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all .2s",outline:"none"}}>
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
-                          </button>
-                          <span style={{fontSize:11,color:listening?"#dc2626":C.gray,fontWeight:listening?700:400}}>{listening?"Recording - tap to stop":"Tap to speak"}</span>
-                        </div>
-                      )}
+                    <div style={{...S.inputRow,marginBottom:16}}>
+                      <textarea style={S.textarea} rows={1} value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}}} placeholder="Ask a follow-up question..." disabled={loading}/>
+                      <button style={{...S.sendBtn,opacity:loading||!query.trim()?0.4:1}} onClick={()=>submit()} disabled={loading||!query.trim()}>Send</button>
                     </div>
                     <button onClick={reset} style={{fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:0}}>Start new search</button>
                   </>

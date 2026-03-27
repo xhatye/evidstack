@@ -3413,7 +3413,9 @@ function CompoundAdvisorScreen({onUpgrade}){
   const [listening,setListening]=useState(false);
   const [voiceSupported]=useState(()=>typeof window!=="undefined"&&("SpeechRecognition" in window||"webkitSpeechRecognition" in window));
 
-  const startVoice=()=>{
+  const [voiceError,setVoiceError]=useState("");
+
+  const startVoice=async()=>{
     if(listening){
       recognitionRef.current?.stop();
       setListening(false);
@@ -3421,6 +3423,18 @@ function CompoundAdvisorScreen({onUpgrade}){
     }
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     if(!SR)return;
+
+    // Request mic permission explicitly first - this triggers the browser prompt
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      // Stop the stream immediately, we just needed the permission grant
+      stream.getTracks().forEach(t=>t.stop());
+      setVoiceError("");
+    }catch(e){
+      setVoiceError("Microphone access denied. Please allow microphone access in your browser settings and try again.");
+      return;
+    }
+
     const rec=new SR();
     rec.lang="en-US";
     rec.continuous=false;
@@ -3437,7 +3451,12 @@ function CompoundAdvisorScreen({onUpgrade}){
       const t=lastTranscriptRef.current.trim();
       if(t.length>3)setTimeout(()=>submit(t),150);
     };
-    rec.onerror=(e)=>{console.warn("Speech error:",e.error);setListening(false);};
+    rec.onerror=(e)=>{
+      setListening(false);
+      if(e.error==="not-allowed")setVoiceError("Microphone access denied. Allow it in browser settings.");
+      else if(e.error==="no-speech")setVoiceError("");
+      else setVoiceError("Voice error: "+e.error);
+    };
     recognitionRef.current=rec;
     rec.start();
   };
@@ -3647,6 +3666,7 @@ function CompoundAdvisorScreen({onUpgrade}){
                 </span>
               </div>
             )}
+            {voiceError&&<p style={{fontSize:12,color:"#dc2626",margin:"6px 0 0",fontWeight:600}}>{voiceError}</p>}
           </div>
         )}
 

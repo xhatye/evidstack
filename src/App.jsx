@@ -21,6 +21,9 @@ const ROUTES = {
   "/bloodwork":"bloodwork",
   "/pricing":"pricing",
   "/advisor":"advisor",
+  "/interaction-checker":"interaction-checker",
+  "/stack-audit":"stack-audit",
+  "/bloodwork-history":"bloodwork-history",
 };
 
 function getPageFromPath(){
@@ -90,7 +93,7 @@ function OnboardingModal({onClose}){
     {
       icon:"🔬",
       title:`${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds, ranked by science`,
-      desc:"Every supplement, steroid, peptide, SARM, and research compound in our database is scored on two axes: how strong the effect is, and how solid the evidence is. No marketing, no guesswork.",
+      desc:"Every supplement in our database is scored on two axes: how strong the effect is, and how solid the evidence is. No marketing, no guesswork.",
       detail:"Browse by goal (Sleep, Testosterone, Focus, Weight Loss, Skin, and 14 more categories) or search directly.",
     },
     {
@@ -102,7 +105,7 @@ function OnboardingModal({onClose}){
     {
       icon:"🧬",
       title:"Pro AI tools",
-      desc:"AI Compound Advisor lets you describe any issue and returns compounds ranked by evidence - try 1 query free. My Tracker logs your daily intake. AI Bloodwork Analyzer turns your blood test into supplement recommendations.",
+      desc:"AI Compound Advisor lets you describe any issue and returns compounds ranked by evidence - try 1 query free. Interaction Checker analyzes your full stack for conflicts and synergies. Stack Audit AI scores your current stack and tells you exactly what to change. Bloodwork History tracks 16 biomarkers over time.",
       detail:"All AI tools are Pro-only and powered by the same evidence base as the database.",
     },
   ];
@@ -287,10 +290,11 @@ function UpgradeModal({onClose,onAuthNeeded}){
   const features=[
     {icon:"🔬",text:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including Tier 2-4`},
     {icon:"🔭",text:"AI Compound Advisor - unlimited evidence-ranked queries"},
-    {icon:"🩸",text:"AI Bloodwork Analyzer - bio-personalized recommendations"},
+    {icon:"⚗️",text:"Interaction Checker - full stack safety analysis"},
+    {icon:"🎯",text:"Stack Audit AI - score and optimize your current stack"},
+    {icon:"🩸",text:"Bloodwork History - track 16 biomarkers over time"},
     {icon:"📊",text:"My Tracker - weekly supplement log"},
     {icon:"💾",text:"Save and name your stacks"},
-    {icon:"⚖️",text:"Compare any 2 compounds side-by-side"},
   ];
 
   return(
@@ -337,6 +341,9 @@ function UpgradeModal({onClose,onAuthNeeded}){
               {feature:"Biohacking tier",free:false,pro:true},
               {feature:"AI Compound Advisor",free:"1 query",pro:"Unlimited",highlight:true},
               {feature:"Conversation memory",free:false,pro:true},
+              {feature:"Interaction Checker",free:false,pro:true,highlight:true},
+              {feature:"Stack Audit AI",free:false,pro:true},
+              {feature:"Bloodwork History",free:false,pro:true},
               {feature:"AI Bloodwork Analyzer",free:false,pro:true},
               {feature:"My Tracker",free:false,pro:true},
               {feature:"Compare compounds",free:false,pro:true},
@@ -2105,7 +2112,7 @@ function AboutPage(){
         },
         {
           label:"What we cover",
-          body:`Evidstack covers ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds across the full spectrum of evidence-based supplementation: foundational supplements like vitamin D, zinc, and omega-3; advanced nootropics and cognitive enhancers including racetams, cholinergics, and dopaminergic agents; peptides spanning healing compounds like BPC-157 and TB-500, GH secretagogues like Ipamorelin and CJC-1295, and skin and longevity peptides like GHK-Cu and Epithalon; the full growth hormone axis including recombinant HGH (Somatropin), once-weekly analogs (Somapacitan, Lonapegsomatropin), and oral secretagogues (Anamorelin, MK-677); GLP-1 receptor agonists and metabolic compounds including semaglutide and tirzepatide; hair retention and aesthetic compounds including finasteride, dutasteride, and minoxidil; the complete SARM landscape (RAD-140, LGD-4033, Ostarine, Andarine, YK-11, S-23, LGD-3303); anabolic androgenic steroids with full clinical documentation (testosterone, nandrolone, oxandrolone, stanozolol, trenbolone, boldenone, and 50+ others); beta-agonists (clenbuterol), aromatase inhibitors (exemestane, formestane), and progestins relevant to endocrinology and sports pharmacology; anti-aging interventions including rapamycin, metformin, and senolytic compounds; and adaptogenic and stress-response compounds. Each entry includes clinical dosing ranges, timing recommendations, known interactions, safety rating, legal status, and estimated monthly cost.`
+          body:`Evidstack covers ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds across the full spectrum of evidence-based supplementation: foundational supplements like vitamin D, zinc, and omega-3; advanced nootropics and cognitive enhancers including racetams, cholinergics, and dopaminergic agents; peptides spanning healing compounds like BPC-157 and TB-500, GH secretagogues like Ipamorelin and CJC-1295, and skin and longevity peptides like GHK-Cu and Epithalon; GLP-1 receptor agonists and metabolic compounds including semaglutide and tirzepatide; hair retention and aesthetic compounds including finasteride, dutasteride, and minoxidil; SARMs and performance compounds with available human trial data; anti-aging interventions including rapamycin, metformin, and senolytic compounds; and adaptogenic and stress-response compounds. Each entry includes clinical dosing ranges, timing recommendations, known interactions, safety rating, legal status, and estimated monthly cost.`
         },
         {
           label:"What we are not",
@@ -2255,6 +2262,9 @@ function AccountCenter({onClose,onUpgrade}){
                 <div style={{display:"flex",flexDirection:"column",gap:1}}>
                   {[
                     {label:"AI Compound Advisor",path:"advisor"},
+                    {label:"Interaction Checker",path:"interaction-checker"},
+                    {label:"Stack Audit AI",path:"stack-audit"},
+                    {label:"Bloodwork History",path:"bloodwork-history"},
                     {label:"AI Bloodwork Analyzer",path:"bloodwork"},
                     {label:"My Tracker",path:"tracker"},
                     {label:"Terms & Privacy",path:"legal"},
@@ -2294,6 +2304,9 @@ function AccountCenter({onClose,onUpgrade}){
                   {feature:"Biohacking tier",free:false,pro:true,highlight:false},
                   {feature:"AI Compound Advisor",free:"1 query",pro:"Unlimited",highlight:true},
                   {feature:"Conversation memory",free:false,pro:true,highlight:false},
+                  {feature:"Interaction Checker",free:false,pro:true,highlight:true},
+                  {feature:"Stack Audit AI",free:false,pro:true,highlight:false},
+                  {feature:"Bloodwork History",free:false,pro:true,highlight:false},
                   {feature:"AI Bloodwork Analyzer",free:false,pro:true,highlight:false},
                   {feature:"My Tracker",free:false,pro:true,highlight:false},
                   {feature:"Compare compounds",free:false,pro:true,highlight:false},
@@ -2478,6 +2491,9 @@ function AppInner(){
   const proTools=[
     {id:"tracker",label:"My Tracker"},
     {id:"bloodwork",label:"AI Bloodwork Analyzer"},
+    {id:"interaction-checker",label:"Interaction Checker"},
+    {id:"stack-audit",label:"Stack Audit AI"},
+    {id:"bloodwork-history",label:"Bloodwork History"},
   ];
   const proPages=proTools.map(t=>t.id);
 
@@ -2609,6 +2625,9 @@ function AppInner(){
       {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}
       {page==="tracker"        &&<MyTracker onUpgrade={openUpgrade}/>}
       {page==="advisor"        &&<CompoundAdvisorScreen onUpgrade={openUpgrade}/>}
+      {page==="interaction-checker"&&<InteractionCheckerPro onUpgrade={openUpgrade}/>}
+      {page==="stack-audit"   &&<StackAuditScreen onUpgrade={openUpgrade}/>}
+      {page==="bloodwork-history"&&<BloodworkHistoryScreen onUpgrade={openUpgrade}/>}
       {page==="stack-builder" &&<StackBuilder onUpgrade={openUpgrade}/>}
       {page==="cycle-alerts"  &&<CycleAlertsScreen onUpgrade={openUpgrade}/>}
       {page==="stack-optimizer"&&<StackOptimizerScreen onUpgrade={openUpgrade}/>}
@@ -2663,7 +2682,7 @@ function AppInner(){
             ):(
               <div>
                 <p style={{fontSize:15,color:"#e8e5df",margin:"0 0 6px",fontWeight:900,letterSpacing:"-.02em"}}>Evidstack Pro is here.</p>
-                <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 20px",lineHeight:1.7}}>AI Compound Advisor, AI Bloodwork Analyzer, My Tracker, and {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including peptides, GLP-1s, and biohacking tier.</p>
+                <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 20px",lineHeight:1.7}}>AI Compound Advisor, Interaction Checker, Stack Audit AI, Bloodwork History, and {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including peptides, GLP-1s, and biohacking tier.</p>
                 <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center",justifyContent:"center"}}>
                   <button onClick={()=>{openUpgrade();}} style={{padding:"12px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",lineHeight:1}}>
                     Start for $9.99/mo
@@ -2819,7 +2838,7 @@ function AppInner(){
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Tools</p>
-            {[["tracker","My Tracker"],["bloodwork","AI Bloodwork Analyzer"]].map(([p,l])=>(
+            {[["tracker","My Tracker"],["bloodwork","AI Bloodwork Analyzer"],["interaction-checker","Interaction Checker"],["stack-audit","Stack Audit AI"],["bloodwork-history","Bloodwork History"]].map(([p,l])=>(
               <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>
@@ -3741,6 +3760,572 @@ function CompoundAdvisorScreen({onUpgrade}){
   );
 }
 
+// ── INTERACTION CHECKER ───────────────────────────────────────────────────────
+function InteractionCheckerPro({onUpgrade}){
+  const {isPro}=useAuth();
+  const isMob=useIsMobile();
+  const [input,setInput]=useState("");
+  const [compounds,setCompounds]=useState([]);
+  const [result,setResult]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [err,setErr]=useState("");
+  const [phase,setPhase]=useState("idle");
+  const [revealIdx,setRevealIdx]=useState(0);
+
+  useEffect(()=>{
+    if(phase!=="revealing"||!result?.interactions)return;
+    if(revealIdx>=result.interactions.length){setPhase("done");return;}
+    const t=setTimeout(()=>setRevealIdx(n=>n+1),150);
+    return()=>clearTimeout(t);
+  },[phase,revealIdx,result]);
+
+  const addCompound=()=>{
+    const v=input.trim();
+    if(!v||compounds.includes(v))return;
+    setCompounds(c=>[...c,v]);
+    setInput("");
+  };
+
+  const removeCompound=(c)=>setCompounds(cs=>cs.filter(x=>x!==c));
+
+  const analyze=async()=>{
+    if(compounds.length<2){setErr("Add at least 2 compounds.");return;}
+    setLoading(true);setErr("");setResult(null);setRevealIdx(0);setPhase("scanning");
+    try{
+      const res=await fetch("/api/interaction-checker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds})});
+      const data=await res.json();
+      if(data.error){setErr(data.error);setPhase("idle");return;}
+      setResult(data);setPhase("revealing");
+    }catch{setErr("Analysis failed.");setPhase("idle");}
+    finally{setLoading(false);}
+  };
+
+  const reset=()=>{setResult(null);setCompounds([]);setInput("");setPhase("idle");setRevealIdx(0);setErr("");};
+
+  const severityColor=(s)=>({positive:"#16a34a",minor:"#ca8a04",moderate:"#d97706",major:"#dc2626"})[s]||C.gray;
+  const severityBg=(s)=>({positive:"#f0fdf4",minor:"#fefce8",moderate:"#fff7ed",major:"#fef2f2"})[s]||C.bg;
+  const verdictColor=(v)=>({SAFE:"#16a34a",CAUTION:"#d97706",DANGER:"#dc2626"})[v]||C.gray;
+
+  if(!isPro)return(
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+      <div style={{maxWidth:720,margin:"0 auto",padding:isMob?"60px 16px":"80px 32px",textAlign:"center"}}>
+        <span style={{fontSize:52,display:"block",marginBottom:20}}>⚗️</span>
+        <h2 style={{fontSize:isMob?24:36,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>Interaction Checker</h2>
+        <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Enter your full stack and get a complete interaction analysis: absorption conflicts, timing clashes, synergies, and safety flags, all in one report.</p>
+        <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"32px",marginBottom:32,textAlign:"left",maxWidth:500,margin:"0 auto 32px"}}>
+          {[["⚠️","Safety flags","Major and moderate interaction warnings with severity scores"],["⚡","Synergy detection","Find which compounds amplify each other"],["⏱️","Timing protocol","Exact daily schedule to avoid absorption competition"],["🔬","Full pair analysis","Every compound pair assessed individually"]].map(([icon,title,desc])=>(
+            <div key={title} style={{display:"flex",gap:14,marginBottom:20}}>
+              <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
+              <div><p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{title}</p><p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{desc}</p></div>
+            </div>
+          ))}
+        </div>
+        <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/month</button>
+      </div>
+    </div>
+  );
+
+  return(
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+      <style>{`
+        @keyframes icFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes icScan{0%{width:0%}100%{width:100%}}
+        .ic-card{animation:icFadeIn .35s ease both}
+      `}</style>
+      <div style={{maxWidth:800,margin:"0 auto",padding:isMob?"32px 16px 80px":"56px 32px 100px"}}>
+        <h1 style={{fontSize:isMob?28:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 8px"}}>Interaction Checker</h1>
+        <p style={{fontSize:14,color:C.gray,margin:"0 0 28px",lineHeight:1.6}}>Add every compound in your stack. Get a full interaction report with severity ratings and an optimized timing protocol.</p>
+
+        {/* Input */}
+        <div style={{display:"flex",gap:0,border:`2px solid ${C.ink}`,background:C.white,marginBottom:12}}>
+          <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")addCompound();}}
+            placeholder="Type a compound name and press Enter..."
+            style={{flex:1,padding:"14px 16px",border:"none",fontSize:14,fontFamily:"Montserrat,sans-serif",outline:"none",background:"transparent",color:C.ink}}/>
+          <button onClick={addCompound} style={{padding:"0 20px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Add</button>
+        </div>
+
+        {/* Compound chips */}
+        {compounds.length>0&&(
+          <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:20}}>
+            {compounds.map(c=>(
+              <div key={c} style={{display:"flex",alignItems:"center",gap:6,padding:"6px 12px",background:C.ink,color:C.white,fontSize:12,fontWeight:700}}>
+                {c}
+                <button onClick={()=>removeCompound(c)} style={{background:"none",border:"none",color:"#9ca3af",cursor:"pointer",fontSize:14,padding:0,lineHeight:1}}>x</button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {err&&<p style={{fontSize:13,color:C.red,fontWeight:700,margin:"0 0 16px"}}>{err}</p>}
+
+        <div style={{display:"flex",gap:10,marginBottom:28}}>
+          <button onClick={analyze} disabled={loading||compounds.length<2} style={{padding:"12px 28px",background:compounds.length>=2?C.gold:C.border,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:compounds.length>=2?"pointer":"default",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+            {loading?"Analyzing...":"Analyze Stack"}
+          </button>
+          {result&&<button onClick={reset} style={{padding:"12px 20px",background:"transparent",border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Start over</button>}
+        </div>
+
+        {/* Scanning */}
+        {phase==="scanning"&&(
+          <div className="ic-card" style={{background:C.ink,padding:"28px 24px",marginBottom:20}}>
+            <div style={{height:2,background:"#1f2937",marginBottom:20,overflow:"hidden"}}>
+              <div style={{height:"100%",background:C.gold,animation:"icScan 1.8s ease-in-out infinite"}}/>
+            </div>
+            <p style={{fontSize:12,color:C.gold,fontWeight:700,margin:0,letterSpacing:".08em"}}>SCANNING {compounds.length} COMPOUNDS FOR INTERACTIONS...</p>
+          </div>
+        )}
+
+        {/* Results */}
+        {result&&(
+          <div className="ic-card">
+            {/* Verdict banner */}
+            <div style={{background:verdictColor(result.overall_verdict),padding:"20px 24px",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+              <div>
+                <p style={{fontSize:10,fontWeight:800,color:"rgba(255,255,255,.7)",letterSpacing:".14em",margin:"0 0 4px",textTransform:"uppercase"}}>Overall Verdict</p>
+                <p style={{fontSize:22,fontWeight:900,color:C.white,margin:0,letterSpacing:"-.02em"}}>{result.overall_verdict} - {result.safe_to_stack?"Safe to stack":"Do not stack as-is"}</p>
+              </div>
+              <span style={{fontSize:40}}>{result.overall_verdict==="SAFE"?"✅":result.overall_verdict==="CAUTION"?"⚠️":"🚫"}</span>
+            </div>
+            <div style={{background:C.white,border:`1px solid ${C.border}`,padding:"16px 20px",marginBottom:20}}>
+              <p style={{fontSize:13,color:C.gray,margin:0,lineHeight:1.7}}>{result.overall_summary}</p>
+            </div>
+
+            {/* Individual interactions */}
+            <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Interaction Analysis</p>
+            <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:24}}>
+              {result.interactions?.slice(0,revealIdx).map((ix,i)=>(
+                <div key={i} className="ic-card" style={{background:severityBg(ix.severity),border:`1px solid ${severityColor(ix.severity)}40`,borderLeft:`4px solid ${severityColor(ix.severity)}`,padding:"14px 18px",animationDelay:`${i*.05}s`}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,marginBottom:6,flexWrap:"wrap"}}>
+                    <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:0}}>{ix.compounds?.join(" + ")}</p>
+                    <span style={{fontSize:10,fontWeight:800,color:severityColor(ix.severity),background:`${severityColor(ix.severity)}15`,padding:"3px 8px",letterSpacing:".08em",textTransform:"uppercase",flexShrink:0,borderRadius:2}}>{ix.severity}</span>
+                  </div>
+                  <p style={{fontSize:12,color:C.gray,margin:"0 0 6px",lineHeight:1.5}}>{ix.description}</p>
+                  {ix.recommendation&&<p style={{fontSize:12,fontWeight:700,color:C.ink,margin:0}}>→ {ix.recommendation}</p>}
+                </div>
+              ))}
+            </div>
+
+            {/* Timing protocol */}
+            {phase==="done"&&result.timing_protocol&&(
+              <div className="ic-card" style={{background:C.ink,padding:"20px 24px",marginBottom:16}}>
+                <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,margin:"0 0 10px",textTransform:"uppercase"}}>Optimized Timing Protocol</p>
+                <p style={{fontSize:13,color:"#d1d5db",margin:0,lineHeight:1.7}}>{result.timing_protocol}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── STACK AUDIT AI ────────────────────────────────────────────────────────────
+function StackAuditScreen({onUpgrade}){
+  const {isPro}=useAuth();
+  const isMob=useIsMobile();
+  const [stack,setStack]=useState("");
+  const [goals,setGoals]=useState("");
+  const [budget,setBudget]=useState("100");
+  const [result,setResult]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [err,setErr]=useState("");
+  const [phase,setPhase]=useState("idle");
+
+  const audit=async()=>{
+    if(!stack.trim()){setErr("Describe your current stack first.");return;}
+    setLoading(true);setErr("");setResult(null);setPhase("scanning");
+    try{
+      const res=await fetch("/api/stack-audit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({stack,goals,budget})});
+      const data=await res.json();
+      if(data.error){setErr(data.error);setPhase("idle");return;}
+      setResult(data);setPhase("done");
+    }catch{setErr("Audit failed.");setPhase("idle");}
+    finally{setLoading(false);}
+  };
+
+  const reset=()=>{setResult(null);setStack("");setGoals("");setBudget("100");setPhase("idle");setErr("");};
+
+  const verdictColor=(v)=>({KEEP:"#16a34a",OPTIMIZE:"#ca8a04",REPLACE:"#d97706",REMOVE:"#dc2626"})[v]||C.gray;
+  const gradeColor=(g)=>({"A":"#16a34a","B":"#22c55e","C":"#ca8a04","D":"#d97706","F":"#dc2626"})[g]||C.gray;
+
+  if(!isPro)return(
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+      <div style={{maxWidth:720,margin:"0 auto",padding:isMob?"60px 16px":"80px 32px",textAlign:"center"}}>
+        <span style={{fontSize:52,display:"block",marginBottom:20}}>🎯</span>
+        <h2 style={{fontSize:isMob?24:36,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>Stack Audit AI</h2>
+        <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Paste your current stack and get a complete audit: redundancies, critical gaps, timing fixes, cost-to-benefit analysis, and a Stack Score from 0 to 100.</p>
+        <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"32px",marginBottom:32,textAlign:"left",maxWidth:500,margin:"0 auto 32px"}}>
+          {[["📊","Stack Score","Your stack graded 0-100 with letter grade"],["🗑️","Redundancy detection","Find what is doubling up and wasting money"],["🔍","Gap analysis","What is missing for your specific goals"],["💡","Priority changes","Top 3 changes to make immediately"]].map(([icon,title,desc])=>(
+            <div key={title} style={{display:"flex",gap:14,marginBottom:20}}>
+              <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
+              <div><p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{title}</p><p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{desc}</p></div>
+            </div>
+          ))}
+        </div>
+        <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/month</button>
+      </div>
+    </div>
+  );
+
+  return(
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+      <style>{`@keyframes auditFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.audit-card{animation:auditFade .4s ease both}`}</style>
+      <div style={{maxWidth:800,margin:"0 auto",padding:isMob?"32px 16px 80px":"56px 32px 100px"}}>
+        <h1 style={{fontSize:isMob?28:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 8px"}}>Stack Audit AI</h1>
+        <p style={{fontSize:14,color:C.gray,margin:"0 0 32px",lineHeight:1.6}}>Describe everything you are currently taking. The AI scores your stack, flags redundancies, identifies gaps, and tells you exactly what to change.</p>
+
+        {!result&&(
+          <div>
+            <div style={{marginBottom:16}}>
+              <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 8px",letterSpacing:".08em",textTransform:"uppercase"}}>Your current stack *</p>
+              <textarea value={stack} onChange={e=>setStack(e.target.value)}
+                placeholder="e.g. Creatine 5g, Magnesium glycinate 400mg, Vitamin D3 4000IU, Ashwagandha 600mg, Caffeine 200mg, L-Theanine 400mg, Omega-3 2g..."
+                style={{width:"100%",padding:"14px 16px",border:`2px solid ${C.ink}`,fontSize:13,fontFamily:"Montserrat,sans-serif",resize:"vertical",outline:"none",background:C.white,color:C.ink,minHeight:100,boxSizing:"border-box"}}/>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:12,marginBottom:20}}>
+              <div>
+                <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 8px",letterSpacing:".08em",textTransform:"uppercase"}}>Your goals</p>
+                <input value={goals} onChange={e=>setGoals(e.target.value)} placeholder="e.g. muscle gain, sleep, focus, longevity..."
+                  style={{width:"100%",padding:"12px 14px",border:`1px solid ${C.border}`,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",background:C.white,color:C.ink,boxSizing:"border-box"}}/>
+              </div>
+              <div>
+                <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 8px",letterSpacing:".08em",textTransform:"uppercase"}}>Monthly budget ($)</p>
+                <input value={budget} onChange={e=>setBudget(e.target.value)} placeholder="100"
+                  style={{width:"100%",padding:"12px 14px",border:`1px solid ${C.border}`,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",background:C.white,color:C.ink,boxSizing:"border-box"}}/>
+              </div>
+            </div>
+            {err&&<p style={{fontSize:13,color:C.red,fontWeight:700,margin:"0 0 12px"}}>{err}</p>}
+            <button onClick={audit} disabled={loading||!stack.trim()} style={{padding:"13px 32px",background:stack.trim()?C.gold:C.border,color:C.ink,border:"none",fontSize:14,fontWeight:800,cursor:stack.trim()?"pointer":"default",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+              {loading?"Auditing...":"Audit My Stack"}
+            </button>
+          </div>
+        )}
+
+        {phase==="scanning"&&(
+          <div className="audit-card" style={{background:C.ink,padding:"28px 24px",marginTop:24}}>
+            <div style={{height:2,background:"#1f2937",marginBottom:20,overflow:"hidden"}}>
+              <div style={{height:"100%",background:C.gold,animation:"icScan 2s ease-in-out infinite"}}/>
+            </div>
+            <p style={{fontSize:12,color:C.gold,fontWeight:700,margin:0,letterSpacing:".08em"}}>AUDITING YOUR STACK...</p>
+          </div>
+        )}
+
+        {result&&(
+          <div>
+            {/* Score */}
+            <div className="audit-card" style={{display:"flex",gap:isMob?16:32,alignItems:"center",background:C.white,border:`1px solid ${C.border}`,borderTop:`4px solid ${gradeColor(result.grade)}`,padding:isMob?"20px":"28px 32px",marginBottom:20,flexWrap:"wrap"}}>
+              <div style={{textAlign:"center",flexShrink:0}}>
+                <div style={{fontSize:isMob?52:68,fontWeight:900,color:gradeColor(result.grade),lineHeight:1}}>{result.grade}</div>
+                <div style={{fontSize:11,color:C.gray,fontWeight:700,letterSpacing:".08em"}}>GRADE</div>
+              </div>
+              <div style={{flex:1,minWidth:200}}>
+                <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:8}}>
+                  <span style={{fontSize:28,fontWeight:900,color:C.ink}}>{result.stack_score}</span>
+                  <span style={{fontSize:13,color:C.gray,fontWeight:600}}>/100 Stack Score</span>
+                </div>
+                <div style={{height:8,background:C.bg,borderRadius:4,overflow:"hidden",marginBottom:10}}>
+                  <div style={{height:"100%",background:gradeColor(result.grade),width:`${result.stack_score}%`,transition:"width 1s ease",borderRadius:4}}/>
+                </div>
+                <p style={{fontSize:13,color:C.gray,margin:0,lineHeight:1.6}}>{result.summary}</p>
+              </div>
+            </div>
+
+            {/* Priority changes */}
+            {result.priority_changes?.length>0&&(
+              <div className="audit-card" style={{background:C.ink,padding:"20px 24px",marginBottom:16}}>
+                <p style={{fontSize:10,fontWeight:800,color:C.gold,letterSpacing:".14em",margin:"0 0 12px",textTransform:"uppercase"}}>Top Priority Changes</p>
+                {result.priority_changes.map((c,i)=>(
+                  <div key={i} style={{display:"flex",gap:12,marginBottom:i<result.priority_changes.length-1?10:0,alignItems:"flex-start"}}>
+                    <span style={{fontSize:13,fontWeight:900,color:C.gold,flexShrink:0,marginTop:1}}>#{i+1}</span>
+                    <p style={{fontSize:13,color:"#d1d5db",margin:0,lineHeight:1.5}}>{c}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Per-compound verdicts */}
+            {result.compounds_analyzed?.length>0&&(
+              <div className="audit-card" style={{marginBottom:16}}>
+                <p style={{fontSize:10,fontWeight:800,color:C.gray,letterSpacing:".14em",margin:"0 0 12px",textTransform:"uppercase"}}>Compound-by-Compound Verdict</p>
+                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                  {result.compounds_analyzed.map((c,i)=>(
+                    <div key={i} style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${verdictColor(c.verdict)}`,padding:"12px 16px",display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap"}}>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
+                          <span style={{fontSize:13,fontWeight:800,color:C.ink}}>{c.name}</span>
+                          <span style={{fontSize:10,fontWeight:800,color:verdictColor(c.verdict),padding:"2px 6px",background:`${verdictColor(c.verdict)}15`,letterSpacing:".06em",borderRadius:2}}>{c.verdict}</span>
+                        </div>
+                        <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.4}}>{c.reason}</p>
+                        {c.optimization&&<p style={{fontSize:12,fontWeight:700,color:C.ink,margin:"4px 0 0"}}>→ {c.optimization}</p>}
+                      </div>
+                      <div style={{textAlign:"center",flexShrink:0}}>
+                        <div style={{fontSize:18,fontWeight:900,color:verdictColor(c.verdict)}}>{c.score}</div>
+                        <div style={{fontSize:9,color:C.gray,fontWeight:700}}>SCORE</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Redundancies & Gaps */}
+            <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:12,marginBottom:16}}>
+              {result.redundancies?.length>0&&(
+                <div className="audit-card" style={{background:"#fef2f2",border:"1px solid #fecaca",padding:"16px 18px"}}>
+                  <p style={{fontSize:10,fontWeight:800,color:"#991b1b",letterSpacing:".12em",margin:"0 0 10px",textTransform:"uppercase"}}>Redundancies</p>
+                  {result.redundancies.map((r,i)=><p key={i} style={{fontSize:12,color:"#7f1d1d",margin:i>0?"6px 0 0":0,lineHeight:1.5}}>• {r}</p>)}
+                </div>
+              )}
+              {result.critical_gaps?.length>0&&(
+                <div className="audit-card" style={{background:"#f0fdf4",border:"1px solid #bbf7d0",padding:"16px 18px"}}>
+                  <p style={{fontSize:10,fontWeight:800,color:"#166534",letterSpacing:".12em",margin:"0 0 10px",textTransform:"uppercase"}}>Critical Gaps</p>
+                  {result.critical_gaps.map((g,i)=><p key={i} style={{fontSize:12,color:"#14532d",margin:i>0?"6px 0 0":0,lineHeight:1.5}}>+ {g}</p>)}
+                </div>
+              )}
+            </div>
+
+            {/* Optimized stack */}
+            {result.optimized_stack&&(
+              <div className="audit-card" style={{border:`1.5px solid ${C.ink}`,padding:"20px 24px",marginBottom:16}}>
+                <p style={{fontSize:10,fontWeight:800,color:C.gray,letterSpacing:".14em",margin:"0 0 10px",textTransform:"uppercase"}}>Recommended Stack</p>
+                <p style={{fontSize:13,color:C.ink,margin:0,lineHeight:1.7}}>{result.optimized_stack}</p>
+              </div>
+            )}
+
+            <button onClick={reset} style={{fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:0}}>Audit a different stack</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── BLOODWORK HISTORY TRACKER ─────────────────────────────────────────────────
+function BloodworkHistoryScreen({onUpgrade}){
+  const {isPro,user}=useAuth();
+  const isMob=useIsMobile();
+  const STORAGE_KEY=`evidstack_bw_${user?.uid||"guest"}`;
+
+  const MARKERS=[
+    {id:"testosterone_total",label:"Testosterone Total",unit:"ng/dL",normal:[300,900],warn_low:250,warn_high:1200},
+    {id:"testosterone_free",label:"Testosterone Free",unit:"pg/mL",normal:[8,25],warn_low:5,warn_high:40},
+    {id:"lh",label:"LH",unit:"mIU/mL",normal:[1.7,8.6],warn_low:1,warn_high:15},
+    {id:"fsh",label:"FSH",unit:"mIU/mL",normal:[1.5,12.4],warn_low:1,warn_high:20},
+    {id:"estradiol",label:"Estradiol (E2)",unit:"pg/mL",normal:[10,40],warn_low:8,warn_high:60},
+    {id:"shbg",label:"SHBG",unit:"nmol/L",normal:[10,57],warn_low:8,warn_high:80},
+    {id:"igf1",label:"IGF-1",unit:"ng/mL",normal:[100,300],warn_low:80,warn_high:400},
+    {id:"alt",label:"ALT",unit:"U/L",normal:[7,56],warn_low:0,warn_high:80},
+    {id:"ast",label:"AST",unit:"U/L",normal:[10,40],warn_low:0,warn_high:60},
+    {id:"hdl",label:"HDL Cholesterol",unit:"mg/dL",normal:[40,100],warn_low:35,warn_high:150},
+    {id:"ldl",label:"LDL Cholesterol",unit:"mg/dL",normal:[0,130],warn_low:0,warn_high:160},
+    {id:"hematocrit",label:"Hematocrit",unit:"%",normal:[38,50],warn_low:35,warn_high:55},
+    {id:"psa",label:"PSA",unit:"ng/mL",normal:[0,4],warn_low:0,warn_high:6},
+    {id:"creatinine",label:"Creatinine",unit:"mg/dL",normal:[0.7,1.2],warn_low:0.5,warn_high:1.5},
+    {id:"rbc",label:"RBC",unit:"M/uL",normal:[4.5,5.9],warn_low:4.0,warn_high:6.5},
+    {id:"cortisol",label:"Cortisol (AM)",unit:"mcg/dL",normal:[6,23],warn_low:4,warn_high:30},
+  ];
+
+  const [entries,setEntries]=useState(()=>{
+    try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");}catch{return[];}
+  });
+  const [showForm,setShowForm]=useState(false);
+  const [date,setDate]=useState(new Date().toISOString().split("T")[0]);
+  const [note,setNote]=useState("");
+  const [values,setValues]=useState({});
+  const [selectedMarker,setSelectedMarker]=useState("testosterone_total");
+
+  const saveEntry=()=>{
+    const entry={id:Date.now(),date,note,values:{...values}};
+    const updated=[...entries,entry].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    setEntries(updated);
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(updated));
+    setShowForm(false);setValues({});setNote("");setDate(new Date().toISOString().split("T")[0]);
+  };
+
+  const deleteEntry=(id)=>{
+    const updated=entries.filter(e=>e.id!==id);
+    setEntries(updated);
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(updated));
+  };
+
+  const marker=MARKERS.find(m=>m.id===selectedMarker);
+  const markerHistory=entries.map(e=>({date:e.date,val:parseFloat(e.values[selectedMarker])||null})).filter(e=>e.val!==null);
+
+  const statusColor=(val,m)=>{
+    if(!val||!m)return C.gray;
+    if(val<m.warn_low||val>m.warn_high)return"#dc2626";
+    if(val<m.normal[0]||val>m.normal[1])return"#d97706";
+    return"#16a34a";
+  };
+
+  if(!isPro)return(
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+      <div style={{maxWidth:720,margin:"0 auto",padding:isMob?"60px 16px":"80px 32px",textAlign:"center"}}>
+        <span style={{fontSize:52,display:"block",marginBottom:20}}>🩸</span>
+        <h2 style={{fontSize:isMob?24:36,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>Bloodwork History</h2>
+        <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Track 16 biomarkers over time. See how your testosterone, liver enzymes, lipids, and hematocrit evolve as you change your stack.</p>
+        <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"32px",marginBottom:32,textAlign:"left",maxWidth:500,margin:"0 auto 32px"}}>
+          {[["📈","Longitudinal tracking","Enter labs every 3 months, see every trend over time"],["16","Biomarkers","Testosterone, LH, FSH, E2, SHBG, IGF-1, ALT, AST, HDL, LDL, hematocrit, and more"],["🟡","Normal range overlay","Each value color-coded against clinical reference ranges"],["🔗","Stack correlation","Add notes to each entry to correlate with stack changes"]].map(([icon,title,desc])=>(
+            <div key={title} style={{display:"flex",gap:14,marginBottom:20}}>
+              <span style={{fontSize:20,flexShrink:0,fontWeight:900}}>{icon}</span>
+              <div><p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{title}</p><p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{desc}</p></div>
+            </div>
+          ))}
+        </div>
+        <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/month</button>
+      </div>
+    </div>
+  );
+
+  return(
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+      <div style={{maxWidth:900,margin:"0 auto",padding:isMob?"32px 16px 80px":"56px 32px 100px"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:16,marginBottom:28}}>
+          <div>
+            <h1 style={{fontSize:isMob?28:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 6px"}}>Bloodwork History</h1>
+            <p style={{fontSize:14,color:C.gray,margin:0}}>Track your biomarkers over time. {entries.length} entr{entries.length===1?"y":"ies"} logged.</p>
+          </div>
+          <button onClick={()=>setShowForm(true)} style={{padding:"12px 22px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>+ Log Blood Work</button>
+        </div>
+
+        {/* Log form */}
+        {showForm&&(
+          <div style={{background:C.white,border:`2px solid ${C.ink}`,padding:isMob?"20px":"28px 32px",marginBottom:28}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+              <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:0}}>New Entry</p>
+              <button onClick={()=>setShowForm(false)} style={{background:"none",border:"none",fontSize:18,cursor:"pointer",color:C.gray}}>x</button>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 2fr",gap:12,marginBottom:16}}>
+              <div>
+                <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 6px",letterSpacing:".08em",textTransform:"uppercase"}}>Date</p>
+                <input type="date" value={date} onChange={e=>setDate(e.target.value)}
+                  style={{width:"100%",padding:"10px 12px",border:`1px solid ${C.border}`,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"}}/>
+              </div>
+              <div>
+                <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 6px",letterSpacing:".08em",textTransform:"uppercase"}}>Stack note (optional)</p>
+                <input value={note} onChange={e=>setNote(e.target.value)} placeholder="e.g. Week 8 of Test E 250mg/week + Ashwagandha"
+                  style={{width:"100%",padding:"10px 12px",border:`1px solid ${C.border}`,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"}}/>
+              </div>
+            </div>
+            <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 12px",letterSpacing:".08em",textTransform:"uppercase"}}>Biomarker Values (leave blank if not tested)</p>
+            <div style={{display:"grid",gridTemplateColumns:isMob?"1fr 1fr":"repeat(4,1fr)",gap:10,marginBottom:20}}>
+              {MARKERS.map(m=>(
+                <div key={m.id}>
+                  <p style={{fontSize:10,fontWeight:700,color:C.gray,margin:"0 0 4px",lineHeight:1.2}}>{m.label}<br/><span style={{fontWeight:400,opacity:.7}}>{m.unit}</span></p>
+                  <input type="number" value={values[m.id]||""} onChange={e=>setValues(v=>({...v,[m.id]:e.target.value}))}
+                    placeholder="-" style={{width:"100%",padding:"8px 10px",border:`1px solid ${statusColor(parseFloat(values[m.id]),m)}`,fontSize:12,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box",color:statusColor(parseFloat(values[m.id]),m),fontWeight:values[m.id]?700:400}}/>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:10}}>
+              <button onClick={saveEntry} style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Save Entry</button>
+              <button onClick={()=>setShowForm(false)} style={{padding:"11px 20px",background:"transparent",border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Cancel</button>
+            </div>
+          </div>
+        )}
+
+        {entries.length===0&&!showForm&&(
+          <div style={{textAlign:"center",padding:"60px 20px",color:C.gray}}>
+            <p style={{fontSize:48,margin:"0 0 12px"}}>🩸</p>
+            <p style={{fontSize:15,fontWeight:700,color:C.ink,margin:"0 0 6px"}}>No entries yet</p>
+            <p style={{fontSize:13,margin:"0 0 20px"}}>Log your first blood work to start tracking trends.</p>
+            <button onClick={()=>setShowForm(true)} style={{padding:"11px 24px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Log Blood Work</button>
+          </div>
+        )}
+
+        {entries.length>0&&(
+          <>
+            {/* Marker selector + trend */}
+            <div style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"16px":"24px 28px",marginBottom:20}}>
+              <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:16,flexWrap:"wrap"}}>
+                <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:0,letterSpacing:".08em",textTransform:"uppercase",flexShrink:0}}>Trend:</p>
+                <select value={selectedMarker} onChange={e=>setSelectedMarker(e.target.value)}
+                  style={{padding:"8px 12px",border:`1px solid ${C.border}`,fontSize:12,fontFamily:"Montserrat,sans-serif",outline:"none",background:C.white,color:C.ink,fontWeight:700}}>
+                  {MARKERS.map(m=><option key={m.id} value={m.id}>{m.label}</option>)}
+                </select>
+              </div>
+              {markerHistory.length>=2?(
+                <div style={{position:"relative",height:100,marginBottom:8}}>
+                  {(()=>{
+                    const vals=markerHistory.map(e=>e.val);
+                    const min=Math.min(...vals,marker.normal[0]*0.8);
+                    const max=Math.max(...vals,marker.normal[1]*1.1);
+                    const range=max-min||1;
+                    const W=100;const H=100;
+                    const pts=markerHistory.map((e,i)=>{
+                      const x=(i/(markerHistory.length-1))*W;
+                      const y=H-((e.val-min)/range)*H;
+                      return `${x},${y}`;
+                    }).join(" ");
+                    const normalTop=H-((marker.normal[1]-min)/range)*H;
+                    const normalBottom=H-((marker.normal[0]-min)/range)*H;
+                    return(
+                      <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",height:100,overflow:"visible"}}>
+                        <rect x="0" y={normalTop} width={W} height={normalBottom-normalTop} fill="#16a34a" opacity=".08"/>
+                        <polyline points={pts} fill="none" stroke={statusColor(vals[vals.length-1],marker)} strokeWidth="1.5"/>
+                        {markerHistory.map((e,i)=>{
+                          const x=(i/(markerHistory.length-1))*W;
+                          const y=H-((e.val-min)/range)*H;
+                          return <circle key={i} cx={x} cy={y} r="2.5" fill={statusColor(e.val,marker)}/>;
+                        })}
+                      </svg>
+                    );
+                  })()}
+                </div>
+              ):(
+                <p style={{fontSize:12,color:C.gray,margin:0}}>Log at least 2 entries to see a trend chart.</p>
+              )}
+              {markerHistory.length>0&&(
+                <div style={{display:"flex",gap:20,flexWrap:"wrap"}}>
+                  {markerHistory.slice(-3).map((e,i)=>(
+                    <div key={i}>
+                      <p style={{fontSize:10,color:C.gray,margin:"0 0 2px"}}>{e.date}</p>
+                      <p style={{fontSize:15,fontWeight:900,color:statusColor(e.val,marker),margin:0}}>{e.val} <span style={{fontSize:10,fontWeight:400,color:C.gray}}>{marker?.unit}</span></p>
+                    </div>
+                  ))}
+                  <div style={{marginLeft:"auto",textAlign:"right"}}>
+                    <p style={{fontSize:10,color:C.gray,margin:"0 0 2px"}}>Normal range</p>
+                    <p style={{fontSize:12,fontWeight:700,color:"#16a34a",margin:0}}>{marker?.normal[0]} - {marker?.normal[1]} {marker?.unit}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Entries list */}
+            <p style={{fontSize:10,fontWeight:800,color:C.gray,letterSpacing:".14em",margin:"0 0 12px",textTransform:"uppercase"}}>All Entries</p>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {[...entries].reverse().map(e=>{
+                const flagged=MARKERS.filter(m=>{const v=parseFloat(e.values[m.id]);return v&&(v<m.warn_low||v>m.warn_high);});
+                const warned=MARKERS.filter(m=>{const v=parseFloat(e.values[m.id]);return v&&(v<m.normal[0]||v>m.normal[1])&&!(v<m.warn_low||v>m.warn_high);});
+                return(
+                  <div key={e.id} style={{background:C.white,border:`1px solid ${C.border}`,padding:"14px 18px",display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap"}}>
+                    <div style={{flex:1}}>
+                      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:4,flexWrap:"wrap"}}>
+                        <p style={{fontSize:14,fontWeight:800,color:C.ink,margin:0}}>{e.date}</p>
+                        {flagged.length>0&&<span style={{fontSize:10,fontWeight:800,color:"#dc2626",background:"#fef2f2",padding:"2px 8px",borderRadius:2}}>{flagged.length} FLAG{flagged.length>1?"S":""}</span>}
+                        {warned.length>0&&flagged.length===0&&<span style={{fontSize:10,fontWeight:800,color:"#d97706",background:"#fff7ed",padding:"2px 8px",borderRadius:2}}>{warned.length} CAUTION</span>}
+                        {flagged.length===0&&warned.length===0&&Object.keys(e.values).length>0&&<span style={{fontSize:10,fontWeight:800,color:"#16a34a",background:"#f0fdf4",padding:"2px 8px",borderRadius:2}}>ALL NORMAL</span>}
+                      </div>
+                      {e.note&&<p style={{fontSize:12,color:C.gray,margin:"0 0 8px"}}>{e.note}</p>}
+                      <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                        {MARKERS.filter(m=>e.values[m.id]).map(m=>{
+                          const v=parseFloat(e.values[m.id]);
+                          return(<span key={m.id} style={{fontSize:11,color:statusColor(v,m),fontWeight:700}}>{m.label}: {v}</span>);
+                        })}
+                      </div>
+                    </div>
+                    <button onClick={()=>deleteEntry(e.id)} style={{background:"none",border:"none",fontSize:16,cursor:"pointer",color:C.gray,flexShrink:0}}>🗑</button>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function PricingPage({onUpgrade,onAuth}){
   const {user,isPro}=useAuth();
   const isMob=useIsMobile();
@@ -3754,6 +4339,9 @@ function PricingPage({onUpgrade,onAuth}){
     {feature:"AI Compound Advisor",free:"1 free query",pro:"Unlimited",highlight:true},
     {feature:"Conversation memory",free:false,pro:true},
     {feature:"Synergy and protocol suggestions",free:false,pro:true},
+    {feature:"Interaction Checker",free:false,pro:true,highlight:true},
+    {feature:"Stack Audit AI",free:false,pro:true},
+    {feature:"Bloodwork History",free:false,pro:true},
     {feature:"AI Bloodwork Analyzer",free:false,pro:true},
     {feature:"My Tracker",free:false,pro:true},
     {feature:"Compare compounds",free:false,pro:true},
@@ -3806,7 +4394,7 @@ function PricingPage({onUpgrade,onAuth}){
           <p style={{fontSize:12,color:C.green,fontWeight:700,margin:"0 0 4px"}}>Or $79/year - save 34%</p>
           <p style={{fontSize:13,color:C.gray,margin:"0 0 24px"}}>Full access. Cancel in one click.</p>
           <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:28}}>
-            {[`All ${count}+ compounds (Tier 1-4)`,"Peptides, GLP-1s, SARMs, nootropics","AI Compound Advisor - unlimited queries","Conversation memory and follow-ups","AI Bloodwork Analyzer","My Tracker","Compare compounds","Save your stacks"].map(f=>(
+            {[`All ${count}+ compounds (Tier 1-4)`,"Peptides, GLP-1s, SARMs, nootropics","AI Compound Advisor - unlimited queries","Interaction Checker - full safety analysis","Stack Audit AI - score and optimize your stack","Bloodwork History - track 16 biomarkers over time","AI Bloodwork Analyzer","My Tracker","Compare compounds","Save your stacks"].map(f=>(
               <div key={f} style={{display:"flex",gap:10,alignItems:"center"}}>
                 <span style={{color:C.gold,fontWeight:900,fontSize:14}}>✓</span>
                 <span style={{fontSize:13,color:C.ink,fontWeight:600}}>{f}</span>

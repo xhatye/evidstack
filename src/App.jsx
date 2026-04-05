@@ -259,7 +259,7 @@ function ProfileSetupModal({onClose}){
           <div style={{marginBottom:24}}>
             <p style={{fontSize:10,fontWeight:700,color:C.gray,margin:"0 0 6px",letterSpacing:".08em",textTransform:"uppercase"}}>Biological sex</p>
             <div style={{display:"flex",border:`1px solid ${C.border}`,background:C.bg}}>
-              {["Male","Female","Other"].map(s=>(
+              {["Male","Female"].map(s=>(
                 <button key={s} style={sexBtn(sex===s)} onClick={()=>setSex(s)}>{s}</button>
               ))}
             </div>
@@ -2363,7 +2363,7 @@ function ProfileTab(){
       <div style={{marginBottom:18}}>
         <p style={{fontSize:10,fontWeight:700,color:C.gray,margin:"0 0 5px",letterSpacing:".06em",textTransform:"uppercase"}}>Biological sex</p>
         <div style={{display:"flex",border:`1px solid ${C.border}`,background:C.bg}}>
-          {["Male","Female","Other"].map(s=><button key={s} style={sBtn(sex===s)} onClick={()=>setSex(s)}>{s}</button>)}
+          {["Male","Female"].map(s=><button key={s} style={sBtn(sex===s)} onClick={()=>setSex(s)}>{s}</button>)}
         </div>
       </div>
 

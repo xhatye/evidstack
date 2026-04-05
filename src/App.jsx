@@ -170,15 +170,124 @@ function OnboardingModal({onClose}){
   );
 }
 
+// ── PROFILE SETUP MODAL ───────────────────────────────────────────────────────
+function ProfileSetupModal({onClose}){
+  const {saveProfile}=useAuth();
+  const isMob=useIsMobile();
+  const [age,setAge]=useState("");
+  const [weight,setWeight]=useState("");
+  const [weightUnit,setWeightUnit]=useState("kg");
+  const [height,setHeight]=useState("");
+  const [heightUnit,setHeightUnit]=useState("cm");
+  const [sex,setSex]=useState("");
+  const [saving,setSaving]=useState(false);
+
+  const save=async()=>{
+    setSaving(true);
+    const weightKg=weightUnit==="lbs"?Math.round(parseFloat(weight)*0.453592):parseFloat(weight);
+    const heightCm=heightUnit==="ft"?Math.round(parseFloat(height)*30.48):parseFloat(height);
+    await saveProfile({
+      age:parseInt(age)||null,
+      weightKg:isNaN(weightKg)?null:weightKg,
+      heightCm:isNaN(heightCm)?null:heightCm,
+      sex:sex||null,
+      updatedAt:Date.now(),
+    });
+    onClose();
+  };
+
+  const canSave=age&&weight&&height&&sex;
+
+  const iS={
+    width:"100%",padding:"10px 12px",border:`1px solid ${C.border}`,
+    fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",
+    background:C.white,color:C.ink,boxSizing:"border-box",
+  };
+  const unitBtn=(active)=>({
+    padding:"4px 10px",background:active?C.ink:"transparent",
+    color:active?C.white:C.gray,border:"none",cursor:"pointer",
+    fontSize:11,fontWeight:700,fontFamily:"Montserrat,sans-serif",transition:"all .15s",
+  });
+  const sexBtn=(active)=>({
+    flex:1,padding:"10px 8px",background:active?C.ink:"transparent",
+    color:active?C.white:C.gray,border:"none",cursor:"pointer",
+    fontSize:12,fontWeight:700,fontFamily:"Montserrat,sans-serif",transition:"all .15s",
+  });
+
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:1010,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+      <div style={{background:C.white,width:"100%",maxWidth:400,position:"relative",fontFamily:"Montserrat,sans-serif"}}>
+        {/* Header */}
+        <div style={{background:C.ink,padding:"24px 28px 20px"}}>
+          <p style={{fontSize:9,fontWeight:800,letterSpacing:".18em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>Profile Calibration</p>
+          <h2 style={{fontSize:20,fontWeight:900,color:C.white,margin:"0 0 6px",letterSpacing:"-.03em"}}>One last step.</h2>
+          <p style={{fontSize:12,color:"#9ca3af",margin:0,lineHeight:1.6}}>4 quick fields. Used to calibrate compound dosages to your body: weight-based dosing, age-adjusted metabolism, and sex-specific hormone profiles.</p>
+        </div>
+
+        <div style={{padding:"24px 28px"}}>
+          {/* Age */}
+          <div style={{marginBottom:14}}>
+            <p style={{fontSize:10,fontWeight:700,color:C.gray,margin:"0 0 6px",letterSpacing:".08em",textTransform:"uppercase"}}>Age</p>
+            <input value={age} onChange={e=>setAge(e.target.value)} type="number" min="13" max="99" placeholder="e.g. 28" style={iS}/>
+          </div>
+
+          {/* Weight */}
+          <div style={{marginBottom:14}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+              <p style={{fontSize:10,fontWeight:700,color:C.gray,margin:0,letterSpacing:".08em",textTransform:"uppercase"}}>Weight</p>
+              <div style={{display:"flex",border:`1px solid ${C.border}`,background:C.bg}}>
+                <button style={unitBtn(weightUnit==="kg")} onClick={()=>setWeightUnit("kg")}>kg</button>
+                <button style={unitBtn(weightUnit==="lbs")} onClick={()=>setWeightUnit("lbs")}>lbs</button>
+              </div>
+            </div>
+            <input value={weight} onChange={e=>setWeight(e.target.value)} type="number" min="30" placeholder={weightUnit==="kg"?"e.g. 80":"e.g. 176"} style={iS}/>
+          </div>
+
+          {/* Height */}
+          <div style={{marginBottom:14}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+              <p style={{fontSize:10,fontWeight:700,color:C.gray,margin:0,letterSpacing:".08em",textTransform:"uppercase"}}>Height</p>
+              <div style={{display:"flex",border:`1px solid ${C.border}`,background:C.bg}}>
+                <button style={unitBtn(heightUnit==="cm")} onClick={()=>setHeightUnit("cm")}>cm</button>
+                <button style={unitBtn(heightUnit==="ft")} onClick={()=>setHeightUnit("ft")}>ft</button>
+              </div>
+            </div>
+            <input value={height} onChange={e=>setHeight(e.target.value)} type="number" min="100" placeholder={heightUnit==="cm"?"e.g. 178":"e.g. 5.9"} style={iS}/>
+          </div>
+
+          {/* Sex */}
+          <div style={{marginBottom:24}}>
+            <p style={{fontSize:10,fontWeight:700,color:C.gray,margin:"0 0 6px",letterSpacing:".08em",textTransform:"uppercase"}}>Biological sex</p>
+            <div style={{display:"flex",border:`1px solid ${C.border}`,background:C.bg}}>
+              {["Male","Female","Other"].map(s=>(
+                <button key={s} style={sexBtn(sex===s)} onClick={()=>setSex(s)}>{s}</button>
+              ))}
+            </div>
+          </div>
+
+          <button onClick={save} disabled={!canSave||saving}
+            style={{width:"100%",padding:"13px",background:canSave?C.gold:C.border,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:canSave?"pointer":"default",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",marginBottom:10}}>
+            {saving?"Saving...":"Save and continue"}
+          </button>
+          <button onClick={onClose} style={{width:"100%",padding:"10px",background:"transparent",border:"none",fontSize:12,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
+            Skip for now
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AuthModal({onClose,initialMode="login"}){
   const {loginEmail,signupEmail,loginGoogle,resetPassword}=useAuth();
-  const [mode,setMode]=useState(initialMode); // login | signup | forgot
+  const [mode,setMode]=useState(initialMode); // login | signup | forgot | profile
   const [email,setEmail]=useState("");
   const [pw,setPw]=useState("");
   const [pw2,setPw2]=useState("");
   const [error,setError]=useState("");
   const [info,setInfo]=useState("");
   const [loading,setLoading]=useState(false);
+  const [showProfile,setShowProfile]=useState(false);
 
   const switchMode=(m)=>{setMode(m);setError("");setInfo("");setPw("");setPw2("");};
 
@@ -188,9 +297,8 @@ function AuthModal({onClose,initialMode="login"}){
     if(mode==="signup"&&pw.length<6){setError("Password must be at least 6 characters.");return;}
     setLoading(true);
     try{
-      if(mode==="login")await loginEmail(email,pw);
-      else if(mode==="signup")await signupEmail(email,pw);
-      onClose();
+      if(mode==="login"){await loginEmail(email,pw);onClose();}
+      else if(mode==="signup"){await signupEmail(email,pw);setShowProfile(true);}
     }catch(e){
       setError(e.code==="auth/invalid-credential"?"Incorrect email or password.":
                e.code==="auth/email-already-in-use"?"This email is already registered.":
@@ -213,9 +321,16 @@ function AuthModal({onClose,initialMode="login"}){
 
   const google=async()=>{
     setError("");setLoading(true);
-    try{await loginGoogle();onClose();}
+    try{
+      await loginGoogle();
+      // For Google sign-in we don't know if it's new - show profile modal
+      setShowProfile(true);
+    }
     catch(e){setError("Google sign-in failed.");setLoading(false);}
   };
+
+  // Show profile setup after signup
+  if(showProfile) return <ProfileSetupModal onClose={onClose}/>;
 
   const inputStyle={width:"100%",padding:"11px 14px",border:`1px solid ${C.border}`,marginBottom:10,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"};
 
@@ -2178,10 +2293,93 @@ function ProtocolsPage({onGoToSupplements}){
 }
 
 /* ACCOUNT CENTER */
+// ── PROFILE TAB (inside AccountCenter) ────────────────────────────────────────
+function ProfileTab(){
+  const {userProfile,saveProfile}=useAuth();
+  const [age,setAge]=useState(String(userProfile?.age||""));
+  const [weightKg,setWeightKg]=useState(String(userProfile?.weightKg||""));
+  const [heightCm,setHeightCm]=useState(String(userProfile?.heightCm||""));
+  const [sex,setSex]=useState(userProfile?.sex||"");
+  const [weightUnit,setWeightUnit]=useState("kg");
+  const [heightUnit,setHeightUnit]=useState("cm");
+  const [saving,setSaving]=useState(false);
+  const [saved,setSaved]=useState(false);
+
+  const displayWeight=weightUnit==="lbs"&&weightKg?Math.round(parseFloat(weightKg)*2.20462):weightKg;
+  const displayHeight=heightUnit==="ft"&&heightCm?+(parseFloat(heightCm)/30.48).toFixed(1):heightCm;
+
+  const handleSave=async()=>{
+    setSaving(true);
+    const wKg=weightUnit==="lbs"?Math.round(parseFloat(displayWeight)*0.453592):parseFloat(weightKg);
+    const hCm=heightUnit==="ft"?Math.round(parseFloat(displayHeight)*30.48):parseFloat(heightCm);
+    await saveProfile({age:parseInt(age)||null,weightKg:isNaN(wKg)?null:wKg,heightCm:isNaN(hCm)?null:hCm,sex:sex||null,updatedAt:Date.now()});
+    setSaving(false);setSaved(true);setTimeout(()=>setSaved(false),2000);
+  };
+
+  const iS={width:"100%",padding:"10px 12px",border:`1px solid ${C.border}`,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",background:C.white,color:C.ink,boxSizing:"border-box",marginBottom:12};
+  const uBtn=(active)=>({padding:"4px 10px",background:active?C.ink:"transparent",color:active?C.white:C.gray,border:"none",cursor:"pointer",fontSize:11,fontWeight:700,fontFamily:"Montserrat,sans-serif"});
+  const sBtn=(active)=>({flex:1,padding:"9px 6px",background:active?C.ink:"transparent",color:active?C.white:C.gray,border:"none",cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"Montserrat,sans-serif"});
+
+  return(
+    <div>
+      <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 6px",textTransform:"uppercase"}}>Body Profile</p>
+      <p style={{fontSize:12,color:C.gray,margin:"0 0 18px",lineHeight:1.6}}>Used to calibrate compound dosages, adjust AI recommendations to your weight, and apply sex-specific hormone reference ranges.</p>
+
+      <div style={{marginBottom:12}}>
+        <p style={{fontSize:10,fontWeight:700,color:C.gray,margin:"0 0 5px",letterSpacing:".06em",textTransform:"uppercase"}}>Age</p>
+        <input value={age} onChange={e=>setAge(e.target.value)} type="number" min="13" max="99" placeholder="e.g. 28" style={iS}/>
+      </div>
+
+      <div style={{marginBottom:12}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+          <p style={{fontSize:10,fontWeight:700,color:C.gray,margin:0,letterSpacing:".06em",textTransform:"uppercase"}}>Weight</p>
+          <div style={{display:"flex",border:`1px solid ${C.border}`,background:C.bg}}>
+            <button style={uBtn(weightUnit==="kg")} onClick={()=>setWeightUnit("kg")}>kg</button>
+            <button style={uBtn(weightUnit==="lbs")} onClick={()=>setWeightUnit("lbs")}>lbs</button>
+          </div>
+        </div>
+        <input value={displayWeight} onChange={e=>{
+          const v=e.target.value;
+          if(weightUnit==="lbs"){setWeightKg(String(Math.round(parseFloat(v)*0.453592)));}
+          else setWeightKg(v);
+        }} type="number" placeholder={weightUnit==="kg"?"e.g. 80":"e.g. 176"} style={iS}/>
+      </div>
+
+      <div style={{marginBottom:12}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+          <p style={{fontSize:10,fontWeight:700,color:C.gray,margin:0,letterSpacing:".06em",textTransform:"uppercase"}}>Height</p>
+          <div style={{display:"flex",border:`1px solid ${C.border}`,background:C.bg}}>
+            <button style={uBtn(heightUnit==="cm")} onClick={()=>setHeightUnit("cm")}>cm</button>
+            <button style={uBtn(heightUnit==="ft")} onClick={()=>setHeightUnit("ft")}>ft</button>
+          </div>
+        </div>
+        <input value={displayHeight} onChange={e=>{
+          const v=e.target.value;
+          if(heightUnit==="ft"){setHeightCm(String(Math.round(parseFloat(v)*30.48)));}
+          else setHeightCm(v);
+        }} type="number" placeholder={heightUnit==="cm"?"e.g. 178":"e.g. 5.9"} style={iS}/>
+      </div>
+
+      <div style={{marginBottom:18}}>
+        <p style={{fontSize:10,fontWeight:700,color:C.gray,margin:"0 0 5px",letterSpacing:".06em",textTransform:"uppercase"}}>Biological sex</p>
+        <div style={{display:"flex",border:`1px solid ${C.border}`,background:C.bg}}>
+          {["Male","Female","Other"].map(s=><button key={s} style={sBtn(sex===s)} onClick={()=>setSex(s)}>{s}</button>)}
+        </div>
+      </div>
+
+      {saved&&<p style={{fontSize:12,color:C.green,fontWeight:700,margin:"0 0 10px"}}>Profile saved.</p>}
+      <button onClick={handleSave} disabled={saving}
+        style={{width:"100%",padding:"11px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+        {saving?"Saving...":"Save profile"}
+      </button>
+    </div>
+  );
+}
+
 function AccountCenter({onClose,onUpgrade}){
-  const {user,isPro,logout,changePassword}=useAuth();
+  const {user,isPro,logout,changePassword,userProfile,saveProfile}=useAuth();
   const isMob=useIsMobile();
-  const [tab,setTab]=useState("overview"); // overview | security
+  const [tab,setTab]=useState("overview"); // overview | billing | security | profile
   const [oldPw,setOldPw]=useState("");
   const [newPw,setNewPw]=useState("");
   const [newPw2,setNewPw2]=useState("");
@@ -2205,7 +2403,7 @@ function AccountCenter({onClose,onUpgrade}){
   };
 
   const inputStyle={width:"100%",padding:"10px 12px",border:`1px solid ${C.border}`,marginBottom:8,fontSize:12,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"};
-  const tabs=[{id:"overview",label:"Overview"},{id:"billing",label:"Billing"},{id:"security",label:"Security"}];
+  const tabs=[{id:"overview",label:"Overview"},{id:"billing",label:"Billing"},{id:"security",label:"Security"},{id:"profile",label:"My Profile"}];
 
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
@@ -2387,6 +2585,8 @@ function AccountCenter({onClose,onUpgrade}){
               </div>
             </div>
           )}
+
+          {tab==="profile"&&<ProfileTab/>}
         </div>
       </div>
     </div>

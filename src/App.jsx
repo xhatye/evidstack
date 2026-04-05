@@ -4021,6 +4021,31 @@ function InteractionCheckerPro({onUpgrade}){
           ))}
         </div>
         <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/month</button>
+        <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all tools.</p>
+        <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example - Interaction report</p>
+          <div style={{border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,background:C.white}}>
+            <div style={{padding:"12px 18px",borderBottom:`1px solid ${C.border}`,background:"#16a34a",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span style={{fontSize:12,fontWeight:800,color:C.white}}>SAFE - Safe to stack</span>
+              <span style={{fontSize:20}}>✅</span>
+            </div>
+            {[{pair:"Creatine + Beta-Alanine",sev:"positive",sevColor:"#16a34a",sevBg:"#f0fdf4",desc:"Synergistic: both enhance ATP resynthesis and buffer lactic acid. Stack freely."},
+              {pair:"Zinc + Iron",sev:"moderate",sevColor:"#d97706",sevBg:"#fff7ed",desc:"Absorption competition at shared intestinal transporter. Separate by minimum 2 hours."},
+              {pair:"Caffeine + L-Theanine",sev:"positive",sevColor:"#16a34a",sevBg:"#f0fdf4",desc:"Classic synergy - theanine blunts caffeine jitteriness while preserving focus enhancement."},
+            ].map(r=>(
+              <div key={r.pair} style={{padding:"11px 18px",borderBottom:`1px solid ${C.border}`,borderLeft:`4px solid ${r.sevColor}`,background:r.sevBg}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:3,flexWrap:"wrap",gap:4}}>
+                  <span style={{fontSize:12,fontWeight:800,color:C.ink}}>{r.pair}</span>
+                  <span style={{fontSize:10,fontWeight:800,color:r.sevColor,textTransform:"uppercase"}}>{r.sev}</span>
+                </div>
+                <p style={{fontSize:11,color:"#374151",margin:0,lineHeight:1.4}}>{r.desc}</p>
+              </div>
+            ))}
+            <div style={{padding:"10px 18px",background:"#1f2937",textAlign:"center"}}>
+              <p style={{fontSize:11,color:"#6b7280",margin:0,fontStyle:"italic"}}>Unlock Pro to analyze your full stack</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -4163,6 +4188,43 @@ function StackAuditScreen({onUpgrade}){
           ))}
         </div>
         <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/month</button>
+        <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all tools.</p>
+        <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example - Stack audit</p>
+          <div style={{border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,background:C.white}}>
+            <div style={{padding:"16px 18px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:16,background:C.ink}}>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontSize:36,fontWeight:900,color:"#22c55e",lineHeight:1}}>B</div>
+                <div style={{fontSize:9,color:"#6b7280",fontWeight:700,letterSpacing:".08em"}}>GRADE</div>
+              </div>
+              <div>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+                  <span style={{fontSize:22,fontWeight:900,color:C.white}}>74</span>
+                  <span style={{fontSize:11,color:"#9ca3af"}}>/100 Stack Score</span>
+                </div>
+                <p style={{fontSize:11,color:"#9ca3af",margin:0}}>Solid foundation. 2 redundancies found, 1 critical gap for stated goals.</p>
+              </div>
+            </div>
+            {[{name:"Creatine",verdict:"KEEP",score:95,color:"#16a34a",reason:"Best-evidenced performance compound. Dose correct."},
+              {name:"Magnesium Oxide",verdict:"REPLACE",score:40,color:"#d97706",reason:"Poor bioavailability (~4%). Switch to bisglycinate or malate."},
+              {name:"Vitamin C + Zinc",verdict:"OPTIMIZE",score:65,color:"#ca8a04",reason:"Timing conflict - high-dose vitamin C reduces zinc absorption. Separate by 2h."},
+            ].map(r=>(
+              <div key={r.name} style={{padding:"10px 18px",borderBottom:`1px solid ${C.border}`,borderLeft:`4px solid ${r.color}`,display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
+                <div>
+                  <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:2}}>
+                    <span style={{fontSize:12,fontWeight:800,color:C.ink}}>{r.name}</span>
+                    <span style={{fontSize:9,fontWeight:800,color:r.color,padding:"1px 5px",background:`${r.color}15`,borderRadius:2}}>{r.verdict}</span>
+                  </div>
+                  <p style={{fontSize:11,color:C.gray,margin:0}}>{r.reason}</p>
+                </div>
+                <span style={{fontSize:15,fontWeight:900,color:r.color,flexShrink:0}}>{r.score}</span>
+              </div>
+            ))}
+            <div style={{padding:"10px 18px",background:"#1f2937",textAlign:"center"}}>
+              <p style={{fontSize:11,color:"#6b7280",margin:0,fontStyle:"italic"}}>Unlock Pro to audit your stack</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -4373,6 +4435,48 @@ function BloodworkHistoryScreen({onUpgrade}){
           ))}
         </div>
         <button onClick={onUpgrade} style={{padding:"14px 32px",background:C.ink,color:C.white,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/month</button>
+        <p style={{fontSize:11,color:C.gray,marginTop:12}}>Cancel anytime. Full access to all tools.</p>
+        <div style={{maxWidth:520,margin:"32px auto 0",textAlign:"left"}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Example - Bloodwork history</p>
+          <div style={{border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,background:C.white}}>
+            <div style={{padding:"12px 18px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:C.ink}}>
+              <span style={{fontSize:12,color:"#9ca3af"}}>Testosterone Total (ng/dL)</span>
+              <span style={{fontSize:10,color:"#4ade80",fontWeight:700}}>TRENDING UP</span>
+            </div>
+            <div style={{padding:"14px 18px",borderBottom:`1px solid ${C.border}`}}>
+              <svg viewBox="0 0 200 60" style={{width:"100%",height:60}}>
+                <rect x="0" y="15" width="200" height="25" fill="#16a34a" opacity=".08"/>
+                <polyline points="10,42 50,35 90,28 130,20 170,16" fill="none" stroke="#16a34a" strokeWidth="2"/>
+                {[{cx:10,cy:42},{cx:50,cy:35},{cx:90,cy:28},{cx:130,cy:20},{cx:170,cy:16}].map((p,i)=>(
+                  <circle key={i} cx={p.cx} cy={p.cy} r="3" fill="#16a34a"/>
+                ))}
+                <text x="0" y="58" fontSize="7" fill="#6b7280">Jan</text>
+                <text x="40" y="58" fontSize="7" fill="#6b7280">Apr</text>
+                <text x="80" y="58" fontSize="7" fill="#6b7280">Jul</text>
+                <text x="120" y="58" fontSize="7" fill="#6b7280">Oct</text>
+                <text x="158" y="58" fontSize="7" fill="#6b7280">Jan</text>
+              </svg>
+            </div>
+            {[{date:"Jan 2024",val:"412",status:"CAUTION",color:"#d97706",note:"Below optimal range"},
+              {date:"Jul 2024",val:"578",status:"NORMAL",color:"#16a34a",note:"Within range"},
+              {date:"Jan 2025",val:"689",status:"OPTIMAL",color:"#16a34a",note:"Stack change: added Tongkat Ali"},
+            ].map(r=>(
+              <div key={r.date} style={{padding:"9px 18px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <span style={{fontSize:12,fontWeight:700,color:C.ink}}>{r.date}</span>
+                  <p style={{fontSize:10,color:C.gray,margin:0}}>{r.note}</p>
+                </div>
+                <div style={{textAlign:"right"}}>
+                  <div style={{fontSize:14,fontWeight:900,color:r.color}}>{r.val}</div>
+                  <div style={{fontSize:9,fontWeight:700,color:r.color}}>{r.status}</div>
+                </div>
+              </div>
+            ))}
+            <div style={{padding:"10px 18px",background:"#1f2937",textAlign:"center"}}>
+              <p style={{fontSize:11,color:"#6b7280",margin:0,fontStyle:"italic"}}>Unlock Pro to track your biomarkers over time</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

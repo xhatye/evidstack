@@ -89,8 +89,8 @@ function OnboardingModal({onClose}){
   const slides=[
     {
       icon:"🔬",
-      title:"204+ compounds, ranked by science",
-      desc:"Every supplement in our database is scored on two axes: how strong the effect is, and how solid the evidence is. No marketing, no guesswork.",
+      title:`${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds, ranked by science`,
+      desc:"Every supplement, steroid, peptide, SARM, and research compound in our database is scored on two axes: how strong the effect is, and how solid the evidence is. No marketing, no guesswork.",
       detail:"Browse by goal (Sleep, Testosterone, Focus, Weight Loss, Skin, and 14 more categories) or search directly.",
     },
     {
@@ -2105,7 +2105,7 @@ function AboutPage(){
         },
         {
           label:"What we cover",
-          body:"Evidstack covers 204 compounds across the full spectrum of evidence-based supplementation: foundational supplements like vitamin D, zinc, and omega-3; advanced nootropics and cognitive enhancers including racetams, cholinergics, and dopaminergic agents; peptides spanning healing compounds like BPC-157 and TB-500, GH secretagogues like Ipamorelin and CJC-1295, and skin and longevity peptides like GHK-Cu and Epithalon; GLP-1 receptor agonists and metabolic compounds including semaglutide and tirzepatide; hair retention and aesthetic compounds including finasteride, dutasteride, and minoxidil; SARMs and performance compounds with available human trial data; anti-aging interventions including rapamycin, metformin, and senolytic compounds; and adaptogenic and stress-response compounds. Each entry includes clinical dosing ranges, timing recommendations, known interactions, safety rating, legal status, and estimated monthly cost."
+          body:`Evidstack covers ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds across the full spectrum of evidence-based supplementation: foundational supplements like vitamin D, zinc, and omega-3; advanced nootropics and cognitive enhancers including racetams, cholinergics, and dopaminergic agents; peptides spanning healing compounds like BPC-157 and TB-500, GH secretagogues like Ipamorelin and CJC-1295, and skin and longevity peptides like GHK-Cu and Epithalon; the full growth hormone axis including recombinant HGH (Somatropin), once-weekly analogs (Somapacitan, Lonapegsomatropin), and oral secretagogues (Anamorelin, MK-677); GLP-1 receptor agonists and metabolic compounds including semaglutide and tirzepatide; hair retention and aesthetic compounds including finasteride, dutasteride, and minoxidil; the complete SARM landscape (RAD-140, LGD-4033, Ostarine, Andarine, YK-11, S-23, LGD-3303); anabolic androgenic steroids with full clinical documentation (testosterone, nandrolone, oxandrolone, stanozolol, trenbolone, boldenone, and 50+ others); beta-agonists (clenbuterol), aromatase inhibitors (exemestane, formestane), and progestins relevant to endocrinology and sports pharmacology; anti-aging interventions including rapamycin, metformin, and senolytic compounds; and adaptogenic and stress-response compounds. Each entry includes clinical dosing ranges, timing recommendations, known interactions, safety rating, legal status, and estimated monthly cost.`
         },
         {
           label:"What we are not",
@@ -2640,7 +2640,7 @@ function AppInner(){
           {/* Social proof */}
           <div style={{maxWidth:680,margin:"0 auto 16px",display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:1,background:C.border}}>
             {[
-              {val:"204+",label:"Compounds"},
+              {val:`${Math.floor(SUPPLEMENTS.length/10)*10}+`,label:"Compounds"},
               {val:"PubMed",label:"Primary source"},
               {val:"4 tiers",label:"Evidence levels"},
               {val:"Free",label:"No card needed"},
@@ -2893,7 +2893,7 @@ function CycleAlertsScreen({onUpgrade}){
       <h2 style={{fontSize:isMob?24:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>AI Cycle Alerts</h2>
       <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Never lose track of your compound cycles again. Precise on/off phase alerts for every compound in your stack.</p>
       <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"32px",marginBottom:32,textAlign:"left"}}>
-        {[["⏱️","Precise phase tracking","Exact day count for ON and OFF phases"],["🔔","Stop and restart dates","Know exactly when to stop and when to restart each compound"],["🔍","Autocomplete from 204 compounds","Search your stack directly from our database"],["♾️","Unlimited cycles","Track RAD-140, BPC-157, Ashwagandha, peptides, all at once"]].map(([icon,title,desc])=>(
+        {[["⏱️","Precise phase tracking","Exact day count for ON and OFF phases"],["🔔","Stop and restart dates","Know exactly when to stop and when to restart each compound"],["🔍",`Autocomplete from ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds`,"Search your stack directly from our database"],["♾️","Unlimited cycles","Track RAD-140, BPC-157, Ashwagandha, peptides, all at once"]].map(([icon,title,desc])=>(
           <div key={title} style={{display:"flex",gap:14,marginBottom:20}}>
             <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
             <div><p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{title}</p><p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{desc}</p></div>
@@ -3419,7 +3419,7 @@ function CompoundAdvisorScreen({onUpgrade}){
 
   const SCANNING_LINES=[
     "Parsing query intent...",
-    "Searching 204 compounds...",
+    `Searching ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds...`,
     "Cross-referencing PubMed meta-analyses...",
     "Scoring efficacy and evidence quality...",
     "Checking compound interactions...",

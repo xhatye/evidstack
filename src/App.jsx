@@ -3471,7 +3471,7 @@ function CycleAlertsScreen({onUpgrade}){
   );
 
   return(
-    <div style={Sp.page}>
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
         <div style={{background:"#6366f1",padding:"12px 0",marginBottom:0}}>
           <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18}}>🔄</span>
@@ -3479,7 +3479,7 @@ function CycleAlertsScreen({onUpgrade}){
             <span style={{marginLeft:"auto",fontSize:10,fontWeight:800,color:"rgba(0,0,0,.5)",background:"rgba(0,0,0,.08)",padding:"3px 8px",letterSpacing:".08em",borderRadius:2}}>PRO</span>
           </div>
         </div>
-<div style={Sp.inner}>
+<div style={{padding:isMob?"32px 16px 80px":"48px 24px 80px"}}><div style={Sp.inner}>
       <h1 style={Sp.h1}>AI Cycle Alerts</h1>
       <p style={Sp.sub}>Track your compound cycles. Get precise alerts for when to start, stop, and restart.</p>
 
@@ -3681,6 +3681,7 @@ function StackOptimizerScreen({onUpgrade}){
         {result.retestIn&&<p style={{fontSize:12,color:C.gray,textAlign:"center",marginTop:8}}>Suggested re-analysis in: {result.retestIn}</p>}
       </>)}
     </div></div>
+  </div>
   );
 }
 
@@ -3801,7 +3802,7 @@ function BloodWorkScreen({onUpgrade}){
   );
 
   return(
-    <div style={Sp.page}>
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
         <div style={{background:"#10b981",padding:"12px 0",marginBottom:0}}>
           <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18}}>🩸</span>
@@ -3809,7 +3810,7 @@ function BloodWorkScreen({onUpgrade}){
             <span style={{marginLeft:"auto",fontSize:10,fontWeight:800,color:"rgba(0,0,0,.5)",background:"rgba(0,0,0,.08)",padding:"3px 8px",letterSpacing:".08em",borderRadius:2}}>PRO</span>
           </div>
         </div>
-<div style={Sp.inner}>
+<div style={{padding:isMob?"32px 16px 80px":"48px 24px 80px"}}><div style={Sp.inner}>
       <h1 style={Sp.h1}>AI Bloodwork Analyzer</h1>
       <p style={Sp.sub}>Enter your blood test results and get supplement recommendations based on your actual biology.</p>
 
@@ -3949,6 +3950,7 @@ function BloodWorkScreen({onUpgrade}){
         <button style={{...Sp.btnOutline(false),marginTop:14}} onClick={()=>setView("input")}>Run new analysis</button>
       </>)}
     </div></div>
+  </div>
   );
 }
 

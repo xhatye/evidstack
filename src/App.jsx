@@ -1332,7 +1332,6 @@ function MyTracker({onUpgrade}){
       )}
     </div>
   </div>
-  </div>
   );
 }
 
@@ -3774,7 +3773,6 @@ function StackOptimizerScreen({onUpgrade}){
         {result.retestIn&&<p style={{fontSize:12,color:C.gray,textAlign:"center",marginTop:8}}>Suggested re-analysis in: {result.retestIn}</p>}
       </>)}
     </div></div>
-  </div>
   );
 }
 

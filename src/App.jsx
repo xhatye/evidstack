@@ -1257,6 +1257,7 @@ function MyTracker({onUpgrade}){
         </div>
       )}
     </div>
+  </div>
   );
 }
 

@@ -1,4 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
+import { db } from "./firebase.js";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 function useIsMobile(){ 
   const [m,setM]=useState(()=>typeof window!=="undefined"&&window.innerWidth<768);
@@ -26,9 +28,16 @@ const ROUTES = {
   "/bloodwork-history":"bloodwork-history",
 };
 
+function getShareIdFromPath(){
+  const path=window.location.pathname;
+  if(path.startsWith("/stack/"))return path.replace("/stack/","");
+  return null;
+}
+
 function getPageFromPath(){
   const path=window.location.pathname;
   if(path.startsWith("/compound/"))return "compound";
+  if(path.startsWith("/stack/"))return "shared-stack";
   return ROUTES[path]||"supplements";
 }
 function getCompoundIdFromPath(){
@@ -1940,6 +1949,7 @@ const GOAL_OPTIONS=[
 
 function StackBuilder({onUpgrade}){
   const {isPro,user:sbUser}=useAuth();
+  const user=sbUser; // alias for share button
   const isMob=useIsMobile();
   const [goals,setGoals]=useState([]);
   const [budget,setBudget]=useState(80);
@@ -2096,9 +2106,22 @@ function StackBuilder({onUpgrade}){
             <p style={{fontSize:9,fontWeight:800,color:C.gold,letterSpacing:".16em",margin:"0 0 8px",textTransform:"uppercase"}}>Your personalized stack</p>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8,marginBottom:8}}>
               <h3 style={{fontSize:28,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:0}}>{result.stack_name}</h3>
-              <button onClick={saveStack} style={{padding:"8px 16px",background:saveMsg?C.green:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",flexShrink:0,transition:"background .3s"}}>
-                {saveMsg||"Save stack"}
-              </button>
+              <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                <button onClick={saveStack} style={{padding:"8px 16px",background:saveMsg?C.green:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",flexShrink:0,transition:"background .3s"}}>
+                  {saveMsg||"Save stack"}
+                </button>
+                <button onClick={async()=>{
+                  try{
+                    const shareId=Math.random().toString(36).slice(2,10);
+                    await setDoc(doc(db,"shared_stacks",shareId),{...result,sharedAt:Date.now(),sharedBy:user?.uid||"anonymous"});
+                    const url=`${window.location.origin}/stack/${shareId}`;
+                    await navigator.clipboard.writeText(url);
+                    alert("Share link copied to clipboard!");
+                  }catch(e){alert("Could not create share link.");}
+                }} style={{padding:"8px 14px",background:"transparent",border:`1px solid ${C.border}`,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",color:C.gray,flexShrink:0}}>
+                  Share 🔗
+                </button>
+              </div>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:12}}>
               <span style={{fontSize:13,fontWeight:800,color:C.green}}>{result.total_cost}</span>
@@ -2594,10 +2617,232 @@ function AccountCenter({onClose,onUpgrade}){
 }
 
 /* ROOT */
+// ── GOAL QUIZ ─────────────────────────────────────────────────────────────────
+function GoalQuizSection({onNavigate,onAuth}){
+  const {user}=useAuth();
+  const isMob=useIsMobile();
+  const [step,setStep]=useState(0); // 0=hidden,1,2,3,result
+  const [goal,setGoal]=useState("");
+  const [experience,setExperience]=useState("");
+  const [budget,setBudget]=useState("");
+  const [visible,setVisible]=useState(false);
+
+  useEffect(()=>{
+    const seen=localStorage.getItem("evidstack_quiz_seen");
+    if(!seen){const t=setTimeout(()=>setVisible(true),3000);return()=>clearTimeout(t);}
+  },[]);
+
+  if(!visible||step===0)return(
+    <div style={{maxWidth:680,margin:"0 auto 24px",textAlign:"center"}}>
+      <button onClick={()=>setStep(1)} style={{padding:"10px 24px",background:"transparent",border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+        Not sure where to start? Take the 30-second quiz →
+      </button>
+    </div>
+  );
+
+  const GOALS_Q=[
+    {id:"strength",label:"Strength & Muscle",icon:"💪"},
+    {id:"sleep",label:"Sleep Quality",icon:"😴"},
+    {id:"focus",label:"Focus & Cognition",icon:"🧠"},
+    {id:"hormones",label:"Testosterone",icon:"🩸"},
+    {id:"weight",label:"Fat Loss",icon:"⚖️"},
+    {id:"longevity",label:"Longevity",icon:"❤️"},
+    {id:"recovery",label:"Recovery",icon:"🔁"},
+    {id:"energy",label:"Energy",icon:"⚡"},
+  ];
+  const EXP=[{id:"beginner",label:"Beginner",desc:"Just starting out"},{id:"intermediate",label:"Intermediate",desc:"Some experience"},{id:"advanced",label:"Advanced",desc:"Know my protocols"}];
+  const BUDGETS=[{id:"50",label:"Under $50/mo"},{id:"100",label:"$50-100/mo"},{id:"200",label:"$100-200/mo"},{id:"200+",label:"$200+/mo"}];
+
+  // Hardcoded quick recommendations per goal
+  const RECS={
+    strength:["Creatine Monohydrate","Leucine","Beta-Alanine","Vitamin D3","Zinc"],
+    sleep:["Magnesium Bisglycinate","L-Theanine","Melatonin","Ashwagandha","Glycine"],
+    focus:["L-Theanine","Caffeine","Bacopa Monnieri","Alpha-GPC","Rhodiola Rosea"],
+    hormones:["Zinc","Vitamin D3","Ashwagandha","Tongkat Ali","Fadogia Agrestis"],
+    weight:["Berberine","Caffeine","Green Tea Extract","Glucomannan","L-Carnitine"],
+    longevity:["NMN","Resveratrol","Quercetin","Alpha-Lipoic Acid","Vitamin D3"],
+    recovery:["Creatine Monohydrate","Tart Cherry","Magnesium Bisglycinate","Collagen","BPC-157"],
+    energy:["Creatine Monohydrate","Caffeine","L-Theanine","Rhodiola Rosea","CoQ10"],
+  };
+
+  const dismiss=()=>{setStep(0);setVisible(false);localStorage.setItem("evidstack_quiz_seen","1");};
+
+  const optBtn=(active)=>({
+    padding:isMob?"10px 12px":"12px 18px",border:`2px solid ${active?C.ink:C.border}`,
+    background:active?C.ink:C.white,color:active?C.white:C.ink,
+    cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"Montserrat,sans-serif",
+    transition:"all .15s",textAlign:"left",display:"flex",alignItems:"center",gap:8,
+  });
+
+  return(
+    <div style={{maxWidth:680,margin:"0 auto 32px"}}>
+      {step===1&&(
+        <div style={{background:C.white,border:`2px solid ${C.ink}`,padding:isMob?"20px":"28px 32px",position:"relative"}}>
+          <button onClick={dismiss} style={{position:"absolute",top:12,right:14,background:"none",border:"none",fontSize:16,cursor:"pointer",color:C.gray}}>x</button>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>30-second quiz</p>
+          <p style={{fontSize:isMob?16:18,fontWeight:900,color:C.ink,margin:"0 0 18px",letterSpacing:"-.02em"}}>What is your main goal?</p>
+          <div style={{display:"grid",gridTemplateColumns:isMob?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:8,marginBottom:20}}>
+            {GOALS_Q.map(g=>(
+              <button key={g.id} style={optBtn(goal===g.id)} onClick={()=>setGoal(g.id)}>
+                <span style={{fontSize:16}}>{g.icon}</span>
+                <span style={{fontSize:11}}>{g.label}</span>
+              </button>
+            ))}
+          </div>
+          <button onClick={()=>{if(goal)setStep(2);}} disabled={!goal}
+            style={{padding:"11px 28px",background:goal?C.gold:C.border,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:goal?"pointer":"default",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+            Next →
+          </button>
+        </div>
+      )}
+      {step===2&&(
+        <div style={{background:C.white,border:`2px solid ${C.ink}`,padding:isMob?"20px":"28px 32px",position:"relative"}}>
+          <button onClick={dismiss} style={{position:"absolute",top:12,right:14,background:"none",border:"none",fontSize:16,cursor:"pointer",color:C.gray}}>x</button>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>30-second quiz - 2/3</p>
+          <p style={{fontSize:isMob?16:18,fontWeight:900,color:C.ink,margin:"0 0 18px",letterSpacing:"-.02em"}}>Experience level?</p>
+          <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
+            {EXP.map(e=>(
+              <button key={e.id} style={{...optBtn(experience===e.id),flexDirection:"row",justifyContent:"space-between"}} onClick={()=>setExperience(e.id)}>
+                <span>{e.label}</span><span style={{fontSize:11,color:experience===e.id?C.white:C.gray,fontWeight:400}}>{e.desc}</span>
+              </button>
+            ))}
+          </div>
+          <div style={{display:"flex",gap:10}}>
+            <button onClick={()=>setStep(1)} style={{padding:"11px 20px",background:"transparent",border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>← Back</button>
+            <button onClick={()=>{if(experience)setStep(3);}} disabled={!experience}
+              style={{padding:"11px 28px",background:experience?C.gold:C.border,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:experience?"pointer":"default",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+              Next →
+            </button>
+          </div>
+        </div>
+      )}
+      {step===3&&(
+        <div style={{background:C.white,border:`2px solid ${C.ink}`,padding:isMob?"20px":"28px 32px",position:"relative"}}>
+          <button onClick={dismiss} style={{position:"absolute",top:12,right:14,background:"none",border:"none",fontSize:16,cursor:"pointer",color:C.gray}}>x</button>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>30-second quiz - 3/3</p>
+          <p style={{fontSize:isMob?16:18,fontWeight:900,color:C.ink,margin:"0 0 18px",letterSpacing:"-.02em"}}>Monthly supplement budget?</p>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:20}}>
+            {BUDGETS.map(b=>(
+              <button key={b.id} style={optBtn(budget===b.id)} onClick={()=>setBudget(b.id)}>{b.label}</button>
+            ))}
+          </div>
+          <div style={{display:"flex",gap:10}}>
+            <button onClick={()=>setStep(2)} style={{padding:"11px 20px",background:"transparent",border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>← Back</button>
+            <button onClick={()=>{if(budget)setStep(4);}} disabled={!budget}
+              style={{padding:"11px 28px",background:budget?C.gold:C.border,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:budget?"pointer":"default",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+              Show my stack →
+            </button>
+          </div>
+        </div>
+      )}
+      {step===4&&(
+        <div style={{background:C.white,border:`2px solid ${C.ink}`,borderTop:`4px solid ${C.gold}`,padding:isMob?"20px":"28px 32px",position:"relative"}}>
+          <button onClick={dismiss} style={{position:"absolute",top:12,right:14,background:"none",border:"none",fontSize:16,cursor:"pointer",color:C.gray}}>x</button>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>Your personalized starter stack</p>
+          <p style={{fontSize:isMob?16:18,fontWeight:900,color:C.ink,margin:"0 0 4px",letterSpacing:"-.02em"}}>
+            Top 5 compounds for {GOALS_Q.find(g=>g.id===goal)?.label}
+          </p>
+          <p style={{fontSize:12,color:C.gray,margin:"0 0 16px"}}>Ranked by efficacy and evidence. {experience==="beginner"?"Beginner-friendly selection.":experience==="advanced"?"Advanced protocol.":"Intermediate protocol."}</p>
+          <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
+            {(RECS[goal]||[]).map((name,i)=>{
+              const supp=SUPPLEMENTS.find(s=>s.name===name||s.aliases?.includes(name));
+              return(
+                <div key={name} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:C.bg,border:`1px solid ${C.border}`}}>
+                  <span style={{fontSize:14,fontWeight:900,color:C.gold,width:20,flexShrink:0}}>#{i+1}</span>
+                  <div style={{flex:1}}>
+                    <span style={{fontSize:13,fontWeight:800,color:C.ink}}>{name}</span>
+                    {supp&&<span style={{fontSize:10,color:C.gray,marginLeft:8}}>T{supp.tier} | Safety: {["","Risky","Caution","Caution","Safe","Very Safe"][supp.safety]||""}</span>}
+                  </div>
+                  {supp&&<span style={{fontSize:10,fontWeight:700,color:supp.tier===1?C.green:C.blue}}>{supp.tier===1?"Free":"Pro"}</span>}
+                </div>
+              );
+            })}
+          </div>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+            {user?(
+              <button onClick={()=>{onNavigate("advisor");dismiss();}} style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+                Analyze with AI Advisor →
+              </button>
+            ):(
+              <button onClick={()=>{onAuth("signup");dismiss();}} style={{padding:"11px 24px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+                Create free account to see dosages →
+              </button>
+            )}
+            <button onClick={()=>{onNavigate("supplements");dismiss();}} style={{padding:"11px 16px",background:"transparent",border:`1px solid ${C.border}`,fontSize:11,fontWeight:700,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
+              Browse all compounds
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── SHARED STACK PAGE ─────────────────────────────────────────────────────────
+function SharedStackPage({shareId}){
+  const isMob=useIsMobile();
+  const [data,setData]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [err,setErr]=useState("");
+
+  useEffect(()=>{
+    if(!shareId)return;
+    (async()=>{
+      try{
+        const ref=doc(db,"shared_stacks",shareId);
+        const snap=await getDoc(ref);
+        if(snap.exists()){setData(snap.data());}
+        else setErr("Stack not found or link has expired.");
+      }catch{setErr("Could not load shared stack.");}
+      finally{setLoading(false);}
+    })();
+  },[shareId]);
+
+  if(loading)return<div style={{maxWidth:680,margin:"80px auto",textAlign:"center",fontFamily:"Montserrat,sans-serif"}}><p style={{color:C.gray}}>Loading shared stack...</p></div>;
+  if(err)return<div style={{maxWidth:680,margin:"80px auto",textAlign:"center",fontFamily:"Montserrat,sans-serif"}}><p style={{color:C.red,fontWeight:700}}>{err}</p></div>;
+  if(!data)return null;
+
+  const tierColor=(t)=>["",C.green,C.blue,C.purple,C.amber][t]||C.gray;
+
+  return(
+    <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"24px 16px 80px":"48px 48px 80px",fontFamily:"Montserrat,sans-serif"}}>
+      <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>Shared Stack</p>
+      <h1 style={{fontSize:isMob?24:36,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 6px"}}>{data.stack_name||"Shared Stack"}</h1>
+      <p style={{fontSize:13,color:C.gray,margin:"0 0 6px"}}>Shared via Evidstack.com</p>
+      {data.total_cost&&<p style={{fontSize:13,fontWeight:800,color:C.green,margin:"0 0 24px"}}>{data.total_cost}</p>}
+      {data.summary&&<p style={{fontSize:14,color:C.gray,lineHeight:1.7,margin:"0 0 28px"}}>{data.summary}</p>}
+      <div style={{border:`1px solid ${C.border}`,borderTop:`4px solid ${C.gold}`,background:C.white,marginBottom:20}}>
+        <div style={{padding:"16px 24px",borderBottom:`1px solid ${C.border}`}}>
+          <p style={{fontSize:11,fontWeight:800,color:C.gray,margin:0,letterSpacing:".1em",textTransform:"uppercase"}}>{data.compounds?.length} Compounds</p>
+        </div>
+        {data.compounds?.map((c,i)=>(
+          <div key={i} style={{display:"flex",gap:16,padding:"16px 24px",borderBottom:i<data.compounds.length-1?`1px solid ${C.border}`:"none"}}>
+            <div style={{width:28,height:28,background:tierColor(c.tier),flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",marginTop:2}}>
+              <span style={{fontSize:10,fontWeight:900,color:C.white}}>T{c.tier}</span>
+            </div>
+            <div style={{flex:1}}>
+              <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:"0 0 3px"}}>{c.name}</p>
+              <p style={{fontSize:11,color:C.blue,margin:"0 0 4px",fontWeight:700}}>{c.dose} - {c.timing}</p>
+              <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{c.reason}</p>
+            </div>
+            {c.cost&&<span style={{fontSize:11,color:C.gray,flexShrink:0}}>{c.cost}</span>}
+          </div>
+        ))}
+      </div>
+      {data.interactions&&<div style={{background:C.bg,border:`1px solid ${C.border}`,padding:"16px 20px",marginBottom:12}}><p style={{fontSize:10,fontWeight:800,color:C.gray,margin:"0 0 6px",letterSpacing:".1em",textTransform:"uppercase"}}>Interactions</p><p style={{fontSize:13,color:C.gray,margin:0,lineHeight:1.6}}>{data.interactions}</p></div>}
+      <div style={{background:C.ink,padding:"20px 24px",textAlign:"center"}}>
+        <p style={{fontSize:13,color:"#9ca3af",margin:"0 0 14px"}}>Build your own evidence-based stack at Evidstack.com</p>
+        <a href="https://evidstack.com" style={{display:"inline-block",padding:"11px 28px",background:C.gold,color:C.ink,fontSize:12,fontWeight:800,textDecoration:"none",letterSpacing:".04em"}}>Build my stack</a>
+      </div>
+    </div>
+  );
+}
+
 function AppInner(){
   const {user,isPro,loading,logout}=useAuth();
   const [page,setPage]=useState(()=>getPageFromPath());
   const [compoundId,setCompoundId]=useState(()=>getCompoundIdFromPath());
+  const [shareId,setShareId]=useState(()=>getShareIdFromPath());
   const [goal,setGoal]=useState("all");
   const [search,setSearch]=useState("");
   const [selected,setSelected]=useState(null);
@@ -2640,8 +2885,40 @@ function AppInner(){
   const [showTools,setShowTools]=useState(false);
 
   const navigateTo=(p)=>{navigate(p);setPage(p);setCompoundId(null);window.scrollTo({top:0,behavior:"instant"});};
+
+  // Dynamic SEO meta tags
   useEffect(()=>{
-    const onPop=()=>{setPage(getPageFromPath());setCompoundId(getCompoundIdFromPath());};
+    const supp=page==="compound"&&compoundId?SUPPLEMENTS.find(s=>s.id===compoundId):null;
+    let title="EVIDSTACK - Evidence-Based Supplement & Compound Database";
+    let desc="370+ supplements, peptides, SARMs, and compounds ranked by efficacy and evidence. PubMed meta-analyses, AI compound advisor, interaction checker.";
+    if(supp){
+      title=`${supp.name} - Dosage, Evidence & Interactions | Evidstack`;
+      desc=`${supp.name} evidence review: safety ${["","risky","caution","caution","safe","very safe"][supp.safety]||""}, Tier ${supp.tier}, ${supp.effects?.length||0} goals covered. Dosing, interactions, and study summaries on Evidstack.`;
+    }else if(page==="advisor"){title="AI Compound Advisor - Evidstack";desc="Describe any health goal and get compounds ranked by efficacy and evidence quality. Powered by 370+ compound database and PubMed data.";}
+    else if(page==="pricing"){title="Pricing - Evidstack Pro";desc="Unlock all 370+ compounds, AI Compound Advisor, Interaction Checker, Stack Audit, and Bloodwork History for $9.99/month.";}
+    else if(page==="interaction-checker"){title="Interaction Checker - Evidstack";desc="Check your full supplement stack for interactions, absorption conflicts, synergies, and optimal timing. Evidence-based analysis.";}
+    else if(page==="stack-audit"){title="Stack Audit AI - Evidstack";desc="AI-powered supplement stack audit. Get a Stack Score, identify redundancies, critical gaps, and priority changes.";}
+    else if(page==="bloodwork-history"){title="Bloodwork History - Evidstack";desc="Track 16 biomarkers over time. Correlate blood test results with your supplement stack changes.";}
+    document.title=title;
+    let metaDesc=document.querySelector("meta[name='description']");
+    if(metaDesc)metaDesc.setAttribute("content",desc);
+    let ogTitle=document.querySelector("meta[property='og:title']");
+    if(ogTitle)ogTitle.setAttribute("content",title);
+    let ogDesc=document.querySelector("meta[property='og:description']");
+    if(ogDesc)ogDesc.setAttribute("content",desc);
+    let canonical=document.querySelector("link[rel='canonical']");
+    if(canonical){
+      const path=page==="supplements"?"":page==="compound"&&compoundId?`/compound/${compoundId}`:`/${page}`;
+      canonical.setAttribute("href",`https://evidstack.com${path}`);
+    }
+  },[page,compoundId]);
+
+  useEffect(()=>{
+    const onPop=()=>{
+      setPage(getPageFromPath());
+      setCompoundId(getCompoundIdFromPath());
+      setShareId(getShareIdFromPath());
+    };
     window.addEventListener("popstate",onPop);
     return()=>window.removeEventListener("popstate",onPop);
   },[]);
@@ -2820,6 +3097,7 @@ function AppInner(){
       {page==="pricing"        &&<PricingPage onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="affiliate"&&<AffiliatePage/>}
       {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
+      {page==="shared-stack"&&<SharedStackPage shareId={shareId}/>}
       {page==="legal"          &&<LegalPage/>}
       {page==="interactions"   &&<InteractionChecker onUpgrade={openUpgrade}/>}
       {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}
@@ -2896,7 +3174,10 @@ function AppInner(){
           </div>
         </div>
 
-
+        {/* Goal Quiz */}
+        <div style={{padding:"0 16px"}}>
+          <GoalQuizSection onNavigate={navigateTo} onAuth={openAuth}/>
+        </div>
 
       <div style={{background:C.bg,display:"flex",flexDirection:"column",alignItems:"center",padding:"16px 0 40px"}}>
         <p style={{fontSize:10,fontWeight:700,letterSpacing:".16em",color:C.gray,margin:"0 0 14px",textTransform:"uppercase"}}>Browse the database</p>
@@ -4354,7 +4635,49 @@ function StackAuditScreen({onUpgrade}){
               </div>
             )}
 
-            <button onClick={reset} style={{fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:0}}>Audit a different stack</button>
+            <div style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap",marginTop:8}}>
+              <button onClick={reset} style={{fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:0}}>Audit a different stack</button>
+              <button onClick={()=>{
+                const printContent=`
+                  <html><head><title>Stack Audit - Evidstack</title>
+                  <style>body{font-family:Helvetica,sans-serif;padding:32px;color:#1a1a1a;max-width:700px;margin:0 auto;}
+                  h1{font-size:28px;font-weight:900;margin:0 0 4px;}
+                  .score{font-size:48px;font-weight:900;color:#16a34a;}
+                  .label{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.1em;}
+                  .compound{padding:12px 0;border-bottom:1px solid #d4d0c8;}
+                  .verdict{display:inline-block;padding:2px 8px;font-size:10px;font-weight:800;border-radius:2px;}
+                  .KEEP{background:#f0fdf4;color:#166534;} .OPTIMIZE{background:#fefce8;color:#92400e;}
+                  .REPLACE{background:#fff7ed;color:#92400e;} .REMOVE{background:#fef2f2;color:#991b1b;}
+                  .section{margin:24px 0;} .gray{color:#6b7280;font-size:13px;line-height:1.6;}
+                  .footer{margin-top:40px;padding-top:16px;border-top:1px solid #d4d0c8;font-size:11px;color:#9ca3af;}</style></head>
+                  <body>
+                  <p class="label">Evidstack Pro - Stack Audit</p>
+                  <h1>${result.stack_name||"Stack Audit"}</h1>
+                  <div style="display:flex;align-items:center;gap:24px;margin:16px 0;padding:20px;background:#f9f7f4;border-left:4px solid #e2c97e;">
+                    <div><div class="score">${result.grade}</div><div class="label">Grade</div></div>
+                    <div><div style="font-size:32px;font-weight:900;">${result.stack_score}</div><div class="label">Stack Score / 100</div></div>
+                    <div style="flex:1;"><p class="gray">${result.summary||""}</p></div>
+                  </div>
+                  <div class="section">
+                    <p class="label" style="margin-bottom:12px;">Priority Changes</p>
+                    ${(result.priority_changes||[]).map((c,i)=>`<p style="margin:6px 0;"><strong>#${i+1}</strong> ${c}</p>`).join("")}
+                  </div>
+                  <div class="section">
+                    <p class="label" style="margin-bottom:12px;">Compound Analysis</p>
+                    ${(result.compounds_analyzed||[]).map(c=>`<div class="compound"><strong>${c.name}</strong> <span class="verdict ${c.verdict}">${c.verdict}</span> <span style="float:right;font-weight:900;">${c.score}/100</span><p class="gray" style="margin:4px 0 0;">${c.reason}${c.optimization?` → ${c.optimization}`:""}</p></div>`).join("")}
+                  </div>
+                  ${result.optimized_stack?`<div class="section"><p class="label" style="margin-bottom:8px;">Recommended Stack</p><p class="gray">${result.optimized_stack}</p></div>`:""}
+                  <div class="footer">Generated by Evidstack.com | Evidence-Based Supplementation | ${new Date().toLocaleDateString()}</div>
+                  </body></html>`;
+                const w=window.open("","_blank");
+                w.document.write(printContent);
+                w.document.close();
+                w.focus();
+                w.print();
+              }} style={{fontSize:12,color:C.ink,background:"transparent",border:`1px solid ${C.border}`,cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"6px 14px",fontWeight:700}}>
+                Export PDF 📄
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -4489,7 +4812,38 @@ function BloodworkHistoryScreen({onUpgrade}){
             <h1 style={{fontSize:isMob?28:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 6px"}}>Bloodwork History</h1>
             <p style={{fontSize:14,color:C.gray,margin:0}}>Track your biomarkers over time. {entries.length} entr{entries.length===1?"y":"ies"} logged.</p>
           </div>
-          <button onClick={()=>setShowForm(true)} style={{padding:"12px 22px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>+ Log Blood Work</button>
+          <div style={{display:"flex",gap:10,flexShrink:0,flexWrap:"wrap"}}>
+            {entries.length>0&&<button onClick={()=>{
+              const printContent=`<html><head><title>Bloodwork History - Evidstack</title>
+              <style>body{font-family:Helvetica,sans-serif;padding:32px;color:#1a1a1a;max-width:700px;margin:0 auto;}
+              h1{font-size:28px;font-weight:900;margin:0 0 4px;}
+              .label{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.1em;}
+              table{width:100%;border-collapse:collapse;margin:16px 0;}
+              th{background:#1a1a1a;color:white;padding:8px 12px;font-size:11px;text-align:left;}
+              td{padding:8px 12px;border-bottom:1px solid #d4d0c8;font-size:12px;}
+              .ok{color:#16a34a;font-weight:700;} .low{color:#d97706;font-weight:700;} .flag{color:#dc2626;font-weight:700;}
+              .footer{margin-top:40px;padding-top:16px;border-top:1px solid #d4d0c8;font-size:11px;color:#9ca3af;}</style></head>
+              <body>
+              <p class="label">Evidstack Pro - Bloodwork History</p>
+              <h1>Biomarker Report</h1>
+              <p style="color:#6b7280;font-size:13px;margin:4px 0 24px;">${entries.length} entries | Generated ${new Date().toLocaleDateString()}</p>
+              ${[...entries].reverse().map(e=>`
+                <div style="margin-bottom:28px;">
+                  <p style="font-size:15px;font-weight:800;margin:0 0 4px;">${e.date}</p>
+                  ${e.note?`<p style="font-size:12px;color:#6b7280;margin:0 0 10px;">${e.note}</p>`:""}
+                  <table><tr>${MARKERS.filter(m=>e.values[m.id]).map(m=>`<th>${m.label}<br/><span style="font-weight:400;">${m.unit}</span></th>`).join("")}</tr>
+                  <tr>${MARKERS.filter(m=>e.values[m.id]).map(m=>{const v=parseFloat(e.values[m.id]);const ok=v>=m.normal[0]&&v<=m.normal[1];const danger=v<m.warn_low||v>m.warn_high;return`<td class="${danger?"flag":ok?"ok":"low"}">${v}</td>`;}).join("")}</tr></table>
+                </div>`).join("")}
+              <div class="footer">Generated by Evidstack.com | Evidence-Based Supplementation | This report is for informational purposes only. Consult a healthcare provider.</div>
+              </body></html>`;
+              const w=window.open("","_blank");
+              w.document.write(printContent);
+              w.document.close();
+              w.focus();
+              w.print();
+            }} style={{padding:"12px 18px",background:"transparent",border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,color:C.ink,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Export PDF 📄</button>}
+            <button onClick={()=>setShowForm(true)} style={{padding:"12px 22px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>+ Log Blood Work</button>
+          </div>
         </div>
 
         {/* Log form */}

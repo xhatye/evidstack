@@ -1332,6 +1332,7 @@ function MyTracker({onUpgrade}){
       )}
     </div>
   </div>
+  </div>
   );
 }
 
@@ -3660,6 +3661,7 @@ function CycleAlertsScreen({onUpgrade}){
         </p>
       </div>
     </div></div>
+  </div>
   );
 }
 

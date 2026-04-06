@@ -574,8 +574,8 @@ function ScoreBlock({label,value,color,max=5}){
         <span style={{fontSize:9,fontWeight:700,letterSpacing:".12em",color:C.gray,textTransform:"uppercase"}}>{label}</span>
         <span style={{fontSize:11,fontWeight:800,color}}>{value}/{max}</span>
       </div>
-      <div style={{height:2,background:C.light,position:"relative"}}>
-        <div style={{position:"absolute",left:0,top:0,height:"100%",width:`${Math.abs(value)/max*100}%`,background:color,transition:"width .5s cubic-bezier(.16,1,.3,1)"}}/>
+      <div style={{height:7,background:C.light,position:"relative",borderRadius:4,overflow:"hidden"}}>
+        <div style={{position:"absolute",left:0,top:0,height:"100%",width:`${Math.abs(value)/max*100}%`,background:color,transition:"width .6s cubic-bezier(.16,1,.3,1)",borderRadius:4}}/>
       </div>
     </div>
   );
@@ -609,6 +609,7 @@ function EffectRow({effect,goalObj}){
 /* SUPPLEMENT CARD */
 function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade,onCompare,compareA,compareB,cardIndex=0}){
   const isMob=useIsMobile();
+  const [hovered,setHovered]=useState(false);
   if(supp.tier>=2&&!isPro)return <PaywallCard supp={supp} onUpgrade={onUpgrade} isMob={isMob} onCompare={onCompare} compareA={compareA} compareB={compareB} showCTA={cardIndex%5===0}/>;
   const goalMap=Object.fromEntries(GOALS.map((g,i)=>[g.id,{...g,label:T.controls.goals[i]||g.label}]));
   const effects=activeGoal==="all"?supp.effects:supp.effects.filter(e=>e.goal===activeGoal);
@@ -617,7 +618,19 @@ function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade,onCo
   const avgEff=Math.round(effects.reduce((s,e)=>s+Math.abs(e.efficacy),0)/effects.length);
   const avgEv=Math.round(effects.reduce((s,e)=>s+e.evidence,0)/effects.length);
   return(
-    <div onClick={onClick} style={{background:C.white,border:`1px solid ${isSelected?C.black:C.border}`,borderTop:`3px solid ${tc}`,cursor:"pointer",transition:"border-color .2s, box-shadow .2s",boxShadow:isSelected?"0 8px 32px rgba(0,0,0,.08)":"none"}}>
+    <div
+      onClick={onClick}
+      onMouseEnter={()=>setHovered(true)}
+      onMouseLeave={()=>setHovered(false)}
+      style={{
+        background:C.white,
+        border:`1px solid ${isSelected?C.black:hovered?C.gray:C.border}`,
+        borderTop:`3px solid ${tc}`,
+        cursor:"pointer",
+        transition:"border-color .18s, box-shadow .18s, transform .18s",
+        boxShadow:isSelected?"0 8px 32px rgba(0,0,0,.10)":hovered?"0 4px 20px rgba(0,0,0,.08)":"none",
+        transform:isSelected?"none":hovered?"translateY(-2px)":"none",
+      }}>
       <div style={{padding:isMob?"16px 14px 14px":"24px 28px 20px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
           <div>
@@ -1103,8 +1116,15 @@ function MyTracker({onUpgrade}){
   const daysThisWeek=last7.filter(d=>logs[d]?.taken?.length>0).length;
 
   return(
-    <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"24px 16px 80px":"48px 48px 80px"}}>
-      <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Pro Feature</p>
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+        <div style={{background:"#f59e0b",padding:"12px 0",marginBottom:0}}>
+          <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:18}}>📊</span>
+            <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>My Tracker</span>
+            <span style={{marginLeft:"auto",fontSize:10,fontWeight:800,color:"rgba(0,0,0,.5)",background:"rgba(0,0,0,.08)",padding:"3px 8px",letterSpacing:".08em",borderRadius:2}}>PRO</span>
+          </div>
+        </div>
+      <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"24px 16px 80px":"48px 48px 80px"}}>
       <h2 style={{fontSize:isMob?24:36,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 24px"}}>My Tracker</h2>
 
       {/* Stats bar */}
@@ -3174,6 +3194,28 @@ function AppInner(){
           </div>
         </div>
 
+
+        {/* How it works */}
+        <div style={{maxWidth:680,margin:"0 auto 0",padding:"48px 16px 40px",fontFamily:"Montserrat,sans-serif"}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".18em",color:C.gray,textAlign:"center",margin:"0 0 32px",textTransform:"uppercase"}}>How it works</p>
+          <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr 1fr",gap:isMobile?16:24}}>
+            {[
+              {n:"01",icon:"🔬",title:"Evidence-ranked database",desc:"Every compound is scored on two independent axes: actual effect size in human trials, and quality of the research behind it. No marketing, no sponsorships."},
+              {n:"02",icon:"🤖",title:"AI Compound Advisor",desc:"Describe any goal or symptom. The advisor searches 370+ compounds and returns the strongest options ranked by combined efficacy and evidence score."},
+              {n:"03",icon:"⚗️",title:"Safety and interaction analysis",desc:"Check your full stack for absorption conflicts, timing issues, and synergies. Know exactly what to take, when, and what to avoid stacking together."},
+            ].map(({n,icon,title,desc})=>(
+              <div key={n} style={{position:"relative",paddingTop:8}}>
+                <div style={{position:"absolute",top:0,left:0,fontSize:11,fontWeight:900,color:C.gold,letterSpacing:".04em"}}>{n}</div>
+                <div style={{paddingTop:20}}>
+                  <div style={{fontSize:28,marginBottom:12}}>{icon}</div>
+                  <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 8px",letterSpacing:"-.02em",lineHeight:1.2}}>{title}</p>
+                  <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.7}}>{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Goal Quiz */}
         <div style={{padding:"0 16px"}}>
           <GoalQuizSection onNavigate={navigateTo} onAuth={openAuth}/>
@@ -3428,8 +3470,15 @@ function CycleAlertsScreen({onUpgrade}){
   );
 
   return(
-    <div style={Sp.page}><div style={Sp.inner}>
-      <span style={Sp.tag}>PRO FEATURE</span>
+    <div style={Sp.page}>
+        <div style={{background:"#6366f1",padding:"12px 0",marginBottom:0}}>
+          <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:18}}>🔄</span>
+            <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>AI Cycle Alerts</span>
+            <span style={{marginLeft:"auto",fontSize:10,fontWeight:800,color:"rgba(0,0,0,.5)",background:"rgba(0,0,0,.08)",padding:"3px 8px",letterSpacing:".08em",borderRadius:2}}>PRO</span>
+          </div>
+        </div>
+<div style={Sp.inner}>
       <h1 style={Sp.h1}>AI Cycle Alerts</h1>
       <p style={Sp.sub}>Track your compound cycles. Get precise alerts for when to start, stop, and restart.</p>
 
@@ -3751,8 +3800,15 @@ function BloodWorkScreen({onUpgrade}){
   );
 
   return(
-    <div style={Sp.page}><div style={Sp.inner}>
-      <span style={Sp.tag}>PRO FEATURE</span>
+    <div style={Sp.page}>
+        <div style={{background:"#10b981",padding:"12px 0",marginBottom:0}}>
+          <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:18}}>🩸</span>
+            <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>AI Bloodwork Analyzer</span>
+            <span style={{marginLeft:"auto",fontSize:10,fontWeight:800,color:"rgba(0,0,0,.5)",background:"rgba(0,0,0,.08)",padding:"3px 8px",letterSpacing:".08em",borderRadius:2}}>PRO</span>
+          </div>
+        </div>
+<div style={Sp.inner}>
       <h1 style={Sp.h1}>AI Bloodwork Analyzer</h1>
       <p style={Sp.sub}>Enter your blood test results and get supplement recommendations based on your actual biology.</p>
 
@@ -4001,6 +4057,13 @@ function CompoundAdvisorScreen({onUpgrade}){
         .adv-score-bar{animation:advisorScoreGrow .8s cubic-bezier(.22,1,.36,1) both}
       `}</style>
 
+        <div style={{background:"#e2c97e",padding:"12px 0",marginBottom:0}}>
+          <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:18}}>🔭</span>
+            <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>AI Compound Advisor</span>
+            <span style={{marginLeft:"auto",fontSize:10,fontWeight:800,color:"rgba(0,0,0,.5)",background:"rgba(0,0,0,.08)",padding:"3px 8px",letterSpacing:".08em",borderRadius:2}}>PRO</span>
+          </div>
+        </div>
       <div style={S.inner}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:8}}>
           <h1 style={{...S.h1,margin:0}}>AI Compound Advisor</h1>
@@ -4338,6 +4401,13 @@ function InteractionCheckerPro({onUpgrade}){
         @keyframes icScan{0%{width:0%}100%{width:100%}}
         .ic-card{animation:icFadeIn .35s ease both}
       `}</style>
+        <div style={{background:"#3b82f6",padding:"12px 0",marginBottom:0}}>
+          <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:18}}>⚗️</span>
+            <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>Interaction Checker</span>
+            <span style={{marginLeft:"auto",fontSize:10,fontWeight:800,color:"rgba(0,0,0,.5)",background:"rgba(0,0,0,.08)",padding:"3px 8px",letterSpacing:".08em",borderRadius:2}}>PRO</span>
+          </div>
+        </div>
       <div style={{maxWidth:800,margin:"0 auto",padding:isMob?"32px 16px 80px":"56px 32px 100px"}}>
         <h1 style={{fontSize:isMob?28:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 8px"}}>Interaction Checker</h1>
         <p style={{fontSize:14,color:C.gray,margin:"0 0 28px",lineHeight:1.6}}>Add every compound in your stack. Get a full interaction report with severity ratings and an optimized timing protocol.</p>
@@ -4513,6 +4583,13 @@ function StackAuditScreen({onUpgrade}){
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
       <style>{`@keyframes auditFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.audit-card{animation:auditFade .4s ease both}`}</style>
+        <div style={{background:"#8b5cf6",padding:"12px 0",marginBottom:0}}>
+          <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:18}}>🎯</span>
+            <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>Stack Audit AI</span>
+            <span style={{marginLeft:"auto",fontSize:10,fontWeight:800,color:"rgba(0,0,0,.5)",background:"rgba(0,0,0,.08)",padding:"3px 8px",letterSpacing:".08em",borderRadius:2}}>PRO</span>
+          </div>
+        </div>
       <div style={{maxWidth:800,margin:"0 auto",padding:isMob?"32px 16px 80px":"56px 32px 100px"}}>
         <h1 style={{fontSize:isMob?28:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 8px"}}>Stack Audit AI</h1>
         <p style={{fontSize:14,color:C.gray,margin:"0 0 32px",lineHeight:1.6}}>Describe everything you are currently taking. The AI scores your stack, flags redundancies, identifies gaps, and tells you exactly what to change.</p>
@@ -4806,6 +4883,13 @@ function BloodworkHistoryScreen({onUpgrade}){
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+        <div style={{background:"#ef4444",padding:"12px 0",marginBottom:0}}>
+          <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:18}}>🩸</span>
+            <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>Bloodwork History</span>
+            <span style={{marginLeft:"auto",fontSize:10,fontWeight:800,color:"rgba(0,0,0,.5)",background:"rgba(0,0,0,.08)",padding:"3px 8px",letterSpacing:".08em",borderRadius:2}}>PRO</span>
+          </div>
+        </div>
       <div style={{maxWidth:900,margin:"0 auto",padding:isMob?"32px 16px 80px":"56px 32px 100px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:16,marginBottom:28}}>
           <div>

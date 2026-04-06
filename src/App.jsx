@@ -8,6 +8,35 @@ function useIsMobile(){
   return m;
 }
 
+function useScrollReveal(threshold){
+  const th=threshold||0.12;
+  const ref=useRef(null);
+  const [visible,setVisible]=useState(false);
+  useEffect(()=>{
+    const el=ref.current;if(!el)return;
+    const obs=new IntersectionObserver(([e])=>{if(e.isIntersecting){setVisible(true);obs.disconnect();}},{threshold:th});
+    obs.observe(el);
+    return()=>obs.disconnect();
+  },[]);
+  return[ref,visible];
+}
+
+function useCountUp(target,duration,started){
+  const[count,setCount]=useState(0);
+  useEffect(()=>{
+    if(!started)return;
+    let t0=null;const d=duration||1400;
+    const step=(ts)=>{
+      if(!t0)t0=ts;
+      const p=Math.min((ts-t0)/d,1);
+      setCount(Math.floor((1-Math.pow(1-p,3))*target));
+      if(p<1)requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  },[target,started]);
+  return count;
+}
+
 const ROUTES = {
   "/":"supplements",
   "/supplements":"supplements",
@@ -71,6 +100,50 @@ const T = {
 
 const tierColor=(t)=>[null,C.green,C.blue,C.purple,C.amber][t]||C.gray;
 const efColor=(v)=>v<0?C.red:v>=4?C.green:v===3?C.blue:v===2?C.amber:C.gray;
+
+/* HERO STATS with count-up */
+function HeroStats({isMobile}){
+  const [ref,visible]=useScrollReveal(0.1);
+  const total=Math.floor(SUPPLEMENTS.length/10)*10;
+  const count=useCountUp(total,1200,visible);
+  return(
+    <div ref={ref} className={"evid-reveal"+(visible?" visible":"")}
+      style={{display:"flex",justifyContent:"center",gap:isMobile?16:32,marginBottom:24,flexWrap:"wrap"}}>
+      <div><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>{visible?count+"+":(total+"+")}</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>compounds</span></div>
+      <div><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>4</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>evidence tiers</span></div>
+      <div><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>PubMed</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>primary source</span></div>
+      <div><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>Cochrane</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>systematic reviews</span></div>
+    </div>
+  );
+}
+
+/* HOW IT WORKS with scroll-reveal */
+function HowItWorksSection({isMobile}){
+  const [ref,visible]=useScrollReveal(0.08);
+  const STEPS=[
+    {n:"01",icon:"🔬",title:"Evidence-ranked database",desc:"Every compound scored on two axes: effect size in human trials, and research quality. No marketing, no sponsorships."},
+    {n:"02",icon:"🤖",title:"AI Compound Advisor",desc:"Describe any goal or symptom. The advisor searches 370+ compounds and returns the strongest options ranked by evidence."},
+    {n:"03",icon:"⚗️",title:"Safety and interaction analysis",desc:"Check your full stack for absorption conflicts, timing issues, and synergies. Know exactly what to take and when."},
+  ];
+  return(
+    <div ref={ref} className={"evid-reveal"+(visible?" visible":"")}
+      style={{maxWidth:680,margin:"0 auto 0",padding:"48px 16px 40px",fontFamily:"Montserrat,sans-serif"}}>
+      <p style={{fontSize:10,fontWeight:800,letterSpacing:".18em",color:C.gray,textAlign:"center",margin:"0 0 32px",textTransform:"uppercase"}}>How it works</p>
+      <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr 1fr",gap:isMobile?16:24}}>
+        {STEPS.map(({n,icon,title,desc},i)=>(
+          <div key={n} style={{position:"relative",paddingTop:8,opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(20px)",transition:`opacity .5s ${i*.12}s, transform .5s ${i*.12}s`}}>
+            <div style={{position:"absolute",top:0,left:0,fontSize:11,fontWeight:900,color:C.gold,letterSpacing:".04em"}}>{n}</div>
+            <div style={{paddingTop:20}}>
+              <div style={{fontSize:28,marginBottom:12}}>{icon}</div>
+              <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 8px",letterSpacing:"-.02em",lineHeight:1.2}}>{title}</p>
+              <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.7}}>{desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /* WAITLIST */
 function WaitlistForm(){
@@ -493,6 +566,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
 
           {error&&<p style={{fontSize:12,color:C.red,margin:"0 0 12px"}}>{error}</p>}
           <button onClick={checkout} disabled={loading}
+            className="evid-shimmer-btn"
             style={{width:"100%",padding:"15px",background:C.gold,color:C.ink,border:"none",fontSize:14,fontWeight:900,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",marginBottom:12}}>
             {loading?"...":plan==="annual"?"Start Pro  - $79/year":"Start Pro  - $9.99/month"}
           </button>
@@ -2861,6 +2935,27 @@ function SharedStackPage({shareId}){
 
 function AppInner(){
   const {user,isPro,loading,logout}=useAuth();
+  // Inject global animation CSS once
+  useEffect(()=>{
+    if(document.getElementById("evid-anim-css"))return;
+    const s=document.createElement("style");
+    s.id="evid-anim-css";
+    s.textContent=`
+@keyframes evidFloat{0%,100%{transform:translateY(0) rotate(0deg);}33%{transform:translateY(-14px) rotate(2deg);}66%{transform:translateY(6px) rotate(-1.5deg);}}
+@keyframes evidShimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+@keyframes evidPulse{0%,100%{opacity:.55;}50%{opacity:1;}}
+@keyframes evidFadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes evidCountIn{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
+@keyframes evidGlow{0%,100%{box-shadow:0 0 0 0 rgba(226,201,126,0);}50%{box-shadow:0 0 0 5px rgba(226,201,126,.18);}}
+.evid-reveal{opacity:0;transform:translateY(20px);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);}
+.evid-reveal.visible{opacity:1;transform:translateY(0);}
+.evid-shimmer-btn{position:relative;overflow:hidden;}
+.evid-shimmer-btn::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);background-size:250% 100%;animation:evidShimmer 3s ease-in-out infinite;}
+.evid-pulse-pro{animation:evidGlow 2.8s ease-in-out infinite;}
+    `;
+    document.head.appendChild(s);
+  },[]);
+
   const [page,setPage]=useState(()=>getPageFromPath());
   const [compoundId,setCompoundId]=useState(()=>getCompoundIdFromPath());
   const [shareId,setShareId]=useState(()=>getShareIdFromPath());
@@ -3100,8 +3195,8 @@ function AppInner(){
             <div style={{width:1,height:24,background:C.border,margin:"0 10px"}}/>
             {user?(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
-                {isPro&&<span style={{fontSize:10,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px"}}>PRO</span>}
-                {!isPro&&<button onClick={openUpgrade} style={{padding:"8px 16px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",letterSpacing:".04em"}}>Upgrade</button>}
+                {isPro&&<span className="evid-pulse-pro" style={{fontSize:10,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px"}}>PRO</span>}
+                {!isPro&&<button onClick={openUpgrade} className="evid-shimmer-btn" style={{padding:"8px 16px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",letterSpacing:".04em"}}>Upgrade</button>}
                 <button onClick={()=>setShowAccount(true)} style={{padding:"8px 14px",fontSize:11,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Account</button>
               </div>
             ):(
@@ -3133,18 +3228,31 @@ function AppInner(){
       {page==="bloodwork"     &&<BloodWorkScreen onUpgrade={openUpgrade}/>}
 
       {page==="supplements"&&<>
-        <div style={{padding:isMobile?"32px 16px 40px":"60px 24px 56px",textAlign:"center"}}>
+        <div style={{padding:isMobile?"32px 16px 40px":"60px 24px 56px",textAlign:"center",position:"relative",overflow:"hidden"}}>
+          {/* Molecular background */}
+          {!isMobile&&<svg aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0}} viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+            {[
+              {cx:80,cy:80,r:28,d:11},{cx:1120,cy:60,r:22,d:14},{cx:200,cy:300,r:18,d:9},
+              {cx:980,cy:280,r:24,d:13},{cx:550,cy:40,r:16,d:17},{cx:660,cy:360,r:20,d:8},
+              {cx:350,cy:180,r:14,d:15},{cx:870,cy:150,r:26,d:12},{cx:120,cy:210,r:12,d:19},
+              {cx:1050,cy:340,r:16,d:10},{cx:430,cy:330,r:22,d:7},{cx:760,cy:80,r:14,d:16},
+            ].map(({cx,cy,r,d},i)=>(
+              <g key={i} style={{animation:`evidFloat ${d}s ease-in-out infinite`,animationDelay:`${i*1.1}s`}}>
+                <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1a1a1a" strokeWidth="1" opacity=".035"/>
+                <circle cx={cx} cy={cy} r={r*0.35} fill="#1a1a1a" opacity=".025"/>
+                {i%3===0&&<line x1={cx+r} y1={cy} x2={cx+r+28} y2={cy-14} stroke="#1a1a1a" strokeWidth=".8" opacity=".03"/>}
+                {i%4===0&&<circle cx={cx+r+36} cy={cy-18} r={10} fill="none" stroke="#e2c97e" strokeWidth=".8" opacity=".07"/>}
+              </g>
+            ))}
+          </svg>}
+          <div style={{position:"relative",zIndex:1}}>
           <h1 style={{fontSize:isMobile?28:48,fontWeight:900,lineHeight:1.12,letterSpacing:"-.04em",margin:"0 0 14px",color:C.ink,maxWidth:740,marginLeft:"auto",marginRight:"auto"}}>
             Supplement and peptide information you can trust.
           </h1>
           <p style={{fontSize:isMobile?13:15,color:C.gray,lineHeight:1.8,margin:"0 auto 20px",maxWidth:560,padding:isMobile?"0 4px":0}}>
             Evidstack <strong style={{color:C.ink,fontWeight:700}}>analyzes and ranks supplements</strong> by actual efficacy and strength of evidence. More than <strong style={{color:C.ink,fontWeight:700}}>{Math.floor(SUPPLEMENTS.length/10)*10}+ compounds</strong>, sourced from PubMed and Cochrane.
           </p>
-          <div style={{display:"flex",justifyContent:"center",gap:isMobile?16:32,marginBottom:24,flexWrap:"wrap"}}>
-            {[[(Math.floor(SUPPLEMENTS.length/10)*10).toString()+"+","compounds"],["4","evidence tiers"],["PubMed","primary source"],["Cochrane","systematic reviews"]].map(([val,label])=>(
-              <div key={label}><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>{val}</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>{label}</span></div>
-            ))}
-          </div>
+          <HeroStats isMobile={isMobile}/>
           <div style={{display:"flex",maxWidth:680,margin:"0 auto 20px",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
             {!search&&(
               <div style={{position:"absolute",left:isMobile?14:20,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",zIndex:1,opacity:phFade?1:0,transition:"opacity .4s",fontSize:isMobile?13:14,color:"#9ca3af",fontFamily:"Montserrat,sans-serif",whiteSpace:"nowrap",overflow:"hidden",maxWidth:"calc(100% - 110px)"}}>
@@ -3155,8 +3263,9 @@ function AppInner(){
               style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
             <button style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search</button>
           </div>
+          </div>{/* end zIndex:1 */}
           {/* Social proof */}
-          <div style={{maxWidth:680,margin:"0 auto 16px",display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:1,background:C.border}}>
+          <div className="evid-reveal visible" style={{maxWidth:680,margin:"0 auto 16px",display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:1,background:C.border}}>
             {[
               {val:`${Math.floor(SUPPLEMENTS.length/10)*10}+`,label:"Compounds"},
               {val:"PubMed",label:"Primary source"},
@@ -3183,7 +3292,7 @@ function AppInner(){
                 <p style={{fontSize:15,color:"#e8e5df",margin:"0 0 6px",fontWeight:900,letterSpacing:"-.02em"}}>Evidstack Pro is here.</p>
                 <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 20px",lineHeight:1.7}}>AI Compound Advisor, Interaction Checker, Stack Audit AI, Bloodwork History, and {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including peptides, GLP-1s, and biohacking tier.</p>
                 <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center",justifyContent:"center"}}>
-                  <button onClick={()=>{openUpgrade();}} style={{padding:"12px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",lineHeight:1}}>
+                  <button onClick={()=>{openUpgrade();}} className="evid-shimmer-btn" style={{padding:"12px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",lineHeight:1}}>
                     Start for $9.99/mo
                   </button>
                   <button onClick={()=>{openAuth("signup");}} style={{padding:"12px 24px",background:"transparent",color:"#9ca3af",border:"1px solid #374151",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",lineHeight:1}}>
@@ -3197,25 +3306,7 @@ function AppInner(){
 
 
         {/* How it works */}
-        <div style={{maxWidth:680,margin:"0 auto 0",padding:"48px 16px 40px",fontFamily:"Montserrat,sans-serif"}}>
-          <p style={{fontSize:10,fontWeight:800,letterSpacing:".18em",color:C.gray,textAlign:"center",margin:"0 0 32px",textTransform:"uppercase"}}>How it works</p>
-          <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr 1fr",gap:isMobile?16:24}}>
-            {[
-              {n:"01",icon:"🔬",title:"Evidence-ranked database",desc:"Every compound is scored on two independent axes: actual effect size in human trials, and quality of the research behind it. No marketing, no sponsorships."},
-              {n:"02",icon:"🤖",title:"AI Compound Advisor",desc:"Describe any goal or symptom. The advisor searches 370+ compounds and returns the strongest options ranked by combined efficacy and evidence score."},
-              {n:"03",icon:"⚗️",title:"Safety and interaction analysis",desc:"Check your full stack for absorption conflicts, timing issues, and synergies. Know exactly what to take, when, and what to avoid stacking together."},
-            ].map(({n,icon,title,desc})=>(
-              <div key={n} style={{position:"relative",paddingTop:8}}>
-                <div style={{position:"absolute",top:0,left:0,fontSize:11,fontWeight:900,color:C.gold,letterSpacing:".04em"}}>{n}</div>
-                <div style={{paddingTop:20}}>
-                  <div style={{fontSize:28,marginBottom:12}}>{icon}</div>
-                  <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 8px",letterSpacing:"-.02em",lineHeight:1.2}}>{title}</p>
-                  <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.7}}>{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <HowItWorksSection isMobile={isMobile}/>
 
         {/* Goal Quiz */}
         <div style={{padding:"0 16px"}}>
@@ -5148,7 +5239,7 @@ function PricingPage({onUpgrade,onAuth}){
           </div>
           {isPro
             ?<div style={{padding:"13px",background:"#f0fdf4",border:"1px solid #bbf7d0",textAlign:"center",fontSize:13,fontWeight:700,color:"#166534"}}>You are a Pro member</div>
-            :<button style={S.btnGold} onClick={onUpgrade}>Start for $9.99/month</button>
+            :<button className="evid-shimmer-btn" style={S.btnGold} onClick={onUpgrade}>Start for $9.99/month</button>
           }
         </div>
       </div>

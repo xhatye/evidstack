@@ -2,11 +2,17 @@ export const config = { runtime: "edge" };
 
 export default async function handler(req) {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
-  const { compounds } = await req.json();
+  const body = await req.json();
+  const { compounds } = body;
   if (!compounds || compounds.length < 2)
     return new Response(JSON.stringify({ error: "Add at least 2 compounds." }), { status: 400, headers: { "Content-Type": "application/json" } });
 
-  const prompt = `You are a clinical pharmacologist and supplement safety expert. Analyze interactions between the following compounds: ${compounds.join(", ")}
+  const profile = body.userProfile || null;
+  const profileCtx = profile && profile.weightKg
+    ? `\nUSER PROFILE: ${profile.weightKg}kg, age ${profile.age||"unknown"}, biological sex ${profile.sex||"unknown"}. Factor this into timing recommendations and flag any interactions that are especially relevant to this profile.`
+    : "";
+
+  const prompt = `You are a clinical pharmacologist and supplement safety expert. Analyze interactions between the following compounds: ${compounds.join(", ")}${profileCtx}
 
 Evaluate every pair and group for:
 - Pharmacokinetic interactions (absorption competition, enzyme inhibition/induction, timing conflicts)
@@ -29,9 +35,7 @@ Respond ONLY with valid JSON, no markdown:
   ],
   "timing_protocol": "Optimal daily timing schedule for all compounds listed",
   "safe_to_stack": true | false
-}
-
-Severity guide: positive = beneficial synergy, minor = worth noting, moderate = adjust timing/dose, major = avoid or requires medical supervision.`;
+}`;
 
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {

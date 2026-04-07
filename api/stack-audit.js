@@ -2,15 +2,21 @@ export const config = { runtime: "edge" };
 
 export default async function handler(req) {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
-  const { stack, goals, budget } = await req.json();
+  const body = await req.json();
+  const { stack, goals, budget } = body;
   if (!stack || stack.trim().length < 3)
     return new Response(JSON.stringify({ error: "Describe your current stack." }), { status: 400, headers: { "Content-Type": "application/json" } });
+
+  const profile = body.userProfile || null;
+  const profileCtx = profile && profile.weightKg
+    ? `\nUSER PROFILE: ${profile.weightKg}kg, age ${profile.age||"unknown"}, biological sex ${profile.sex||"unknown"}. Adjust all dosage recommendations to this profile using weight-based dosing where applicable, age-adjusted metabolism considerations, and sex-specific reference ranges.`
+    : "";
 
   const prompt = `You are a precision supplement consultant. Audit the following supplement stack:
 
 CURRENT STACK: ${stack}
 GOALS: ${goals || "not specified"}
-MONTHLY BUDGET: $${budget || "not specified"}
+MONTHLY BUDGET: $${budget || "not specified"}${profileCtx}
 
 Perform a comprehensive audit covering:
 1. Redundancies (compounds doing the same thing)
@@ -19,6 +25,7 @@ Perform a comprehensive audit covering:
 4. Cost-to-benefit ratio of each compound
 5. Safety concerns or interactions
 6. Optimization opportunities
+${profileCtx ? "7. Dosage adjustments based on the user profile provided above" : ""}
 
 Respond ONLY with valid JSON, no markdown:
 {

@@ -969,7 +969,7 @@ function InteractionChecker({onUpgrade}){
     if(compounds.length<2){setError("Add at least 2 compounds.");return;}
     setError("");setLoading(true);setResult(null);
     try{
-      const res=await fetch("/api/interaction-check",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds})});
+      const res=await fetch("/api/interaction-check",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       setResult(data);
@@ -2043,7 +2043,7 @@ const GOAL_OPTIONS=[
 ];
 
 function StackBuilder({onUpgrade}){
-  const {isPro,user:sbUser}=useAuth();
+  const {isPro,user:sbUser,userProfile}=useAuth();
   const user=sbUser; // alias for share button
   const isMob=useIsMobile();
   const [goals,setGoals]=useState([]);
@@ -2077,7 +2077,7 @@ function StackBuilder({onUpgrade}){
     if(goals.length===0){setError("Select at least one goal.");return;}
     setError("");setLoading(true);setResult(null);
     try{
-      const res=await fetch("/api/ai-stack",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({goals,budget,existing,restrictions})});
+      const res=await fetch("/api/ai-stack",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({goals,budget,existing,restrictions,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       setResult(data);
@@ -2327,8 +2327,8 @@ function AboutPage(){
   const isMob=useIsMobile();
   return(
     <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"32px 16px 60px":"64px 48px 100px"}}>
-      <h2 style={{fontSize:isMob?28:44,fontWeight:900,lineHeight:1.05,letterSpacing:"-.05em",margin:"0 0 12px",color:C.ink}}>Built for people who want real answers.</h2>
-      <p style={{fontSize:15,color:C.gray,lineHeight:1.9,margin:"0 0 48px",maxWidth:600}}>The supplement industry runs on marketing. Evidstack runs on data.</p>
+      <h2 style={{fontSize:isMob?28:44,fontWeight:900,lineHeight:1.05,letterSpacing:"-.05em",margin:"0 0 12px",color:C.ink}}>The supplement industry runs on marketing. Evidstack runs on data.</h2>
+      <p style={{fontSize:15,color:C.gray,lineHeight:1.9,margin:"0 0 48px",maxWidth:600}}>And then tells you what to actually do with it - with AI tools calibrated to your body, not a generic 70kg male from a clinical trial.</p>
       <div style={{height:1,background:C.border,margin:"0 0 48px"}}/>
       {[
         {
@@ -2346,6 +2346,10 @@ function AboutPage(){
         {
           label:"What we cover",
           body:`Evidstack covers ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds across the full spectrum of evidence-based supplementation: foundational supplements like vitamin D, zinc, and omega-3; advanced nootropics and cognitive enhancers including racetams, cholinergics, and dopaminergic agents; peptides spanning healing compounds like BPC-157 and TB-500, GH secretagogues like Ipamorelin and CJC-1295, and skin and longevity peptides like GHK-Cu and Epithalon; GLP-1 receptor agonists and metabolic compounds including semaglutide and tirzepatide; hair retention and aesthetic compounds including finasteride, dutasteride, and minoxidil; SARMs and performance compounds with available human trial data; anti-aging interventions including rapamycin, metformin, and senolytic compounds; and adaptogenic and stress-response compounds. Each entry includes clinical dosing ranges, timing recommendations, known interactions, safety rating, legal status, and estimated monthly cost.`
+        },
+        {
+          label:"What others won't cover",
+          body:"Most supplement databases stop at vitamins, minerals, and mainstream nootropics. They avoid the compounds serious optimizers actually want data on, either for legal caution or to stay palatable to advertisers. Evidstack has no advertisers and no conflicts of interest, so we document the full spectrum: anabolic androgenic steroids (testosterone, nandrolone, oxandrolone, trenbolone, and 50+ others), the complete SARM landscape (RAD-140, LGD-4033, Ostarine, Andarine, YK-11, S-23), peptides including BPC-157, TB-500, Ipamorelin, CJC-1295, Epithalon, GHK-Cu, and growth hormone analogs, GLP-1 receptor agonists including semaglutide and tirzepatide, beta-agonists, aromatase inhibitors, and progestins relevant to endocrinology and performance. Every entry is treated with the same scientific rigor as creatine: efficacy score, evidence score, dosing, interactions, safety rating, and legal status. The goal is not to recommend these compounds but to ensure that people who encounter them have access to the same quality of information as they do for any other compound."
         },
         {
           label:"What we are not",
@@ -3247,10 +3251,10 @@ function AppInner(){
           </svg>}
           <div style={{position:"relative",zIndex:1}}>
           <h1 style={{fontSize:isMobile?28:48,fontWeight:900,lineHeight:1.12,letterSpacing:"-.04em",margin:"0 0 14px",color:C.ink,maxWidth:740,marginLeft:"auto",marginRight:"auto"}}>
-            Supplement and peptide information you can trust.
+            Not just what the science says.<br/>What you should actually do.
           </h1>
-          <p style={{fontSize:isMobile?13:15,color:C.gray,lineHeight:1.8,margin:"0 auto 20px",maxWidth:560,padding:isMobile?"0 4px":0}}>
-            Evidstack <strong style={{color:C.ink,fontWeight:700}}>analyzes and ranks supplements</strong> by actual efficacy and strength of evidence. More than <strong style={{color:C.ink,fontWeight:700}}>{Math.floor(SUPPLEMENTS.length/10)*10}+ compounds</strong>, sourced from PubMed and Cochrane.
+          <p style={{fontSize:isMobile?13:15,color:C.gray,lineHeight:1.8,margin:"0 auto 20px",maxWidth:580,padding:isMobile?"0 4px":0}}>
+            {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds: peptides, SARMs, GLP-1s, anabolics, nootropics - scored by <strong style={{color:C.ink,fontWeight:700}}>actual effect size</strong> and <strong style={{color:C.ink,fontWeight:700}}>evidence quality</strong>. Then an AI that turns the data into a protocol built for your body.
           </p>
           <HeroStats isMobile={isMobile}/>
           <div style={{display:"flex",maxWidth:680,margin:"0 auto 20px",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
@@ -3797,7 +3801,7 @@ const BLOOD_MARKERS=[
 ];
 
 function BloodWorkScreen({onUpgrade}){
-  const {isPro}=useAuth();
+  const {isPro,userProfile}=useAuth();
   const [markers,setMarkers]=useState({});
   const [goals,setGoals]=useState([]);
   const [currentStack,setCurrentStack]=useState("");
@@ -3825,7 +3829,7 @@ function BloodWorkScreen({onUpgrade}){
     setLoading(true);setErr("");setResult(null);
     try{
       const stackArr=currentStack.split(",").map(s=>s.trim()).filter(Boolean);
-      const res=await fetch("/api/bloodwork-analyzer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({markers,goals,currentStack:stackArr})});
+      const res=await fetch("/api/bloodwork-analyzer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({markers,goals,currentStack:stackArr,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error){setErr(data.error);return;}
       setResult(data);setView("result");
@@ -4048,7 +4052,7 @@ function BloodWorkScreen({onUpgrade}){
 // ── PRICING PAGE ─────────────────────────────────────────────────────────────
 // ── COMPOUND ADVISOR ─────────────────────────────────────────────────────────
 function CompoundAdvisorScreen({onUpgrade}){
-  const {isPro,user}=useAuth();
+  const {isPro,user,userProfile}=useAuth();
   const isMob=useIsMobile();
   const [query,setQuery]=useState("");
   const [history,setHistory]=useState([]);
@@ -4103,7 +4107,7 @@ function CompoundAdvisorScreen({onUpgrade}){
       const res=await fetch("/api/symptom-advisor",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({query:q,conversationHistory:history}),
+        body:JSON.stringify({query:q,conversationHistory:history,userProfile:userProfile||null}),
       });
       const data=await res.json();
       if(data.error){setErr(data.error);setPhase("idle");return;}
@@ -4170,6 +4174,10 @@ function CompoundAdvisorScreen({onUpgrade}){
           {isPro&&<span style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,border:`1px solid ${C.gold}`,padding:"4px 10px"}}>PRO</span>}
         </div>
         <p style={S.sub}>Describe any health goal or issue. The advisor searches {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds and returns the strongest evidence-based options, ranked by efficacy and study quality.{!isPro&&!freeUsed?" Try 1 query free, no account needed.":""}</p>
+        {userProfile&&userProfile.weightKg&&<div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 14px",background:`${C.gold}12`,border:`1px solid ${C.gold}40`,marginBottom:16,fontSize:11,fontWeight:700,color:"#92400e",maxWidth:S.inner.maxWidth}}>
+          <span style={{fontSize:14}}>🎯</span>
+          Dosages calibrated to your profile: {userProfile.weightKg}kg{userProfile.age?`, ${userProfile.age}yo`:""}{userProfile.sex?`, ${userProfile.sex}`:""}
+        </div>}
 
         {/* Upgrade wall - shown after free query used */}
         {!isPro&&freeUsed&&phase==="idle"&&!result&&(
@@ -4400,7 +4408,7 @@ function CompoundAdvisorScreen({onUpgrade}){
 
 // ── INTERACTION CHECKER ───────────────────────────────────────────────────────
 function InteractionCheckerPro({onUpgrade}){
-  const {isPro}=useAuth();
+  const {isPro,userProfile}=useAuth();
   const isMob=useIsMobile();
   const [input,setInput]=useState("");
   const [compounds,setCompounds]=useState([]);
@@ -4504,7 +4512,7 @@ function InteractionCheckerPro({onUpgrade}){
         </div>
       <div style={{maxWidth:800,margin:"0 auto",padding:isMob?"32px 16px 80px":"56px 32px 100px"}}>
         <h1 style={{fontSize:isMob?28:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 8px"}}>Interaction Checker</h1>
-        <p style={{fontSize:14,color:C.gray,margin:"0 0 28px",lineHeight:1.6}}>Add every compound in your stack. Get a full interaction report with severity ratings and an optimized timing protocol.</p>
+        <p style={{fontSize:14,color:C.gray,margin:"0 0 28px",lineHeight:1.6}}>Examine.com and ConsumerLab stop at the data. Evidstack tells you what to do with it. Add your compounds, get severity-rated interactions, synergy detection, and an exact daily timing protocol.</p>
 
         {/* Input */}
         <div style={{display:"flex",gap:0,border:`2px solid ${C.ink}`,background:C.white,marginBottom:12}}>
@@ -4591,7 +4599,7 @@ function InteractionCheckerPro({onUpgrade}){
 
 // ── STACK AUDIT AI ────────────────────────────────────────────────────────────
 function StackAuditScreen({onUpgrade}){
-  const {isPro}=useAuth();
+  const {isPro,userProfile}=useAuth();
   const isMob=useIsMobile();
   const [stack,setStack]=useState("");
   const [goals,setGoals]=useState("");
@@ -4605,7 +4613,7 @@ function StackAuditScreen({onUpgrade}){
     if(!stack.trim()){setErr("Describe your current stack first.");return;}
     setLoading(true);setErr("");setResult(null);setPhase("scanning");
     try{
-      const res=await fetch("/api/stack-audit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({stack,goals,budget})});
+      const res=await fetch("/api/stack-audit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({stack,goals,budget,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error){setErr(data.error);setPhase("idle");return;}
       setResult(data);setPhase("done");
@@ -4686,7 +4694,8 @@ function StackAuditScreen({onUpgrade}){
         </div>
       <div style={{maxWidth:800,margin:"0 auto",padding:isMob?"32px 16px 80px":"56px 32px 100px"}}>
         <h1 style={{fontSize:isMob?28:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 8px"}}>Stack Audit AI</h1>
-        <p style={{fontSize:14,color:C.gray,margin:"0 0 32px",lineHeight:1.6}}>Describe everything you are currently taking. The AI scores your stack, flags redundancies, identifies gaps, and tells you exactly what to change.</p>
+        <p style={{fontSize:14,color:C.gray,margin:"0 0 4px",lineHeight:1.6}}>Paste your current stack. Get a complete audit: redundancies, gaps, timing conflicts, and a Stack Score 0-100 with grade.</p>
+        <p style={{fontSize:12,color:C.gray,margin:"0 0 28px",lineHeight:1.5,fontStyle:"italic"}}>Unlike static databases, dosage recommendations are calibrated to your body weight and profile.</p>
 
         {!result&&(
           <div>
@@ -4988,7 +4997,8 @@ function BloodworkHistoryScreen({onUpgrade}){
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:16,marginBottom:28}}>
           <div>
             <h1 style={{fontSize:isMob?28:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 6px"}}>Bloodwork History</h1>
-            <p style={{fontSize:14,color:C.gray,margin:0}}>Track your biomarkers over time. {entries.length} entr{entries.length===1?"y":"ies"} logged.</p>
+            <p style={{fontSize:14,color:C.gray,margin:"0 0 3px"}}>The only supplement tool that connects your blood labs to your stack. Track 16 biomarkers over time and see the actual biological effect of every protocol change.</p>
+            <p style={{fontSize:12,color:C.gray,margin:0,fontStyle:"italic"}}>{entries.length} entr{entries.length===1?"y":"ies"} logged.</p>
           </div>
           <div style={{display:"flex",gap:10,flexShrink:0,flexWrap:"wrap"}}>
             {entries.length>0&&<button onClick={()=>{
@@ -5198,6 +5208,47 @@ function PricingPage({onUpgrade,onAuth}){
     <div style={S.page}><div style={S.inner}>
       <h1 style={S.h1}>Simple, honest pricing.</h1>
       <p style={S.sub}>One Pro plan. Everything included. Cancel anytime.</p>
+
+      {/* Competitor comparison USP6 */}
+      <div style={{maxWidth:700,margin:"0 auto 48px",background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`}}>
+        <div style={{padding:"16px 24px 12px",borderBottom:`1px solid ${C.border}`}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:0,textTransform:"uppercase"}}>How Evidstack compares</p>
+        </div>
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontFamily:"Montserrat,sans-serif",fontSize:12}}>
+            <thead>
+              <tr>
+                <th style={{padding:"12px 16px",textAlign:"left",fontWeight:800,color:C.gray,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid ${C.border}`}}>Feature</th>
+                <th style={{padding:"12px 16px",textAlign:"center",fontWeight:800,color:C.gray,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid ${C.border}`}}>Examine.com</th>
+                <th style={{padding:"12px 16px",textAlign:"center",fontWeight:800,color:C.gray,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid ${C.border}`}}>ConsumerLab</th>
+                <th style={{padding:"12px 16px",textAlign:"center",background:C.ink,fontWeight:800,color:C.gold,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid #1f2937`}}>Evidstack Pro</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Price","$29/mo","$50/yr (~$4/mo)","$9.99/mo"],
+                ["SARMs, AAS, peptides","Partial","No","Full 370+"],
+                ["AI compound advisor","No","No","Yes, unlimited"],
+                ["Interaction checker","Basic","No","Full AI analysis"],
+                ["Stack audit","No","No","Score 0-100"],
+                ["Bloodwork integration","No","No","16 biomarkers"],
+                ["Dosage calibration to body","No","No","Weight/age/sex"],
+                ["Conflict of interest","Zero","Zero","Zero"],
+              ].map(([feat,examine,consumer,evidstack],i)=>(
+                <tr key={feat} style={{background:i%2===0?C.white:C.bg}}>
+                  <td style={{padding:"10px 16px",fontWeight:700,color:C.ink,borderBottom:`1px solid ${C.border}`}}>{feat}</td>
+                  <td style={{padding:"10px 16px",textAlign:"center",color:C.gray,borderBottom:`1px solid ${C.border}`}}>{examine}</td>
+                  <td style={{padding:"10px 16px",textAlign:"center",color:C.gray,borderBottom:`1px solid ${C.border}`}}>{consumer}</td>
+                  <td style={{padding:"10px 16px",textAlign:"center",fontWeight:800,color:C.gold,background:i%2===0?"#1a1a1a":"#111111",borderBottom:"1px solid #1f2937"}}>{evidstack}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div style={{padding:"12px 16px",textAlign:"center"}}>
+          <p style={{fontSize:11,color:C.gray,margin:0}}>Examine.com pricing as of 2025. ConsumerLab $99.95/2 years. Neither covers body-calibrated dosing or AI stack analysis.</p>
+        </div>
+      </div>
 
       {/* Plan cards */}
       <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:16,marginBottom:48}}>

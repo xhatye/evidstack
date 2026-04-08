@@ -5192,80 +5192,94 @@ function LooksmaxxPage({onUpgrade,onAuth,onNavigate}){
 
   const protocols={
     skin:{
-      headline:"The skin stack. No fluff.",
-      subline:"Collagen density, elasticity, acne control, aging. Every compound with actual human trial data - not your cousin's skincare blog.",
+      headline:"Skin quality",
+      subline:"Compounds with documented human trial data for collagen synthesis, skin thickness, UV resistance, and anti-aging. Organized by evidence tier.",
       free_compounds:[
-        {name:"GHK-Cu",dose:"Injectable 200mcg/day or topical 0.1-0.5%",why:"Upregulates collagen I, III, elastin. Most studied copper peptide. Clinically proven skin thickness improvement.",badge:"Best evidence",badgeColor:"#16a34a",id:"ghk-cu"},
+        {name:"GHK-Cu",dose:"Injectable 200mcg/day or topical 0.1-0.5%",why:"Upregulates collagen type I and III and elastin synthesis. The most studied copper peptide in human trials, with documented improvements in skin thickness and firmness.",badge:"Best evidence",badgeColor:"#16a34a",id:"ghk-cu"},
         {name:"Astaxanthin",dose:"12mg/day with fat",why:"Most potent carotenoid antioxidant. 14 human RCTs. Reduces UV-induced skin damage, improves elasticity and moisture retention.",badge:"Tier 1 proven",badgeColor:"#16a34a",id:"astaxanthin"},
-        {name:"Vitamin C",dose:"500mg-1g/day",why:"Rate-limiting cofactor for collagen synthesis. Deplete it and collagen production stops. Also brightens skin and reduces oxidative damage.",badge:"Foundation",badgeColor:"#2563eb",id:"vitamin-c"},
+        {name:"Vitamin C",dose:"500mg-1g/day",why:"Cofactor for collagen and elastin synthesis. Deficiency directly impairs collagen production. Also reduces melanin oxidation and provides antioxidant support.",badge:"Foundation",badgeColor:"#2563eb",id:"vitamin-c"},
       ],
       pro_compounds:[
-        {name:"Hydrolyzed Collagen",dose:"10-15g/day",why:"Oral collagen peptides increase skin hydration by 28% and elasticity by 31% in double-blind trials. Takes 8-12 weeks.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"collagen"},
-        {name:"Pycnogenol",dose:"100-150mg/day",why:"French maritime pine bark. 7 RCTs showing improved skin elasticity, hydration, and UV protection. Anti-inflammatory.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"pine-bark-pycnogenol"},
-        {name:"Hyaluronic Acid",dose:"120-240mg/day oral",why:"Oral HA reaches skin tissue. 60-day trials show significant improvement in wrinkle depth and skin moisture. Not just topical hype.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"hyaluronic-acid"},
-        {name:"Epithalon",dose:"10mg/day for 10-20 day cycle",why:"Telomerase activator. Shown to reduce UV-induced skin damage, improve melanin regulation, and slow cellular aging in human studies.",badge:"Biohacker tier",badgeColor:"#d97706",id:"epitalon"},
+        {name:"Hydrolyzed Collagen",dose:"10-15g/day",why:"Oral collagen peptides increase skin hydration and elasticity in multiple double-blind trials. Bioactive peptides reach dermal fibroblasts and upregulate collagen synthesis. Effects visible at 8-12 weeks.",badge:"Strong evidence",badgeColor:"#7c3aed",id:"collagen"},
+        {name:"Pycnogenol",dose:"100-150mg/day",why:"Pine bark polyphenol with 7 controlled trials showing improved skin elasticity, hydration, and UV protection factor. Also documented anti-inflammatory effects via NF-kB inhibition.",badge:"7 RCTs",badgeColor:"#7c3aed",id:"pine-bark-pycnogenol"},
+        {name:"Hyaluronic Acid",dose:"120-240mg/day",why:"Oral HA is absorbed and reaches skin tissue. 60-day studies show measurable reduction in wrinkle depth and improvements in skin moisture compared to placebo.",badge:"Oral absorption",badgeColor:"#7c3aed",id:"hyaluronic-acid"},
+        {name:"Vitamin B3 (Niacinamide)",dose:"500-1000mg/day or 4-5% topical",why:"Inhibits melanosome transfer to keratinocytes, reducing hyperpigmentation. Also improves skin barrier function, reduces sebum production, and has documented effects on acne severity.",badge:"Multi-target",badgeColor:"#7c3aed",id:"vitamin-b3"},
+        {name:"Lycopene",dose:"10-30mg/day with fat",why:"Carotenoid with documented photoprotective effects. 12-week trials show increased skin thickness and reduced UV-induced erythema. Also reduces collagen degradation via MMP inhibition.",badge:"Photoprotection",badgeColor:"#7c3aed",id:"lycopene"},
+        {name:"Epithalon",dose:"10mg/day for 10-20 day cycle",why:"Tetrapeptide that activates telomerase and regulates pineal function. Human and in vitro studies show effects on UV-induced skin damage, melanin regulation, and markers of cellular aging.",badge:"Advanced",badgeColor:"#d97706",id:"epitalon"},
       ],
-      note:"Start with the T1 compounds first. Stack collagen + GHK-Cu + Astaxanthin before adding HA or Pycnogenol. Results compound over 8-16 weeks.",
+      note:"Collagen, GHK-Cu, and Astaxanthin form a solid starting point. Add HA and Pycnogenol after 4-6 weeks. Skin outcomes typically visible at 8-12 weeks of consistent use.",
     },
     hair:{
-      headline:"Hair. Stop it falling. Start it regrowing.",
-      subline:"DHT is the enemy. These are the weapons. Evidence-graded, mechanism explained.",
+      headline:"Hair retention",
+      subline:"Compounds targeting the main mechanisms of androgenic alopecia: DHT inhibition, follicle stimulation, and nutrient support. Evidence graded.",
       free_compounds:[
         {name:"Finasteride",dose:"1mg/day oral",why:"Type II 5-alpha reductase inhibitor. Reduces scalp DHT by ~70%. The most studied hair retention drug. 5-year trials show 90% maintain or improve.",badge:"Gold standard",badgeColor:"#16a34a",id:"finasteride"},
         {name:"Minoxidil",dose:"5% topical 2x/day or 0.25-2.5mg oral",why:"Vasodilator that extends anagen phase and increases follicle size. Oral low-dose is becoming the new standard: better systemic coverage.",badge:"Gold standard",badgeColor:"#16a34a",id:"minoxidil"},
         {name:"Zinc Bisglycinate",dose:"15-30mg/day",why:"Zinc deficiency directly causes hair loss via 5-AR dysregulation. Most bald and thinning men are suboptimal. High absorption form.",badge:"Foundation",badgeColor:"#2563eb",id:"zinc-bisglycinate"},
       ],
       pro_compounds:[
-        {name:"Saw Palmetto",dose:"320mg/day (lipid extract)",why:"Inhibits both 5-AR type I and II. Human trials show 60% of participants maintained or regrew hair. Lower side effect profile than finasteride.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"saw-palmetto"},
-        {name:"Biotin",dose:"5-10mg/day",why:"Only effective if deficient, but deficiency is more common than you think. Also necessary for healthy nail and skin keratin. Low risk.",badge:"Foundations",badgeColor:"#2563eb",id:"biotin"},
-        {name:"BPC-157",dose:"250-500mcg/day",why:"Stimulates blood vessel formation around follicles. Used off-label with early promising data on follicle regeneration and vascularization.",badge:"Experimental",badgeColor:"#d97706",id:"bpc-157"},
+        {name:"Saw Palmetto",dose:"320mg/day (lipid extract)",why:"Inhibits 5-alpha reductase type I and II. Controlled trials report 60% of users maintain or improve hair density. Generally considered a lower systemic DHT impact than finasteride.",badge:"Strong data",badgeColor:"#7c3aed",id:"saw-palmetto"},
+        {name:"Biotin",dose:"5mg/day",why:"Deficiency causes hair thinning and brittle keratin. Prevalence of deficiency is underestimated. Low risk and inexpensive correction.",badge:"Deficiency fix",badgeColor:"#2563eb",id:"biotin"},
+        {name:"BPC-157",dose:"250-500mcg/day",why:"Angiogenic peptide. Promotes VEGF expression and capillary formation. Early data shows relevance to follicle vascularization and scalp tissue repair.",badge:"Experimental",badgeColor:"#d97706",id:"bpc-157"},
+        {name:"Copper",dose:"1-2mg/day",why:"Required cofactor for lysyl oxidase, which crosslinks collagen and elastin in the follicular matrix. Also relevant as a counterbalance when supplementing high-dose zinc.",badge:"Micronutrient",badgeColor:"#7c3aed",id:"copper"},
+        {name:"Resveratrol",dose:"250-500mg/day",why:"Inhibits 5-alpha reductase in vitro. Preliminary human data for anti-androgenic effects and scalp microcirculation improvement. Limited but consistent preclinical evidence.",badge:"Experimental",badgeColor:"#d97706",id:"resveratrol"},
+        {name:"Ipamorelin",dose:"100-200mcg 2-3x/day",why:"GH secretagogue. Chronic elevation of IGF-1 is associated with extended anagen phase and follicle size increases. Hair benefit is secondary to body composition use but documented.",badge:"Advanced",badgeColor:"#d97706",id:"ipamorelin"},
       ],
-      note:"Finasteride + Minoxidil is the standard combo. Add Saw Palmetto if concerned about sides. Zinc fixes underlying deficiency. BPC-157 is the bleeding edge add-on.",
+      note:"Finasteride and Minoxidil are the most studied combination for male androgenic alopecia. Saw Palmetto is a lower-risk alternative to finasteride. Address zinc deficiency before adding other compounds.",
     },
     frame:{
-      headline:"Frame. Shoulder-to-waist ratio is the game.",
-      subline:"The compounds that actually move the needle on muscle mass, testosterone, and body composition. Ranked by evidence, not bodybuilding forums.",
+      headline:"Body composition and testosterone",
+      subline:"Compounds with documented effects on testosterone, lean mass, and body composition in human trials. Foundation to advanced.",
       free_compounds:[
-        {name:"Creatine Monohydrate",dose:"5g/day",why:"The most evidence-backed performance compound in history. 500+ human trials. Increases strength, muscle volume, and arguably facial bone density via IGF-1.",badge:"Best evidence",badgeColor:"#16a34a",id:"creatine-monohydrate"},
-        {name:"Vitamin D3 + K2",dose:"4000-6000 IU D3 + 200mcg K2",why:"Vitamin D deficiency cuts testosterone by 20-30%. Nearly everyone in northern latitudes is deficient. K2 directs calcium to bones not arteries.",badge:"Foundation",badgeColor:"#2563eb",id:"vitamine-d3-k2"},
-        {name:"Zinc Bisglycinate",dose:"15-30mg/day",why:"Zinc is a direct cofactor for testosterone synthesis. Athletes sweat it out. Most men are at the low end. High-absorption glycinate form.",badge:"Foundation",badgeColor:"#2563eb",id:"zinc-bisglycinate"},
+        {name:"Creatine Monohydrate",dose:"5g/day",why:"The most studied performance compound in existence with 500+ human trials. Increases strength, lean mass, and cellular hydration. IGF-1 elevation from long-term use may also affect bone mineral density.",badge:"Best evidence",badgeColor:"#16a34a",id:"creatine-monohydrate"},
+        {name:"Vitamin D3 + K2",dose:"4000-6000 IU D3 + 200mcg K2",why:"Vitamin D deficiency is associated with 20-30% lower testosterone levels. Prevalence of insufficiency is high in northern latitudes. K2 ensures calcium is deposited in bone rather than soft tissue.",badge:"Foundation",badgeColor:"#2563eb",id:"vitamine-d3-k2"},
+        {name:"Zinc Bisglycinate",dose:"15-30mg/day",why:"Cofactor for 5-alpha reductase regulation and testosterone synthesis. Suboptimal zinc status is common in athletes and men with hair loss. Bisglycinate form has superior absorption.",badge:"Foundation",badgeColor:"#2563eb",id:"zinc-bisglycinate"},
       ],
       pro_compounds:[
-        {name:"Tongkat Ali",dose:"400-600mg/day (standardized)",why:"8 human RCTs showing testosterone increases of 15-37% in men with suboptimal levels. Also reduces cortisol: testosterone enemy #1.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"tongkat-ali"},
-        {name:"Ashwagandha KSM-66",dose:"600mg/day",why:"Reduces cortisol by 27%. Multiple trials show testosterone increase of 14-40%. Cortisol and testosterone have an inverse relationship.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"ashwagandha-ksm66"},
-        {name:"Ipamorelin + CJC-1295",dose:"100-200mcg each, 2-3x/day",why:"GHRP + GHRH. Synergistic GH pulse without disrupting natural pulsatile patterns. More lean mass, faster recovery, improved sleep quality.",badge:"Advanced",badgeColor:"#d97706",id:"ipamorelin"},
+        {name:"Tongkat Ali",dose:"400-600mg/day (standardized)",why:"8 human RCTs documenting testosterone increases of 15-37% in men with suboptimal baseline levels. Also reduces SHBG, increasing free testosterone fraction. Cortisol reduction documented in stress trials.",badge:"8 RCTs",badgeColor:"#7c3aed",id:"tongkat-ali"},
+        {name:"Ashwagandha KSM-66",dose:"600mg/day",why:"Adaptogen with documented cortisol reduction (27%) and testosterone increases in multiple controlled trials. HPA axis modulation explains both effects.",badge:"Strong evidence",badgeColor:"#7c3aed",id:"ashwagandha-ksm66"},
+        {name:"Ipamorelin + CJC-1295",dose:"100-200mcg each, 2-3x/day",why:"GHRP + GHRH combination. Synergistic GH release without suppressing natural pulsatile patterns. Effects: lean mass gain, reduced body fat, improved recovery, better sleep architecture.",badge:"Peptide tier",badgeColor:"#d97706",id:"ipamorelin"},
+        {name:"Boron",dose:"6-12mg/day",why:"Reduces SHBG, directly increasing free testosterone. 7mg/day for one week raised free testosterone by 28% and reduced estradiol by 39% in a controlled trial. Cheap and underused.",badge:"Underrated",badgeColor:"#7c3aed",id:"boron"},
+        {name:"NMN / NR",dose:"500-1000mg/day",why:"NAD+ precursor. Restores mitochondrial efficiency, relevant for training performance and recovery. Also shown to improve insulin sensitivity and reduce age-related muscle decline.",badge:"Longevity crossover",badgeColor:"#7c3aed",id:"nmn"},
+        {name:"N-Acetylcysteine",dose:"600-1200mg/day",why:"Precursor to glutathione. Reduces exercise-induced oxidative stress and improves post-workout recovery markers. Also documented benefits for insulin sensitivity and cortisol management.",badge:"Recovery",badgeColor:"#7c3aed",id:"nac"},
       ],
-      note:"Build the foundation first: optimize D3, zinc, sleep quality. Then testosterone herbs. Peptides are the next level once the basics are dialed.",
+      note:"Correct D3 and zinc deficiencies first: these are the most common hormonal bottlenecks. Adaptogens come second. Peptides are the next tier once baseline hormones are optimized.",
     },
     face:{
-      headline:"Face recomp. Lose the fat. Keep the skin.",
-      subline:"The difference between a defined face and a puffy face is usually body fat percentage and facial fat distribution. These compounds target both.",
+      headline:"Facial fat and skin definition",
+      subline:"Compounds targeting visceral and subcutaneous fat reduction, skin elasticity during weight loss, and anti-inflammatory effects on facial puffiness.",
       free_compounds:[
         {name:"Semaglutide",dose:"0.25-2.4mg/week SC injection",why:"GLP-1 agonist. Causes 15-20% body weight loss in trials, with disproportionate facial fat reduction. Requires prescription.",badge:"Most effective",badgeColor:"#16a34a",id:"semaglutide"},
         {name:"Hydrolyzed Collagen",dose:"10-15g/day",why:"Prevents loose skin during fat loss: a major issue when cutting face fat quickly. Collagen maintains skin architecture during weight loss.",badge:"Stack with GLP-1",badgeColor:"#2563eb",id:"collagen"},
         {name:"Astaxanthin",dose:"12mg/day",why:"During a cut, UV and oxidative damage to skin increases. Astaxanthin is photoprotective and antioxidant: protects skin quality during caloric deficit.",badge:"Protective",badgeColor:"#2563eb",id:"astaxanthin"},
       ],
       pro_compounds:[
-        {name:"Tesamorelin",dose:"1-2mg/day SC",why:"FDA approved for visceral fat reduction. Specifically targets abdominal and facial subcutaneous fat via IGF-1 stimulation.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"tesamorelin"},
-        {name:"GHK-Cu",dose:"Injectable 200mcg/day",why:"Critical during face recomp. As fat leaves the face, collagen remodeling needs to follow. GHK-Cu accelerates this: prevents gaunt look.",badge:"Anti-gaunt",badgeColor:"#7c3aed",id:"ghk-cu"},
-        {name:"Pycnogenol",dose:"100mg/day",why:"Reduces water retention and puffiness via anti-inflammatory mechanisms. Some men report visible facial definition improvement within 3-4 weeks.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"pine-bark-pycnogenol"},
+        {name:"Tesamorelin",dose:"1-2mg/day SC",why:"FDA-approved for visceral fat reduction in clinical settings. Works via GHRH receptor activation, increasing IGF-1, which preferentially targets abdominal and facial subcutaneous adipose tissue.",badge:"FDA indication",badgeColor:"#7c3aed",id:"tesamorelin"},
+        {name:"GHK-Cu",dose:"Injectable 200mcg/day",why:"During significant fat loss, skin laxity is a documented risk. GHK-Cu accelerates collagen and elastin remodeling, maintaining skin architecture during body recomposition.",badge:"Skin integrity",badgeColor:"#7c3aed",id:"ghk-cu"},
+        {name:"Pycnogenol",dose:"100-150mg/day",why:"Anti-inflammatory via NF-kB inhibition. Reduces facial water retention and puffiness with measurable improvement in trials. Also improves skin microcirculation.",badge:"Anti-inflammatory",badgeColor:"#7c3aed",id:"pine-bark-pycnogenol"},
+        {name:"Copper",dose:"1-2mg/day",why:"During GLP-1-induced fat loss, copper-dependent lysyl oxidase becomes rate-limiting for collagen crosslinking. Supplementation ensures adequate substrate for skin structural support.",badge:"Collagen support",badgeColor:"#7c3aed",id:"copper"},
+        {name:"N-Acetylcysteine",dose:"600mg/day",why:"Glutathione precursor with documented effects on inflammation and oxidative stress. Also improves insulin sensitivity, which affects facial fat distribution and skin quality.",badge:"Antioxidant",badgeColor:"#7c3aed",id:"nac"},
+        {name:"Epithalon",dose:"10mg/day for 10-20 days",why:"Tetrapeptide with documented effects on cellular aging markers and collagen regulation. Relevant for maintaining skin quality during accelerated body recomposition.",badge:"Advanced",badgeColor:"#d97706",id:"epitalon"},
       ],
-      note:"Semaglutide alone will recomp the face. The danger is losing collagen and looking gaunt. Run Collagen + GHK-Cu alongside any significant cut.",
+      note:"GLP-1 agonists and Tesamorelin cause significant fat loss with facial impact. Co-administration of Collagen and GHK-Cu reduces the risk of skin laxity during rapid fat loss.",
     },
     sleep:{
-      headline:"Sleep is the most underrated looksmax.",
-      subline:"Dark circles, facial puffiness, flat skin, low testosterone: most of that is just bad sleep. Fix the root cause.",
+      headline:"Sleep quality and recovery",
+      subline:"Compounds with documented effects on sleep latency, slow-wave sleep depth, and overnight hormonal recovery. Includes GH secretagogues.",
       free_compounds:[
         {name:"Magnesium Bisglycinate",dose:"300-500mg 1hr before bed",why:"Activates GABA receptors and parasympathetic system. Clinically proven to reduce sleep latency and increase slow-wave sleep. Also reduces cortisol.",badge:"Best evidence",badgeColor:"#16a34a",id:"magnesium-bisglycinate"},
         {name:"Glycine",dose:"3g before bed",why:"Reduces core body temperature which is the primary trigger for sleep onset. Human RCTs show improved subjective sleep quality, less fatigue.",badge:"Proven",badgeColor:"#16a34a",id:"glycine"},
         {name:"Ashwagandha KSM-66",dose:"300-600mg at night",why:"Reduces cortisol, improves sleep quality scores, reduces time to fall asleep. Also the testosterone benefit doubles when sleep quality improves.",badge:"Dual action",badgeColor:"#2563eb",id:"ashwagandha-ksm66"},
       ],
       pro_compounds:[
-        {name:"Ipamorelin",dose:"100-200mcg before bed",why:"GH secretagogue. The largest natural GH pulse of the day is at sleep onset. Ipamorelin amplifies this pulse by 3-5x: deep sleep, cellular repair, more lean mass.",badge:"GH optimization",badgeColor:"#7c3aed",id:"ipamorelin"},
-        {name:"Taurine",dose:"1-3g before bed",why:"GABA-A modulator. Reduces sleep fragmentation and improves REM. Also cardioprotective and anti-inflammatory. Underrated and cheap.",badge:"Underrated",badgeColor:"#7c3aed",id:"taurine"},
-        {name:"Epithalon",dose:"10mg/day for 10-20 days",why:"Regulates melatonin secretion and circadian rhythm at the pineal gland level. Most relevant for anyone whose sleep cycle is desynchronized.",badge:"Biohacker tier",badgeColor:"#d97706",id:"epitalon"},
+        {name:"Ipamorelin",dose:"100-200mcg before bed",why:"GH secretagogue. The primary GH pulse occurs at sleep onset. Pre-sleep Ipamorelin amplifies this pulse without disrupting natural pulsatile GH rhythms, with documented improvements in sleep architecture and recovery markers.",badge:"GH pulse",badgeColor:"#7c3aed",id:"ipamorelin"},
+        {name:"Taurine",dose:"1-3g before bed",why:"GABA-A receptor modulator. Reduces sleep fragmentation and improves REM percentage in sleep studies. Additional benefits for cardiac function and anti-inflammatory markers.",badge:"GABA modulator",badgeColor:"#7c3aed",id:"taurine"},
+        {name:"Epithalon",dose:"10mg/day for 10-20 days",why:"Regulates melatonin secretion at the pineal gland level and modulates circadian gene expression. Most relevant for individuals with disrupted circadian rhythm or age-related melatonin decline.",badge:"Circadian",badgeColor:"#d97706",id:"epitalon"},
+        {name:"Melatonin",dose:"0.5-3mg 30-60min before bed",why:"Endogenous sleep-onset signal. Low physiological doses (0.5-1mg) are more effective than high doses for most users. Also a potent antioxidant with documented mitochondrial anti-aging effects.",badge:"Dose-sensitive",badgeColor:"#7c3aed",id:"melatonin"},
+        {name:"Ashwagandha KSM-66",dose:"300-600mg at night",why:"HPA axis modulator. Evening supplementation reduces cortisol, shortens sleep onset latency, and improves subjective sleep quality. Testosterone benefit is amplified when sleep quality is corrected.",badge:"HPA axis",badgeColor:"#7c3aed",id:"ashwagandha-ksm66"},
+        {name:"NMN / NR",dose:"500mg in the morning",why:"NAD+ precursor that improves mitochondrial efficiency during overnight recovery. Also regulates circadian clock genes including SIRT1 and CLOCK. Take in the morning to avoid potential sleep disruption.",badge:"Circadian clock",badgeColor:"#7c3aed",id:"nmn"},
       ],
-      note:"Get the foundation right: Magnesium + Glycine is a free upgrade most people ignore. Ipamorelin at night is the single best addition once you're sleeping 7+ hours.",
+      note:"Magnesium Bisglycinate and Glycine have the strongest evidence base for sleep onset. GH secretagogues like Ipamorelin amplify the GH pulse at sleep onset and are most effective when base sleep duration is already 7+ hours.",
     },
   };
 
@@ -5289,7 +5303,7 @@ function LooksmaxxPage({onUpgrade,onAuth,onNavigate}){
             Looksmaxx with<br/><span style={{color:C.gold}}>actual science.</span>
           </h1>
           <p style={{fontSize:isMob?13:15,color:"#6b7280",margin:"0 0 28px",maxWidth:520,lineHeight:1.7}}>
-            Every protocol ranked by human trial data. Not Reddit anecdotes. Not influencer stacks. The compounds that actually move the needle on skin, hair, frame, and face: with the mechanism explained.
+            Compounds ranked by human trial evidence across five categories: skin, hair, body composition, facial definition, and sleep. Mechanisms and dosing included for each entry.
           </p>
           <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
             {[["370+","compounds in DB"],["Evidence","ranked by RCT data"],["Zero","conflicts of interest"]].map(([v,l])=>(

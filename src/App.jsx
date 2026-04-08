@@ -55,7 +55,6 @@ const ROUTES = {
   "/interaction-checker":"interaction-checker",
   "/stack-audit":"stack-audit",
   "/bloodwork-history":"bloodwork-history",
-  "/looksmaxx":"looksmaxx",
 };
 
 function getShareIdFromPath(){
@@ -68,7 +67,6 @@ function getPageFromPath(){
   const path=window.location.pathname;
   if(path.startsWith("/compound/"))return "compound";
   if(path.startsWith("/stack/"))return "shared-stack";
-  if(path.startsWith("/looksmaxx"))return "looksmaxx";
   return ROUTES[path]||"supplements";
 }
 function getCompoundIdFromPath(){
@@ -94,7 +92,7 @@ const C = {
 
 const T = {
   nav: { supplements:"Supplements", protocols:"Protocols", about:"About" },
-  controls: { search:"Search a supplement...", sortEfficacy:"Efficacy", sortEvidence:"Evidence", sortTier:"Tier", tierAll:"All Tiers", tiers:["Fundamentals","Advanced","Expert","Biohacking"], result:(n)=>`${n} result${n!==1?"s":""}`, goals:["All","Sleep","Focus","Memory","Mood","Strength","Recovery","Energy","Testosterone","Stress","Longevity","Skin","Cardio","Weight Loss","Hair Health","Liver / Detox","Body Recomp","Eye Health"] },
+  controls: { search:"Search a supplement...", sortEfficacy:"Efficacy", sortEvidence:"Evidence", sortTier:"Tier", tierAll:"All Tiers", tiers:["Fundamentals","Advanced","Expert","Biohacking"], result:(n)=>`${n} result${n!==1?"s":""}`, goals:["All","Sleep","Focus","Memory","Mood","Strength","Recovery","Energy","Testosterone","Stress","Longevity","Aesthetics","Cardio","Fat Loss","Hair","Liver / Detox","Body Recomp","Eye Health"] },
   card: { dosage:"Dosage", interactions:"Interactions", noInteractions:"None known", negative:"NEGATIVE", efficacy:"Efficacy", evidence:"Evidence", avgEfficacy:"Avg. efficacy", avgEvidence:"Avg. evidence", safety:["","RISKY","CAUTION","CAUTION","SAFE","VERY SAFE"], studies:(n,tp)=>`${n} studies / ${tp}` },
   footer:"Data sourced from PubMed meta-analyses and Cochrane reviews. For informational purposes only. Consult a healthcare professional before supplementing.",
   noResults:"No results",
@@ -189,7 +187,7 @@ function OnboardingModal({onClose}){
     {
       icon:"🧬",
       title:"Pro AI tools",
-      desc:"AI Compound Advisor lets you describe any issue and returns compounds ranked by evidence - try 1 query free. Interaction Checker analyzes your full stack for conflicts and synergies. Stack Audit AI scores your current stack and tells you exactly what to change. Bloodwork History tracks 16 biomarkers over time.",
+      desc:"AI Compound Advisor lets you describe any goal: skin quality, hair retention, hormones, body composition. Interaction Checker analyzes your full stack. Stack Audit AI scores and optimizes your protocol. Bloodwork History tracks 16 biomarkers over time.",
       detail:"All AI tools are Pro-only and powered by the same evidence base as the database.",
     },
   ];
@@ -2347,7 +2345,7 @@ function AboutPage(){
         },
         {
           label:"What we cover",
-          body:`Evidstack covers ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds across the full spectrum of evidence-based supplementation: foundational supplements like vitamin D, zinc, and omega-3; advanced nootropics and cognitive enhancers including racetams, cholinergics, and dopaminergic agents; peptides spanning healing compounds like BPC-157 and TB-500, GH secretagogues like Ipamorelin and CJC-1295, and skin and longevity peptides like GHK-Cu and Epithalon; GLP-1 receptor agonists and metabolic compounds including semaglutide and tirzepatide; hair retention and aesthetic compounds including finasteride, dutasteride, and minoxidil; SARMs and performance compounds with available human trial data; anti-aging interventions including rapamycin, metformin, and senolytic compounds; and adaptogenic and stress-response compounds. Each entry includes clinical dosing ranges, timing recommendations, known interactions, safety rating, legal status, and estimated monthly cost.`
+          body:`Evidstack covers ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds across the full spectrum of evidence-based supplementation: foundational supplements like vitamin D, zinc, and omega-3; advanced nootropics and cognitive enhancers including racetams, cholinergics, and dopaminergic agents; peptides spanning healing compounds like BPC-157 and TB-500, GH secretagogues like Ipamorelin and CJC-1295, and skin and longevity peptides like GHK-Cu and Epithalon; GLP-1 receptor agonists and metabolic compounds including semaglutide and tirzepatide; hair retention and facial aesthetic compounds including finasteride, dutasteride, minoxidil, GHK-Cu, collagen peptides, and compounds targeting facial fat distribution and bone density; SARMs and performance compounds with available human trial data; anti-aging interventions including rapamycin, metformin, and senolytic compounds; and adaptogenic and stress-response compounds. Each entry includes clinical dosing ranges, timing recommendations, known interactions, safety rating, legal status, and estimated monthly cost.`
         },
         {
           label:"What others won't cover",
@@ -2984,14 +2982,16 @@ function AppInner(){
   const PLACEHOLDERS=[
     "Search by compound name...",
     "Try \"creatine\" for strength and muscle",
-    "Try \"sleep\" to filter by goal",
+    "Try \"GHK-Cu\" for collagen and skin peptides",
     "Try \"semaglutide\" for weight loss",
     "Try \"BPC-157\" for healing peptides",
-    "Try \"hair\" for hair retention compounds",
+    "Try \"finasteride\" for hair retention",
     "Try \"focus\" for cognitive enhancers",
     "Try \"longevity\" for anti-aging compounds",
-    "Try \"modafinil\" for wakefulness",
-    "Try \"skin\" for aesthetics compounds",
+    "Try \"collagen\" for skin and facial quality",
+    "Try \"skin\" to filter aesthetics compounds",
+    "Try \"astaxanthin\" for photoprotection",
+    "Try \"boron\" for testosterone and bone density",
   ];
   const [phIdx,setPhIdx]=useState(0);
   const [phFade,setPhFade]=useState(true);
@@ -3084,7 +3084,6 @@ function AppInner(){
   const navItems=[
     {id:"supplements",label:"Supplements"},
     {id:"advisor",label:"AI Compound Advisor"},
-    {id:"looksmaxx",label:"Looksmaxx"},
     {id:"pricing",label:"Pricing"},
     {id:"about",label:"About"},
   ];
@@ -3221,7 +3220,6 @@ function AppInner(){
       {page==="affiliate"&&<AffiliatePage/>}
       {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
       {page==="shared-stack"&&<SharedStackPage shareId={shareId}/>}
-      {page==="looksmaxx"&&<LooksmaxxPage onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
       {page==="legal"          &&<LegalPage/>}
       {page==="interactions"   &&<InteractionChecker onUpgrade={openUpgrade}/>}
       {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}
@@ -3258,7 +3256,7 @@ function AppInner(){
             Not just what the science says.<br/>What you should actually do.
           </h1>
           <p style={{fontSize:isMobile?13:15,color:C.gray,lineHeight:1.8,margin:"0 auto 20px",maxWidth:580,padding:isMobile?"0 4px":0}}>
-            {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds: peptides, SARMs, GLP-1s, anabolics, nootropics - scored by <strong style={{color:C.ink,fontWeight:700}}>actual effect size</strong> and <strong style={{color:C.ink,fontWeight:700}}>evidence quality</strong>. Then an AI that turns the data into a protocol built for your body.
+            {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds: peptides, SARMs, GLP-1s, anabolics, nootropics, skin & aesthetics - scored by <strong style={{color:C.ink,fontWeight:700}}>actual effect size</strong> and <strong style={{color:C.ink,fontWeight:700}}>evidence quality</strong>. Then an AI that turns the data into a protocol built for your body.
           </p>
           <HeroStats isMobile={isMobile}/>
           <div style={{display:"flex",maxWidth:680,margin:"0 auto 20px",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
@@ -4131,7 +4129,7 @@ function CompoundAdvisorScreen({onUpgrade}){
 
   const reset=()=>{setResult(null);setHistory([]);setQuery("");setPhase("idle");setRevealedCount(0);setScanLine(0);setErr("");setShowUpgradeWall(false);};
 
-  const SUGGESTIONS=["I want to improve my sleep quality","Best compounds for testosterone optimization","I feel low energy every afternoon","Help me focus better without caffeine dependency","I want to reduce inflammation and joint pain","I'm looking to maximize muscle recovery"];
+  const SUGGESTIONS=["Best compounds for skin quality and collagen","Compounds affecting facial fat distribution","Hair retention stack: DHT, finasteride alternatives","What compounds improve bone density and IGF-1","Best peptide stack for skin and recovery","Best compounds for testosterone optimization","I want to improve my sleep quality","I'm looking to maximize muscle recovery"];
 
   const S={
     page:{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"},
@@ -4177,7 +4175,7 @@ function CompoundAdvisorScreen({onUpgrade}){
           )}
           {isPro&&<span style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,border:`1px solid ${C.gold}`,padding:"4px 10px"}}>PRO</span>}
         </div>
-        <p style={S.sub}>Describe any health goal or issue. The advisor searches {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds and returns the strongest evidence-based options, ranked by efficacy and study quality.{!isPro&&!freeUsed?" Try 1 query free, no account needed.":""}</p>
+        <p style={S.sub}>Describe any goal: performance, cognition, skin quality, hair, hormones, aesthetics, longevity. The advisor searches {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds and returns the strongest evidence-based options, ranked by efficacy and study quality.{!isPro&&!freeUsed?" Try 1 query free, no account needed.":""}</p>
         {userProfile&&userProfile.weightKg&&<div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 14px",background:`${C.gold}12`,border:`1px solid ${C.gold}40`,marginBottom:16,fontSize:11,fontWeight:700,color:"#92400e",maxWidth:S.inner.maxWidth}}>
           <span style={{fontSize:14}}>🎯</span>
           Dosages calibrated to your profile: {userProfile.weightKg}kg{userProfile.age?`, ${userProfile.age}yo`:""}{userProfile.sex?`, ${userProfile.sex}`:""}
@@ -5171,257 +5169,6 @@ function BloodworkHistoryScreen({onUpgrade}){
             </div>
           </>
         )}
-      </div>
-    </div>
-  );
-}
-
-// ── LOOKSMAXX PAGE ───────────────────────────────────────────────────────────
-function LooksmaxxPage({onUpgrade,onAuth,onNavigate}){
-  const {isPro,user}=useAuth();
-  const isMob=useIsMobile();
-  const [activeTab,setActiveTab]=useState("skin");
-
-  const tabs=[
-    {id:"skin",label:"Skin",icon:"🪞"},
-    {id:"hair",label:"Hair",icon:"💈"},
-    {id:"frame",label:"Frame & Body",icon:"💪"},
-    {id:"face",label:"Face Recomp",icon:"🗿"},
-    {id:"sleep",label:"Sleep & Recovery",icon:"😴"},
-  ];
-
-  const protocols={
-    skin:{
-      headline:"Skin quality",
-      subline:"Compounds with documented human trial data for collagen synthesis, skin thickness, UV resistance, and anti-aging. Organized by evidence tier.",
-      free_compounds:[
-        {name:"GHK-Cu",dose:"Injectable 200mcg/day or topical 0.1-0.5%",why:"Upregulates collagen type I and III and elastin synthesis. The most studied copper peptide in human trials, with documented improvements in skin thickness and firmness.",badge:"Best evidence",badgeColor:"#16a34a",id:"ghk-cu"},
-        {name:"Astaxanthin",dose:"12mg/day with fat",why:"Most potent carotenoid antioxidant. 14 human RCTs. Reduces UV-induced skin damage, improves elasticity and moisture retention.",badge:"Tier 1 proven",badgeColor:"#16a34a",id:"astaxanthin"},
-        {name:"Vitamin C",dose:"500mg-1g/day",why:"Cofactor for collagen and elastin synthesis. Deficiency directly impairs collagen production. Also reduces melanin oxidation and provides antioxidant support.",badge:"Foundation",badgeColor:"#2563eb",id:"vitamin-c"},
-      ],
-      pro_compounds:[
-        {name:"Hydrolyzed Collagen",dose:"10-15g/day",why:"Oral collagen peptides increase skin hydration and elasticity in multiple double-blind trials. Bioactive peptides reach dermal fibroblasts and upregulate collagen synthesis. Effects visible at 8-12 weeks.",badge:"Strong evidence",badgeColor:"#7c3aed",id:"collagen"},
-        {name:"Pycnogenol",dose:"100-150mg/day",why:"Pine bark polyphenol with 7 controlled trials showing improved skin elasticity, hydration, and UV protection factor. Also documented anti-inflammatory effects via NF-kB inhibition.",badge:"7 RCTs",badgeColor:"#7c3aed",id:"pine-bark-pycnogenol"},
-        {name:"Hyaluronic Acid",dose:"120-240mg/day",why:"Oral HA is absorbed and reaches skin tissue. 60-day studies show measurable reduction in wrinkle depth and improvements in skin moisture compared to placebo.",badge:"Oral absorption",badgeColor:"#7c3aed",id:"hyaluronic-acid"},
-        {name:"Vitamin B3 (Niacinamide)",dose:"500-1000mg/day or 4-5% topical",why:"Inhibits melanosome transfer to keratinocytes, reducing hyperpigmentation. Also improves skin barrier function, reduces sebum production, and has documented effects on acne severity.",badge:"Multi-target",badgeColor:"#7c3aed",id:"vitamin-b3"},
-        {name:"Lycopene",dose:"10-30mg/day with fat",why:"Carotenoid with documented photoprotective effects. 12-week trials show increased skin thickness and reduced UV-induced erythema. Also reduces collagen degradation via MMP inhibition.",badge:"Photoprotection",badgeColor:"#7c3aed",id:"lycopene"},
-        {name:"Epithalon",dose:"10mg/day for 10-20 day cycle",why:"Tetrapeptide that activates telomerase and regulates pineal function. Human and in vitro studies show effects on UV-induced skin damage, melanin regulation, and markers of cellular aging.",badge:"Advanced",badgeColor:"#d97706",id:"epitalon"},
-      ],
-      note:"Collagen, GHK-Cu, and Astaxanthin form a solid starting point. Add HA and Pycnogenol after 4-6 weeks. Skin outcomes typically visible at 8-12 weeks of consistent use.",
-    },
-    hair:{
-      headline:"Hair retention",
-      subline:"Compounds targeting the main mechanisms of androgenic alopecia: DHT inhibition, follicle stimulation, and nutrient support. Evidence graded.",
-      free_compounds:[
-        {name:"Finasteride",dose:"1mg/day oral",why:"Type II 5-alpha reductase inhibitor. Reduces scalp DHT by ~70%. The most studied hair retention drug. 5-year trials show 90% maintain or improve.",badge:"Gold standard",badgeColor:"#16a34a",id:"finasteride"},
-        {name:"Minoxidil",dose:"5% topical 2x/day or 0.25-2.5mg oral",why:"Vasodilator that extends anagen phase and increases follicle size. Oral low-dose is becoming the new standard: better systemic coverage.",badge:"Gold standard",badgeColor:"#16a34a",id:"minoxidil"},
-        {name:"Zinc Bisglycinate",dose:"15-30mg/day",why:"Zinc deficiency directly causes hair loss via 5-AR dysregulation. Most bald and thinning men are suboptimal. High absorption form.",badge:"Foundation",badgeColor:"#2563eb",id:"zinc-bisglycinate"},
-      ],
-      pro_compounds:[
-        {name:"Saw Palmetto",dose:"320mg/day (lipid extract)",why:"Inhibits 5-alpha reductase type I and II. Controlled trials report 60% of users maintain or improve hair density. Generally considered a lower systemic DHT impact than finasteride.",badge:"Strong data",badgeColor:"#7c3aed",id:"saw-palmetto"},
-        {name:"Biotin",dose:"5mg/day",why:"Deficiency causes hair thinning and brittle keratin. Prevalence of deficiency is underestimated. Low risk and inexpensive correction.",badge:"Deficiency fix",badgeColor:"#2563eb",id:"biotin"},
-        {name:"BPC-157",dose:"250-500mcg/day",why:"Angiogenic peptide. Promotes VEGF expression and capillary formation. Early data shows relevance to follicle vascularization and scalp tissue repair.",badge:"Experimental",badgeColor:"#d97706",id:"bpc-157"},
-        {name:"Copper",dose:"1-2mg/day",why:"Required cofactor for lysyl oxidase, which crosslinks collagen and elastin in the follicular matrix. Also relevant as a counterbalance when supplementing high-dose zinc.",badge:"Micronutrient",badgeColor:"#7c3aed",id:"copper"},
-        {name:"Resveratrol",dose:"250-500mg/day",why:"Inhibits 5-alpha reductase in vitro. Preliminary human data for anti-androgenic effects and scalp microcirculation improvement. Limited but consistent preclinical evidence.",badge:"Experimental",badgeColor:"#d97706",id:"resveratrol"},
-        {name:"Ipamorelin",dose:"100-200mcg 2-3x/day",why:"GH secretagogue. Chronic elevation of IGF-1 is associated with extended anagen phase and follicle size increases. Hair benefit is secondary to body composition use but documented.",badge:"Advanced",badgeColor:"#d97706",id:"ipamorelin"},
-      ],
-      note:"Finasteride and Minoxidil are the most studied combination for male androgenic alopecia. Saw Palmetto is a lower-risk alternative to finasteride. Address zinc deficiency before adding other compounds.",
-    },
-    frame:{
-      headline:"Body composition and testosterone",
-      subline:"Compounds with documented effects on testosterone, lean mass, and body composition in human trials. Foundation to advanced.",
-      free_compounds:[
-        {name:"Creatine Monohydrate",dose:"5g/day",why:"The most studied performance compound in existence with 500+ human trials. Increases strength, lean mass, and cellular hydration. IGF-1 elevation from long-term use may also affect bone mineral density.",badge:"Best evidence",badgeColor:"#16a34a",id:"creatine-monohydrate"},
-        {name:"Vitamin D3 + K2",dose:"4000-6000 IU D3 + 200mcg K2",why:"Vitamin D deficiency is associated with 20-30% lower testosterone levels. Prevalence of insufficiency is high in northern latitudes. K2 ensures calcium is deposited in bone rather than soft tissue.",badge:"Foundation",badgeColor:"#2563eb",id:"vitamine-d3-k2"},
-        {name:"Zinc Bisglycinate",dose:"15-30mg/day",why:"Cofactor for 5-alpha reductase regulation and testosterone synthesis. Suboptimal zinc status is common in athletes and men with hair loss. Bisglycinate form has superior absorption.",badge:"Foundation",badgeColor:"#2563eb",id:"zinc-bisglycinate"},
-      ],
-      pro_compounds:[
-        {name:"Tongkat Ali",dose:"400-600mg/day (standardized)",why:"8 human RCTs documenting testosterone increases of 15-37% in men with suboptimal baseline levels. Also reduces SHBG, increasing free testosterone fraction. Cortisol reduction documented in stress trials.",badge:"8 RCTs",badgeColor:"#7c3aed",id:"tongkat-ali"},
-        {name:"Ashwagandha KSM-66",dose:"600mg/day",why:"Adaptogen with documented cortisol reduction (27%) and testosterone increases in multiple controlled trials. HPA axis modulation explains both effects.",badge:"Strong evidence",badgeColor:"#7c3aed",id:"ashwagandha-ksm66"},
-        {name:"Ipamorelin + CJC-1295",dose:"100-200mcg each, 2-3x/day",why:"GHRP + GHRH combination. Synergistic GH release without suppressing natural pulsatile patterns. Effects: lean mass gain, reduced body fat, improved recovery, better sleep architecture.",badge:"Peptide tier",badgeColor:"#d97706",id:"ipamorelin"},
-        {name:"Boron",dose:"6-12mg/day",why:"Reduces SHBG, directly increasing free testosterone. 7mg/day for one week raised free testosterone by 28% and reduced estradiol by 39% in a controlled trial. Cheap and underused.",badge:"Underrated",badgeColor:"#7c3aed",id:"boron"},
-        {name:"NMN / NR",dose:"500-1000mg/day",why:"NAD+ precursor. Restores mitochondrial efficiency, relevant for training performance and recovery. Also shown to improve insulin sensitivity and reduce age-related muscle decline.",badge:"Longevity crossover",badgeColor:"#7c3aed",id:"nmn"},
-        {name:"N-Acetylcysteine",dose:"600-1200mg/day",why:"Precursor to glutathione. Reduces exercise-induced oxidative stress and improves post-workout recovery markers. Also documented benefits for insulin sensitivity and cortisol management.",badge:"Recovery",badgeColor:"#7c3aed",id:"nac"},
-      ],
-      note:"Correct D3 and zinc deficiencies first: these are the most common hormonal bottlenecks. Adaptogens come second. Peptides are the next tier once baseline hormones are optimized.",
-    },
-    face:{
-      headline:"Facial fat and skin definition",
-      subline:"Compounds targeting visceral and subcutaneous fat reduction, skin elasticity during weight loss, and anti-inflammatory effects on facial puffiness.",
-      free_compounds:[
-        {name:"Semaglutide",dose:"0.25-2.4mg/week SC injection",why:"GLP-1 agonist. Causes 15-20% body weight loss in trials, with disproportionate facial fat reduction. Requires prescription.",badge:"Most effective",badgeColor:"#16a34a",id:"semaglutide"},
-        {name:"Hydrolyzed Collagen",dose:"10-15g/day",why:"Prevents loose skin during fat loss: a major issue when cutting face fat quickly. Collagen maintains skin architecture during weight loss.",badge:"Stack with GLP-1",badgeColor:"#2563eb",id:"collagen"},
-        {name:"Astaxanthin",dose:"12mg/day",why:"During a cut, UV and oxidative damage to skin increases. Astaxanthin is photoprotective and antioxidant: protects skin quality during caloric deficit.",badge:"Protective",badgeColor:"#2563eb",id:"astaxanthin"},
-      ],
-      pro_compounds:[
-        {name:"Tesamorelin",dose:"1-2mg/day SC",why:"FDA-approved for visceral fat reduction in clinical settings. Works via GHRH receptor activation, increasing IGF-1, which preferentially targets abdominal and facial subcutaneous adipose tissue.",badge:"FDA indication",badgeColor:"#7c3aed",id:"tesamorelin"},
-        {name:"GHK-Cu",dose:"Injectable 200mcg/day",why:"During significant fat loss, skin laxity is a documented risk. GHK-Cu accelerates collagen and elastin remodeling, maintaining skin architecture during body recomposition.",badge:"Skin integrity",badgeColor:"#7c3aed",id:"ghk-cu"},
-        {name:"Pycnogenol",dose:"100-150mg/day",why:"Anti-inflammatory via NF-kB inhibition. Reduces facial water retention and puffiness with measurable improvement in trials. Also improves skin microcirculation.",badge:"Anti-inflammatory",badgeColor:"#7c3aed",id:"pine-bark-pycnogenol"},
-        {name:"Copper",dose:"1-2mg/day",why:"During GLP-1-induced fat loss, copper-dependent lysyl oxidase becomes rate-limiting for collagen crosslinking. Supplementation ensures adequate substrate for skin structural support.",badge:"Collagen support",badgeColor:"#7c3aed",id:"copper"},
-        {name:"N-Acetylcysteine",dose:"600mg/day",why:"Glutathione precursor with documented effects on inflammation and oxidative stress. Also improves insulin sensitivity, which affects facial fat distribution and skin quality.",badge:"Antioxidant",badgeColor:"#7c3aed",id:"nac"},
-        {name:"Epithalon",dose:"10mg/day for 10-20 days",why:"Tetrapeptide with documented effects on cellular aging markers and collagen regulation. Relevant for maintaining skin quality during accelerated body recomposition.",badge:"Advanced",badgeColor:"#d97706",id:"epitalon"},
-      ],
-      note:"GLP-1 agonists and Tesamorelin cause significant fat loss with facial impact. Co-administration of Collagen and GHK-Cu reduces the risk of skin laxity during rapid fat loss.",
-    },
-    sleep:{
-      headline:"Sleep quality and recovery",
-      subline:"Compounds with documented effects on sleep latency, slow-wave sleep depth, and overnight hormonal recovery. Includes GH secretagogues.",
-      free_compounds:[
-        {name:"Magnesium Bisglycinate",dose:"300-500mg 1hr before bed",why:"Activates GABA receptors and parasympathetic system. Clinically proven to reduce sleep latency and increase slow-wave sleep. Also reduces cortisol.",badge:"Best evidence",badgeColor:"#16a34a",id:"magnesium-bisglycinate"},
-        {name:"Glycine",dose:"3g before bed",why:"Reduces core body temperature which is the primary trigger for sleep onset. Human RCTs show improved subjective sleep quality, less fatigue.",badge:"Proven",badgeColor:"#16a34a",id:"glycine"},
-        {name:"Ashwagandha KSM-66",dose:"300-600mg at night",why:"Reduces cortisol, improves sleep quality scores, reduces time to fall asleep. Also the testosterone benefit doubles when sleep quality improves.",badge:"Dual action",badgeColor:"#2563eb",id:"ashwagandha-ksm66"},
-      ],
-      pro_compounds:[
-        {name:"Ipamorelin",dose:"100-200mcg before bed",why:"GH secretagogue. The primary GH pulse occurs at sleep onset. Pre-sleep Ipamorelin amplifies this pulse without disrupting natural pulsatile GH rhythms, with documented improvements in sleep architecture and recovery markers.",badge:"GH pulse",badgeColor:"#7c3aed",id:"ipamorelin"},
-        {name:"Taurine",dose:"1-3g before bed",why:"GABA-A receptor modulator. Reduces sleep fragmentation and improves REM percentage in sleep studies. Additional benefits for cardiac function and anti-inflammatory markers.",badge:"GABA modulator",badgeColor:"#7c3aed",id:"taurine"},
-        {name:"Epithalon",dose:"10mg/day for 10-20 days",why:"Regulates melatonin secretion at the pineal gland level and modulates circadian gene expression. Most relevant for individuals with disrupted circadian rhythm or age-related melatonin decline.",badge:"Circadian",badgeColor:"#d97706",id:"epitalon"},
-        {name:"Melatonin",dose:"0.5-3mg 30-60min before bed",why:"Endogenous sleep-onset signal. Low physiological doses (0.5-1mg) are more effective than high doses for most users. Also a potent antioxidant with documented mitochondrial anti-aging effects.",badge:"Dose-sensitive",badgeColor:"#7c3aed",id:"melatonin"},
-        {name:"Ashwagandha KSM-66",dose:"300-600mg at night",why:"HPA axis modulator. Evening supplementation reduces cortisol, shortens sleep onset latency, and improves subjective sleep quality. Testosterone benefit is amplified when sleep quality is corrected.",badge:"HPA axis",badgeColor:"#7c3aed",id:"ashwagandha-ksm66"},
-        {name:"NMN / NR",dose:"500mg in the morning",why:"NAD+ precursor that improves mitochondrial efficiency during overnight recovery. Also regulates circadian clock genes including SIRT1 and CLOCK. Take in the morning to avoid potential sleep disruption.",badge:"Circadian clock",badgeColor:"#7c3aed",id:"nmn"},
-      ],
-      note:"Magnesium Bisglycinate and Glycine have the strongest evidence base for sleep onset. GH secretagogues like Ipamorelin amplify the GH pulse at sleep onset and are most effective when base sleep duration is already 7+ hours.",
-    },
-  };
-
-  const proto=protocols[activeTab];
-  const tabColor={"skin":"#ec4899","hair":"#f59e0b","frame":"#16a34a","face":"#06b6d4","sleep":"#6366f1"};
-  const tc=tabColor[activeTab];
-
-  return(
-    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
-      {/* Header */}
-      <div style={{background:C.ink,padding:isMob?"32px 16px 28px":"48px 48px 40px",position:"relative",overflow:"hidden"}}>
-        {/* Subtle grid background */}
-        {!isMob&&<div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px)",backgroundSize:"40px 40px",pointerEvents:"none"}}/>}
-        <div style={{maxWidth:960,margin:"0 auto",position:"relative"}}>
-          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-            <span style={{fontSize:9,fontWeight:800,letterSpacing:".2em",color:C.gold,textTransform:"uppercase"}}>Evidstack</span>
-            <span style={{fontSize:9,color:"#374151"}}>×</span>
-            <span style={{fontSize:9,fontWeight:800,letterSpacing:".2em",color:"#6b7280",textTransform:"uppercase"}}>Looksmaxxing Protocols</span>
-          </div>
-          <h1 style={{fontSize:isMob?32:52,fontWeight:900,letterSpacing:"-.05em",color:C.white,margin:"0 0 12px",lineHeight:1}}>
-            Looksmaxx with<br/><span style={{color:C.gold}}>actual science.</span>
-          </h1>
-          <p style={{fontSize:isMob?13:15,color:"#6b7280",margin:"0 0 28px",maxWidth:520,lineHeight:1.7}}>
-            Compounds ranked by human trial evidence across five categories: skin, hair, body composition, facial definition, and sleep. Mechanisms and dosing included for each entry.
-          </p>
-          <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-            {[["370+","compounds in DB"],["Evidence","ranked by RCT data"],["Zero","conflicts of interest"]].map(([v,l])=>(
-              <div key={l} style={{padding:"8px 16px",border:"1px solid #1f2937",display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontSize:12,fontWeight:900,color:C.white}}>{v}</span>
-                <span style={{fontSize:10,color:"#6b7280"}}>{l}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Tab navigation */}
-      <div style={{background:C.white,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,zIndex:10}}>
-        <div style={{maxWidth:960,margin:"0 auto",display:"flex",overflowX:"auto",padding:"0 16px"}}>
-          {tabs.map(t=>(
-            <button key={t.id} onClick={()=>setActiveTab(t.id)}
-              style={{padding:"14px 18px",border:"none",borderBottom:`3px solid ${activeTab===t.id?tabColor[t.id]:"transparent"}`,background:"transparent",cursor:"pointer",fontFamily:"Montserrat,sans-serif",fontSize:isMob?11:12,fontWeight:800,color:activeTab===t.id?C.ink:C.gray,letterSpacing:".04em",whiteSpace:"nowrap",flexShrink:0,transition:"all .15s"}}>
-              {t.icon} {t.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div style={{maxWidth:960,margin:"0 auto",padding:isMob?"24px 16px 80px":"48px 48px 100px"}}>
-        {/* Protocol header */}
-        <div style={{marginBottom:32}}>
-          <h2 style={{fontSize:isMob?22:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 6px"}}>{proto.headline}</h2>
-          <p style={{fontSize:14,color:C.gray,margin:0,lineHeight:1.7,maxWidth:600}}>{proto.subline}</p>
-        </div>
-
-        {/* Foundation compounds - always visible */}
-        <div style={{marginBottom:24}}>
-          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
-            <div style={{height:1,flex:1,background:C.border}}/>
-            <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:0,textTransform:"uppercase",flexShrink:0}}>Foundation - Free</p>
-            <div style={{height:1,flex:1,background:C.border}}/>
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr 1fr",gap:12}}>
-            {proto.free_compounds.map(c=>(
-              <div key={c.name} onClick={()=>{window.history.pushState({},"",`/compound/${c.id}`);window.dispatchEvent(new PopStateEvent("popstate"));}}
-                style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${tc}`,padding:"18px 20px",cursor:"pointer",transition:"transform .15s, box-shadow .15s"}}
-                onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 4px 20px rgba(0,0,0,.08)";}}
-                onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-                  <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:0,letterSpacing:"-.02em"}}>{c.name}</p>
-                  <span style={{fontSize:8,fontWeight:800,color:c.badgeColor,background:`${c.badgeColor}15`,padding:"2px 7px",letterSpacing:".06em",borderRadius:2,flexShrink:0,marginLeft:8}}>{c.badge}</span>
-                </div>
-                <p style={{fontSize:10,fontWeight:700,color:tc,margin:"0 0 8px"}}>{c.dose}</p>
-                <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}>{c.why}</p>
-                <p style={{fontSize:10,color:C.gray,margin:"10px 0 0",opacity:.6}}>View full profile →</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Pro compounds */}
-        <div style={{marginBottom:32}}>
-          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
-            <div style={{height:1,flex:1,background:C.border}}/>
-            <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,margin:0,textTransform:"uppercase",flexShrink:0}}>Advanced - Pro</p>
-            <div style={{height:1,flex:1,background:C.border}}/>
-          </div>
-          {!isPro?(
-            <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"28px 24px",textAlign:"center"}}>
-              <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 6px"}}>Advanced protocols are Pro-only.</p>
-              <p style={{fontSize:12,color:C.gray,margin:"0 0 20px"}}>Unlock {proto.pro_compounds.length} additional compounds for this protocol: with full dosing, mechanisms, and evidence reviews.</p>
-              <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap",marginBottom:20}}>
-                {proto.pro_compounds.map(c=>(
-                  <span key={c.name} style={{fontSize:11,fontWeight:700,color:C.gray,background:C.bg,border:`1px solid ${C.border}`,padding:"4px 10px"}}>{c.name}</span>
-                ))}
-              </div>
-              <div style={{display:"flex",gap:10,justifyContent:"center"}}>
-                {user
-                  ?<button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"11px 28px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/month</button>
-                  :<><button onClick={()=>onAuth("signup")} style={{padding:"11px 24px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Create free account</button>
-                  <button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Go Pro</button></>
-                }
-              </div>
-            </div>
-          ):(
-            <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr 1fr",gap:12}}>
-              {proto.pro_compounds.map(c=>(
-                <div key={c.name} onClick={()=>{window.history.pushState({},"",`/compound/${c.id}`);window.dispatchEvent(new PopStateEvent("popstate"));}}
-                  style={{background:C.ink,border:`1px solid #1f2937`,borderTop:`3px solid ${tc}`,padding:"18px 20px",cursor:"pointer",transition:"transform .15s, box-shadow .15s"}}
-                  onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 6px 24px rgba(0,0,0,.3)";}}
-                  onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-                    <p style={{fontSize:14,fontWeight:900,color:C.white,margin:0,letterSpacing:"-.02em"}}>{c.name}</p>
-                    <span style={{fontSize:8,fontWeight:800,color:c.badgeColor,background:`${c.badgeColor}20`,padding:"2px 7px",letterSpacing:".06em",borderRadius:2,flexShrink:0,marginLeft:8}}>{c.badge}</span>
-                  </div>
-                  <p style={{fontSize:10,fontWeight:700,color:tc,margin:"0 0 8px"}}>{c.dose}</p>
-                  <p style={{fontSize:11,color:"#9ca3af",margin:0,lineHeight:1.6}}>{c.why}</p>
-                  <p style={{fontSize:10,color:"#6b7280",margin:"10px 0 0"}}>View full profile →</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Protocol note */}
-        <div style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${tc}`,padding:"14px 20px",marginBottom:40}}>
-          <p style={{fontSize:10,fontWeight:800,letterSpacing:".12em",color:C.gray,margin:"0 0 4px",textTransform:"uppercase"}}>Protocol note</p>
-          <p style={{fontSize:12,color:C.ink,margin:0,lineHeight:1.7}}>{proto.note}</p>
-        </div>
-
-        {/* Cross-sell: AI Advisor */}
-        <div style={{background:C.ink,padding:"24px 28px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:16}}>
-          <div>
-            <p style={{fontSize:13,fontWeight:900,color:C.white,margin:"0 0 4px"}}>Want a stack calibrated to your body?</p>
-            <p style={{fontSize:12,color:"#6b7280",margin:0}}>Describe your goals. The AI searches 370+ compounds and builds a protocol adjusted to your weight, age, and profile.</p>
-          </div>
-          <button onClick={()=>onNavigate("advisor")} className="evid-shimmer-btn"
-            style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>
-            Ask the AI →
-          </button>
-        </div>
       </div>
     </div>
   );

@@ -129,7 +129,7 @@ function HowItWorksSection({isMobile}){
     <div ref={ref} className={"evid-reveal"+(visible?" visible":"")}
       style={{maxWidth:680,margin:"0 auto 0",padding:"48px 16px 40px",fontFamily:"Montserrat,sans-serif"}}>
       <p style={{fontSize:10,fontWeight:800,letterSpacing:".18em",color:C.gray,textAlign:"center",margin:"0 0 32px",textTransform:"uppercase"}}>How it works</p>
-      <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr 1fr",gap:isMobile?16:24}}>
+      <div id="compounds-grid" style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr 1fr",gap:isMobile?16:24}}>
         {STEPS.map(({n,icon,title,desc},i)=>(
           <div key={n} style={{position:"relative",paddingTop:8,opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(20px)",transition:`opacity .5s ${i*.12}s, transform .5s ${i*.12}s`}}>
             <div style={{position:"absolute",top:0,left:0,fontSize:11,fontWeight:900,color:C.gold,letterSpacing:".04em"}}>{n}</div>
@@ -2965,6 +2965,8 @@ function AppInner(){
   const [shareId,setShareId]=useState(()=>getShareIdFromPath());
   const [goal,setGoal]=useState("all");
   const [search,setSearch]=useState("");
+  const [showSuggest,setShowSuggest]=useState(false);
+  const searchContainerRef=useRef(null);
   const [selected,setSelected]=useState(null);
   const [sortBy,setSortBy]=useState("efficacy");
   const [filterTier,setFilterTier]=useState(0);
@@ -2995,6 +2997,12 @@ function AppInner(){
   ];
   const [phIdx,setPhIdx]=useState(0);
   const [phFade,setPhFade]=useState(true);
+  // Close suggestions when clicking outside search container
+  useEffect(()=>{
+    const handler=(e)=>{if(searchContainerRef.current&&!searchContainerRef.current.contains(e.target))setShowSuggest(false);};
+    document.addEventListener("mousedown",handler);
+    return()=>document.removeEventListener("mousedown",handler);
+  },[]);
   useEffect(()=>{
     const iv=setInterval(()=>{
       setPhFade(false);
@@ -3060,7 +3068,28 @@ function AppInner(){
     let list=SUPPLEMENTS;
     if(goal!=="all")list=list.filter(s=>s.effects.some(e=>e.goal===goal));
     if(filterTier)list=list.filter(s=>s.tier===filterTier);
-    if(search.trim()){const q=search.toLowerCase();list=list.filter(s=>s.name.toLowerCase().includes(q)||(s.aliases||[]).some(a=>a.toLowerCase().includes(q)));}
+    if(search.trim()){
+      const q=search.toLowerCase();
+      // Semantic goal match: "sleep" → show all sleep compounds even if name doesn't contain "sleep"
+      const goalMatch=GOALS.find(g=>g.id!=="all"&&(g.label.toLowerCase().replace(" / ","").replace(/ /g,"").includes(q)||g.id===q));
+      if(goalMatch){
+        list=list.filter(s=>s.effects.some(e=>e.goal===goalMatch.id));
+      } else {
+        // Prefix match first, then include match on name + aliases
+        list=list.filter(s=>{
+          const n=s.name.toLowerCase();
+          const aliases=(s.aliases||[]).map(a=>a.toLowerCase());
+          const tags=(s.tags||[]).map(t=>t.toLowerCase());
+          return n.startsWith(q)||n.includes(q)||aliases.some(a=>a.includes(q))||tags.some(t=>t.includes(q));
+        });
+        // Sort so prefix matches come first
+        list=[...list].sort((a,b)=>{
+          const aStarts=a.name.toLowerCase().startsWith(q)?0:1;
+          const bStarts=b.name.toLowerCase().startsWith(q)?0:1;
+          return aStarts-bStarts;
+        });
+      }
+    }
     return[...list].sort((a,b)=>{
       const score=(s,k)=>{
         const ef=goal==="all"?s.effects:s.effects.filter(e=>e.goal===goal);
@@ -3259,15 +3288,81 @@ function AppInner(){
             {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds: peptides, SARMs, GLP-1s, anabolics, nootropics, skin & aesthetics - scored by <strong style={{color:C.ink,fontWeight:700}}>actual effect size</strong> and <strong style={{color:C.ink,fontWeight:700}}>evidence quality</strong>. Then an AI that turns the data into a protocol built for your body.
           </p>
           <HeroStats isMobile={isMobile}/>
-          <div style={{display:"flex",maxWidth:680,margin:"0 auto 20px",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
-            {!search&&(
-              <div style={{position:"absolute",left:isMobile?14:20,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",zIndex:1,opacity:phFade?1:0,transition:"opacity .4s",fontSize:isMobile?13:14,color:"#9ca3af",fontFamily:"Montserrat,sans-serif",whiteSpace:"nowrap",overflow:"hidden",maxWidth:"calc(100% - 110px)"}}>
-                {isMobile?"Search a supplement...":PLACEHOLDERS[phIdx]}
-              </div>
-            )}
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder=""
-              style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
-            <button style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search</button>
+          <div ref={searchContainerRef} style={{maxWidth:680,margin:"0 auto 20px",position:"relative"}}>
+            <div style={{display:"flex",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
+              {!search&&(
+                <div style={{position:"absolute",left:isMobile?14:20,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",zIndex:1,opacity:phFade?1:0,transition:"opacity .4s",fontSize:isMobile?13:14,color:"#9ca3af",fontFamily:"Montserrat,sans-serif",whiteSpace:"nowrap",overflow:"hidden",maxWidth:"calc(100% - 110px)"}}>
+                  {isMobile?"Search a supplement...":PLACEHOLDERS[phIdx]}
+                </div>
+              )}
+              <input value={search}
+                onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
+                onFocus={()=>{if(search.length>0)setShowSuggest(true);}}
+                onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter"){setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}}
+                placeholder=""
+                style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
+              <button onClick={()=>{setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}} style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search</button>
+            </div>
+            {/* Autocomplete dropdown */}
+            {showSuggest&&search.trim().length>0&&(()=>{
+              const q=search.toLowerCase();
+              // Goal-level semantic suggestions
+              const goalHits=GOALS.filter(g=>g.id!=="all"&&(g.label.toLowerCase().replace(" / ","").replace(/ /g,"").includes(q)||g.id.includes(q))).slice(0,3);
+              // Compound name suggestions: prefix first, then includes
+              const prefixHits=SUPPLEMENTS.filter(s=>s.name.toLowerCase().startsWith(q)).slice(0,6);
+              const includeHits=SUPPLEMENTS.filter(s=>!s.name.toLowerCase().startsWith(q)&&(s.name.toLowerCase().includes(q)||(s.aliases||[]).some(a=>a.toLowerCase().includes(q)))).slice(0,4);
+              const compoundHits=[...prefixHits,...includeHits].slice(0,8);
+              if(!goalHits.length&&!compoundHits.length)return null;
+              return(
+                <div style={{position:"absolute",top:"100%",left:0,right:0,background:C.white,border:`1px solid ${C.border}`,boxShadow:"0 8px 24px rgba(0,0,0,.12)",zIndex:50,maxHeight:360,overflowY:"auto",marginTop:2}}>
+                  {goalHits.length>0&&(
+                    <div>
+                      <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:0,padding:"8px 16px 4px",textTransform:"uppercase",background:C.bg,borderBottom:`1px solid ${C.border}`}}>Filter by goal</p>
+                      {goalHits.map(g=>(
+                        <div key={g.id} onMouseDown={()=>{setSearch(g.label);setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}
+                          style={{padding:"10px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,borderBottom:`1px solid ${C.border}`}}
+                          onMouseEnter={e=>e.currentTarget.style.background=C.bg}
+                          onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                          <span style={{fontSize:16}}>{g.icon}</span>
+                          <div>
+                            <p style={{fontSize:13,fontWeight:700,color:C.ink,margin:0}}>{g.label}</p>
+                            <p style={{fontSize:10,color:C.gray,margin:0}}>Show all compounds for this goal</p>
+                          </div>
+                          <span style={{marginLeft:"auto",fontSize:9,fontWeight:700,color:C.gold,letterSpacing:".08em",background:`${C.gold}18`,padding:"2px 7px"}}>GOAL</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {compoundHits.length>0&&(
+                    <div>
+                      {(goalHits.length>0||true)&&<p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:0,padding:"8px 16px 4px",textTransform:"uppercase",background:C.bg,borderBottom:`1px solid ${C.border}`}}>Compounds</p>}
+                      {compoundHits.map(s=>{
+                        const tierColor=["","#16a34a","#2563eb","#7c3aed","#d97706"][s.tier]||C.gray;
+                        const tierLabel=["","T1","T2","T3","T4"][s.tier]||"";
+                        const bestEff=s.effects.length?Math.max(...s.effects.map(e=>e.efficacy)):0;
+                        return(
+                          <div key={s.id} onMouseDown={()=>{setSearch(s.name);setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}
+                            style={{padding:"10px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:12,borderBottom:`1px solid ${C.border}`}}
+                            onMouseEnter={e=>e.currentTarget.style.background=C.bg}
+                            onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                            <span style={{fontSize:10,fontWeight:800,color:tierColor,border:`1px solid ${tierColor}`,padding:"2px 6px",flexShrink:0,minWidth:24,textAlign:"center"}}>{tierLabel}</span>
+                            <div style={{flex:1,minWidth:0}}>
+                              <p style={{fontSize:13,fontWeight:700,color:C.ink,margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.name}</p>
+                              {s.aliases&&s.aliases[0]&&<p style={{fontSize:10,color:C.gray,margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.aliases[0]}</p>}
+                            </div>
+                            <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
+                              <div style={{width:32,height:4,background:C.border,borderRadius:2,overflow:"hidden"}}>
+                                <div style={{width:`${(bestEff/5)*100}%`,height:"100%",background:tierColor,borderRadius:2}}/>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
           </div>{/* end zIndex:1 */}
           {/* Social proof */}

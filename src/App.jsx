@@ -55,6 +55,7 @@ const ROUTES = {
   "/interaction-checker":"interaction-checker",
   "/stack-audit":"stack-audit",
   "/bloodwork-history":"bloodwork-history",
+  "/looksmaxx":"looksmaxx",
 };
 
 function getShareIdFromPath(){
@@ -67,6 +68,7 @@ function getPageFromPath(){
   const path=window.location.pathname;
   if(path.startsWith("/compound/"))return "compound";
   if(path.startsWith("/stack/"))return "shared-stack";
+  if(path.startsWith("/looksmaxx"))return "looksmaxx";
   return ROUTES[path]||"supplements";
 }
 function getCompoundIdFromPath(){
@@ -3082,6 +3084,7 @@ function AppInner(){
   const navItems=[
     {id:"supplements",label:"Supplements"},
     {id:"advisor",label:"AI Compound Advisor"},
+    {id:"looksmaxx",label:"Looksmaxx"},
     {id:"pricing",label:"Pricing"},
     {id:"about",label:"About"},
   ];
@@ -3218,6 +3221,7 @@ function AppInner(){
       {page==="affiliate"&&<AffiliatePage/>}
       {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
       {page==="shared-stack"&&<SharedStackPage shareId={shareId}/>}
+      {page==="looksmaxx"&&<LooksmaxxPage onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
       {page==="legal"          &&<LegalPage/>}
       {page==="interactions"   &&<InteractionChecker onUpgrade={openUpgrade}/>}
       {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}
@@ -5167,6 +5171,243 @@ function BloodworkHistoryScreen({onUpgrade}){
             </div>
           </>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ── LOOKSMAXX PAGE ───────────────────────────────────────────────────────────
+function LooksmaxxPage({onUpgrade,onAuth,onNavigate}){
+  const {isPro,user}=useAuth();
+  const isMob=useIsMobile();
+  const [activeTab,setActiveTab]=useState("skin");
+
+  const tabs=[
+    {id:"skin",label:"Skin",icon:"🪞"},
+    {id:"hair",label:"Hair",icon:"💈"},
+    {id:"frame",label:"Frame & Body",icon:"💪"},
+    {id:"face",label:"Face Recomp",icon:"🗿"},
+    {id:"sleep",label:"Sleep & Recovery",icon:"😴"},
+  ];
+
+  const protocols={
+    skin:{
+      headline:"The skin stack. No fluff.",
+      subline:"Collagen density, elasticity, acne control, aging. Every compound with actual human trial data - not your cousin's skincare blog.",
+      free_compounds:[
+        {name:"GHK-Cu",dose:"Injectable 200mcg/day or topical 0.1-0.5%",why:"Upregulates collagen I, III, elastin. Most studied copper peptide. Clinically proven skin thickness improvement.",badge:"Best evidence",badgeColor:"#16a34a",id:"ghk-cu"},
+        {name:"Astaxanthin",dose:"12mg/day with fat",why:"Most potent carotenoid antioxidant. 14 human RCTs. Reduces UV-induced skin damage, improves elasticity and moisture retention.",badge:"Tier 1 proven",badgeColor:"#16a34a",id:"astaxanthin"},
+        {name:"Vitamin C",dose:"500mg-1g/day",why:"Rate-limiting cofactor for collagen synthesis. Deplete it and collagen production stops. Also brightens skin and reduces oxidative damage.",badge:"Foundation",badgeColor:"#2563eb",id:"vitamin-c"},
+      ],
+      pro_compounds:[
+        {name:"Hydrolyzed Collagen",dose:"10-15g/day",why:"Oral collagen peptides increase skin hydration by 28% and elasticity by 31% in double-blind trials. Takes 8-12 weeks.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"collagen"},
+        {name:"Pycnogenol",dose:"100-150mg/day",why:"French maritime pine bark. 7 RCTs showing improved skin elasticity, hydration, and UV protection. Anti-inflammatory.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"pine-bark-pycnogenol"},
+        {name:"Hyaluronic Acid",dose:"120-240mg/day oral",why:"Oral HA reaches skin tissue. 60-day trials show significant improvement in wrinkle depth and skin moisture. Not just topical hype.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"hyaluronic-acid"},
+        {name:"Epithalon",dose:"10mg/day for 10-20 day cycle",why:"Telomerase activator. Shown to reduce UV-induced skin damage, improve melanin regulation, and slow cellular aging in human studies.",badge:"Biohacker tier",badgeColor:"#d97706",id:"epitalon"},
+      ],
+      note:"Start with the T1 compounds first. Stack collagen + GHK-Cu + Astaxanthin before adding HA or Pycnogenol. Results compound over 8-16 weeks.",
+    },
+    hair:{
+      headline:"Hair. Stop it falling. Start it regrowing.",
+      subline:"DHT is the enemy. These are the weapons. Evidence-graded, mechanism explained.",
+      free_compounds:[
+        {name:"Finasteride",dose:"1mg/day oral",why:"Type II 5-alpha reductase inhibitor. Reduces scalp DHT by ~70%. The most studied hair retention drug. 5-year trials show 90% maintain or improve.",badge:"Gold standard",badgeColor:"#16a34a",id:"finasteride"},
+        {name:"Minoxidil",dose:"5% topical 2x/day or 0.25-2.5mg oral",why:"Vasodilator that extends anagen phase and increases follicle size. Oral low-dose is becoming the new standard: better systemic coverage.",badge:"Gold standard",badgeColor:"#16a34a",id:"minoxidil"},
+        {name:"Zinc Bisglycinate",dose:"15-30mg/day",why:"Zinc deficiency directly causes hair loss via 5-AR dysregulation. Most bald and thinning men are suboptimal. High absorption form.",badge:"Foundation",badgeColor:"#2563eb",id:"zinc-bisglycinate"},
+      ],
+      pro_compounds:[
+        {name:"Saw Palmetto",dose:"320mg/day (lipid extract)",why:"Inhibits both 5-AR type I and II. Human trials show 60% of participants maintained or regrew hair. Lower side effect profile than finasteride.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"saw-palmetto"},
+        {name:"Biotin",dose:"5-10mg/day",why:"Only effective if deficient, but deficiency is more common than you think. Also necessary for healthy nail and skin keratin. Low risk.",badge:"Foundations",badgeColor:"#2563eb",id:"biotin"},
+        {name:"BPC-157",dose:"250-500mcg/day",why:"Stimulates blood vessel formation around follicles. Used off-label with early promising data on follicle regeneration and vascularization.",badge:"Experimental",badgeColor:"#d97706",id:"bpc-157"},
+      ],
+      note:"Finasteride + Minoxidil is the standard combo. Add Saw Palmetto if concerned about sides. Zinc fixes underlying deficiency. BPC-157 is the bleeding edge add-on.",
+    },
+    frame:{
+      headline:"Frame. Shoulder-to-waist ratio is the game.",
+      subline:"The compounds that actually move the needle on muscle mass, testosterone, and body composition. Ranked by evidence, not bodybuilding forums.",
+      free_compounds:[
+        {name:"Creatine Monohydrate",dose:"5g/day",why:"The most evidence-backed performance compound in history. 500+ human trials. Increases strength, muscle volume, and arguably facial bone density via IGF-1.",badge:"Best evidence",badgeColor:"#16a34a",id:"creatine-monohydrate"},
+        {name:"Vitamin D3 + K2",dose:"4000-6000 IU D3 + 200mcg K2",why:"Vitamin D deficiency cuts testosterone by 20-30%. Nearly everyone in northern latitudes is deficient. K2 directs calcium to bones not arteries.",badge:"Foundation",badgeColor:"#2563eb",id:"vitamine-d3-k2"},
+        {name:"Zinc Bisglycinate",dose:"15-30mg/day",why:"Zinc is a direct cofactor for testosterone synthesis. Athletes sweat it out. Most men are at the low end. High-absorption glycinate form.",badge:"Foundation",badgeColor:"#2563eb",id:"zinc-bisglycinate"},
+      ],
+      pro_compounds:[
+        {name:"Tongkat Ali",dose:"400-600mg/day (standardized)",why:"8 human RCTs showing testosterone increases of 15-37% in men with suboptimal levels. Also reduces cortisol: testosterone enemy #1.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"tongkat-ali"},
+        {name:"Ashwagandha KSM-66",dose:"600mg/day",why:"Reduces cortisol by 27%. Multiple trials show testosterone increase of 14-40%. Cortisol and testosterone have an inverse relationship.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"ashwagandha-ksm66"},
+        {name:"Ipamorelin + CJC-1295",dose:"100-200mcg each, 2-3x/day",why:"GHRP + GHRH. Synergistic GH pulse without disrupting natural pulsatile patterns. More lean mass, faster recovery, improved sleep quality.",badge:"Advanced",badgeColor:"#d97706",id:"ipamorelin"},
+      ],
+      note:"Build the foundation first: optimize D3, zinc, sleep quality. Then testosterone herbs. Peptides are the next level once the basics are dialed.",
+    },
+    face:{
+      headline:"Face recomp. Lose the fat. Keep the skin.",
+      subline:"The difference between a defined face and a puffy face is usually body fat percentage and facial fat distribution. These compounds target both.",
+      free_compounds:[
+        {name:"Semaglutide",dose:"0.25-2.4mg/week SC injection",why:"GLP-1 agonist. Causes 15-20% body weight loss in trials, with disproportionate facial fat reduction. Requires prescription.",badge:"Most effective",badgeColor:"#16a34a",id:"semaglutide"},
+        {name:"Hydrolyzed Collagen",dose:"10-15g/day",why:"Prevents loose skin during fat loss: a major issue when cutting face fat quickly. Collagen maintains skin architecture during weight loss.",badge:"Stack with GLP-1",badgeColor:"#2563eb",id:"collagen"},
+        {name:"Astaxanthin",dose:"12mg/day",why:"During a cut, UV and oxidative damage to skin increases. Astaxanthin is photoprotective and antioxidant: protects skin quality during caloric deficit.",badge:"Protective",badgeColor:"#2563eb",id:"astaxanthin"},
+      ],
+      pro_compounds:[
+        {name:"Tesamorelin",dose:"1-2mg/day SC",why:"FDA approved for visceral fat reduction. Specifically targets abdominal and facial subcutaneous fat via IGF-1 stimulation.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"tesamorelin"},
+        {name:"GHK-Cu",dose:"Injectable 200mcg/day",why:"Critical during face recomp. As fat leaves the face, collagen remodeling needs to follow. GHK-Cu accelerates this: prevents gaunt look.",badge:"Anti-gaunt",badgeColor:"#7c3aed",id:"ghk-cu"},
+        {name:"Pycnogenol",dose:"100mg/day",why:"Reduces water retention and puffiness via anti-inflammatory mechanisms. Some men report visible facial definition improvement within 3-4 weeks.",badge:"Pro protocol",badgeColor:"#7c3aed",id:"pine-bark-pycnogenol"},
+      ],
+      note:"Semaglutide alone will recomp the face. The danger is losing collagen and looking gaunt. Run Collagen + GHK-Cu alongside any significant cut.",
+    },
+    sleep:{
+      headline:"Sleep is the most underrated looksmax.",
+      subline:"Dark circles, facial puffiness, flat skin, low testosterone: most of that is just bad sleep. Fix the root cause.",
+      free_compounds:[
+        {name:"Magnesium Bisglycinate",dose:"300-500mg 1hr before bed",why:"Activates GABA receptors and parasympathetic system. Clinically proven to reduce sleep latency and increase slow-wave sleep. Also reduces cortisol.",badge:"Best evidence",badgeColor:"#16a34a",id:"magnesium-bisglycinate"},
+        {name:"Glycine",dose:"3g before bed",why:"Reduces core body temperature which is the primary trigger for sleep onset. Human RCTs show improved subjective sleep quality, less fatigue.",badge:"Proven",badgeColor:"#16a34a",id:"glycine"},
+        {name:"Ashwagandha KSM-66",dose:"300-600mg at night",why:"Reduces cortisol, improves sleep quality scores, reduces time to fall asleep. Also the testosterone benefit doubles when sleep quality improves.",badge:"Dual action",badgeColor:"#2563eb",id:"ashwagandha-ksm66"},
+      ],
+      pro_compounds:[
+        {name:"Ipamorelin",dose:"100-200mcg before bed",why:"GH secretagogue. The largest natural GH pulse of the day is at sleep onset. Ipamorelin amplifies this pulse by 3-5x: deep sleep, cellular repair, more lean mass.",badge:"GH optimization",badgeColor:"#7c3aed",id:"ipamorelin"},
+        {name:"Taurine",dose:"1-3g before bed",why:"GABA-A modulator. Reduces sleep fragmentation and improves REM. Also cardioprotective and anti-inflammatory. Underrated and cheap.",badge:"Underrated",badgeColor:"#7c3aed",id:"taurine"},
+        {name:"Epithalon",dose:"10mg/day for 10-20 days",why:"Regulates melatonin secretion and circadian rhythm at the pineal gland level. Most relevant for anyone whose sleep cycle is desynchronized.",badge:"Biohacker tier",badgeColor:"#d97706",id:"epitalon"},
+      ],
+      note:"Get the foundation right: Magnesium + Glycine is a free upgrade most people ignore. Ipamorelin at night is the single best addition once you're sleeping 7+ hours.",
+    },
+  };
+
+  const proto=protocols[activeTab];
+  const tabColor={"skin":"#ec4899","hair":"#f59e0b","frame":"#16a34a","face":"#06b6d4","sleep":"#6366f1"};
+  const tc=tabColor[activeTab];
+
+  return(
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+      {/* Header */}
+      <div style={{background:C.ink,padding:isMob?"32px 16px 28px":"48px 48px 40px",position:"relative",overflow:"hidden"}}>
+        {/* Subtle grid background */}
+        {!isMob&&<div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px)",backgroundSize:"40px 40px",pointerEvents:"none"}}/>}
+        <div style={{maxWidth:960,margin:"0 auto",position:"relative"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+            <span style={{fontSize:9,fontWeight:800,letterSpacing:".2em",color:C.gold,textTransform:"uppercase"}}>Evidstack</span>
+            <span style={{fontSize:9,color:"#374151"}}>×</span>
+            <span style={{fontSize:9,fontWeight:800,letterSpacing:".2em",color:"#6b7280",textTransform:"uppercase"}}>Looksmaxxing Protocols</span>
+          </div>
+          <h1 style={{fontSize:isMob?32:52,fontWeight:900,letterSpacing:"-.05em",color:C.white,margin:"0 0 12px",lineHeight:1}}>
+            Looksmaxx with<br/><span style={{color:C.gold}}>actual science.</span>
+          </h1>
+          <p style={{fontSize:isMob?13:15,color:"#6b7280",margin:"0 0 28px",maxWidth:520,lineHeight:1.7}}>
+            Every protocol ranked by human trial data. Not Reddit anecdotes. Not influencer stacks. The compounds that actually move the needle on skin, hair, frame, and face: with the mechanism explained.
+          </p>
+          <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+            {[["370+","compounds in DB"],["Evidence","ranked by RCT data"],["Zero","conflicts of interest"]].map(([v,l])=>(
+              <div key={l} style={{padding:"8px 16px",border:"1px solid #1f2937",display:"flex",alignItems:"center",gap:8}}>
+                <span style={{fontSize:12,fontWeight:900,color:C.white}}>{v}</span>
+                <span style={{fontSize:10,color:"#6b7280"}}>{l}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Tab navigation */}
+      <div style={{background:C.white,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,zIndex:10}}>
+        <div style={{maxWidth:960,margin:"0 auto",display:"flex",overflowX:"auto",padding:"0 16px"}}>
+          {tabs.map(t=>(
+            <button key={t.id} onClick={()=>setActiveTab(t.id)}
+              style={{padding:"14px 18px",border:"none",borderBottom:`3px solid ${activeTab===t.id?tabColor[t.id]:"transparent"}`,background:"transparent",cursor:"pointer",fontFamily:"Montserrat,sans-serif",fontSize:isMob?11:12,fontWeight:800,color:activeTab===t.id?C.ink:C.gray,letterSpacing:".04em",whiteSpace:"nowrap",flexShrink:0,transition:"all .15s"}}>
+              {t.icon} {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{maxWidth:960,margin:"0 auto",padding:isMob?"24px 16px 80px":"48px 48px 100px"}}>
+        {/* Protocol header */}
+        <div style={{marginBottom:32}}>
+          <h2 style={{fontSize:isMob?22:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 6px"}}>{proto.headline}</h2>
+          <p style={{fontSize:14,color:C.gray,margin:0,lineHeight:1.7,maxWidth:600}}>{proto.subline}</p>
+        </div>
+
+        {/* Foundation compounds - always visible */}
+        <div style={{marginBottom:24}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+            <div style={{height:1,flex:1,background:C.border}}/>
+            <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:0,textTransform:"uppercase",flexShrink:0}}>Foundation - Free</p>
+            <div style={{height:1,flex:1,background:C.border}}/>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr 1fr",gap:12}}>
+            {proto.free_compounds.map(c=>(
+              <div key={c.name} onClick={()=>{window.history.pushState({},"",`/compound/${c.id}`);window.dispatchEvent(new PopStateEvent("popstate"));}}
+                style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${tc}`,padding:"18px 20px",cursor:"pointer",transition:"transform .15s, box-shadow .15s"}}
+                onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 4px 20px rgba(0,0,0,.08)";}}
+                onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+                  <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:0,letterSpacing:"-.02em"}}>{c.name}</p>
+                  <span style={{fontSize:8,fontWeight:800,color:c.badgeColor,background:`${c.badgeColor}15`,padding:"2px 7px",letterSpacing:".06em",borderRadius:2,flexShrink:0,marginLeft:8}}>{c.badge}</span>
+                </div>
+                <p style={{fontSize:10,fontWeight:700,color:tc,margin:"0 0 8px"}}>{c.dose}</p>
+                <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}>{c.why}</p>
+                <p style={{fontSize:10,color:C.gray,margin:"10px 0 0",opacity:.6}}>View full profile →</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pro compounds */}
+        <div style={{marginBottom:32}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+            <div style={{height:1,flex:1,background:C.border}}/>
+            <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,margin:0,textTransform:"uppercase",flexShrink:0}}>Advanced - Pro</p>
+            <div style={{height:1,flex:1,background:C.border}}/>
+          </div>
+          {!isPro?(
+            <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"28px 24px",textAlign:"center"}}>
+              <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 6px"}}>Advanced protocols are Pro-only.</p>
+              <p style={{fontSize:12,color:C.gray,margin:"0 0 20px"}}>Unlock {proto.pro_compounds.length} additional compounds for this protocol: with full dosing, mechanisms, and evidence reviews.</p>
+              <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap",marginBottom:20}}>
+                {proto.pro_compounds.map(c=>(
+                  <span key={c.name} style={{fontSize:11,fontWeight:700,color:C.gray,background:C.bg,border:`1px solid ${C.border}`,padding:"4px 10px"}}>{c.name}</span>
+                ))}
+              </div>
+              <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+                {user
+                  ?<button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"11px 28px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/month</button>
+                  :<><button onClick={()=>onAuth("signup")} style={{padding:"11px 24px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Create free account</button>
+                  <button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Go Pro</button></>
+                }
+              </div>
+            </div>
+          ):(
+            <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr 1fr",gap:12}}>
+              {proto.pro_compounds.map(c=>(
+                <div key={c.name} onClick={()=>{window.history.pushState({},"",`/compound/${c.id}`);window.dispatchEvent(new PopStateEvent("popstate"));}}
+                  style={{background:C.ink,border:`1px solid #1f2937`,borderTop:`3px solid ${tc}`,padding:"18px 20px",cursor:"pointer",transition:"transform .15s, box-shadow .15s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 6px 24px rgba(0,0,0,.3)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+                    <p style={{fontSize:14,fontWeight:900,color:C.white,margin:0,letterSpacing:"-.02em"}}>{c.name}</p>
+                    <span style={{fontSize:8,fontWeight:800,color:c.badgeColor,background:`${c.badgeColor}20`,padding:"2px 7px",letterSpacing:".06em",borderRadius:2,flexShrink:0,marginLeft:8}}>{c.badge}</span>
+                  </div>
+                  <p style={{fontSize:10,fontWeight:700,color:tc,margin:"0 0 8px"}}>{c.dose}</p>
+                  <p style={{fontSize:11,color:"#9ca3af",margin:0,lineHeight:1.6}}>{c.why}</p>
+                  <p style={{fontSize:10,color:"#6b7280",margin:"10px 0 0"}}>View full profile →</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Protocol note */}
+        <div style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${tc}`,padding:"14px 20px",marginBottom:40}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".12em",color:C.gray,margin:"0 0 4px",textTransform:"uppercase"}}>Protocol note</p>
+          <p style={{fontSize:12,color:C.ink,margin:0,lineHeight:1.7}}>{proto.note}</p>
+        </div>
+
+        {/* Cross-sell: AI Advisor */}
+        <div style={{background:C.ink,padding:"24px 28px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:16}}>
+          <div>
+            <p style={{fontSize:13,fontWeight:900,color:C.white,margin:"0 0 4px"}}>Want a stack calibrated to your body?</p>
+            <p style={{fontSize:12,color:"#6b7280",margin:0}}>Describe your goals. The AI searches 370+ compounds and builds a protocol adjusted to your weight, age, and profile.</p>
+          </div>
+          <button onClick={()=>onNavigate("advisor")} className="evid-shimmer-btn"
+            style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>
+            Ask the AI →
+          </button>
+        </div>
       </div>
     </div>
   );

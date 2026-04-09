@@ -8,8 +8,8 @@ export default async function handler(req) {
 
   const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
   const PRICE_ID = plan === "annual"
-    ? process.env.STRIPE_ANNUAL_PRICE_ID
-    : process.env.STRIPE_PRICE_ID;
+    ? process.env.STRIPE_PRICE_ANNUAL
+    : process.env.STRIPE_PRICE_MONTHLY;
   const APP_URL = process.env.APP_URL || "https://evidstack.com";
 
   try {

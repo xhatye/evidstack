@@ -1892,6 +1892,81 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
         </>
       )}
 
+          {/* Side Effects */}
+          {supp.sideEffects&&supp.sideEffects.length>0&&(
+            <div style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"28px 36px",marginBottom:16}}>
+              <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 20px",textTransform:"uppercase"}}>Side Effects</p>
+              <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                {supp.sideEffects.map((se,i)=>{
+                  const sevColor={mild:C.amber,moderate:"#f97316",severe:C.red}[se.severity]||C.gray;
+                  const freqLabel={common:"Common",uncommon:"Uncommon",rare:"Rare"}[se.frequency]||se.frequency;
+                  const freqDot={common:3,uncommon:2,rare:1}[se.frequency]||1;
+                  return(
+                    <div key={i} style={{padding:"14px 16px",background:C.bg,borderLeft:`3px solid ${sevColor}`,display:"flex",gap:12,flexWrap:"wrap",alignItems:"flex-start"}}>
+                      <div style={{flex:1,minWidth:180}}>
+                        <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 4px"}}>{se.effect}</p>
+                        {se.note&&<p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}>{se.note}</p>}
+                      </div>
+                      <div style={{display:"flex",gap:8,flexShrink:0,alignItems:"center",flexWrap:"wrap"}}>
+                        <span style={{fontSize:9,fontWeight:800,color:sevColor,background:`${sevColor}15`,border:`1px solid ${sevColor}30`,padding:"3px 8px",letterSpacing:".06em",textTransform:"uppercase"}}>{se.severity}</span>
+                        <div style={{display:"flex",alignItems:"center",gap:4}}>
+                          {[1,2,3].map(n=>(
+                            <div key={n} style={{width:8,height:8,borderRadius:"50%",background:n<=freqDot?sevColor:`${sevColor}25`}}/>
+                          ))}
+                          <span style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".06em",textTransform:"uppercase",marginLeft:2}}>{freqLabel}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{marginTop:14,padding:"10px 14px",background:`${C.amber}08`,border:`1px solid ${C.amber}20`}}>
+                <p style={{fontSize:10,color:C.gray,margin:0,lineHeight:1.6}}>Side effect profiles vary by individual. This information is sourced from published clinical literature and does not constitute medical advice.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Evidence Chart */}
+          <div style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"28px 36px",marginBottom:16}}>
+            <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 20px",textTransform:"uppercase"}}>Evidence Overview</p>
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              {supp.effects.map((e,i)=>{
+                const goal=GOALS.find(g=>g.id===e.goal);
+                const eff=Math.abs(e.efficacy);
+                const ev=e.evidence;
+                const rowColor=eff>=4?C.green:eff>=3?C.blue:eff>=2?C.amber:C.red;
+                return(
+                  <div key={i}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6,gap:8,flexWrap:"wrap"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8}}>
+                        <span style={{fontSize:14}}>{goal?.icon||"•"}</span>
+                        <span style={{fontSize:12,fontWeight:700,color:C.ink,textTransform:"capitalize"}}>{e.goal}</span>
+                      </div>
+                      <div style={{display:"flex",gap:16,alignItems:"center"}}>
+                        <span style={{fontSize:10,color:C.gray,fontWeight:600}}>{e.studies} {e.type?.split(" ")[0]||"studies"}</span>
+                        <span style={{fontSize:11,fontWeight:900,color:rowColor}}>{eff}/5</span>
+                      </div>
+                    </div>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+                      <div>
+                        <p style={{fontSize:8,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 3px",textTransform:"uppercase"}}>Efficacy</p>
+                        <div style={{height:6,background:C.border,borderRadius:3,overflow:"hidden"}}>
+                          <div style={{height:"100%",width:`${(eff/5)*100}%`,background:rowColor,borderRadius:3,transition:"width .6s ease"}}/>
+                        </div>
+                      </div>
+                      <div>
+                        <p style={{fontSize:8,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 3px",textTransform:"uppercase"}}>Evidence</p>
+                        <div style={{height:6,background:C.border,borderRadius:3,overflow:"hidden"}}>
+                          <div style={{height:"100%",width:`${(ev/5)*100}%`,background:C.blue,borderRadius:3,transition:"width .6s ease"}}/>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Who it's for */}
           <div style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"28px 36px",marginBottom:16}}>
             <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Quick Facts</p>

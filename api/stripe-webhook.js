@@ -90,7 +90,12 @@ export default async function handler(req, res) {
         if (!uid) break;
         if (session.mode === "subscription" && session.payment_status === "paid") {
           await db.doc(`users/${uid}`).set(
-            { isPro: true, proExpiresAt: null, stripeSubscriptionId: session.subscription },
+            {
+              isPro: true,
+              proExpiresAt: null,
+              stripeSubscriptionId: session.subscription,
+              stripeCustomerId: session.customer,
+            },
             { merge: true }
           );
           // Send welcome email

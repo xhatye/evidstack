@@ -2489,6 +2489,30 @@ function ProtocolsPage({onGoToSupplements}){
   );
 }
 
+/* MANAGE SUBSCRIPTION BUTTON */
+function ManageSubButton({uid}){
+  const [loading,setLoading]=useState(false);
+  const [err,setErr]=useState("");
+  const open=async()=>{
+    setLoading(true);setErr("");
+    try{
+      const res=await fetch("/api/stripe-portal",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({uid})});
+      const data=await res.json();
+      if(data.error)throw new Error(data.error);
+      window.location.href=data.url;
+    }catch(e){setErr(e.message||"Something went wrong.");setLoading(false);}
+  };
+  return(
+    <div>
+      <button onClick={open} disabled={loading}
+        style={{padding:"10px 18px",background:"transparent",border:`1px solid ${loading?"#d4d0c8":"#1a1a1a"}`,fontSize:12,fontWeight:700,color:loading?"#9ca3af":"#1a1a1a",cursor:loading?"not-allowed":"pointer",fontFamily:"Montserrat,sans-serif"}}>
+        {loading?"Loading...":"Manage or cancel subscription →"}
+      </button>
+      {err&&<p style={{fontSize:11,color:"#dc2626",margin:"6px 0 0",lineHeight:1.5}}>{err}</p>}
+    </div>
+  );
+}
+
 /* ACCOUNT CENTER */
 // ── PROFILE TAB (inside AccountCenter) ────────────────────────────────────────
 function ProfileTab(){
@@ -2770,10 +2794,7 @@ function AccountCenter({onClose,onUpgrade}){
                 {isPro&&(
                   <div style={{marginBottom:20}}>
                     <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",color:C.gray,margin:"0 0 10px",textTransform:"uppercase"}}>Manage Subscription</p>
-                    <a href="https://billing.stripe.com/p/login/evidstack" target="_blank" rel="noopener noreferrer"
-                      style={{display:"inline-block",padding:"10px 18px",background:C.bg,border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,color:C.ink,textDecoration:"none",cursor:"pointer"}}>
-                      Manage or cancel subscription →
-                    </a>
+                    <ManageSubButton uid={user?.uid}/>
                     <p style={{fontSize:10,color:C.gray,margin:"6px 0 0"}}>Cancel anytime. No questions asked.</p>
                   </div>
                 )}

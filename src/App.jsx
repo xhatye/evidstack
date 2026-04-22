@@ -118,33 +118,6 @@ function HeroStats({isMobile}){
 }
 
 /* HOW IT WORKS with scroll-reveal */
-function HowItWorksSection({isMobile}){
-  const [ref,visible]=useScrollReveal(0.08);
-  const STEPS=[
-    {n:"01",icon:"🔬",title:"Evidence-ranked database",desc:"Every compound scored on two axes: effect size in human trials, and research quality. No marketing, no sponsorships."},
-    {n:"02",icon:"🤖",title:"AI Compound Advisor",desc:"Describe any goal or symptom. The advisor searches 370+ compounds and returns the strongest options ranked by evidence."},
-    {n:"03",icon:"⚗️",title:"Safety and interaction analysis",desc:"Check your full stack for absorption conflicts, timing issues, and synergies. Know exactly what to take and when."},
-  ];
-  return(
-    <div ref={ref} className={"evid-reveal"+(visible?" visible":"")}
-      style={{maxWidth:680,margin:"0 auto 0",padding:"48px 16px 40px",fontFamily:"Montserrat,sans-serif"}}>
-      <p style={{fontSize:10,fontWeight:800,letterSpacing:".18em",color:C.gray,textAlign:"center",margin:"0 0 32px",textTransform:"uppercase"}}>How it works</p>
-      <div id="compounds-grid" style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr 1fr",gap:isMobile?16:24}}>
-        {STEPS.map(({n,icon,title,desc},i)=>(
-          <div key={n} style={{position:"relative",paddingTop:8,opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(20px)",transition:`opacity .5s ${i*.12}s, transform .5s ${i*.12}s`}}>
-            <div style={{position:"absolute",top:0,left:0,fontSize:11,fontWeight:900,color:C.gold,letterSpacing:".04em"}}>{n}</div>
-            <div style={{paddingTop:20}}>
-              <div style={{fontSize:28,marginBottom:12}}>{icon}</div>
-              <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 8px",letterSpacing:"-.02em",lineHeight:1.2}}>{title}</p>
-              <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.7}}>{desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 /* WAITLIST */
 function WaitlistForm(){
   const [email,setEmail]=useState("");
@@ -3503,7 +3476,7 @@ function AppInner(){
 
 
         {/* How it works */}
-        <HowItWorksSection isMobile={isMobile}/>
+
 
         {/* Goal Quiz */}
         <div style={{padding:"0 16px"}}>

@@ -1862,8 +1862,6 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
               </div>
             </div>
           )}
-        </>
-      )}
 
           {/* Side Effects */}
           {supp.sideEffects&&supp.sideEffects.length>0&&(
@@ -1898,6 +1896,8 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
               </div>
             </div>
           )}
+        </>
+      )}
 
           {/* Evidence Chart */}
           <div style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"28px 36px",marginBottom:16}}>

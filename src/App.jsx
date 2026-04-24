@@ -56,6 +56,7 @@ const ROUTES = {
   "/stack-audit":"stack-audit",
   "/bloodwork-history":"bloodwork-history",
 };
+// goal and guide pages resolved dynamically in getPageFromPath
 
 function getShareIdFromPath(){
   const path=window.location.pathname;
@@ -63,10 +64,22 @@ function getShareIdFromPath(){
   return null;
 }
 
+function getGoalIdFromPath(){
+  const p=window.location.pathname;
+  if(p.startsWith("/goal/"))return p.replace("/goal/","");
+  return null;
+}
+function getGuideIdFromPath(){
+  const p=window.location.pathname;
+  if(p.startsWith("/guide/"))return p.replace("/guide/","");
+  return null;
+}
 function getPageFromPath(){
   const path=window.location.pathname;
   if(path.startsWith("/compound/"))return "compound";
   if(path.startsWith("/stack/"))return "shared-stack";
+  if(path.startsWith("/goal/"))return "goal-page";
+  if(path.startsWith("/guide/"))return "guide-page";
   return ROUTES[path]||"supplements";
 }
 function getCompoundIdFromPath(){
@@ -1862,6 +1875,8 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
               </div>
             </div>
           )}
+        </>
+      )}
 
           {/* Side Effects */}
           {supp.sideEffects&&supp.sideEffects.length>0&&(
@@ -1896,8 +1911,6 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
               </div>
             </div>
           )}
-        </>
-      )}
 
           {/* Evidence Chart */}
           <div style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"28px 36px",marginBottom:16}}>
@@ -3031,6 +3044,8 @@ function AppInner(){
 
   const [page,setPage]=useState(()=>getPageFromPath());
   const [compoundId,setCompoundId]=useState(()=>getCompoundIdFromPath());
+  const [goalId,setGoalId]=useState(()=>getGoalIdFromPath());
+  const [guideId,setGuideId]=useState(()=>getGuideIdFromPath());
   const [shareId,setShareId]=useState(()=>getShareIdFromPath());
   const [goal,setGoal]=useState("all");
   const [search,setSearch]=useState("");
@@ -3098,6 +3113,8 @@ function AppInner(){
     else if(page==="interaction-checker"){title="Interaction Checker - Evidstack";desc="Check your full supplement stack for interactions, absorption conflicts, synergies, and optimal timing. Evidence-based analysis.";}
     else if(page==="stack-audit"){title="Stack Audit AI - Evidstack";desc="AI-powered supplement stack audit. Get a Stack Score, identify redundancies, critical gaps, and priority changes.";}
     else if(page==="bloodwork-history"){title="Bloodwork History - Evidstack";desc="Track 16 biomarkers over time. Correlate blood test results with your supplement stack changes.";}
+    else if(page==="goal-page"&&goalId){const g=GOALS.find(gl=>gl.id===goalId);if(g){title=`Best Supplements for ${g.label} - Evidstack`;desc=`Evidence-ranked supplements for ${g.label}. Every compound scored by efficacy and study quality from PubMed and Cochrane reviews.`;}}
+    else if(page==="guide-page"&&guideId){title=`${guideId.charAt(0).toUpperCase()+guideId.slice(1)} Supplement Guide - Evidstack`;desc=`Evidence-based supplement protocol for ${guideId}. Ranked from primary to optional with dosing, timing, and interaction data.`;}
     document.title=title;
     let metaDesc=document.querySelector("meta[name='description']");
     if(metaDesc)metaDesc.setAttribute("content",desc);
@@ -3117,6 +3134,8 @@ function AppInner(){
       setPage(getPageFromPath());
       setCompoundId(getCompoundIdFromPath());
       setShareId(getShareIdFromPath());
+      setGoalId(getGoalIdFromPath());
+      setGuideId(getGuideIdFromPath());
     };
     window.addEventListener("popstate",onPop);
     return()=>window.removeEventListener("popstate",onPop);
@@ -3318,6 +3337,8 @@ function AppInner(){
       {page==="affiliate"&&<AffiliatePage/>}
       {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
       {page==="shared-stack"&&<SharedStackPage shareId={shareId}/>}
+      {page==="goal-page"&&goalId&&<GoalPage goalId={goalId} onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
+      {page==="guide-page"&&guideId&&<GuidePage guideId={guideId} onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
       {page==="legal"          &&<LegalPage/>}
       {page==="interactions"   &&<InteractionChecker onUpgrade={openUpgrade}/>}
       {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}
@@ -5355,6 +5376,465 @@ function BloodworkHistoryScreen({onUpgrade}){
     </div>
   );
 }
+
+// ── GOAL PAGE ─────────────────────────────────────────────────────────────────
+function GoalPage({goalId,onUpgrade,onAuth,onNavigate}){
+  const {isPro,user}=useAuth();
+  const isMob=useIsMobile();
+  const goal=GOALS.find(g=>g.id===goalId);
+  if(!goal||goal.id==="all"){
+    return(<div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <p style={{fontFamily:"Montserrat,sans-serif",color:C.gray}}>Goal not found.</p>
+    </div>);
+  }
+  // Get all compounds that have an effect for this goal, sorted by combined score
+  const compounds=SUPPLEMENTS.filter(s=>s.effects.some(e=>e.goal===goalId))
+    .map(s=>{
+      const eff=s.effects.find(e=>e.goal===goalId);
+      return{...s,goalEfficacy:eff?.efficacy||0,goalEvidence:eff?.evidence||0,goalStudies:eff?.study_count||eff?.studies||0,goalSummary:eff?.summary||"",goalType:eff?.study_type||eff?.type||""};
+    })
+    .sort((a,b)=>(b.goalEfficacy+b.goalEvidence)-(a.goalEfficacy+a.goalEvidence));
+
+  const tierColor=["","#16a34a","#2563eb","#7c3aed","#d97706"];
+  const FREE_SHOW=6;
+
+  const navigateToCompound=(id)=>{
+    window.history.pushState({},"",`/compound/${id}`);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  };
+  const navigateToGuide=()=>{
+    window.history.pushState({},"",`/guide/${goalId}`);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  };
+
+  // Check if a guide exists for this goal
+  const GUIDE_IDS=["sleep","focus","hormones","force","longevity","skin","weight","recovery","hair","stress","mood","energy","recomp","cardio"];
+  const hasGuide=GUIDE_IDS.includes(goalId);
+
+  return(
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+      {/* Header */}
+      <div style={{background:C.white,borderBottom:`1px solid ${C.border}`,padding:isMob?"24px 16px":"32px 48px"}}>
+        <div style={{maxWidth:900,margin:"0 auto"}}>
+          <button onClick={()=>onNavigate("supplements")} style={{fontSize:11,color:C.gray,background:"transparent",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",marginBottom:16,padding:0}}>← Back to database</button>
+          <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:8}}>
+            <span style={{fontSize:isMob?32:40}}>{goal.icon}</span>
+            <h1 style={{fontSize:isMob?24:36,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:0}}>Best supplements for {goal.label}</h1>
+          </div>
+          <p style={{fontSize:14,color:C.gray,margin:"0 0 16px",lineHeight:1.7,maxWidth:620}}>
+            {compounds.length} compounds with documented effects on {goal.label.toLowerCase()} in human trials. Ranked by combined efficacy and evidence score from PubMed and Cochrane reviews.
+          </p>
+          <div style={{display:"flex",gap:12,flexWrap:"wrap",alignItems:"center"}}>
+            <div style={{padding:"6px 14px",background:C.bg,border:`1px solid ${C.border}`,fontSize:11,fontWeight:700,color:C.gray}}>{compounds.length} compounds</div>
+            <div style={{padding:"6px 14px",background:C.bg,border:`1px solid ${C.border}`,fontSize:11,fontWeight:700,color:C.gray}}>PubMed sourced</div>
+            <div style={{padding:"6px 14px",background:C.bg,border:`1px solid ${C.border}`,fontSize:11,fontWeight:700,color:C.gray}}>Evidence ranked</div>
+            {hasGuide&&<button onClick={navigateToGuide} className="evid-shimmer-btn" style={{padding:"6px 16px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>View {goal.label} Protocol Guide →</button>}
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{maxWidth:900,margin:"0 auto",padding:isMob?"16px 16px 80px":"32px 48px 80px"}}>
+        {/* A-F grade legend */}
+        <div style={{background:C.white,border:`1px solid ${C.border}`,padding:"12px 20px",marginBottom:24,display:"flex",gap:16,flexWrap:"wrap",alignItems:"center"}}>
+          <span style={{fontSize:10,fontWeight:800,letterSpacing:".12em",color:C.gray,textTransform:"uppercase",flexShrink:0}}>Evidence grade</span>
+          {[["A","5/5","#16a34a"],["B","4/5","#2563eb"],["C","3/5","#7c3aed"],["D","2/5","#d97706"],["F","1/5","#dc2626"]].map(([g,s,col])=>(
+            <div key={g} style={{display:"flex",alignItems:"center",gap:4}}>
+              <span style={{fontSize:12,fontWeight:900,color:col,background:`${col}15`,border:`1px solid ${col}30`,padding:"1px 7px",minWidth:20,textAlign:"center"}}>{g}</span>
+              <span style={{fontSize:10,color:C.gray}}>{s}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Compound list */}
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {compounds.map((s,idx)=>{
+            const locked=!isPro&&idx>=FREE_SHOW;
+            const tc=tierColor[s.tier]||C.gray;
+            const effGrade=["","F","D","C","B","A"][Math.round(s.goalEfficacy)]||"F";
+            const evGrade=["","F","D","C","B","A"][Math.round(s.goalEvidence)]||"F";
+            const effColor=["","#dc2626","#d97706","#7c3aed","#2563eb","#16a34a"][Math.round(s.goalEfficacy)]||C.gray;
+            const evColor=["","#dc2626","#d97706","#7c3aed","#2563eb","#16a34a"][Math.round(s.goalEvidence)]||C.gray;
+            if(locked&&idx===FREE_SHOW)return(
+              <div key="gate" style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"24px",textAlign:"center",marginTop:8}}>
+                <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:"0 0 6px"}}>Showing {FREE_SHOW} of {compounds.length} compounds</p>
+                <p style={{fontSize:12,color:C.gray,margin:"0 0 20px"}}>Pro unlocks all {compounds.length} compounds for {goal.label}, full dosing, interactions, and the {goal.label} Protocol Guide.</p>
+                <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+                  {user
+                    ?<button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"11px 28px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/mo</button>
+                    :<><button onClick={()=>onAuth("signup")} style={{padding:"11px 24px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Create free account</button>
+                    <button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Go Pro</button></>
+                  }
+                </div>
+              </div>
+            );
+            if(locked)return null;
+            return(
+              <div key={s.id} onClick={()=>navigateToCompound(s.id)}
+                style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${tc}`,padding:isMob?"14px 16px":"16px 24px",cursor:"pointer",display:"flex",alignItems:"center",gap:isMob?12:20,flexWrap:"wrap",transition:"box-shadow .15s"}}
+                onMouseEnter={e=>e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,.07)"}
+                onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
+                {/* Rank */}
+                <span style={{fontSize:isMob?13:15,fontWeight:900,color:C.gray,minWidth:24,textAlign:"center",flexShrink:0}}>#{idx+1}</span>
+                {/* Tier badge */}
+                <span style={{fontSize:10,fontWeight:800,color:tc,border:`1px solid ${tc}`,padding:"2px 7px",flexShrink:0}}>T{s.tier}</span>
+                {/* Name + summary */}
+                <div style={{flex:1,minWidth:0}}>
+                  <p style={{fontSize:isMob?13:15,fontWeight:900,color:C.ink,margin:"0 0 3px",letterSpacing:"-.02em"}}>{s.name}</p>
+                  {s.goalSummary&&<p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.5,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:isMob?"nowrap":"normal"}}>{s.goalSummary}</p>}
+                </div>
+                {/* Grades */}
+                <div style={{display:"flex",gap:isMob?8:16,flexShrink:0,alignItems:"center"}}>
+                  <div style={{textAlign:"center"}}>
+                    <p style={{fontSize:8,fontWeight:700,color:C.gray,margin:"0 0 2px",letterSpacing:".1em",textTransform:"uppercase"}}>Efficacy</p>
+                    <span style={{fontSize:16,fontWeight:900,color:effColor}}>{effGrade}</span>
+                  </div>
+                  <div style={{textAlign:"center"}}>
+                    <p style={{fontSize:8,fontWeight:700,color:C.gray,margin:"0 0 2px",letterSpacing:".1em",textTransform:"uppercase"}}>Evidence</p>
+                    <span style={{fontSize:16,fontWeight:900,color:evColor}}>{evGrade}</span>
+                  </div>
+                  {!isMob&&s.goalStudies>0&&<div style={{textAlign:"center"}}>
+                    <p style={{fontSize:8,fontWeight:700,color:C.gray,margin:"0 0 2px",letterSpacing:".1em",textTransform:"uppercase"}}>Studies</p>
+                    <span style={{fontSize:13,fontWeight:800,color:C.gray}}>{s.goalStudies}</span>
+                  </div>}
+                  <span style={{fontSize:10,color:C.gray,opacity:.5,flexShrink:0}}>→</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom CTA */}
+        {hasGuide&&(
+          <div style={{background:C.ink,padding:"24px 28px",marginTop:32,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:16}}>
+            <div>
+              <p style={{fontSize:13,fontWeight:900,color:C.white,margin:"0 0 4px"}}>{goal.label} Protocol Guide</p>
+              <p style={{fontSize:12,color:"#6b7280",margin:0}}>Step-by-step protocol: which compounds to start with, what to add, exact dosing, and interaction warnings.</p>
+            </div>
+            <button onClick={navigateToGuide} className="evid-shimmer-btn"
+              style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>
+              View Protocol Guide →
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+// ── GUIDE PAGE ─────────────────────────────────────────────────────────────────
+const GUIDES={
+  sleep:{
+    title:"Sleep Optimization Protocol",
+    goal:"sleep",
+    intro:"Evidence-based protocol for improving sleep onset, sleep depth, and overnight recovery. Ranked from foundational to advanced. Start with Primary compounds for 4 weeks before adding Secondary.",
+    primary:[
+      {id:"magnesium-bisglycinate",role:"Foundation",dose:"300-400mg",timing:"1hr before bed",why:"Activates GABA receptors and reduces cortisol. Most consistent evidence for sleep onset across multiple RCTs.",weeks:"Start week 1"},
+      {id:"glycine",role:"Foundation",dose:"3g",timing:"30min before bed",why:"Reduces core body temperature triggering sleep onset. Double-blind RCTs show improved sleep quality and reduced daytime fatigue.",weeks:"Start week 1"},
+      {id:"l-theanine",role:"Foundation",dose:"200-400mg",timing:"1hr before bed",why:"Increases alpha brain wave activity. Promotes relaxed alertness without drowsiness. Pairs well with magnesium.",weeks:"Start week 2"},
+    ],
+    secondary:[
+      {id:"ashwagandha-ksm66",role:"Secondary",dose:"300-600mg",timing:"Evening",why:"HPA axis modulation reduces cortisol and shortens sleep onset. 600mg KSM-66 standardized extract in trials.",weeks:"Add week 4"},
+      {id:"melatonin",role:"Secondary",dose:"0.5-1mg",timing:"30-60min before bed",why:"Physiological doses only. 0.5-1mg is more effective than high doses for most users. Dose-sensitive  -  more is not better.",weeks:"Add week 4"},
+      {id:"taurine",role:"Secondary",dose:"1-2g",timing:"Before bed",why:"GABA-A modulator. Reduces sleep fragmentation. Often overlooked but consistent data on REM quality.",weeks:"Add week 6"},
+    ],
+    advanced:[
+      {id:"ipamorelin",role:"Advanced",dose:"100-200mcg",timing:"Pre-sleep injection",why:"GH secretagogue that amplifies the natural GH pulse at sleep onset. Improves deep sleep architecture. Requires subcutaneous injection.",weeks:"Optional  -  advanced only"},
+    ],
+    avoid:["High-dose melatonin (5mg+)  -  receptor downregulation","Alcohol  -  disrupts REM despite causing drowsiness","Caffeine within 8-10 hours of sleep"],
+    stack_note:"Start with Magnesium + Glycine. These two alone will improve sleep quality for most people. Add Theanine after 1 week if sleep onset is still slow. Ashwagandha is most useful if poor sleep is stress-driven.",
+  },
+  focus:{
+    title:"Cognitive Focus Protocol",
+    goal:"focus",
+    intro:"Protocol for sustained focus, working memory, and executive function. Designed for people who need mental performance without dependence. Ranked by evidence quality and safety profile.",
+    primary:[
+      {id:"caffeine",role:"Foundation",dose:"100-200mg",timing:"Morning, before task",why:"Most evidence-backed cognitive enhancer. Improves reaction time, alertness, and sustained attention. Stack with L-Theanine to reduce jitteriness.",weeks:"Start week 1"},
+      {id:"l-theanine",role:"Foundation",dose:"200mg",timing:"With caffeine",why:"Synergizes with caffeine. Blunts anxiety and jitteriness while maintaining alertness. 2:1 ratio theanine:caffeine is the studied combination.",weeks:"Start week 1"},
+      {id:"lions-mane",role:"Foundation",dose:"1000-3000mg",timing:"Morning",why:"NGF stimulation. Human trials show improved cognitive scores. Effects build over 4-8 weeks  -  not acute.",weeks:"Start week 1"},
+    ],
+    secondary:[
+      {id:"bacopa-monnieri",role:"Secondary",dose:"300-450mg",timing:"With food",why:"Best evidence for memory consolidation and learning speed. Saponins take 4-6 weeks to show effect. Take with fat for absorption.",weeks:"Add week 4"},
+      {id:"rhodiola-rosea",role:"Secondary",dose:"200-400mg",timing:"Morning, away from food",why:"Adaptogen that reduces mental fatigue and cognitive decline under stress. Particularly useful during high-stress periods.",weeks:"Add week 4"},
+      {id:"coq10",role:"Secondary",dose:"200-400mg",timing:"Morning with fat",why:"Mitochondrial energy production. Most relevant if cognitive fatigue is energy-related rather than neurological.",weeks:"Add week 6"},
+    ],
+    advanced:[
+      {id:"nmn",role:"Advanced",dose:"500-1000mg",timing:"Morning",why:"NAD+ restoration improves mitochondrial efficiency and neuronal energy production. Most pronounced in adults over 35.",weeks:"Optional"},
+    ],
+    avoid:["Combining multiple stimulants","Exceeding 400mg caffeine daily  -  diminishing returns and anxiety","Bacopa at night  -  can cause vivid dreams"],
+    stack_note:"Caffeine + L-Theanine is the single most evidence-backed combination for focus. Add Lion's Mane for long-term cognitive support. Bacopa for memory specifically. Do not stack more than 3-4 compounds simultaneously.",
+  },
+  hormones:{
+    title:"Testosterone Optimization Protocol",
+    goal:"hormones",
+    intro:"Evidence-based protocol for naturally optimizing testosterone. Focused on correcting common deficiencies and reducing hormonal suppression before considering ergogenic compounds. Always run bloodwork before and during.",
+    primary:[
+      {id:"vitamine-d3-k2",role:"Foundation",dose:"4000-6000 IU D3 + 200mcg K2",timing:"Morning with fat",why:"Vitamin D deficiency is directly associated with 20-30% lower testosterone. Most common correctable deficiency in men. K2 ensures calcium goes to bones not arteries.",weeks:"Start week 1"},
+      {id:"zinc-bisglycinate",role:"Foundation",dose:"15-30mg",timing:"Away from calcium",why:"Direct cofactor for testosterone synthesis and 5-AR regulation. Athletes and men with poor diet are commonly deficient. Bisglycinate is highest absorption form.",weeks:"Start week 1"},
+      {id:"magnesium-bisglycinate",role:"Foundation",dose:"300-400mg",timing:"Evening",why:"Low magnesium suppresses free testosterone. Athletes lose significant magnesium through sweat. Evening dosing also improves sleep which further supports hormonal recovery.",weeks:"Start week 1"},
+    ],
+    secondary:[
+      {id:"ashwagandha-ksm66",role:"Secondary",dose:"600mg",timing:"Morning or evening",why:"8 RCTs showing testosterone increases of 15-37% in men with suboptimal baseline. Reduces cortisol  -  which has a direct inverse relationship with testosterone.",weeks:"Add week 4"},
+      {id:"tongkat-ali",role:"Secondary",dose:"400-600mg",timing:"Morning",why:"Reduces SHBG, increasing the free testosterone fraction. Documented increases of 15-37% in human trials. Most effective when baseline is suboptimal.",weeks:"Add week 4"},
+      {id:"boron",role:"Secondary",dose:"6-12mg",timing:"With food",why:"Reduces SHBG. 7mg daily for one week raised free testosterone 28% and reduced estradiol 39% in a controlled trial. Cheap and consistently underused.",weeks:"Add week 6"},
+    ],
+    advanced:[
+      {id:"ipamorelin",role:"Advanced",dose:"100-200mcg 2-3x/day",timing:"Away from meals",why:"GH secretagogue. Elevated IGF-1 from chronic GH pulsing supports lean mass and indirectly improves the hormonal environment.",weeks:"Optional  -  advanced only"},
+    ],
+    avoid:["Soy protein in large amounts  -  phytoestrogen effect","Alcohol  -  acutely suppresses testosterone production","Combining multiple 5-AR inhibitors without bloodwork"],
+    stack_note:"Correct D3, zinc, and magnesium first. These three deficiencies together suppress testosterone significantly and fixing them costs almost nothing. Only add adaptogens after 4-6 weeks of foundation. Bloodwork before and 8 weeks after any protocol change.",
+  },
+  force:{
+    title:"Strength and Performance Protocol",
+    goal:"force",
+    intro:"Protocol for maximizing strength, power output, and training performance. Focused on compounds with direct human trial evidence for performance outcomes. Stack is designed to be sustainable long-term.",
+    primary:[
+      {id:"creatine-monohydrate",role:"Foundation",dose:"5g/day",timing:"Any time  -  consistency matters more than timing",why:"The most studied performance compound in existence. 500+ human trials. Increases phosphocreatine stores, strength, and power output. No loading phase needed.",weeks:"Start week 1"},
+      {id:"citrulline",role:"Foundation",dose:"6-8g",timing:"30-60min pre-workout",why:"Increases nitric oxide production and reduces training fatigue. More effective than arginine for blood flow. Malate form adds fatigue resistance.",weeks:"Start week 1"},
+      {id:"beta-alanine",role:"Foundation",dose:"3.2-6.4g",timing:"Pre-workout",why:"Increases muscle carnosine, buffering acid accumulation during high-intensity sets. Effective for sets lasting 1-4 minutes. Tingling is normal and harmless.",weeks:"Start week 1"},
+    ],
+    secondary:[
+      {id:"vitamine-d3-k2",role:"Secondary",dose:"4000 IU D3",timing:"Morning with fat",why:"Deficiency directly reduces muscle protein synthesis and strength. Cheap correction with significant upside if deficient.",weeks:"Add week 2"},
+      {id:"zinc-bisglycinate",role:"Secondary",dose:"15-25mg",timing:"Evening",why:"Zinc depletion from sweat reduces testosterone and recovery. Athletes are commonly deficient.",weeks:"Add week 2"},
+      {id:"omega-3",role:"Secondary",dose:"2-3g EPA/DHA",timing:"With meals",why:"Reduces exercise-induced inflammation, improves muscle protein synthesis response to training, and speeds recovery.",weeks:"Add week 4"},
+    ],
+    advanced:[
+      {id:"ipamorelin",role:"Advanced",dose:"100-200mcg 2-3x/day",timing:"Away from meals or pre-sleep",why:"GH secretagogue. Increases lean mass, reduces body fat, improves recovery. Significantly more effect when combined with resistance training.",weeks:"Optional  -  advanced only"},
+    ],
+    avoid:["NSAIDs regularly  -  blunt training adaptation","Creatine loading phase  -  unnecessary and causes GI distress","Beta-alanine above 6.4g  -  no additional benefit"],
+    stack_note:"Creatine alone is worth more than most entire supplement stacks. Take it daily, timing does not matter. Add Citrulline and Beta-Alanine for acute training performance. Omega-3 is the most underrated recovery compound in this list.",
+  },
+  longevity:{
+    title:"Longevity Protocol",
+    goal:"longevity",
+    intro:"Protocol targeting the primary mechanisms of biological aging: NAD+ depletion, oxidative stress, inflammation, mitochondrial dysfunction, and cellular senescence. Ranked by human evidence quality.",
+    primary:[
+      {id:"vitamine-d3-k2",role:"Foundation",dose:"4000-6000 IU D3 + 200mcg K2",timing:"Morning with fat",why:"Vitamin D deficiency is associated with accelerated all-cause mortality. K2 prevents arterial calcification. Near-universal correction needed.",weeks:"Start week 1"},
+      {id:"omega-3",role:"Foundation",dose:"2-4g EPA/DHA",timing:"With meals",why:"Reduces systemic inflammation  -  the primary driver of age-related disease. Improves cardiovascular outcomes in meta-analyses of multiple RCTs.",weeks:"Start week 1"},
+      {id:"coq10",role:"Foundation",dose:"200-400mg ubiquinol",timing:"Morning with fat",why:"Mitochondrial energy production cofactor. Declines with age and is depleted by statins. Ubiquinol form is better absorbed.",weeks:"Start week 1"},
+    ],
+    secondary:[
+      {id:"nmn",role:"Secondary",dose:"500-1000mg",timing:"Morning",why:"NAD+ precursor. NAD+ drops 50% by age 50. Human trials show significant NAD+ restoration. Most relevant in adults over 35.",weeks:"Add week 4"},
+      {id:"resveratrol",role:"Secondary",dose:"500mg",timing:"With fat and NMN",why:"SIRT1 activator synergistic with NMN. Anti-inflammatory and cardioprotective in human trials. Bioavailability is enhanced when taken with fat.",weeks:"Add week 4"},
+      {id:"astaxanthin",role:"Secondary",dose:"12mg",timing:"With fat",why:"Most potent carotenoid antioxidant. 14 human RCTs. Reduces oxidative damage, improves cardiovascular markers, and has photoprotective effects.",weeks:"Add week 6"},
+    ],
+    advanced:[
+      {id:"epitalon",role:"Advanced",dose:"10mg/day for 10-20 day cycles",timing:"Any time",why:"Telomerase activator. Documented effects on aging biomarkers and pineal function in human studies. Used in 2-3 cycle per year protocol.",weeks:"Optional  -  2-3 cycles/year"},
+    ],
+    avoid:["Antioxidant megadosing  -  can blunt hormetic adaptation from exercise","Combining multiple NAD+ precursors  -  one is sufficient","Resveratrol without fat  -  poor bioavailability"],
+    stack_note:"D3+K2 and Omega-3 are the highest-evidence longevity interventions accessible to everyone. Fix those first. NMN becomes progressively more relevant after age 35. Resveratrol is most useful when combined with NMN due to SIRT1 synergy.",
+  },
+  skin:{
+    title:"Skin Quality Protocol",
+    goal:"skin",
+    intro:"Evidence-based protocol for improving skin thickness, elasticity, hydration, and collagen density. Compounds ranked by human trial evidence. Results typically visible at 8-12 weeks of consistent use.",
+    primary:[
+      {id:"vitamin-c",role:"Foundation",dose:"500-1000mg",timing:"Morning",why:"Rate-limiting cofactor for collagen synthesis. Vitamin C deficiency stops collagen production. Also reduces oxidative skin damage and melanin oxidation.",weeks:"Start week 1"},
+      {id:"astaxanthin",role:"Foundation",dose:"12mg",timing:"With fat",why:"14 human RCTs showing reduced UV-induced skin damage, improved elasticity, and moisture retention. The most evidence-backed carotenoid for skin.",weeks:"Start week 1"},
+      {id:"collagen",role:"Foundation",dose:"10-15g",timing:"Morning",why:"Oral collagen peptides reach dermal fibroblasts and upregulate collagen synthesis. 26 RCTs show improved hydration and elasticity. Below 10g has inconsistent effect.",weeks:"Start week 1"},
+    ],
+    secondary:[
+      {id:"hyaluronic-acid",role:"Secondary",dose:"120-240mg",timing:"Morning",why:"Oral HA is absorbed and reaches skin tissue. 60-day trials show measurable reduction in wrinkle depth and skin moisture improvements.",weeks:"Add week 4"},
+      {id:"pine-bark-pycnogenol",role:"Secondary",dose:"100-150mg",timing:"With food",why:"7 RCTs showing improved skin elasticity, hydration, and UV protection. Anti-inflammatory via NF-kB inhibition. Pairs well with Vitamin C.",weeks:"Add week 4"},
+      {id:"ghk-cu",role:"Secondary",dose:"Topical 0.1-0.5% or injectable 200mcg",timing:"Evening",why:"Upregulates collagen type I and III. The most studied copper peptide for skin. Documented improvements in skin thickness and wound healing.",weeks:"Add week 6"},
+    ],
+    advanced:[
+      {id:"epitalon",role:"Advanced",dose:"10mg/day for 10-20 day cycles",timing:"Any time",why:"Tetrapeptide that reduces UV-induced skin damage, improves melanin regulation, and affects cellular aging markers.",weeks:"Optional  -  2-3 cycles/year"},
+    ],
+    avoid:["High-dose Vitamin A without monitoring  -  hepatotoxic","Combining multiple retinoids","Collagen below 10g/day  -  insufficient dose based on trial data"],
+    stack_note:"Vitamin C + Collagen + Astaxanthin is the highest-evidence skin stack. Take them together consistently for 12 weeks before evaluating. HA and Pycnogenol add synergistic hydration and anti-inflammatory effects. Do not expect visible results before 8 weeks.",
+  },
+  weight:{
+    title:"Fat Loss Protocol",
+    goal:"weight",
+    intro:"Evidence-based protocol for fat loss and body composition improvement. Focused on compounds with documented effects in human trials. No protocol replaces caloric deficit  -  these compounds work within a proper nutrition framework.",
+    primary:[
+      {id:"berberine",role:"Foundation",dose:"500mg 3x/day",timing:"Before meals",why:"Activates AMPK, improving insulin sensitivity and reducing fat storage. Meta-analyses show comparable effects to metformin for glucose control. Take with food to reduce GI effects.",weeks:"Start week 1"},
+      {id:"omega-3",role:"Foundation",dose:"3-4g EPA/DHA",timing:"With meals",why:"Reduces cortisol-driven fat accumulation. Improves insulin sensitivity. Most useful when dietary fat intake is low.",weeks:"Start week 1"},
+      {id:"vitamin-c",role:"Foundation",dose:"500mg",timing:"Morning",why:"Inversely correlated with cortisol. Lower cortisol reduces stress-driven abdominal fat accumulation. Also improves carnitine synthesis.",weeks:"Start week 1"},
+    ],
+    secondary:[
+      {id:"ashwagandha-ksm66",role:"Secondary",dose:"600mg",timing:"Morning or evening",why:"Reduces cortisol by 27% in trials. High cortisol directly promotes abdominal fat storage. Most useful for stress-driven weight gain.",weeks:"Add week 4"},
+      {id:"creatine-monohydrate",role:"Secondary",dose:"5g",timing:"Any time",why:"Preserves lean mass during a caloric deficit. More lean mass increases resting metabolic rate. Critical during aggressive cuts.",weeks:"Add week 4"},
+      {id:"semaglutide",role:"Secondary  -  Rx only",dose:"0.25-2.4mg/week SC",timing:"Weekly injection",why:"GLP-1 agonist with 15-20% body weight reduction in trials. FDA-approved. Requires prescription. Most effective pharmaceutical intervention available.",weeks:"Prescription only"},
+    ],
+    advanced:[
+      {id:"tesamorelin",role:"Advanced",dose:"1-2mg/day SC",timing:"Daily injection",why:"FDA-approved for visceral fat reduction. Particularly targets abdominal and facial subcutaneous fat via IGF-1 stimulation.",weeks:"Optional  -  prescription"},
+    ],
+    avoid:["Thermogenic stimulant stacks  -  high cardiovascular risk, minimal sustained benefit","Combining berberine with metformin without medical supervision","High-dose diuretics for weight loss  -  dangerous"],
+    stack_note:"No supplement protocol replaces caloric deficit. Berberine is the most accessible evidence-backed compound for fat loss. Creatine during a cut preserves lean mass which matters for long-term metabolism. Semaglutide is the highest-efficacy intervention but requires a prescription.",
+  },
+  recovery:{
+    title:"Recovery Protocol",
+    goal:"recovery",
+    intro:"Protocol for accelerating muscle repair, reducing DOMS, and improving readiness between training sessions. Compounds ranked by human trial evidence for recovery outcomes.",
+    primary:[
+      {id:"omega-3",role:"Foundation",dose:"3-4g EPA/DHA",timing:"With meals",why:"Most consistent recovery compound in the literature. Reduces exercise-induced inflammation and muscle soreness in multiple RCTs.",weeks:"Start week 1"},
+      {id:"creatine-monohydrate",role:"Foundation",dose:"5g",timing:"Any time",why:"Accelerates phosphocreatine resynthesis between sets and sessions. Reduces muscle damage markers in human trials. Take daily.",weeks:"Start week 1"},
+      {id:"magnesium-bisglycinate",role:"Foundation",dose:"300-400mg",timing:"Evening",why:"Athletes lose significant magnesium through sweat. Deficiency slows recovery and increases muscle cramps. Evening dosing also improves sleep quality.",weeks:"Start week 1"},
+    ],
+    secondary:[
+      {id:"nac",role:"Secondary",dose:"600-1200mg",timing:"Post-workout",why:"Glutathione precursor. Reduces exercise-induced oxidative stress and improves post-workout recovery markers.",weeks:"Add week 2"},
+      {id:"taurine",role:"Secondary",dose:"2-3g",timing:"Pre or post workout",why:"Reduces oxidative damage and muscle soreness markers in trials. Also cardioprotective during high-intensity exercise.",weeks:"Add week 2"},
+      {id:"collagen",role:"Secondary",dose:"15g + Vitamin C",timing:"1hr pre-workout",why:"Collagen + Vitamin C taken before exercise increases collagen synthesis markers in tendons and connective tissue. Specific timing matters here.",weeks:"Add week 4"},
+    ],
+    advanced:[
+      {id:"bpc-157",role:"Advanced",dose:"250-500mcg",timing:"Near injured area or systemic",why:"Angiogenic peptide with strong animal data and consistent human anecdotal evidence for tendon, ligament, and joint repair.",weeks:"Optional  -  for specific injuries"},
+    ],
+    avoid:["NSAIDs regularly  -  blunt the inflammatory signal needed for adaptation","Vitamin C megadosing around training  -  may blunt adaptation","Alcohol post-workout  -  impairs protein synthesis and recovery"],
+    stack_note:"Omega-3 + Creatine + Magnesium covers the majority of recovery needs. Collagen before exercise is specifically for connective tissue, not muscle. BPC-157 is the advanced option for injury-specific recovery.",
+  },
+};
+
+function GuidePage({guideId,onUpgrade,onAuth,onNavigate}){
+  const {isPro,user}=useAuth();
+  const isMob=useIsMobile();
+  const guide=GUIDES[guideId];
+
+  if(!guide){
+    return(
+      <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:16}}>
+        <p style={{fontFamily:"Montserrat,sans-serif",fontSize:14,color:C.gray}}>Protocol guide not found.</p>
+        <button onClick={()=>onNavigate("supplements")} style={{padding:"10px 20px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Back to database</button>
+      </div>
+    );
+  }
+
+  const goal=GOALS.find(g=>g.id===guide.goal);
+  const navigateToCompound=(id)=>{window.history.pushState({},"",`/compound/${id}`);window.dispatchEvent(new PopStateEvent("popstate"));};
+  const navigateToGoal=()=>{window.history.pushState({},"",`/goal/${guide.goal}`);window.dispatchEvent(new PopStateEvent("popstate"));};
+
+  const TIER_LABELS={primary:"Primary",secondary:"Secondary",advanced:"Advanced"};
+  const TIER_COLORS={primary:"#16a34a",secondary:"#2563eb",advanced:"#d97706"};
+  const ALL_STEPS=[
+    ...guide.primary.map(c=>({...c,tier:"primary"})),
+    ...guide.secondary.map(c=>({...c,tier:"secondary"})),
+    ...(guide.advanced||[]).map(c=>({...c,tier:"advanced"})),
+  ];
+
+  return(
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+      {/* Header */}
+      <div style={{background:C.ink,padding:isMob?"24px 16px 28px":"40px 48px",position:"relative",overflow:"hidden"}}>
+        {!isMob&&<div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px)",backgroundSize:"32px 32px",pointerEvents:"none"}}/>}
+        <div style={{maxWidth:860,margin:"0 auto",position:"relative"}}>
+          <button onClick={navigateToGoal} style={{fontSize:11,color:"#6b7280",background:"transparent",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",marginBottom:16,padding:0}}>← All {goal?.label} compounds</button>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+            <span style={{fontSize:9,fontWeight:800,letterSpacing:".16em",color:C.gold,textTransform:"uppercase"}}>Protocol Guide</span>
+            <span style={{fontSize:9,color:"#374151"}}>|</span>
+            <span style={{fontSize:9,fontWeight:700,letterSpacing:".12em",color:"#6b7280",textTransform:"uppercase"}}>Evidence-based</span>
+          </div>
+          <h1 style={{fontSize:isMob?24:38,fontWeight:900,letterSpacing:"-.04em",color:C.white,margin:"0 0 12px",lineHeight:1.05}}>{guide.title}</h1>
+          <p style={{fontSize:13,color:"#9ca3af",margin:"0 0 24px",maxWidth:580,lineHeight:1.7}}>{guide.intro}</p>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+            {[
+              [TIER_LABELS.primary,"#16a34a",guide.primary.length+" compounds"],
+              [TIER_LABELS.secondary,"#2563eb",guide.secondary.length+" compounds"],
+              [TIER_LABELS.advanced,"#d97706",(guide.advanced?.length||0)+" compounds"],
+            ].map(([label,col,sub])=>(
+              <div key={label} style={{padding:"6px 14px",border:`1px solid ${col}30`,background:`${col}12`}}>
+                <span style={{fontSize:10,fontWeight:800,color:col}}>{label}</span>
+                <span style={{fontSize:9,color:"#6b7280",marginLeft:6}}>{sub}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{maxWidth:860,margin:"0 auto",padding:isMob?"16px 16px 80px":"32px 48px 80px"}}>
+        {/* Stack note */}
+        <div style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.gold}`,padding:"14px 20px",marginBottom:28}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".12em",color:C.gray,margin:"0 0 4px",textTransform:"uppercase"}}>Protocol overview</p>
+          <p style={{fontSize:12,color:C.ink,margin:0,lineHeight:1.7}}>{guide.stack_note}</p>
+        </div>
+
+        {/* Compounds by tier */}
+        {["primary","secondary","advanced"].map(tier=>{
+          const items=tier==="primary"?guide.primary:tier==="secondary"?guide.secondary:guide.advanced||[];
+          if(!items.length)return null;
+          const isAdvancedTier=tier==="advanced";
+          const locked=isAdvancedTier&&!isPro;
+          const tc=TIER_COLORS[tier];
+          return(
+            <div key={tier} style={{marginBottom:28}}>
+              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+                <div style={{height:1,flex:1,background:C.border}}/>
+                <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:tc,margin:0,textTransform:"uppercase",flexShrink:0}}>{TIER_LABELS[tier]}</p>
+                <div style={{height:1,flex:1,background:C.border}}/>
+              </div>
+              {locked?(
+                <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"20px 24px",textAlign:"center"}}>
+                  <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 6px"}}>Advanced compounds  -  Pro only</p>
+                  <p style={{fontSize:12,color:C.gray,margin:"0 0 16px"}}>{items.map(i=>i.id.replace(/-/g," ")).join(", ")}</p>
+                  <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+                    {user
+                      ?<button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"10px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/mo</button>
+                      :<><button onClick={()=>onAuth("signup")} style={{padding:"10px 20px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Create account</button>
+                      <button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"10px 20px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Go Pro</button></>
+                    }
+                  </div>
+                </div>
+              ):(
+                <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                  {items.map((item,i)=>{
+                    const supp=SUPPLEMENTS.find(s=>s.id===item.id);
+                    return(
+                      <div key={item.id} style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${tc}`,padding:isMob?"14px 16px":"18px 24px"}}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8,marginBottom:10}}>
+                          <div style={{display:"flex",alignItems:"center",gap:10,flex:1,minWidth:0}}>
+                            <span style={{fontSize:13,fontWeight:900,color:C.ink,letterSpacing:"-.02em"}}>{supp?.name||item.id}</span>
+                            <span style={{fontSize:8,fontWeight:800,color:tc,background:`${tc}12`,border:`1px solid ${tc}25`,padding:"2px 7px",flexShrink:0,letterSpacing:".06em"}}>{item.role.toUpperCase()}</span>
+                          </div>
+                          <span style={{fontSize:10,color:C.gray,fontStyle:"italic",flexShrink:0}}>{item.weeks}</span>
+                        </div>
+                        <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:isMob?8:16,marginBottom:10}}>
+                          <div>
+                            <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 3px",textTransform:"uppercase"}}>Dose</p>
+                            <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:0}}>{item.dose}</p>
+                          </div>
+                          <div>
+                            <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 3px",textTransform:"uppercase"}}>Timing</p>
+                            <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:0}}>{item.timing}</p>
+                          </div>
+                        </div>
+                        <p style={{fontSize:11,color:C.gray,margin:"0 0 10px",lineHeight:1.6}}>{item.why}</p>
+                        <button onClick={()=>navigateToCompound(item.id)}
+                          style={{fontSize:10,fontWeight:700,color:tc,background:"transparent",border:`1px solid ${tc}30`,padding:"4px 12px",cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
+                          Full evidence profile →
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {/* What to avoid */}
+        <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid #dc2626`,padding:"20px 24px",marginBottom:24}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:"#dc2626",margin:"0 0 14px",textTransform:"uppercase"}}>What to avoid</p>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {guide.avoid.map((a,i)=>(
+              <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                <span style={{color:"#dc2626",fontWeight:900,fontSize:14,flexShrink:0,marginTop:1}}>×</span>
+                <span style={{fontSize:12,color:C.ink,lineHeight:1.5}}>{a}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Disclaimer */}
+        <div style={{padding:"12px 16px",background:`${C.amber}08`,border:`1px solid ${C.amber}20`}}>
+          <p style={{fontSize:10,color:C.gray,margin:0,lineHeight:1.6}}>This protocol is based on published clinical research and is for informational purposes only. It does not constitute medical advice. Consult a healthcare provider before starting any supplementation protocol, especially for prescription compounds or if you have underlying health conditions.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 function PricingPage({onUpgrade,onAuth}){
   const {user,isPro}=useAuth();

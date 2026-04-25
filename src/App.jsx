@@ -126,6 +126,7 @@ function HeroStats({isMobile}){
       <div><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>4</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>evidence tiers</span></div>
       <div><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>PubMed</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>primary source</span></div>
       <div><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>Cochrane</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>systematic reviews</span></div>
+      <div><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>1,000+</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>side effects documented</span></div>
     </div>
   );
 }
@@ -3378,9 +3379,8 @@ function AppInner(){
             Not just what the science says.<br/>What you should actually do.
           </h1>
           <p style={{fontSize:isMobile?13:15,color:C.gray,lineHeight:1.8,margin:"0 auto 20px",maxWidth:580,padding:isMobile?"0 4px":0}}>
-            {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds: peptides, SARMs, GLP-1s, anabolics, nootropics, skin & aesthetics - scored by <strong style={{color:C.ink,fontWeight:700}}>actual effect size</strong> and <strong style={{color:C.ink,fontWeight:700}}>evidence quality</strong>. Then an AI that turns the data into a protocol built for your body.
+            {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds: peptides, SARMs, GLP-1s, anabolics, nootropics, skin & aesthetics - scored by <strong style={{color:C.ink,fontWeight:700}}>actual effect size</strong> and <strong style={{color:C.ink,fontWeight:700}}>evidence quality</strong>. Then an AI that turns the data into a protocol built for your body. Free to search. No account required.
           </p>
-          <HeroStats isMobile={isMobile}/>
           <div ref={searchContainerRef} style={{maxWidth:680,margin:"0 auto 20px",position:"relative"}}>
             <div style={{display:"flex",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
               {!search&&(
@@ -3394,7 +3394,7 @@ function AppInner(){
                 onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter"){setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}}
                 placeholder=""
                 style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
-              <button onClick={()=>{setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}} style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search</button>
+              <button onClick={()=>{setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}} style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search for free →</button>
             </div>
             {/* Autocomplete dropdown */}
             {showSuggest&&search.trim().length>0&&(()=>{
@@ -3457,6 +3457,8 @@ function AppInner(){
               );
             })()}
           </div>
+          <p style={{fontSize:11,color:C.gray,textAlign:"center",margin:"0 auto 12px",maxWidth:500,fontFamily:"Montserrat,sans-serif"}}>T1 = strongest evidence. T4 = experimental. Every compound scored by effect size and study quality.</p>
+          <HeroStats isMobile={isMobile}/>
           </div>{/* end zIndex:1 */}
           {/* Social proof */}
           <div className="evid-reveal visible" style={{maxWidth:680,margin:"0 auto 16px",display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:1,background:C.border}}>

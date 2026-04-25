@@ -3339,7 +3339,7 @@ function AppInner(){
       {page==="affiliate"&&<AffiliatePage/>}
       {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
       {page==="shared-stack"&&<SharedStackPage shareId={shareId}/>}
-      {page==="guides"&&<GuidesIndexPage onNavigate={navigateTo}/>}
+      {page==="guides"&&<GuidesIndexPage onNavigate={navigateTo} onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="goal-page"&&goalId&&<GoalPage goalId={goalId} onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
       {page==="guide-page"&&guideId&&<GuidePage guideId={guideId} onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
       {page==="legal"          &&<LegalPage/>}
@@ -5387,13 +5387,15 @@ function BloodworkHistoryScreen({onUpgrade}){
 }
 
 // ── GUIDES INDEX PAGE ──────────────────────────────────────────────────────────
-function GuidesIndexPage({onNavigate}){
+function GuidesIndexPage({onNavigate,onUpgrade,onAuth}){
+  const {isPro,user}=useAuth();
   const isMob=useIsMobile();
+  const FREE_GUIDE_IDS=["sleep","force"];
   const GUIDE_ITEMS=[
     {id:"sleep",label:"Sleep",icon:"😴",desc:"Magnesium, Glycine, L-Theanine, Ashwagandha. Improve onset, depth, and recovery."},
+    {id:"force",label:"Strength",icon:"💪",desc:"Creatine, Citrulline, Beta-Alanine. The highest-evidence performance stack."},
     {id:"focus",label:"Focus & Cognition",icon:"🧠",desc:"Caffeine + L-Theanine, Lion's Mane, Bacopa. Sustained mental performance without dependence."},
     {id:"hormones",label:"Testosterone",icon:"🩸",desc:"D3, Zinc, Tongkat Ali, Ashwagandha, Boron. Optimize the hormonal foundation first."},
-    {id:"force",label:"Strength",icon:"💪",desc:"Creatine, Citrulline, Beta-Alanine. The highest-evidence performance stack."},
     {id:"longevity",label:"Longevity",icon:"❤️",desc:"Omega-3, CoQ10, NMN, Resveratrol. Target NAD+ decline, inflammation, and mitochondrial function."},
     {id:"skin",label:"Skin Quality",icon:"✨",desc:"Vitamin C, Astaxanthin, Collagen, Hyaluronic Acid. 8-12 weeks to visible improvement."},
     {id:"weight",label:"Fat Loss",icon:"⚖️",desc:"Berberine, Omega-3, Ashwagandha. Works within a caloric deficit. No thermogenic stack."},
@@ -5402,6 +5404,14 @@ function GuidesIndexPage({onNavigate}){
   const GOAL_ITEMS=GOALS.filter(g=>g.id!=="all");
   const navigateGuide=(id)=>{window.history.pushState({},"",`/guide/${id}`);window.dispatchEvent(new PopStateEvent("popstate"));};
   const navigateGoal=(id)=>{window.history.pushState({},"",`/goal/${id}`);window.dispatchEvent(new PopStateEvent("popstate"));};
+  const handleGuideClick=(g)=>{
+    if(!isPro&&!FREE_GUIDE_IDS.includes(g.id)){
+      if(user)onUpgrade();
+      else onAuth("signup");
+      return;
+    }
+    navigateGuide(g.id);
+  };
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
       <div style={{background:C.white,borderBottom:`1px solid ${C.border}`,padding:isMob?"24px 16px":"40px 48px"}}>
@@ -5411,24 +5421,44 @@ function GuidesIndexPage({onNavigate}){
         </div>
       </div>
       <div style={{maxWidth:960,margin:"0 auto",padding:isMob?"20px 16px 80px":"40px 48px 80px"}}>
-        {/* Protocol guides */}
-        <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Protocol guides</p>
-        <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:12,marginBottom:40}}>
-          {GUIDE_ITEMS.map(g=>(
-            <div key={g.id} onClick={()=>navigateGuide(g.id)}
-              style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.gold}`,padding:"20px 24px",cursor:"pointer",transition:"box-shadow .15s"}}
-              onMouseEnter={e=>e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,.07)"}
-              onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
-              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
-                <span style={{fontSize:22}}>{g.icon}</span>
-                <span style={{fontSize:15,fontWeight:900,color:C.ink,letterSpacing:"-.02em"}}>{g.label}</span>
-                <span style={{marginLeft:"auto",fontSize:10,color:C.gray}}>→</span>
-              </div>
-              <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}>{g.desc}</p>
-            </div>
-          ))}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:16}}>
+          <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:0,textTransform:"uppercase"}}>Protocol guides</p>
+          {!isPro&&<span style={{fontSize:10,color:C.gray}}>{FREE_GUIDE_IDS.length} free - {GUIDE_ITEMS.length-FREE_GUIDE_IDS.length} Pro only</span>}
         </div>
-        {/* All goal pages */}
+        <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:12,marginBottom:40}}>
+          {GUIDE_ITEMS.map(g=>{
+            const locked=!isPro&&!FREE_GUIDE_IDS.includes(g.id);
+            return(
+              <div key={g.id} onClick={()=>handleGuideClick(g)}
+                style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${locked?C.gray:C.gold}`,padding:"20px 24px",cursor:"pointer",transition:"box-shadow .15s",opacity:locked?.65:1,position:"relative"}}
+                onMouseEnter={e=>e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,.07)"}
+                onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+                  <span style={{fontSize:22,filter:locked?"grayscale(1)":"none"}}>{g.icon}</span>
+                  <span style={{fontSize:15,fontWeight:900,color:locked?C.gray:C.ink,letterSpacing:"-.02em"}}>{g.label}</span>
+                  {locked
+                    ?<span style={{marginLeft:"auto",fontSize:9,fontWeight:800,background:C.ink,color:C.gold,padding:"2px 7px",letterSpacing:".08em"}}>PRO</span>
+                    :<span style={{marginLeft:"auto",fontSize:10,color:C.gray}}>→</span>}
+                </div>
+                <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}>{locked?"Unlock with Pro to access the full protocol.":g.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+        {!isPro&&(
+          <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"18px 22px",marginBottom:40,display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
+            <div style={{flex:1,minWidth:180}}>
+              <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 4px"}}>6 more protocol guides - Pro only</p>
+              <p style={{fontSize:11,color:C.gray,margin:0}}>Testosterone, Focus, Longevity, Skin, Fat Loss, and Recovery with full compound lists, dosing, and timing.</p>
+            </div>
+            <div style={{display:"flex",gap:8,flexShrink:0,flexWrap:"wrap"}}>
+              {user
+                ?<button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"10px 22px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/mo</button>
+                :<><button onClick={()=>onAuth("signup")} style={{padding:"10px 18px",background:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Create account</button>
+                <button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"10px 18px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Go Pro</button></>}
+            </div>
+          </div>
+        )}
         <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Browse by goal</p>
         <div style={{display:"grid",gridTemplateColumns:isMob?"1fr 1fr":"repeat(4,1fr)",gap:8}}>
           {GOAL_ITEMS.map(g=>{
@@ -5460,7 +5490,7 @@ function GoalPage({goalId,onUpgrade,onAuth,onNavigate}){
     .map(s=>{const eff=s.effects.find(e=>e.goal===goalId);return{...s,goalEfficacy:eff?.efficacy||0,goalEvidence:eff?.evidence||0,goalStudies:eff?.study_count||eff?.studies||0,goalSummary:eff?.summary||"",goalType:eff?.study_type||eff?.type||""};})
     .sort((a,b)=>(b.goalEfficacy+b.goalEvidence)-(a.goalEfficacy+a.goalEvidence));
   const tierColor=["","#16a34a","#2563eb","#7c3aed","#d97706"];
-  const FREE_SHOW=6;
+  const FREE_SHOW=3;
   const navigateToCompound=(id)=>{window.history.pushState({},"",`/compound/${id}`);window.dispatchEvent(new PopStateEvent("popstate"));};
   const navigateToGuide=()=>{window.history.pushState({},"",`/guide/${goalId}`);window.dispatchEvent(new PopStateEvent("popstate"));};
   const GUIDE_IDS=["sleep","focus","hormones","force","longevity","skin","weight","recovery"];
@@ -5727,7 +5757,7 @@ function GuidePage({guideId,onUpgrade,onAuth,onNavigate}){
           const items=tier==="Primary"?guide.primary:tier==="Secondary"?guide.secondary:guide.advanced||[];
           if(!items.length)return null;
           const isAdv=tier==="Advanced";
-          const locked=isAdv&&!isPro;
+          const locked=tier!=="Primary"&&!isPro;
           const tc=TIER_COLORS[tier];
           return(
             <div key={tier} style={{marginBottom:24}}>
@@ -5738,7 +5768,7 @@ function GuidePage({guideId,onUpgrade,onAuth,onNavigate}){
               </div>
               {locked?(
                 <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"18px 22px",textAlign:"center"}}>
-                  <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 5px"}}>Advanced compounds - Pro only</p>
+                  <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 5px"}}>{tier} compounds - Pro only</p>
                   <p style={{fontSize:11,color:C.gray,margin:"0 0 14px"}}>{items.map(i=>{const s=SUPPLEMENTS.find(x=>x.id===i.id);return s?.name||i.id;}).join(", ")}</p>
                   <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
                     {user?<button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"9px 22px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/mo</button>
@@ -5773,17 +5803,29 @@ function GuidePage({guideId,onUpgrade,onAuth,onNavigate}){
             </div>
           );
         })}
-        <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:"3px solid #dc2626",padding:"16px 22px",marginBottom:20}}>
-          <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:"#dc2626",margin:"0 0 12px",textTransform:"uppercase"}}>What to avoid</p>
-          <div style={{display:"flex",flexDirection:"column",gap:7}}>
-            {guide.avoid.map((a,i)=>(
-              <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start"}}>
-                <span style={{color:"#dc2626",fontWeight:900,fontSize:13,flexShrink:0,marginTop:1}}>x</span>
-                <span style={{fontSize:11,color:C.ink,lineHeight:1.5}}>{a}</span>
-              </div>
-            ))}
+        {isPro?(
+          <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:"3px solid #dc2626",padding:"16px 22px",marginBottom:20}}>
+            <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:"#dc2626",margin:"0 0 12px",textTransform:"uppercase"}}>What to avoid</p>
+            <div style={{display:"flex",flexDirection:"column",gap:7}}>
+              {guide.avoid.map((a,i)=>(
+                <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start"}}>
+                  <span style={{color:"#dc2626",fontWeight:900,fontSize:13,flexShrink:0,marginTop:1}}>x</span>
+                  <span style={{fontSize:11,color:C.ink,lineHeight:1.5}}>{a}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ):(
+          <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:"3px solid #dc2626",padding:"16px 22px",marginBottom:20}}>
+            <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:"#dc2626",margin:"0 0 8px",textTransform:"uppercase"}}>What to avoid</p>
+            <p style={{fontSize:11,color:C.gray,margin:"0 0 12px"}}>{guide.avoid.length} interactions and combinations to avoid - Pro only.</p>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              {user?<button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"8px 18px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Unlock Pro - $9.99/mo</button>
+              :<><button onClick={()=>onAuth("signup")} style={{padding:"8px 14px",background:C.ink,color:C.white,border:"none",fontSize:10,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Create account</button>
+              <button onClick={onUpgrade} className="evid-shimmer-btn" style={{padding:"8px 14px",background:C.gold,color:C.ink,border:"none",fontSize:10,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Go Pro</button></>}
+            </div>
+          </div>
+        )}
         <div style={{padding:"10px 14px",background:`${C.amber}08`,border:`1px solid ${C.amber}20`}}>
           <p style={{fontSize:10,color:C.gray,margin:0,lineHeight:1.6}}>This protocol is based on published clinical research and is for informational purposes only. It does not constitute medical advice. Consult a healthcare provider before starting any supplementation protocol.</p>
         </div>

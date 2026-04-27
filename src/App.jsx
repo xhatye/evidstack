@@ -5725,6 +5725,7 @@ function GuidePage({guideId,onUpgrade,onAuth,onNavigate}){
   const navigateToGoal=()=>{window.history.pushState({},"",`/goal/${guide.goal}`);window.dispatchEvent(new PopStateEvent("popstate"));};
   const TIER_COLORS={Primary:"#16a34a",Secondary:"#2563eb",Advanced:"#d97706"};
   const ALL_TIERS=["Primary","Secondary","Advanced"];
+  const freeGuide=guideId==="sleep"||guideId==="force";
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
       <div style={{background:C.ink,padding:isMob?"24px 16px 28px":"40px 48px",position:"relative",overflow:"hidden"}}>
@@ -5759,7 +5760,6 @@ function GuidePage({guideId,onUpgrade,onAuth,onNavigate}){
           const items=tier==="Primary"?guide.primary:tier==="Secondary"?guide.secondary:guide.advanced||[];
           if(!items.length)return null;
           const isAdv=tier==="Advanced";
-          const freeGuide=guideId==="sleep"||guideId==="force";
           const locked=tier!=="Primary"&&!isPro&&!freeGuide;
           const tc=TIER_COLORS[tier];
           return(

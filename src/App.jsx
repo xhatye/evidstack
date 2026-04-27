@@ -5759,7 +5759,8 @@ function GuidePage({guideId,onUpgrade,onAuth,onNavigate}){
           const items=tier==="Primary"?guide.primary:tier==="Secondary"?guide.secondary:guide.advanced||[];
           if(!items.length)return null;
           const isAdv=tier==="Advanced";
-          const locked=tier!=="Primary"&&!isPro;
+          const freeGuide=guideId==="sleep"||guideId==="force";
+          const locked=tier!=="Primary"&&!isPro&&!freeGuide;
           const tc=TIER_COLORS[tier];
           return(
             <div key={tier} style={{marginBottom:24}}>
@@ -5805,7 +5806,7 @@ function GuidePage({guideId,onUpgrade,onAuth,onNavigate}){
             </div>
           );
         })}
-        {isPro?(
+        {(isPro||freeGuide)?(
           <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:"3px solid #dc2626",padding:"16px 22px",marginBottom:20}}>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:"#dc2626",margin:"0 0 12px",textTransform:"uppercase"}}>What to avoid</p>
             <div style={{display:"flex",flexDirection:"column",gap:7}}>

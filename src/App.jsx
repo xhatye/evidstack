@@ -3098,6 +3098,7 @@ function AppInner(){
   const isMobile=useIsMobile();
   const [mobileMenu,setMobileMenu]=useState(false);
   const [showTools,setShowTools]=useState(false);
+  const [showExitModal,setShowExitModal]=useState(false);
 
   const navigateTo=(p)=>{navigate(p);setPage(p);setCompoundId(null);window.scrollTo({top:0,behavior:"instant"});};
 
@@ -3142,6 +3143,19 @@ function AppInner(){
     window.addEventListener("popstate",onPop);
     return()=>window.removeEventListener("popstate",onPop);
   },[]);
+  useEffect(()=>{
+    if(page!=="supplements")return;
+    let shown=false;
+    const handler=(e)=>{
+      if(e.clientY<=0&&!shown&&!sessionStorage.getItem("evid_exit_shown")){
+        shown=true;
+        sessionStorage.setItem("evid_exit_shown","1");
+        setShowExitModal(true);
+      }
+    };
+    document.addEventListener("mouseleave",handler);
+    return()=>document.removeEventListener("mouseleave",handler);
+  },[page]);
   const openAuth=(mode="login")=>{setAuthMode(mode);setShowAuth(true);};
   const openUpgrade=()=>setShowUpgrade(true);
   const toggle=(id)=>setSelected(p=>p===id?null:id);
@@ -3223,6 +3237,18 @@ function AppInner(){
       {showUpgrade&&<UpgradeModal onClose={()=>setShowUpgrade(false)} onAuthNeeded={()=>openAuth("signup")}/>}
       {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
       {showCompareModal&&compareA&&compareB&&<CompareModal compA={compareA} compB={compareB} onClose={()=>{setShowCompareModal(false);setCompareA(null);setCompareB(null);}}/>}
+      {showExitModal&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+          <div style={{background:C.white,maxWidth:420,width:"100%",padding:"32px 28px",position:"relative",fontFamily:"Montserrat,sans-serif"}}>
+            <button onClick={()=>setShowExitModal(false)} style={{position:"absolute",top:12,right:16,background:"transparent",border:"none",fontSize:18,cursor:"pointer",color:C.gray}}>x</button>
+            <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 10px",textTransform:"uppercase"}}>Before you go</p>
+            <h2 style={{fontSize:22,fontWeight:900,letterSpacing:"-.03em",color:C.ink,margin:"0 0 10px",lineHeight:1.1}}>Search any compound free.</h2>
+            <p style={{fontSize:13,color:C.gray,margin:"0 0 20px",lineHeight:1.7}}>370+ compounds ranked by clinical trial data. Type any supplement name and see the evidence score, dosing protocol, side effects, and interactions - no account needed.</p>
+            <button onClick={()=>{setShowExitModal(false);document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});document.getElementById("evidstack-search")?.focus();}} className="evid-shimmer-btn" style={{width:"100%",padding:"13px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Search for free →</button>
+            <button onClick={()=>setShowExitModal(false)} style={{width:"100%",padding:"10px",background:"transparent",border:"none",fontSize:11,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif",marginTop:8}}>No thanks</button>
+          </div>
+        </div>
+      )}
 
       {/* Mobile menu drawer */}
       {isMobile&&mobileMenu&&(
@@ -3261,6 +3287,13 @@ function AppInner(){
         </div>
       )}
 
+      {page==="supplements"&&(
+        <div style={{background:C.ink,padding:"8px 16px",textAlign:"center",fontSize:11,fontWeight:700,color:C.white,display:"flex",alignItems:"center",justifyContent:"center",gap:8,flexWrap:"wrap"}}>
+          <span style={{width:6,height:6,borderRadius:3,background:C.gold,display:"inline-block",flexShrink:0}}/>
+          <span>370+ compounds ranked by clinical trial data - free to search, no account required</span>
+          <button onClick={()=>document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"})} style={{padding:"3px 10px",background:"transparent",border:`1px solid ${C.gold}`,color:C.gold,fontSize:10,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search now →</button>
+        </div>
+      )}
       <nav style={{borderBottom:`1px solid ${C.border}`,padding:isMobile?"0 16px":"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:72,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
         <div onClick={()=>navigateTo("supplements")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
           <div style={{width:30,height:30,border:`2px solid ${C.black}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:10,fontWeight:900}}>E</span></div>
@@ -3381,6 +3414,19 @@ function AppInner(){
           <p style={{fontSize:isMobile?13:15,color:C.gray,lineHeight:1.8,margin:"0 auto 20px",maxWidth:580,padding:isMobile?"0 4px":0}}>
             {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds: peptides, SARMs, GLP-1s, anabolics, nootropics, skin & aesthetics - scored by <strong style={{color:C.ink,fontWeight:700}}>actual effect size</strong> and <strong style={{color:C.ink,fontWeight:700}}>evidence quality</strong>. Then an AI that turns the data into a protocol built for your body. Free to search. No account required.
           </p>
+          <div style={{maxWidth:680,margin:"0 auto 20px",background:C.white,border:`1px solid ${C.border}`,display:"flex",flexDirection:isMobile?"column":"row"}}>
+            {[
+              {n:"1",label:"Search any compound",desc:"Type creatine, BPC-157, semaglutide, anything."},
+              {n:"2",label:"See the evidence",desc:"Efficacy and evidence scored from PubMed and Cochrane RCTs."},
+              {n:"3",label:"Get a protocol",desc:"AI builds a stack calibrated to your body and goals."},
+            ].map((step,i,arr)=>(
+              <div key={step.n} style={{flex:1,padding:"14px 16px",borderRight:isMobile?"none":(i<arr.length-1?`1px solid ${C.border}`:"none"),borderBottom:isMobile&&i<arr.length-1?`1px solid ${C.border}`:"none",textAlign:"left"}}>
+                <span style={{fontSize:10,fontWeight:900,color:C.gold,display:"block",marginBottom:4,fontFamily:"Montserrat,sans-serif"}}>{step.n}</span>
+                <span style={{fontSize:11,fontWeight:900,color:C.ink,display:"block",marginBottom:3,fontFamily:"Montserrat,sans-serif"}}>{step.label}</span>
+                {!isMobile&&<span style={{fontSize:11,color:C.gray,lineHeight:1.5,fontFamily:"Montserrat,sans-serif"}}>{step.desc}</span>}
+              </div>
+            ))}
+          </div>
           <div ref={searchContainerRef} style={{maxWidth:680,margin:"0 auto 20px",position:"relative"}}>
             <div style={{display:"flex",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
               {!search&&(
@@ -3388,7 +3434,7 @@ function AppInner(){
                   {isMobile?"Search a supplement...":PLACEHOLDERS[phIdx]}
                 </div>
               )}
-              <input value={search}
+              <input id="evidstack-search" value={search}
                 onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
                 onFocus={()=>{if(search.length>0)setShowSuggest(true);}}
                 onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter"){setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}}
@@ -3509,19 +3555,7 @@ function AppInner(){
           <GoalQuizSection onNavigate={navigateTo} onAuth={openAuth}/>
         </div>
 
-      <div style={{background:C.bg,display:"flex",flexDirection:"column",alignItems:"center",padding:"16px 0 40px"}}>
-        <p style={{fontSize:10,fontWeight:700,letterSpacing:".16em",color:C.gray,margin:"0 0 14px",textTransform:"uppercase"}}>Browse the database</p>
-        <style>{`
-          @keyframes chevBounce{0%,100%{transform:translateY(0);opacity:.2}50%{transform:translateY(7px);opacity:1}}
-          .chev1{animation:chevBounce 1.6s ease-in-out infinite;}
-          .chev2{animation:chevBounce 1.6s ease-in-out .28s infinite;}
-        `}</style>
-        {[1,2].map(n=>(
-          <svg key={n} className={n===1?"chev1":"chev2"} width="30" height="17" viewBox="0 0 30 17" fill="none" style={{display:"block"}}>
-            <polyline points="3,3 15,14 27,3" stroke="#0a0a0a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        ))}
-      </div>
+      <div style={{height:1,background:C.border,maxWidth:680,margin:"0 auto 24px"}}/>
 
         <div style={{borderBottom:`1px solid ${C.border}`,background:C.white}}>
           <div style={{display:"flex",gap:0,overflowX:"auto",padding:"0 32px"}}>
@@ -5502,6 +5536,11 @@ function GoalPage({goalId,onUpgrade,onAuth,onNavigate}){
       <div style={{background:C.white,borderBottom:`1px solid ${C.border}`,padding:isMob?"24px 16px":"32px 48px"}}>
         <div style={{maxWidth:900,margin:"0 auto"}}>
           <button onClick={()=>onNavigate("guides")} style={{fontSize:11,color:C.gray,background:"transparent",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",marginBottom:16,padding:0}}>← All guides</button>
+          <div style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.gold}`,padding:"10px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+            <span style={{fontWeight:900,color:C.gold,fontSize:11,flexShrink:0}}>New here?</span>
+            <span style={{fontSize:11,color:C.gray}}>Evidstack ranks supplements by clinical trial evidence. Free to search - Pro unlocks all compounds and AI tools.</span>
+            <button onClick={()=>{window.history.pushState({},"","/");window.dispatchEvent(new PopStateEvent("popstate"));}} style={{fontSize:10,fontWeight:800,color:C.ink,background:"transparent",border:`1px solid ${C.border}`,padding:"3px 10px",cursor:"pointer",fontFamily:"Montserrat,sans-serif",flexShrink:0}}>See how it works →</button>
+          </div>
           <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:8}}>
             <span style={{fontSize:isMob?32:40}}>{goal.icon}</span>
             <h1 style={{fontSize:isMob?22:34,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:0}}>Best supplements for {goal.label}</h1>

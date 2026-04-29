@@ -67,7 +67,7 @@ TIER PRIORITY: The user has chosen to prioritize Tier ${tierPriority} compounds 
         Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "openai/gpt-oss-120b",
+        model: "llama-3.3-70b-versatile",
         max_tokens: 2000,
         temperature: 0.3,
         messages: [

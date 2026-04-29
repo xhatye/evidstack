@@ -45,7 +45,7 @@ Respond ONLY with valid JSON:
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: { "Authorization": `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "meta-llama/llama-4-maverick", max_tokens: 2000, temperature: 0.3, messages: [{ role: "user", content: prompt }] }),
+      body: JSON.stringify({ model: "openai/gpt-oss-120b", max_tokens: 2000, temperature: 0.3, messages: [{ role: "user", content: prompt }] }),
     });
     const data = await res.json();
     const text = data.choices?.[0]?.message?.content || "{}";

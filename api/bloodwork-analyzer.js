@@ -102,7 +102,7 @@ Respond ONLY with valid JSON in this exact format (no markdown, no extra text):
         Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-4-maverick",
+        model: "openai/gpt-oss-120b",
         max_tokens: 1800,
         temperature: 0.3,
         messages: [{ role: "user", content: prompt }],

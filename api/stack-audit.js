@@ -53,7 +53,7 @@ Respond ONLY with valid JSON, no markdown:
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
-      body: JSON.stringify({ model: "llama-3.3-70b-versatile", max_tokens: 2500, temperature: 0.3, messages: [{ role: "user", content: prompt }] }),
+      body: JSON.stringify({ model: "meta-llama/llama-4-maverick", max_tokens: 2500, temperature: 0.3, messages: [{ role: "user", content: prompt }] }),
     });
     const data = await res.json();
     const raw = data.choices?.[0]?.message?.content || "";

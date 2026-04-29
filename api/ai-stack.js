@@ -60,7 +60,7 @@ RESPONSE FORMAT (strict JSON only):
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "meta-llama/llama-4-maverick",
         max_tokens: 1500,
         temperature: 0.3,
         messages: [{ role: "user", content: prompt }],

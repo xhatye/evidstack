@@ -4,7 +4,7 @@ export default async function handler(req) {
   if (req.method !== "POST")
     return new Response("Method not allowed", { status: 405 });
 
-  const { query, conversationHistory } = await req.json();
+  const { query, conversationHistory, tierPriority } = await req.json();
 
   if (!query || query.trim().length < 3)
     return new Response(
@@ -50,7 +50,9 @@ Respond ONLY with valid JSON in exactly this structure (no markdown, no preamble
   "disclaimer": "This analysis is for informational purposes only. Consult a healthcare provider before starting any supplementation protocol."
 }
 
-If the user needs clarification, set "clarify" to a single question string and set "compounds" to an empty array.`;
+If the user needs clarification, set "clarify" to a single question string and set "compounds" to an empty array.${tierPriority?`
+
+TIER PRIORITY: The user has chosen to prioritize Tier ${tierPriority} compounds (T${tierPriority}: ${["","Fundamentals - strongest evidence, safest, most studied","Advanced - solid evidence, less mainstream","Expert - strong evidence, more complex protocols","Biohacking - cutting-edge, experimental"][tierPriority]}). When multiple compounds have comparable evidence, prefer T${tierPriority} options and rank them higher. Still include compounds from other tiers if they are clearly superior for the stated goal. Mention the tier of each compound in your response.`:""}` ;
 
   const messages = [
     ...(conversationHistory || []),

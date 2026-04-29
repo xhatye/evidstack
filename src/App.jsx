@@ -4311,6 +4311,7 @@ function CompoundAdvisorScreen({onUpgrade}){
   const [err,setErr]=useState("");
   const [revealedCount,setRevealedCount]=useState(0);
   const [phase,setPhase]=useState("idle");
+  const [tierPriority,setTierPriority]=useState(null);
   const inputRef=useRef(null);
 
   // Free query tracking - 1 free query per session (localStorage)
@@ -4357,7 +4358,7 @@ function CompoundAdvisorScreen({onUpgrade}){
       const res=await fetch("/api/symptom-advisor",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({query:q,conversationHistory:history,userProfile:userProfile||null}),
+        body:JSON.stringify({query:q,conversationHistory:history,userProfile:userProfile||null,tierPriority:tierPriority||null}),
       });
       const data=await res.json();
       if(data.error){setErr(data.error);setPhase("idle");return;}
@@ -4375,7 +4376,7 @@ function CompoundAdvisorScreen({onUpgrade}){
     }
   };
 
-  const reset=()=>{setResult(null);setHistory([]);setQuery("");setPhase("idle");setRevealedCount(0);setScanLine(0);setErr("");setShowUpgradeWall(false);};
+  const reset=()=>{setResult(null);setHistory([]);setQuery("");setPhase("idle");setRevealedCount(0);setScanLine(0);setErr("");setShowUpgradeWall(false);setTierPriority(null);};
 
   const SUGGESTIONS=["Best compounds for skin quality and collagen","Compounds affecting facial fat distribution","Hair retention stack: DHT, finasteride alternatives","What compounds improve bone density and IGF-1","Best peptide stack for skin and recovery","Best compounds for testosterone optimization","I want to improve my sleep quality","I'm looking to maximize muscle recovery"];
 
@@ -4458,6 +4459,26 @@ function CompoundAdvisorScreen({onUpgrade}){
         {/* Input - hidden after free query used for non-pro */}
         {(!freeUsed||isPro||phase!=="idle"||result)&&(
           <div style={{marginBottom:28}}>
+            {/* Tier priority selector */}
+            <div style={{marginBottom:10}}>
+              <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 8px",textTransform:"uppercase"}}>Prioritize tier (optional)</p>
+              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                {[
+                  {t:1,label:"T1 - Fundamentals",color:C.green},
+                  {t:2,label:"T2 - Advanced",color:C.blue},
+                  {t:3,label:"T3 - Expert",color:"#7c3aed"},
+                  {t:4,label:"T4 - Biohacking",color:C.amber},
+                ].map(({t,label,color})=>{
+                  const active=tierPriority===t;
+                  return(
+                    <button key={t} onClick={()=>setTierPriority(active?null:t)}
+                      style={{padding:"6px 14px",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",border:`1px solid ${active?color:C.border}`,background:active?color:"transparent",color:active?C.white:color,letterSpacing:".04em",transition:"all .15s"}}>
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             {/* Textarea + Send row */}
             <div style={S.inputRow}>
               <textarea

@@ -56,6 +56,7 @@ const ROUTES = {
   "/stack-audit":"stack-audit",
   "/bloodwork-history":"bloodwork-history",
   "/guides":"guides",
+  "/changelog":"changelog",
 };
 
 function getShareIdFromPath(){
@@ -3388,6 +3389,7 @@ function AppInner(){
       {page==="cycle-alerts"  &&<CycleAlertsScreen onUpgrade={openUpgrade}/>}
       {page==="stack-optimizer"&&<StackOptimizerScreen onUpgrade={openUpgrade}/>}
       {page==="bloodwork"     &&<BloodWorkScreen onUpgrade={openUpgrade}/>}
+      {page==="changelog"    &&<ChangelogPage onNavigate={navigateTo}/>}
 
       {page==="supplements"&&<>
         <div style={{padding:isMobile?"32px 16px 40px":"60px 24px 56px",textAlign:"center",position:"relative",overflow:"hidden"}}>
@@ -3695,7 +3697,7 @@ function AppInner(){
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Company</p>
-            {[["about","About"],["pricing","Pricing"],["affiliate","Affiliate Program"],["legal","Terms & Privacy"]].map(([p,l])=>(
+            {[["about","About"],["pricing","Pricing"],["affiliate","Affiliate Program"],["legal","Terms & Privacy"],["changelog","Changelog"]].map(([p,l])=>(
               <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>
@@ -5897,6 +5899,162 @@ function GuidePage({guideId,onUpgrade,onAuth,onNavigate}){
   );
 }
 
+const CHANGELOG = [
+  {
+    date: "April 29, 2025",
+    entries: [
+      {
+        tags: ["Fix"],
+        title: "AI Compound Advisor restored",
+        desc: "Fixed a server error affecting the AI Compound Advisor after a model configuration change."
+      }
+    ]
+  },
+  {
+    date: "April 28, 2025",
+    entries: [
+      {
+        tags: ["Improvement"],
+        title: "Bounce rate improvements",
+        desc: "Added a How it works bar, exit intent modal, and product explainer on goal pages to help new visitors understand the product faster."
+      },
+      {
+        tags: ["New Feature"],
+        title: "Sleep and Strength guides fully free",
+        desc: "The Sleep Optimization and Strength Protocol guides are now fully accessible without a Pro subscription, including advanced compounds."
+      }
+    ]
+  },
+  {
+    date: "April 27, 2025",
+    entries: [
+      {
+        tags: ["New Feature"],
+        title: "Protocol guides and goal pages",
+        desc: "Added 8 evidence-based protocol guides (Sleep, Focus, Testosterone, Strength, Longevity, Skin, Fat Loss, Recovery) and 17 goal pages ranking all compounds by A-F evidence grade."
+      }
+    ]
+  },
+  {
+    date: "April 22, 2025",
+    entries: [
+      {
+        tags: ["Database Update"],
+        title: "Side effects added to all 371 compounds",
+        desc: "Every compound now shows a full side effect profile with severity (mild/moderate/severe), frequency (common/uncommon/rare), and clinical notes."
+      },
+      {
+        tags: ["New Feature"],
+        title: "Evidence overview charts on compound pages",
+        desc: "Each compound page now displays visual efficacy and evidence bars per goal with A-F grading alongside numeric scores."
+      }
+    ]
+  },
+  {
+    date: "April 15, 2025",
+    entries: [
+      {
+        tags: ["New Feature"],
+        title: "Stripe customer portal",
+        desc: "Pro subscribers can now manage and cancel their subscription directly from Account settings without contacting support."
+      },
+      {
+        tags: ["Improvement"],
+        title: "TikTok and Instagram links in footer",
+        desc: "Added social media icons linking to @evidstack on TikTok and Instagram."
+      }
+    ]
+  },
+  {
+    date: "April 10, 2025",
+    entries: [
+      {
+        tags: ["New Feature"],
+        title: "Live autocomplete search with semantic goal matching",
+        desc: "The search bar now shows compound suggestions as you type with prefix matching. Typing a goal name like sleep or testosterone filters by that goal automatically."
+      }
+    ]
+  },
+  {
+    date: "April 5, 2025",
+    entries: [
+      {
+        tags: ["Improvement"],
+        title: "USPs and competitor comparison table",
+        desc: "Added a competitor comparison table on the Pricing page (Evidstack vs Examine.com vs ConsumerLab) and updated copy across the site."
+      },
+      {
+        tags: ["Database Update"],
+        title: "Database expanded to 371 compounds",
+        desc: "Added new entries across peptides, SARMs, GLP-1 agonists, and biohacking tier compounds."
+      }
+    ]
+  },
+  {
+    date: "March 28, 2025",
+    entries: [
+      {
+        tags: ["New Feature"],
+        title: "Vercel Analytics",
+        desc: "Added anonymous visitor analytics to track page views and traffic sources."
+      }
+    ]
+  },
+  {
+    date: "March 20, 2025",
+    entries: [
+      {
+        tags: ["New Feature"],
+        title: "Evidstack Pro launched",
+        desc: "Launched the Pro subscription at $9.99/month and $79/year with Stripe. Includes AI Compound Advisor, Interaction Checker, Stack Audit AI, Bloodwork History, and full database access."
+      }
+    ]
+  }
+];
+
+const TAG_STYLE = {
+  "New Feature":  { background: "#e2c97e", color: "#1a1a1a" },
+  "Database Update": { background: "#16a34a", color: "#ffffff" },
+  "Fix":          { background: "#2563eb", color: "#ffffff" },
+  "Improvement":  { background: "#7c3aed", color: "#ffffff" },
+};
+
+function ChangelogPage({onNavigate}){
+  const isMob=useIsMobile();
+  return(
+    <div style={{background:"#f4f2ee",minHeight:"100vh",fontFamily:"Montserrat,sans-serif"}}>
+      <div style={{background:"#1a1a1a",padding:isMob?"32px 20px":"48px 24px",textAlign:"center"}}>
+        <h1 style={{fontSize:isMob?28:40,fontWeight:900,color:"#ffffff",margin:"0 0 8px",letterSpacing:"-.03em"}}>Changelog</h1>
+        <p style={{fontSize:13,color:"#9ca3af",margin:0}}>Every update to the Evidstack database and product, in order.</p>
+      </div>
+      <div style={{maxWidth:720,margin:"0 auto",padding:isMob?"24px 16px":"40px 24px"}}>
+        {CHANGELOG.map((group,gi)=>(
+          <div key={gi} style={{marginBottom:40}}>
+            <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
+              <span style={{fontSize:13,fontWeight:700,color:"#1a1a1a"}}>{group.date}</span>
+              <div style={{flex:1,height:1,background:"#e8e5df"}}/>
+            </div>
+            {group.entries.map((entry,ei)=>(
+              <div key={ei} style={{background:"#ffffff",border:"1px solid #e8e5df",padding:"16px 20px",marginBottom:12}}>
+                <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}}>
+                  {entry.tags.map((tag,ti)=>{
+                    const s=TAG_STYLE[tag]||{background:"#e8e5df",color:"#1a1a1a"};
+                    return(
+                      <span key={ti} style={{fontSize:10,fontWeight:800,letterSpacing:".06em",padding:"2px 8px",background:s.background,color:s.color,textTransform:"uppercase"}}>{tag}</span>
+                    );
+                  })}
+                </div>
+                <p style={{fontSize:15,fontWeight:900,color:"#1a1a1a",margin:"0 0 6px",lineHeight:1.3}}>{entry.title}</p>
+                <p style={{fontSize:12,color:"#6b7280",margin:0,lineHeight:1.7}}>{entry.desc}</p>
+              </div>
+            ))}
+          </div>
+        ))}
+        <p style={{fontSize:11,color:"#9ca3af",textAlign:"center",marginTop:8}}>Updates are logged from March 2025 onward.</p>
+      </div>
+    </div>
+  );
+}
 
 function PricingPage({onUpgrade,onAuth}){
   const {user,isPro}=useAuth();

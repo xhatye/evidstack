@@ -567,38 +567,52 @@ function UpgradeModal({onClose,onAuthNeeded}){
 /* PAYWALL CARD */
 const FREE_VISIBLE=4; // Tier 1 cards visible without account
 
-function FreeGateBanner({onAuth,isMob}){
+function BlurredPreviewPaywall({lockedCompounds,onAuth,onUpgrade,user,isMob}){
   return(
-    <div style={{border:`1.5px solid ${C.ink}`,background:C.white,padding:isMob?"20px 16px":"24px 28px",textAlign:"center",margin:"4px 0"}}>
-      <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:"0 0 6px",letterSpacing:"-.02em"}}>You have seen {FREE_VISIBLE} compounds.</p>
-      <p style={{fontSize:13,color:C.gray,margin:"0 0 20px",lineHeight:1.6}}>Create a free account to browse all 33 Tier 1 compounds. No credit card needed.</p>
-      <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
-        <button onClick={()=>onAuth("signup")} style={{padding:"12px 28px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
-          Create free account
-        </button>
-        <button onClick={()=>onAuth("login")} style={{padding:"12px 20px",background:"transparent",color:C.gray,border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
-          Sign in
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function FreeGateCard({supp,isMob}){
-  return(
-    <div style={{border:`1px solid ${C.border}`,background:C.white,padding:isMob?"14px 16px":"18px 24px",display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,filter:"blur(2px)",pointerEvents:"none",userSelect:"none",opacity:.55}}>
-      <div>
-        <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{supp.name}</p>
-        <p style={{fontSize:11,color:C.gray,margin:0}}>Tier {supp.tier} compound</p>
-      </div>
-      <div style={{display:"flex",gap:8,flexShrink:0}}>
-        <div style={{padding:"6px 12px",background:C.bg,border:`1px solid ${C.border}`}}>
-          <p style={{fontSize:9,color:C.gray,margin:"0 0 2px",fontWeight:700}}>EFFICACY</p>
-          <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:0}}>{supp.effects?.[0]?.efficacy||"-"}/5</p>
-        </div>
-        <div style={{padding:"6px 12px",background:C.bg,border:`1px solid ${C.border}`}}>
-          <p style={{fontSize:9,color:C.gray,margin:"0 0 2px",fontWeight:700}}>EVIDENCE</p>
-          <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:0}}>{supp.effects?.[0]?.evidence||"-"}/5</p>
+    <div>
+      {lockedCompounds.map((s)=>{
+        const tc=tierColor(s.tier);
+        return(
+          <div key={s.id} style={{position:"relative",border:`1px solid ${C.border}`,background:C.white,borderTop:`3px solid ${tc}`,padding:isMob?"14px 16px":"18px 24px",opacity:0.7,cursor:"default",marginBottom:12}}>
+            <div style={{position:"absolute",inset:0,background:"rgba(244,242,238,0.5)",pointerEvents:"none"}}/>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
+              <div>
+                <p style={{fontSize:9,fontWeight:800,color:tc,letterSpacing:".14em",margin:"0 0 4px",textTransform:"uppercase"}}>TIER {s.tier}</p>
+                <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:0}}>{s.name}</p>
+              </div>
+              <div style={{display:"flex",gap:8,flexShrink:0,filter:"blur(4px)"}}>
+                <div style={{padding:"6px 12px",background:C.bg,border:`1px solid ${C.border}`}}>
+                  <p style={{fontSize:9,color:C.gray,margin:"0 0 2px",fontWeight:700}}>EFFICACY</p>
+                  <div style={{height:8,background:"#e5e7eb",borderRadius:4,width:"60px"}}/>
+                </div>
+                <div style={{padding:"6px 12px",background:C.bg,border:`1px solid ${C.border}`}}>
+                  <p style={{fontSize:9,color:C.gray,margin:"0 0 2px",fontWeight:700}}>EVIDENCE</p>
+                  <div style={{height:8,background:"#e5e7eb",borderRadius:4,width:"60px"}}/>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"28px 24px",textAlign:"center"}}>
+        <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 6px"}}>You're seeing {FREE_VISIBLE} of {SUPPLEMENTS.length} compounds</p>
+        <p style={{fontSize:12,color:C.gray,margin:"0 0 8px"}}>Pro unlocks all compounds including peptides, SARMs, GLP-1s, and the full biohacking tier - plus AI tools, interaction checker, stack audit, and bloodwork tracking.</p>
+        <p style={{fontSize:11,color:C.gray,margin:"0 0 20px"}}>$9.99/month. Cancel anytime.</p>
+        <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+          {user?(
+            <button onClick={onUpgrade} style={{padding:"12px 28px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+              Upgrade to Pro
+            </button>
+          ):(
+            <>
+              <button onClick={()=>onAuth("signup")} style={{padding:"12px 28px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
+                Create free account
+              </button>
+              <button onClick={onUpgrade} style={{padding:"12px 20px",background:"transparent",color:C.gray,border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
+                Upgrade to Pro - $9.99/mo
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -3650,10 +3664,10 @@ function AppInner(){
                 const isTier1=s.tier===1;
                 if(!user&&isTier1){
                   if(tier1Seen===FREE_VISIBLE){
-                    items.push(<FreeGateBanner key="free-gate-banner" onAuth={openAuth} isMob={isMobile}/>);
+                    const locked=filtered.filter(s2=>s2.tier===1).slice(FREE_VISIBLE,FREE_VISIBLE+10);
+                    items.push(<BlurredPreviewPaywall key="blurred-paywall" lockedCompounds={locked} onAuth={openAuth} onUpgrade={openUpgrade} user={user} isMob={isMobile}/>);
                   }
                   if(tier1Seen>=FREE_VISIBLE){
-                    items.push(<div key={s.id} style={{animation:`fadeUp .35s ${i*.02}s both`}}><FreeGateCard supp={s} isMob={isMobile}/></div>);
                     tier1Seen++;
                     continue;
                   }

@@ -3302,7 +3302,7 @@ function AppInner(){
         </div>
       )}
 
-      {page==="supplements"&&(
+      {page==="supplements"&&!isMobile&&(
         <div style={{background:C.ink,padding:"8px 16px",textAlign:"center",fontSize:11,fontWeight:700,color:C.white,display:"flex",alignItems:"center",justifyContent:"center",gap:8,flexWrap:"wrap"}}>
           <span style={{width:6,height:6,borderRadius:3,background:C.gold,display:"inline-block",flexShrink:0}}/>
           <span>370+ compounds ranked by clinical trial data - free to search, no account required</span>
@@ -3318,6 +3318,8 @@ function AppInner(){
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             {user&&!isPro&&<button onClick={openUpgrade} style={{padding:"6px 12px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
             {isPro&&<span style={{fontSize:9,fontWeight:800,color:C.gold,border:`1px solid ${C.gold}`,padding:"2px 6px"}}>PRO</span>}
+            {!user&&<button onClick={()=>openAuth("login")} style={{padding:"6px 10px",background:"transparent",border:`1px solid ${C.border}`,color:C.ink,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Sign in</button>}
+            {!user&&<button onClick={()=>openAuth("signup")} style={{padding:"6px 10px",background:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Sign up</button>}
             <button onClick={()=>setMobileMenu(true)} style={{background:"none",border:"none",cursor:"pointer",padding:4,display:"flex",flexDirection:"column",gap:5}}>
               <span style={{display:"block",width:22,height:2,background:C.ink}}/>
               <span style={{display:"block",width:22,height:2,background:C.ink}}/>
@@ -3406,7 +3408,7 @@ function AppInner(){
       {page==="changelog"    &&<ChangelogPage onNavigate={navigateTo}/>}
 
       {page==="supplements"&&<>
-        <div style={{padding:isMobile?"32px 16px 40px":"60px 24px 56px",textAlign:"center",position:"relative",overflow:"hidden"}}>
+        <div style={{padding:isMobile?"32px 16px 40px":"60px 24px 56px",textAlign:"center",position:"relative",overflow:isMobile?"visible":"hidden"}}>
           {/* Molecular background */}
           {!isMobile&&<svg aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0}} viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
             {[
@@ -3574,7 +3576,7 @@ function AppInner(){
       <div style={{height:1,background:C.border,maxWidth:680,margin:"0 auto 24px"}}/>
 
         <div style={{borderBottom:`1px solid ${C.border}`,background:C.white}}>
-          <div style={{display:"flex",gap:0,overflowX:"auto",padding:"0 32px"}}>
+          <div style={{display:"flex",gap:0,overflowX:"auto",padding:isMobile?"0 12px":"0 32px"}}>
             {GOALS.map((g,i)=>(
               <div key={g.id} style={{display:"flex",alignItems:"stretch",position:"relative"}}>
                 <button onClick={()=>setGoal(g.id)}

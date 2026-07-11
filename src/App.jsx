@@ -3442,7 +3442,7 @@ function AppInner(){
             ):(
               <div style={{display:"flex",gap:6}}>
                 <button onClick={()=>openAuth("login")}  style={{padding:"8px 14px",fontSize:12,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Sign in</button>
-                <button onClick={()=>{setEmailCaptureCompound(null);setShowEmailCapture(true);}} className="evid-shimmer-btn" style={{padding:"8px 16px",fontSize:12,fontWeight:800,background:C.gold,color:C.ink,border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".02em"}}>Create free account</button>
+                <button onClick={()=>{setEmailCaptureCompound(null);setShowEmailCapture(true);}} className="evid-shimmer-btn" style={{padding:"8px 16px",fontSize:12,fontWeight:800,background:C.gold,color:C.ink,border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".02em"}}>Create free account<span style={{fontSize:9,color:C.gray,display:"block",textAlign:"center",marginTop:2}}>No card required</span></button>
               </div>
             )}
           </div>

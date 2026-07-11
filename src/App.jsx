@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { db } from "./firebase.js";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
 
 function useIsMobile(){ 
   const [m,setM]=useState(()=>typeof window!=="undefined"&&window.innerWidth<768);
@@ -343,6 +343,60 @@ function ProfileSetupModal({onClose}){
             Skip for now
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* EMAIL CAPTURE MODAL */
+function EmailCaptureModal({onClose,compoundId}){
+  const [email,setEmail]=useState("");
+  const [done,setDone]=useState(false);
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
+
+  const submit=async()=>{
+    if(!email.includes("@")){setError("Enter a valid email address.");return;}
+    setLoading(true);setError("");
+    try{
+      await addDoc(collection(db,"leads"),{email,compoundId:compoundId||null,timestamp:Date.now(),source:compoundId?"compound_wall":"nav_cta"});
+      const limit=parseInt(sessionStorage.getItem("evid_email_limit")||"5");
+      sessionStorage.setItem("evid_email_limit",String(limit+5));
+      setDone(true);
+    }catch(e){setError("Something went wrong. Try again.");}
+    finally{setLoading(false);}
+  };
+
+  return(
+    <div onClick={done?onClose:undefined} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:24,fontFamily:"Montserrat,sans-serif"}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:C.white,width:"100%",maxWidth:420,position:"relative"}}>
+        <div style={{background:C.ink,padding:"24px 28px 20px"}}>
+          <p style={{fontSize:9,fontWeight:800,letterSpacing:".18em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>Evidstack</p>
+          <h2 style={{fontSize:20,fontWeight:900,color:C.white,margin:"0 0 4px",letterSpacing:"-.03em"}}>Keep exploring.</h2>
+          <p style={{fontSize:12,color:"#9ca3af",margin:0,lineHeight:1.6}}>Enter your email to unlock 5 more compound pages. Free, no password required.</p>
+        </div>
+        {done?(
+          <div style={{padding:"32px 28px",textAlign:"center"}}>
+            <p style={{fontSize:36,margin:"0 0 12px"}}>✓</p>
+            <p style={{fontSize:15,fontWeight:900,color:C.ink,margin:"0 0 8px"}}>You're in.</p>
+            <p style={{fontSize:13,color:C.gray,margin:"0 0 24px",lineHeight:1.6}}>5 more compound pages unlocked for this session.</p>
+            <button onClick={onClose} style={{padding:"11px 28px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Continue browsing</button>
+          </div>
+        ):(
+          <div style={{padding:"24px 28px"}}>
+            <input value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()} placeholder="your@email.com" type="email"
+              style={{width:"100%",padding:"11px 14px",border:`1px solid ${C.border}`,marginBottom:error?8:12,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"}}/>
+            {error&&<p style={{fontSize:12,color:C.red,margin:"0 0 12px"}}>{error}</p>}
+            <button onClick={submit} disabled={loading}
+              style={{width:"100%",padding:"13px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif",marginBottom:10}}>
+              {loading?"...":"Unlock 5 more pages"}
+            </button>
+            <p style={{fontSize:11,color:C.gray,textAlign:"center",margin:"0 0 16px"}}>No spam. No password. Just science.</p>
+            <div style={{borderTop:`1px solid ${C.border}`,paddingTop:14,textAlign:"center"}}>
+              <button onClick={onClose} style={{background:"none",border:"none",fontSize:11,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Continue without email</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -3074,6 +3128,8 @@ function AppInner(){
   const [authMode,setAuthMode]=useState("login");
   const [showUpgrade,setShowUpgrade]=useState(false);
   const [showAccount,setShowAccount]=useState(false);
+  const [showEmailCapture,setShowEmailCapture]=useState(false);
+  const [emailCaptureCompound,setEmailCaptureCompound]=useState(null);
   const [compareA,setCompareA]=useState(null);
   const [compareB,setCompareB]=useState(null);
   const [showCompareModal,setShowCompareModal]=useState(false);
@@ -3171,6 +3227,13 @@ function AppInner(){
     document.addEventListener("mouseleave",handler);
     return()=>document.removeEventListener("mouseleave",handler);
   },[page]);
+  useEffect(()=>{
+    if(loading||page!=="compound"||!compoundId||user)return;
+    const views=parseInt(sessionStorage.getItem("evid_compound_views")||"0")+1;
+    const limit=parseInt(sessionStorage.getItem("evid_email_limit")||"5");
+    sessionStorage.setItem("evid_compound_views",String(views));
+    if(views>limit){setEmailCaptureCompound(compoundId);setShowEmailCapture(true);}
+  },[page,compoundId,user,loading]);
   const openAuth=(mode="login")=>{setAuthMode(mode);setShowAuth(true);};
   const openUpgrade=()=>setShowUpgrade(true);
   const toggle=(id)=>setSelected(p=>p===id?null:id);
@@ -3252,6 +3315,7 @@ function AppInner(){
       {showUpgrade&&<UpgradeModal onClose={()=>setShowUpgrade(false)} onAuthNeeded={()=>openAuth("signup")}/>}
       {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
       {showCompareModal&&compareA&&compareB&&<CompareModal compA={compareA} compB={compareB} onClose={()=>{setShowCompareModal(false);setCompareA(null);setCompareB(null);}}/>}
+      {showEmailCapture&&<EmailCaptureModal onClose={()=>setShowEmailCapture(false)} compoundId={emailCaptureCompound}/>}
       {showExitModal&&(
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
           <div style={{background:C.white,maxWidth:420,width:"100%",padding:"32px 28px",position:"relative",fontFamily:"Montserrat,sans-serif"}}>
@@ -3295,7 +3359,7 @@ function AppInner(){
             ):(
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
                 <button onClick={()=>{openAuth("login");setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:"transparent",color:C.ink,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>Sign in</button>
-                <button onClick={()=>{openAuth("signup");setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:800,background:C.ink,color:C.white,border:"none",cursor:"pointer",width:"100%"}}>Sign up</button>
+                <button onClick={()=>{setEmailCaptureCompound(null);setShowEmailCapture(true);setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:800,background:C.gold,color:C.ink,border:"none",cursor:"pointer",width:"100%",fontFamily:"Montserrat,sans-serif"}}>Create free account</button>
               </div>
             )}
           </div>
@@ -3319,7 +3383,7 @@ function AppInner(){
             {user&&!isPro&&<button onClick={openUpgrade} style={{padding:"6px 12px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
             {isPro&&<span style={{fontSize:9,fontWeight:800,color:C.gold,border:`1px solid ${C.gold}`,padding:"2px 6px"}}>PRO</span>}
             {!user&&<button onClick={()=>openAuth("login")} style={{padding:"6px 10px",background:"transparent",border:`1px solid ${C.border}`,color:C.ink,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Sign in</button>}
-            {!user&&<button onClick={()=>openAuth("signup")} style={{padding:"6px 10px",background:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Sign up</button>}
+            {!user&&<button onClick={()=>{setEmailCaptureCompound(null);setShowEmailCapture(true);}} style={{padding:"6px 10px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Free account</button>}
             <button onClick={()=>setMobileMenu(true)} style={{background:"none",border:"none",cursor:"pointer",padding:4,display:"flex",flexDirection:"column",gap:5}}>
               <span style={{display:"block",width:22,height:2,background:C.ink}}/>
               <span style={{display:"block",width:22,height:2,background:C.ink}}/>
@@ -3378,7 +3442,7 @@ function AppInner(){
             ):(
               <div style={{display:"flex",gap:6}}>
                 <button onClick={()=>openAuth("login")}  style={{padding:"8px 14px",fontSize:12,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Sign in</button>
-                <button onClick={()=>openAuth("signup")} style={{padding:"8px 16px",fontSize:12,fontWeight:800,background:C.ink,color:C.white,border:"none",cursor:"pointer"}}>Sign up</button>
+                <button onClick={()=>{setEmailCaptureCompound(null);setShowEmailCapture(true);}} className="evid-shimmer-btn" style={{padding:"8px 16px",fontSize:12,fontWeight:800,background:C.gold,color:C.ink,border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".02em"}}>Create free account</button>
               </div>
             )}
           </div>

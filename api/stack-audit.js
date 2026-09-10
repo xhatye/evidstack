@@ -1,6 +1,7 @@
-export const config = { runtime: "edge" };
+import { secure } from "../server/access.js";
+export const config = { runtime: "nodejs" };
 
-export default async function handler(req) {
+async function handler(req, context) {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
   const body = await req.json();
   const { stack, goals, budget } = body;
@@ -52,6 +53,7 @@ Respond ONLY with valid JSON, no markdown:
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(25000),
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
       body: JSON.stringify({ model: "openai/gpt-oss-120b", max_tokens: 2500, temperature: 0.3, messages: [{ role: "user", content: prompt }] }),
     });
@@ -63,3 +65,6 @@ Respond ONLY with valid JSON, no markdown:
     return new Response(JSON.stringify({ error: "Audit failed. Please try again." }), { status: 500, headers: { "Content-Type": "application/json" } });
   }
 }
+
+
+export default secure(handler, {free:false,textFields:["stack","goals"]});

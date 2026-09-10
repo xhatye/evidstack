@@ -1,6 +1,7 @@
-export const config = { runtime: "edge" };
+import { secure } from "../server/access.js";
+export const config = { runtime: "nodejs" };
 
-export default async function handler(req) {
+async function handler(req, context) {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
   const { uid } = await req.json();
@@ -12,15 +13,7 @@ export default async function handler(req) {
   try {
     // 1. Get the stripeCustomerId from Firestore via a simple fetch
     // We use the Firebase REST API since this is an Edge function
-    const FIREBASE_PROJECT = process.env.FIREBASE_PROJECT_ID;
-    const firestoreRes = await fetch(
-      `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/users/${uid}`,
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    const firestoreData = await firestoreRes.json();
-    const customerId = firestoreData?.fields?.stripeCustomerId?.stringValue;
+    const customerId = context.account.stripeCustomerId;
 
     if (!customerId) {
       return new Response(
@@ -32,6 +25,7 @@ export default async function handler(req) {
     // 2. Create a Stripe Customer Portal session
     const portalRes = await fetch("https://api.stripe.com/v1/billing_portal/sessions", {
       method: "POST",
+      signal: AbortSignal.timeout(25000),
       headers: {
         Authorization: `Bearer ${STRIPE_SECRET}`,
         "Content-Type": "application/x-www-form-urlencoded",
@@ -57,3 +51,6 @@ export default async function handler(req) {
     });
   }
 }
+
+
+export default secure(handler, {"billing":true});

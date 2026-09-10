@@ -1,3 +1,4 @@
+import { authenticatedFetch } from "./api.js";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { db } from "./firebase.js";
 import { doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
@@ -519,7 +520,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
     if(!user){onClose();onAuthNeeded();return;}
     setLoading(true);setError("");
     try{
-      const res=await fetch("/api/stripe-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({uid:user.uid,email:user.email,plan})});
+      const res=await authenticatedFetch("/api/stripe-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({uid:user.uid,email:user.email,plan})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       window.location.href=data.url;
@@ -528,7 +529,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
 
   const features=[
     {icon:"🔬",text:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including Tier 2-4`},
-    {icon:"🔭",text:"AI Compound Advisor - unlimited evidence-ranked queries"},
+    {icon:"🔭",text:"AI Compound Advisor - up to 100 AI requests per day"},
     {icon:"⚗️",text:"Interaction Checker - full stack safety analysis"},
     {icon:"🎯",text:"Stack Audit AI - score and optimize your current stack"},
     {icon:"🩸",text:"Bloodwork History - track 16 biomarkers over time"},
@@ -578,7 +579,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
               {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+`,highlight:true},
               {feature:"Peptides & GLP-1s",free:false,pro:true},
               {feature:"Biohacking tier",free:false,pro:true},
-              {feature:"AI Compound Advisor",free:"1 query",pro:"Unlimited",highlight:true},
+              {feature:"AI Compound Advisor",free:"1 query",pro:"100 AI requests/day",highlight:true},
               {feature:"Conversation memory",free:false,pro:true},
               {feature:"Interaction Checker",free:false,pro:true,highlight:true},
               {feature:"Stack Audit AI",free:false,pro:true},
@@ -850,7 +851,7 @@ function WeeklyProtocolAI({onUpgrade}){
     if(!goals.length){setError("Select at least one goal.");return;}
     setError("");setLoading(true);setResult(null);
     try{
-      const res=await fetch("/api/weekly-protocol",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({goals,stack,budget,experience})});
+      const res=await authenticatedFetch("/api/weekly-protocol",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({goals,stack,budget,experience})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       setResult(data);setActiveWeek(0);
@@ -1025,7 +1026,7 @@ function InteractionChecker({onUpgrade}){
     if(compounds.length<2){setError("Add at least 2 compounds.");return;}
     setError("");setLoading(true);setResult(null);
     try{
-      const res=await fetch("/api/interaction-check",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds,userProfile:userProfile||null})});
+      const res=await authenticatedFetch("/api/interaction-checker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       setResult(data);
@@ -2208,7 +2209,7 @@ function StackBuilder({onUpgrade}){
     if(goals.length===0){setError("Select at least one goal.");return;}
     setError("");setLoading(true);setResult(null);
     try{
-      const res=await fetch("/api/ai-stack",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({goals,budget,existing,restrictions,userProfile:userProfile||null})});
+      const res=await authenticatedFetch("/api/ai-stack",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({goals,budget,existing,restrictions,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       setResult(data);
@@ -2552,7 +2553,7 @@ function ManageSubButton({uid}){
   const open=async()=>{
     setLoading(true);setErr("");
     try{
-      const res=await fetch("/api/stripe-portal",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({uid})});
+      const res=await authenticatedFetch("/api/stripe-portal",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({uid})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       window.location.href=data.url;
@@ -2777,7 +2778,7 @@ function AccountCenter({onClose,onUpgrade}){
                   {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+`,highlight:true},
                   {feature:"Peptides & GLP-1s",free:false,pro:true,highlight:false},
                   {feature:"Biohacking tier",free:false,pro:true,highlight:false},
-                  {feature:"AI Compound Advisor",free:"1 query",pro:"Unlimited",highlight:true},
+                  {feature:"AI Compound Advisor",free:"1 query",pro:"100 AI requests/day",highlight:true},
                   {feature:"Conversation memory",free:false,pro:true,highlight:false},
                   {feature:"Interaction Checker",free:false,pro:true,highlight:true},
                   {feature:"Stack Audit AI",free:false,pro:true,highlight:false},
@@ -4015,7 +4016,7 @@ function StackOptimizerScreen({onUpgrade}){
   const analyze=async()=>{
     setLoading(true);setErr("");setResult(null);
     try{
-      const res=await fetch("/api/stack-optimizer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({logs:logEntries,stack})});
+      const res=await authenticatedFetch("/api/stack-optimizer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({logs:logEntries,stack})});
       const data=await res.json();
       if(data.error){setErr(data.error);return;}
       setResult(data);
@@ -4161,7 +4162,7 @@ function BloodWorkScreen({onUpgrade}){
     setLoading(true);setErr("");setResult(null);
     try{
       const stackArr=currentStack.split(",").map(s=>s.trim()).filter(Boolean);
-      const res=await fetch("/api/bloodwork-analyzer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({markers,goals,currentStack:stackArr,userProfile:userProfile||null})});
+      const res=await authenticatedFetch("/api/bloodwork-analyzer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({markers,goals,currentStack:stackArr,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error){setErr(data.error);return;}
       setResult(data);setView("result");
@@ -4407,7 +4408,7 @@ function CompoundAdvisorScreen({onUpgrade}){
   const SCANNING_LINES=[
     "Parsing query intent...",
     `Searching ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds...`,
-    "Cross-referencing PubMed meta-analyses...",
+    "Preparing the AI response...",
     "Scoring efficacy and evidence quality...",
     "Checking compound interactions...",
     "Ranking by combined score...",
@@ -4437,7 +4438,7 @@ function CompoundAdvisorScreen({onUpgrade}){
     setLoading(true);setErr("");setResult(null);setRevealedCount(0);setPhase("scanning");setScanLine(0);setShowUpgradeWall(false);
     const newHistory=[...history,{role:"user",content:q}];
     try{
-      const res=await fetch("/api/symptom-advisor",{
+      const res=await authenticatedFetch("/api/symptom-advisor",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({query:q,conversationHistory:history,userProfile:userProfile||null,tierPriority:tierPriority||null}),
@@ -4517,9 +4518,9 @@ function CompoundAdvisorScreen({onUpgrade}){
           <div style={{border:`2px solid ${C.ink}`,background:C.white,padding:isMob?"24px 20px":"36px 40px",marginBottom:28,textAlign:"center"}}>
             <div style={{fontSize:44,marginBottom:14}}>🔭</div>
             <h2 style={{fontSize:isMob?20:26,fontWeight:900,color:C.ink,margin:"0 0 10px",letterSpacing:"-.03em"}}>You have used your free query.</h2>
-            <p style={{fontSize:14,color:C.gray,margin:"0 auto 28px",maxWidth:460,lineHeight:1.7}}>Upgrade to Pro for unlimited queries, follow-up conversations, synergy detection, and protocol suggestions.</p>
+            <p style={{fontSize:14,color:C.gray,margin:"0 auto 28px",maxWidth:460,lineHeight:1.7}}>Upgrade to Pro for up to 100 AI requests per day, follow-up conversations, synergy detection, and protocol suggestions.</p>
             <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:12,maxWidth:480,margin:"0 auto 28px",textAlign:"left"}}>
-              {[["💬","Unlimited queries","Ask about anything, anytime"],["🔗","Synergy detection","See which compounds stack"],["📈","Protocol suggestions","Step-by-step intro plan"],["🧠","Conversation memory","Follow-up questions in context"]].map(([icon,title,desc])=>(
+              {[["💬","100 AI requests per day","Ask about anything, anytime"],["🔗","Synergy detection","See which compounds stack"],["📈","Protocol suggestions","Step-by-step intro plan"],["🧠","Conversation memory","Follow-up questions in context"]].map(([icon,title,desc])=>(
                 <div key={title} style={{display:"flex",gap:10,padding:"12px 14px",background:C.bg,border:`1px solid ${C.border}`}}>
                   <span style={{fontSize:18,flexShrink:0}}>{icon}</span>
                   <div><p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 2px"}}>{title}</p><p style={{fontSize:11,color:C.gray,margin:0}}>{desc}</p></div>
@@ -4743,7 +4744,7 @@ function CompoundAdvisorScreen({onUpgrade}){
                 ):(
                   <div style={{borderTop:`1px solid ${C.border}`,paddingTop:20,marginTop:8,textAlign:"center"}}>
                     <p style={{fontSize:13,fontWeight:700,color:C.ink,margin:"0 0 6px"}}>Want to ask a follow-up?</p>
-                    <p style={{fontSize:12,color:C.gray,margin:"0 0 16px"}}>Pro members get unlimited queries and full conversation memory.</p>
+                    <p style={{fontSize:12,color:C.gray,margin:"0 0 16px"}}>Pro members get up to 100 AI requests per day and full conversation memory.</p>
                     <button onClick={onUpgrade} style={{padding:"11px 28px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
                       Unlock Pro - $9.99/mo
                     </button>
@@ -4791,7 +4792,7 @@ function InteractionCheckerPro({onUpgrade}){
     if(compounds.length<2){setErr("Add at least 2 compounds.");return;}
     setLoading(true);setErr("");setResult(null);setRevealIdx(0);setPhase("scanning");
     try{
-      const res=await fetch("/api/interaction-checker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds})});
+      const res=await authenticatedFetch("/api/interaction-checker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds})});
       const data=await res.json();
       if(data.error){setErr(data.error);setPhase("idle");return;}
       setResult(data);setPhase("revealing");
@@ -4966,7 +4967,7 @@ function StackAuditScreen({onUpgrade}){
     if(!stack.trim()){setErr("Describe your current stack first.");return;}
     setLoading(true);setErr("");setResult(null);setPhase("scanning");
     try{
-      const res=await fetch("/api/stack-audit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({stack,goals,budget,userProfile:userProfile||null})});
+      const res=await authenticatedFetch("/api/stack-audit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({stack,goals,budget,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error){setErr(data.error);setPhase("idle");return;}
       setResult(data);setPhase("done");
@@ -6146,7 +6147,7 @@ function PricingPage({onUpgrade,onAuth}){
     {feature:"Peptides & GLP-1s",free:false,pro:true},
     {feature:"Biohacking tier (T4)",free:false,pro:true},
     {feature:"Compound pages (full profile)",free:false,pro:true},
-    {feature:"AI Compound Advisor",free:"1 free query",pro:"Unlimited",highlight:true},
+    {feature:"AI Compound Advisor",free:"1 free query",pro:"100 AI requests/day",highlight:true},
     {feature:"Conversation memory",free:false,pro:true},
     {feature:"Synergy and protocol suggestions",free:false,pro:true},
     {feature:"Interaction Checker",free:false,pro:true,highlight:true},
@@ -6171,48 +6172,7 @@ function PricingPage({onUpgrade,onAuth}){
   return(
     <div style={S.page}><div style={S.inner}>
       <h1 style={S.h1}>Simple, honest pricing.</h1>
-      <p style={S.sub}>One Pro plan. Everything included. Cancel anytime.</p>
-
-      {/* Competitor comparison USP6 */}
-      <div style={{maxWidth:700,margin:"0 auto 48px",background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`}}>
-        <div style={{padding:"16px 24px 12px",borderBottom:`1px solid ${C.border}`}}>
-          <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:0,textTransform:"uppercase"}}>How Evidstack compares</p>
-        </div>
-        <div style={{overflowX:"auto"}}>
-          <table style={{width:"100%",borderCollapse:"collapse",fontFamily:"Montserrat,sans-serif",fontSize:12}}>
-            <thead>
-              <tr>
-                <th style={{padding:"12px 16px",textAlign:"left",fontWeight:800,color:C.gray,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid ${C.border}`}}>Feature</th>
-                <th style={{padding:"12px 16px",textAlign:"center",fontWeight:800,color:C.gray,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid ${C.border}`}}>Examine.com</th>
-                <th style={{padding:"12px 16px",textAlign:"center",fontWeight:800,color:C.gray,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid ${C.border}`}}>ConsumerLab</th>
-                <th style={{padding:"12px 16px",textAlign:"center",background:C.ink,fontWeight:800,color:C.gold,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid #1f2937`}}>Evidstack Pro</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["Price","$29/mo","$50/yr (~$4/mo)","$9.99/mo"],
-                ["SARMs, AAS, peptides","Partial","No","Full 370+"],
-                ["AI compound advisor","No","No","Yes, unlimited"],
-                ["Interaction checker","Basic","No","Full AI analysis"],
-                ["Stack audit","No","No","Score 0-100"],
-                ["Bloodwork integration","No","No","16 biomarkers"],
-                ["Dosage calibration to body","No","No","Weight/age/sex"],
-                ["Conflict of interest","Zero","Zero","Zero"],
-              ].map(([feat,examine,consumer,evidstack],i)=>(
-                <tr key={feat} style={{background:i%2===0?C.white:C.bg}}>
-                  <td style={{padding:"10px 16px",fontWeight:700,color:C.ink,borderBottom:`1px solid ${C.border}`}}>{feat}</td>
-                  <td style={{padding:"10px 16px",textAlign:"center",color:C.gray,borderBottom:`1px solid ${C.border}`}}>{examine}</td>
-                  <td style={{padding:"10px 16px",textAlign:"center",color:C.gray,borderBottom:`1px solid ${C.border}`}}>{consumer}</td>
-                  <td style={{padding:"10px 16px",textAlign:"center",fontWeight:800,color:C.gold,background:i%2===0?"#1a1a1a":"#111111",borderBottom:"1px solid #1f2937"}}>{evidstack}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div style={{padding:"12px 16px",textAlign:"center"}}>
-          <p style={{fontSize:11,color:C.gray,margin:0}}>Examine.com pricing as of 2025. ConsumerLab $99.95/2 years. Neither covers body-calibrated dosing or AI stack analysis.</p>
-        </div>
-      </div>
+      <p style={S.sub}>One Pro plan. Up to 100 AI requests per day across all AI tools, with 10 requests per minute. Cancel anytime.</p>
 
       {/* Plan cards */}
       <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:16,marginBottom:48}}>
@@ -6245,7 +6205,7 @@ function PricingPage({onUpgrade,onAuth}){
           <p style={{fontSize:12,color:C.green,fontWeight:700,margin:"0 0 4px"}}>Or $79/year - save 34%</p>
           <p style={{fontSize:13,color:C.gray,margin:"0 0 24px"}}>Full access. Cancel in one click.</p>
           <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:28}}>
-            {[`All ${count}+ compounds (Tier 1-4)`,"Peptides, GLP-1s, SARMs, nootropics","AI Compound Advisor - unlimited queries","Interaction Checker - full safety analysis","Stack Audit AI - score and optimize your stack","Bloodwork History - track 16 biomarkers over time","AI Bloodwork Analyzer","My Tracker","Compare compounds","Save your stacks"].map(f=>(
+            {[`All ${count}+ compounds (Tier 1-4)`,"Peptides, GLP-1s, SARMs, nootropics","AI Compound Advisor - up to 100 AI requests per day","Interaction Checker - full safety analysis","Stack Audit AI - score and optimize your stack","Bloodwork History - track 16 biomarkers over time","AI Bloodwork Analyzer","My Tracker","Compare compounds","Save your stacks"].map(f=>(
               <div key={f} style={{display:"flex",gap:10,alignItems:"center"}}>
                 <span style={{color:C.gold,fontWeight:900,fontSize:14}}>✓</span>
                 <span style={{fontSize:13,color:C.ink,fontWeight:600}}>{f}</span>

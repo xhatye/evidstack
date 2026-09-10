@@ -1,3 +1,4 @@
+import { secure } from "../server/access.js";
 export const config = { runtime: "nodejs" };
 
 const MARKERS = [
@@ -21,7 +22,7 @@ const MARKERS = [
 
 export { MARKERS };
 
-export default async function handler(req) {
+async function handler(req, context) {
   if (req.method !== "POST")
     return new Response("Method not allowed", { status: 405 });
 
@@ -97,6 +98,7 @@ Respond ONLY with valid JSON in this exact format (no markdown, no extra text):
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(25000),
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
@@ -125,3 +127,6 @@ Respond ONLY with valid JSON in this exact format (no markdown, no extra text):
     );
   }
 }
+
+
+export default secure(handler, {free:false,textFields:["stack","goals"]});

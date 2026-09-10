@@ -1,6 +1,7 @@
-export const config = { runtime: "edge" };
+import { secure } from "../server/access.js";
+export const config = { runtime: "nodejs" };
 
-export default async function handler(req) {
+async function handler(req, context) {
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
   }
@@ -55,6 +56,7 @@ RESPONSE FORMAT (strict JSON only):
   try {
     const aiRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(25000),
       headers: {
         "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
         "Content-Type": "application/json",
@@ -87,3 +89,6 @@ RESPONSE FORMAT (strict JSON only):
     });
   }
 }
+
+
+export default secure(handler, {"free":false});

@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'isPro', 'profile'])
+        && request.resource.data.isPro == false;
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['profile']);
+    }
+    // Billing and quota documents are writable only through the Admin SDK.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

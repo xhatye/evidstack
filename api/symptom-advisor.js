@@ -1,6 +1,7 @@
-export const config = { runtime: "edge" };
+import { secure } from "../server/access.js";
+export const config = { runtime: "nodejs" };
 
-export default async function handler(req) {
+async function handler(req, context) {
   if (req.method !== "POST")
     return new Response("Method not allowed", { status: 405 });
 
@@ -62,6 +63,7 @@ TIER PRIORITY: The user has chosen to prioritize Tier ${tierPriority} compounds 
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(25000),
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
@@ -93,3 +95,6 @@ TIER PRIORITY: The user has chosen to prioritize Tier ${tierPriority} compounds 
     );
   }
 }
+
+
+export default secure(handler, {"free":true});

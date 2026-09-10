@@ -1,10 +1,13 @@
+import "./home.css";
+import { getPageSeo, applyPageSeo } from "./seo.js";
+import { authenticatedFetch } from "./api.js";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { db } from "./firebase.js";
 import { doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
 
-function useIsMobile(){ 
-  const [m,setM]=useState(()=>typeof window!=="undefined"&&window.innerWidth<768);
-  useEffect(()=>{const h=()=>setM(window.innerWidth<768);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h);},[]);
+function useIsMobile(breakpoint=768){ 
+  const [m,setM]=useState(()=>typeof window!=="undefined"&&window.innerWidth<breakpoint);
+  useEffect(()=>{const h=()=>setM(window.innerWidth<breakpoint);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h);},[breakpoint]);
   return m;
 }
 
@@ -411,7 +414,23 @@ function AuthModal({onClose,initialMode="login"}){
   const [error,setError]=useState("");
   const [info,setInfo]=useState("");
   const [loading,setLoading]=useState(false);
-  const [showProfile,setShowProfile]=useState(false);
+  const dialogRef=useRef(null);
+  useEffect(()=>{
+    const previous=document.activeElement;
+    const previousOverflow=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    dialogRef.current?.querySelector('input')?.focus();
+    const handleKey=(event)=>{
+      if(event.key==="Escape"){event.preventDefault();onClose();}
+      if(event.key!=="Tab")return;
+      const focusable=[...dialogRef.current.querySelectorAll('button:not([disabled]),input,a[href]')];
+      const first=focusable[0],last=focusable.at(-1);
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+    };
+    document.addEventListener("keydown",handleKey);
+    return()=>{document.removeEventListener("keydown",handleKey);document.body.style.overflow=previousOverflow;previous?.focus();};
+  },[onClose]);
 
   const switchMode=(m)=>{setMode(m);setError("");setInfo("");setPw("");setPw2("");};
 
@@ -422,7 +441,7 @@ function AuthModal({onClose,initialMode="login"}){
     setLoading(true);
     try{
       if(mode==="login"){await loginEmail(email,pw);onClose();}
-      else if(mode==="signup"){await signupEmail(email,pw);setShowProfile(true);}
+      else if(mode==="signup"){await signupEmail(email,pw);onClose();}
     }catch(e){
       setError(e.code==="auth/invalid-credential"?"Incorrect email or password.":
                e.code==="auth/email-already-in-use"?"This email is already registered.":
@@ -447,23 +466,20 @@ function AuthModal({onClose,initialMode="login"}){
     setError("");setLoading(true);
     try{
       await loginGoogle();
-      // For Google sign-in we don't know if it's new - show profile modal
-      setShowProfile(true);
+      onClose();
     }
     catch(e){setError("Google sign-in failed.");setLoading(false);}
   };
 
-  // Show profile setup after signup
-  if(showProfile) return <ProfileSetupModal onClose={onClose}/>;
 
   const inputStyle={width:"100%",padding:"11px 14px",border:`1px solid ${C.border}`,marginBottom:10,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"};
 
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
-      <div onClick={e=>e.stopPropagation()} style={{background:C.white,width:"100%",maxWidth:400,padding:"40px 36px",position:"relative"}}>
-        <button onClick={onClose} style={{position:"absolute",top:16,right:16,background:"none",border:"none",fontSize:20,cursor:"pointer",color:C.gray}}>x</button>
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="auth-heading" onClick={e=>e.stopPropagation()} style={{background:C.white,width:"100%",maxWidth:400,padding:"40px 36px",position:"relative",maxHeight:"90dvh",overflowY:"auto"}}>
+        <button aria-label="Close sign in dialog" onClick={onClose} style={{position:"absolute",top:16,right:16,background:"none",border:"none",fontSize:20,cursor:"pointer",color:C.gray}}>x</button>
         <p style={{fontSize:9,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:"0 0 8px",textTransform:"uppercase"}}>Evidstack</p>
-        <h2 style={{fontSize:24,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 24px"}}>
+        <h2 id="auth-heading" style={{fontSize:24,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 24px"}}>
           {mode==="login"?"Sign in":mode==="signup"?"Create account":"Reset password"}
         </h2>
 
@@ -477,11 +493,12 @@ function AuthModal({onClose,initialMode="login"}){
           </div>
         </>}
 
-        <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" type="email" style={inputStyle}/>
+        {mode==="signup"&&<p style={{fontSize:12,lineHeight:1.6,color:C.gray,marginBottom:16}}>Start with a free account. No card or health profile required.</p>}
+        <input aria-label="Email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" type="email" style={inputStyle}/>
 
         {mode!=="forgot"&&<>
-          <input value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&(mode==="login"?submit():null)} placeholder="Password" type="password" style={inputStyle}/>
-          {mode==="signup"&&<input value={pw2} onChange={e=>setPw2(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()} placeholder="Confirm password" type="password" style={{...inputStyle,marginBottom:mode==="login"?0:10}}/>}
+          <input aria-label="Password" autoComplete={mode==="signup"?"new-password":"current-password"} value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&(mode==="login"?submit():null)} placeholder="Password" type="password" style={inputStyle}/>
+          {mode==="signup"&&<input aria-label="Confirm password" autoComplete="new-password" value={pw2} onChange={e=>setPw2(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()} placeholder="Confirm password" type="password" style={{...inputStyle,marginBottom:mode==="login"?0:10}}/>}
         </>}
 
         {mode==="login"&&(
@@ -519,7 +536,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
     if(!user){onClose();onAuthNeeded();return;}
     setLoading(true);setError("");
     try{
-      const res=await fetch("/api/stripe-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({uid:user.uid,email:user.email,plan})});
+      const res=await authenticatedFetch("/api/stripe-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({uid:user.uid,email:user.email,plan})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       window.location.href=data.url;
@@ -528,7 +545,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
 
   const features=[
     {icon:"🔬",text:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including Tier 2-4`},
-    {icon:"🔭",text:"AI Compound Advisor - unlimited evidence-ranked queries"},
+    {icon:"🔭",text:"AI Compound Advisor - up to 100 AI requests per day"},
     {icon:"⚗️",text:"Interaction Checker - full stack safety analysis"},
     {icon:"🎯",text:"Stack Audit AI - score and optimize your current stack"},
     {icon:"🩸",text:"Bloodwork History - track 16 biomarkers over time"},
@@ -578,7 +595,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
               {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+`,highlight:true},
               {feature:"Peptides & GLP-1s",free:false,pro:true},
               {feature:"Biohacking tier",free:false,pro:true},
-              {feature:"AI Compound Advisor",free:"1 query",pro:"Unlimited",highlight:true},
+              {feature:"AI Compound Advisor",free:"1 query",pro:"100 AI requests/day",highlight:true},
               {feature:"Conversation memory",free:false,pro:true},
               {feature:"Interaction Checker",free:false,pro:true,highlight:true},
               {feature:"Stack Audit AI",free:false,pro:true},
@@ -850,7 +867,7 @@ function WeeklyProtocolAI({onUpgrade}){
     if(!goals.length){setError("Select at least one goal.");return;}
     setError("");setLoading(true);setResult(null);
     try{
-      const res=await fetch("/api/weekly-protocol",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({goals,stack,budget,experience})});
+      const res=await authenticatedFetch("/api/weekly-protocol",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({goals,stack,budget,experience})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       setResult(data);setActiveWeek(0);
@@ -1025,7 +1042,7 @@ function InteractionChecker({onUpgrade}){
     if(compounds.length<2){setError("Add at least 2 compounds.");return;}
     setError("");setLoading(true);setResult(null);
     try{
-      const res=await fetch("/api/interaction-check",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds,userProfile:userProfile||null})});
+      const res=await authenticatedFetch("/api/interaction-checker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       setResult(data);
@@ -1808,7 +1825,7 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
       </button>
 
       {/* Header */}
-      <div style={{borderTop:`4px solid ${tc}`,background:C.white,border:`1px solid ${C.border}`,borderTop:`4px solid ${tc}`,marginBottom:24}}>
+      <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`4px solid ${tc}`,marginBottom:24}}>
         <div style={{padding:isMob?"20px 18px":"32px 36px"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:16}}>
             <div>
@@ -2208,7 +2225,7 @@ function StackBuilder({onUpgrade}){
     if(goals.length===0){setError("Select at least one goal.");return;}
     setError("");setLoading(true);setResult(null);
     try{
-      const res=await fetch("/api/ai-stack",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({goals,budget,existing,restrictions,userProfile:userProfile||null})});
+      const res=await authenticatedFetch("/api/ai-stack",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({goals,budget,existing,restrictions,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       setResult(data);
@@ -2552,7 +2569,7 @@ function ManageSubButton({uid}){
   const open=async()=>{
     setLoading(true);setErr("");
     try{
-      const res=await fetch("/api/stripe-portal",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({uid})});
+      const res=await authenticatedFetch("/api/stripe-portal",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({uid})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       window.location.href=data.url;
@@ -2777,7 +2794,7 @@ function AccountCenter({onClose,onUpgrade}){
                   {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+`,highlight:true},
                   {feature:"Peptides & GLP-1s",free:false,pro:true,highlight:false},
                   {feature:"Biohacking tier",free:false,pro:true,highlight:false},
-                  {feature:"AI Compound Advisor",free:"1 query",pro:"Unlimited",highlight:true},
+                  {feature:"AI Compound Advisor",free:"1 query",pro:"100 AI requests/day",highlight:true},
                   {feature:"Conversation memory",free:false,pro:true,highlight:false},
                   {feature:"Interaction Checker",free:false,pro:true,highlight:true},
                   {feature:"Stack Audit AI",free:false,pro:true,highlight:false},
@@ -3133,24 +3150,7 @@ function AppInner(){
   const [compareA,setCompareA]=useState(null);
   const [compareB,setCompareB]=useState(null);
   const [showCompareModal,setShowCompareModal]=useState(false);
-  const [showOnboarding,setShowOnboarding]=useState(()=>{
-    const count=parseInt(localStorage.getItem(ONBOARDING_KEY)||"0");
-    return count<ONBOARDING_MAX;
-  });
-  const PLACEHOLDERS=[
-    "Search by compound name...",
-    "Try \"creatine\" for strength and muscle",
-    "Try \"GHK-Cu\" for collagen and skin peptides",
-    "Try \"semaglutide\" for weight loss",
-    "Try \"BPC-157\" for healing peptides",
-    "Try \"finasteride\" for hair retention",
-    "Try \"focus\" for cognitive enhancers",
-    "Try \"longevity\" for anti-aging compounds",
-    "Try \"collagen\" for skin and facial quality",
-    "Try \"skin\" to filter aesthetics compounds",
-    "Try \"astaxanthin\" for photoprotection",
-    "Try \"boron\" for testosterone and bone density",
-  ];
+  const PLACEHOLDERS=["Try creatine for strength...","Try sleep to explore a goal...","Search magnesium or omega-3...","Try focus for a clearer starting point..."];
   const [phIdx,setPhIdx]=useState(0);
   const [phFade,setPhFade]=useState(true);
   // Close suggestions when clicking outside search container
@@ -3160,48 +3160,20 @@ function AppInner(){
     return()=>document.removeEventListener("mousedown",handler);
   },[]);
   useEffect(()=>{
-    const iv=setInterval(()=>{
-      setPhFade(false);
-      setTimeout(()=>{setPhIdx(i=>(i+1)%PLACEHOLDERS.length);setPhFade(true);},400);
-    },4000);
-    return()=>clearInterval(iv);
-  },[]);
+    if(search||page!=="supplements"||window.matchMedia("(prefers-reduced-motion: reduce)").matches){setPhFade(true);return;}
+    let transition;
+    const iv=setInterval(()=>{setPhFade(false);transition=setTimeout(()=>{setPhIdx(i=>(i+1)%PLACEHOLDERS.length);setPhFade(true);},300);},4000);
+    return()=>{clearInterval(iv);clearTimeout(transition);};
+  },[search,page]);
   const isMobile=useIsMobile();
+  const compactNav=useIsMobile(1280);
   const [mobileMenu,setMobileMenu]=useState(false);
   const [showTools,setShowTools]=useState(false);
   const [showExitModal,setShowExitModal]=useState(false);
 
   const navigateTo=(p)=>{navigate(p);setPage(p);setCompoundId(null);window.scrollTo({top:0,behavior:"instant"});};
 
-  // Dynamic SEO meta tags
-  useEffect(()=>{
-    const supp=page==="compound"&&compoundId?SUPPLEMENTS.find(s=>s.id===compoundId):null;
-    let title="EVIDSTACK - Evidence-Based Supplement & Compound Database";
-    let desc="370+ supplements, peptides, SARMs, and compounds ranked by efficacy and evidence. PubMed meta-analyses, AI compound advisor, interaction checker.";
-    if(supp){
-      title=`${supp.name} - Dosage, Evidence & Interactions | Evidstack`;
-      desc=`${supp.name} evidence review: safety ${["","risky","caution","caution","safe","very safe"][supp.safety]||""}, Tier ${supp.tier}, ${supp.effects?.length||0} goals covered. Dosing, interactions, and study summaries on Evidstack.`;
-    }else if(page==="advisor"){title="AI Compound Advisor - Evidstack";desc="Describe any health goal and get compounds ranked by efficacy and evidence quality. Powered by 370+ compound database and PubMed data.";}
-    else if(page==="pricing"){title="Pricing - Evidstack Pro";desc="Unlock all 370+ compounds, AI Compound Advisor, Interaction Checker, Stack Audit, and Bloodwork History for $9.99/month.";}
-    else if(page==="interaction-checker"){title="Interaction Checker - Evidstack";desc="Check your full supplement stack for interactions, absorption conflicts, synergies, and optimal timing. Evidence-based analysis.";}
-    else if(page==="stack-audit"){title="Stack Audit AI - Evidstack";desc="AI-powered supplement stack audit. Get a Stack Score, identify redundancies, critical gaps, and priority changes.";}
-    else if(page==="bloodwork-history"){title="Bloodwork History - Evidstack";desc="Track 16 biomarkers over time. Correlate blood test results with your supplement stack changes.";}
-    else if(page==="guides"){title="Supplement Protocol Guides - Evidstack";desc="Evidence-based supplement protocols for sleep, focus, testosterone, strength, longevity, skin, fat loss and recovery. Ranked by clinical trial data.";}
-    else if(page==="goal-page"&&goalId){const g=GOALS.find(gl=>gl.id===goalId);if(g){title=`Best Supplements for ${g.label} - Evidstack`;desc=`Evidence-ranked supplements for ${g.label}. Every compound scored by efficacy and study quality from PubMed and Cochrane reviews.`;}}
-    else if(page==="guide-page"&&guideId){title=`${guideId.charAt(0).toUpperCase()+guideId.slice(1)} Supplement Guide - Evidstack`;desc=`Evidence-based supplement protocol for ${guideId}. Ranked from primary to optional with dosing, timing, and interaction data.`;}
-    document.title=title;
-    let metaDesc=document.querySelector("meta[name='description']");
-    if(metaDesc)metaDesc.setAttribute("content",desc);
-    let ogTitle=document.querySelector("meta[property='og:title']");
-    if(ogTitle)ogTitle.setAttribute("content",title);
-    let ogDesc=document.querySelector("meta[property='og:description']");
-    if(ogDesc)ogDesc.setAttribute("content",desc);
-    let canonical=document.querySelector("link[rel='canonical']");
-    if(canonical){
-      const path=page==="supplements"?"":page==="compound"&&compoundId?`/compound/${compoundId}`:`/${page}`;
-      canonical.setAttribute("href",`https://evidstack.com${path}`);
-    }
-  },[page,compoundId]);
+  useEffect(()=>{applyPageSeo(getPageSeo(window.location.pathname));},[page,compoundId,goalId,guideId,shareId]);
 
   useEffect(()=>{
     const onPop=()=>{
@@ -3215,25 +3187,20 @@ function AppInner(){
     return()=>window.removeEventListener("popstate",onPop);
   },[]);
   useEffect(()=>{
-    if(page!=="supplements")return;
+    if(page!=="supplements"||isPro)return;
     let shown=false;
-    const handler=(e)=>{
-      if(e.clientY<=0&&!shown&&!sessionStorage.getItem("evid_exit_shown")){
-        shown=true;
-        sessionStorage.setItem("evid_exit_shown","1");
-        setShowExitModal(true);
-      }
+    try{shown=sessionStorage.getItem("evid_pro_prompt_seen")==="1";}catch{}
+    const onScroll=()=>{
+      if(shown||showAuth||showUpgrade||showAccount||mobileMenu)return;
+      const marker=document.querySelector('[data-pro-prompt="true"]');
+      if(!marker||window.scrollY<400||marker.getBoundingClientRect().top>window.innerHeight*0.75)return;
+      if(document.getElementById("cookie-banner")?.offsetHeight)return;
+      shown=true;try{sessionStorage.setItem("evid_pro_prompt_seen","1");}catch{}
+      setShowExitModal(true);
     };
-    document.addEventListener("mouseleave",handler);
-    return()=>document.removeEventListener("mouseleave",handler);
-  },[page]);
-  useEffect(()=>{
-    if(loading||page!=="compound"||!compoundId||user)return;
-    const views=parseInt(sessionStorage.getItem("evid_compound_views")||"0")+1;
-    const limit=parseInt(sessionStorage.getItem("evid_email_limit")||"5");
-    sessionStorage.setItem("evid_compound_views",String(views));
-    if(views>limit){setEmailCaptureCompound(compoundId);setShowEmailCapture(true);}
-  },[page,compoundId,user,loading]);
+    window.addEventListener("scroll",onScroll,{passive:true});
+    return()=>window.removeEventListener("scroll",onScroll);
+  },[page,isPro,showAuth,showUpgrade,showAccount,mobileMenu]);
   const openAuth=(mode="login")=>{setAuthMode(mode);setShowAuth(true);};
   const openUpgrade=()=>setShowUpgrade(true);
   const toggle=(id)=>setSelected(p=>p===id?null:id);
@@ -3309,28 +3276,25 @@ function AppInner(){
   const proPages=proTools.map(t=>t.id);
 
   return(
-    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
-      {showOnboarding&&<OnboardingModal onClose={()=>setShowOnboarding(false)}/>}
+    <div className={page==="supplements"?"evid-homepage":undefined} style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} initialMode={authMode}/>}
       {showUpgrade&&<UpgradeModal onClose={()=>setShowUpgrade(false)} onAuthNeeded={()=>openAuth("signup")}/>}
       {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
       {showCompareModal&&compareA&&compareB&&<CompareModal compA={compareA} compB={compareB} onClose={()=>{setShowCompareModal(false);setCompareA(null);setCompareB(null);}}/>}
       {showEmailCapture&&<EmailCaptureModal onClose={()=>setShowEmailCapture(false)} compoundId={emailCaptureCompound}/>}
-      {showExitModal&&(
-        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
-          <div style={{background:C.white,maxWidth:420,width:"100%",padding:"32px 28px",position:"relative",fontFamily:"Montserrat,sans-serif"}}>
-            <button onClick={()=>setShowExitModal(false)} style={{position:"absolute",top:12,right:16,background:"transparent",border:"none",fontSize:18,cursor:"pointer",color:C.gray}}>x</button>
-            <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 10px",textTransform:"uppercase"}}>Before you go</p>
-            <h2 style={{fontSize:22,fontWeight:900,letterSpacing:"-.03em",color:C.ink,margin:"0 0 10px",lineHeight:1.1}}>Search any compound free.</h2>
-            <p style={{fontSize:13,color:C.gray,margin:"0 0 20px",lineHeight:1.7}}>370+ compounds ranked by clinical trial data. Type any supplement name and see the evidence score, dosing protocol, side effects, and interactions - no account needed.</p>
-            <button onClick={()=>{setShowExitModal(false);document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});document.getElementById("evidstack-search")?.focus();}} className="evid-shimmer-btn" style={{width:"100%",padding:"13px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Search for free →</button>
-            <button onClick={()=>setShowExitModal(false)} style={{width:"100%",padding:"10px",background:"transparent",border:"none",fontSize:11,color:C.gray,cursor:"pointer",fontFamily:"Montserrat,sans-serif",marginTop:8}}>No thanks</button>
-          </div>
-        </div>
+      {showExitModal&&!isPro&&page==="supplements"&&!showAuth&&!showUpgrade&&!showAccount&&!mobileMenu&&(
+        <aside className="pro-browse-prompt" aria-label="Evidstack Pro">
+          <button className="pro-prompt-close" aria-label="Dismiss Pro suggestion" onClick={()=>setShowExitModal(false)}>×</button>
+          <span className="pro-prompt-label">EVIDSTACK PRO</span>
+          <p>More of the research.<br/><strong>All in one place.</strong></p>
+          <span className="pro-prompt-detail">Unlock Tier 2–4 compounds and Pro tools.<br/>$9.99/month. Cancel anytime.</span>
+          <button className="pro-prompt-cta" onClick={()=>{setShowExitModal(false);openUpgrade();}}>Explore Pro <span aria-hidden="true">↗</span></button>
+          <button className="pro-prompt-later" onClick={()=>setShowExitModal(false)}>Keep browsing</button>
+        </aside>
       )}
 
       {/* Mobile menu drawer */}
-      {isMobile&&mobileMenu&&(
+      {compactNav&&mobileMenu&&(
         <div onClick={()=>setMobileMenu(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200}}>
           <div onClick={e=>e.stopPropagation()} onTouchMove={e=>e.stopPropagation()} style={{position:"absolute",top:0,right:0,width:280,height:"100%",background:C.white,padding:"24px 20px",display:"flex",flexDirection:"column",gap:4,overflowY:"auto",WebkitOverflowScrolling:"touch"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
@@ -3359,32 +3323,25 @@ function AppInner(){
             ):(
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
                 <button onClick={()=>{openAuth("login");setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:"transparent",color:C.ink,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>Sign in</button>
-                <button onClick={()=>{setEmailCaptureCompound(null);setShowEmailCapture(true);setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:800,background:C.gold,color:C.ink,border:"none",cursor:"pointer",width:"100%",fontFamily:"Montserrat,sans-serif"}}>Create free account</button>
+                <button onClick={()=>{openAuth("signup");setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:800,background:C.gold,color:C.ink,border:"none",cursor:"pointer",width:"100%",fontFamily:"Montserrat,sans-serif"}}>Create free account</button>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {page==="supplements"&&!isMobile&&(
-        <div style={{background:C.ink,padding:"8px 16px",textAlign:"center",fontSize:11,fontWeight:700,color:C.white,display:"flex",alignItems:"center",justifyContent:"center",gap:8,flexWrap:"wrap"}}>
-          <span style={{width:6,height:6,borderRadius:3,background:C.gold,display:"inline-block",flexShrink:0}}/>
-          <span>370+ compounds ranked by clinical trial data - free to search, no account required</span>
-          <button onClick={()=>document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"})} style={{padding:"3px 10px",background:"transparent",border:`1px solid ${C.gold}`,color:C.gold,fontSize:10,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search now →</button>
-        </div>
-      )}
-      <nav style={{borderBottom:`1px solid ${C.border}`,padding:isMobile?"0 16px":"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:72,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
+      <nav className="evid-main-nav" style={{borderBottom:`1px solid ${C.border}`,padding:compactNav?"0 16px":"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:72,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
         <div onClick={()=>navigateTo("supplements")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
           <div style={{width:30,height:30,border:`2px solid ${C.black}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:10,fontWeight:900}}>E</span></div>
           <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink,cursor:"pointer"}} onClick={()=>navigateTo("supplements")}>EVIDSTACK</span>
         </div>
-        {isMobile?(
+        {compactNav?(
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             {user&&!isPro&&<button onClick={openUpgrade} style={{padding:"6px 12px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
             {isPro&&<span style={{fontSize:9,fontWeight:800,color:C.gold,border:`1px solid ${C.gold}`,padding:"2px 6px"}}>PRO</span>}
             {!user&&<button onClick={()=>openAuth("login")} style={{padding:"6px 10px",background:"transparent",border:`1px solid ${C.border}`,color:C.ink,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Sign in</button>}
-            {!user&&<button onClick={()=>{setEmailCaptureCompound(null);setShowEmailCapture(true);}} style={{padding:"6px 10px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Free account</button>}
-            <button onClick={()=>setMobileMenu(true)} style={{background:"none",border:"none",cursor:"pointer",padding:4,display:"flex",flexDirection:"column",gap:5}}>
+            {!user&&<button onClick={()=>{openAuth("signup");}} style={{padding:"6px 10px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Free account</button>}
+            <button aria-label="Open navigation" aria-expanded={mobileMenu} onClick={()=>setMobileMenu(true)} style={{background:"none",border:"none",cursor:"pointer",padding:4,display:"flex",flexDirection:"column",gap:5}}>
               <span style={{display:"block",width:22,height:2,background:C.ink}}/>
               <span style={{display:"block",width:22,height:2,background:C.ink}}/>
               <span style={{display:"block",width:22,height:2,background:C.ink}}/>
@@ -3442,7 +3399,7 @@ function AppInner(){
             ):(
               <div style={{display:"flex",gap:6}}>
                 <button onClick={()=>openAuth("login")}  style={{padding:"8px 14px",fontSize:12,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Sign in</button>
-                <button onClick={()=>{setEmailCaptureCompound(null);setShowEmailCapture(true);}} className="evid-shimmer-btn" style={{padding:"8px 16px",fontSize:12,fontWeight:800,background:C.gold,color:C.ink,border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".02em"}}>Create free account<span style={{fontSize:9,color:C.gray,display:"block",textAlign:"center",marginTop:2}}>No card required</span></button>
+                <button onClick={()=>{openAuth("signup");}} className="evid-shimmer-btn" style={{padding:"8px 16px",fontSize:12,fontWeight:800,background:C.gold,color:C.ink,border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".02em"}}>Create free account<span style={{fontSize:9,color:C.gray,display:"block",textAlign:"center",marginTop:2}}>No card required</span></button>
               </div>
             )}
           </div>
@@ -3472,57 +3429,25 @@ function AppInner(){
       {page==="changelog"    &&<ChangelogPage onNavigate={navigateTo}/>}
 
       {page==="supplements"&&<>
-        <div style={{padding:isMobile?"32px 16px 40px":"60px 24px 56px",textAlign:"center",position:"relative",overflow:isMobile?"visible":"hidden"}}>
-          {/* Molecular background */}
-          {!isMobile&&<svg aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0}} viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
-            {[
-              {cx:80,cy:80,r:28,d:11},{cx:1120,cy:60,r:22,d:14},{cx:200,cy:300,r:18,d:9},
-              {cx:980,cy:280,r:24,d:13},{cx:550,cy:40,r:16,d:17},{cx:660,cy:360,r:20,d:8},
-              {cx:350,cy:180,r:14,d:15},{cx:870,cy:150,r:26,d:12},{cx:120,cy:210,r:12,d:19},
-              {cx:1050,cy:340,r:16,d:10},{cx:430,cy:330,r:22,d:7},{cx:760,cy:80,r:14,d:16},
-            ].map(({cx,cy,r,d},i)=>(
-              <g key={i} style={{animation:`evidFloat ${d}s ease-in-out infinite`,animationDelay:`${i*1.1}s`}}>
-                <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1a1a1a" strokeWidth="1" opacity=".035"/>
-                <circle cx={cx} cy={cy} r={r*0.35} fill="#1a1a1a" opacity=".025"/>
-                {i%3===0&&<line x1={cx+r} y1={cy} x2={cx+r+28} y2={cy-14} stroke="#1a1a1a" strokeWidth=".8" opacity=".03"/>}
-                {i%4===0&&<circle cx={cx+r+36} cy={cy-18} r={10} fill="none" stroke="#e2c97e" strokeWidth=".8" opacity=".07"/>}
-              </g>
-            ))}
-          </svg>}
-          <div style={{position:"relative",zIndex:1}}>
-          <h1 style={{fontSize:isMobile?28:48,fontWeight:900,lineHeight:1.12,letterSpacing:"-.04em",margin:"0 0 14px",color:C.ink,maxWidth:740,marginLeft:"auto",marginRight:"auto"}}>
-            Not just what the science says.<br/>What you should actually do.
-          </h1>
-          <p style={{fontSize:isMobile?13:15,color:C.gray,lineHeight:1.8,margin:"0 auto 20px",maxWidth:580,padding:isMobile?"0 4px":0}}>
-            {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds: peptides, SARMs, GLP-1s, anabolics, nootropics, skin & aesthetics - scored by <strong style={{color:C.ink,fontWeight:700}}>actual effect size</strong> and <strong style={{color:C.ink,fontWeight:700}}>evidence quality</strong>. Then an AI that turns the data into a protocol built for your body. Free to search. No account required.
-          </p>
-          <div style={{maxWidth:680,margin:"0 auto 20px",background:C.white,border:`1px solid ${C.border}`,display:"flex",flexDirection:isMobile?"column":"row"}}>
-            {[
-              {n:"1",label:"Search any compound",desc:"Type creatine, BPC-157, semaglutide, anything."},
-              {n:"2",label:"See the evidence",desc:"Efficacy and evidence scored from PubMed and Cochrane RCTs."},
-              {n:"3",label:"Get a protocol",desc:"AI builds a stack calibrated to your body and goals."},
-            ].map((step,i,arr)=>(
-              <div key={step.n} style={{flex:1,padding:"14px 16px",borderRight:isMobile?"none":(i<arr.length-1?`1px solid ${C.border}`:"none"),borderBottom:isMobile&&i<arr.length-1?`1px solid ${C.border}`:"none",textAlign:"left"}}>
-                <span style={{fontSize:10,fontWeight:900,color:C.gold,display:"block",marginBottom:4,fontFamily:"Montserrat,sans-serif"}}>{step.n}</span>
-                <span style={{fontSize:11,fontWeight:900,color:C.ink,display:"block",marginBottom:3,fontFamily:"Montserrat,sans-serif"}}>{step.label}</span>
-                {!isMobile&&<span style={{fontSize:11,color:C.gray,lineHeight:1.5,fontFamily:"Montserrat,sans-serif"}}>{step.desc}</span>}
-              </div>
-            ))}
-          </div>
+        <section className="evid-home-hero" aria-labelledby="evid-home-title">
+          <div className="evid-hero-art" aria-hidden="true"><div className="evid-orbit orbit-one"/><div className="evid-orbit orbit-two"/><div className="evid-orbit orbit-three"/><span className="orbit-point point-one"/><span className="orbit-point point-two"/><div className="evid-hero-grid"/></div>
+          <div className="evid-hero-content">
+          <p className="evid-hero-kicker">SUPPLEMENTS. COMPOUNDS. CONTEXT.</p>
+          <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>
+          <p className="evid-hero-description">A research database for supplements and compounds. Compare evidence, understand doses and spot potential interactions before building your stack.</p>
+          <p className="evid-hero-support">Explore {SUPPLEMENTS.length} compound profiles, from everyday supplements to specialist compounds. Pro adds the full catalogue, stack analysis and research tools.</p>
+          <div className="evid-hero-actions"><button onClick={()=>{document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Find a compound <span aria-hidden="true">↓</span></button><button onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
+          <p className="evid-hero-access">Start with a free preview. Go deeper with Pro.</p>
           <div ref={searchContainerRef} style={{maxWidth:680,margin:"0 auto 20px",position:"relative"}}>
             <div style={{display:"flex",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
-              {!search&&(
-                <div style={{position:"absolute",left:isMobile?14:20,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",zIndex:1,opacity:phFade?1:0,transition:"opacity .4s",fontSize:isMobile?13:14,color:"#9ca3af",fontFamily:"Montserrat,sans-serif",whiteSpace:"nowrap",overflow:"hidden",maxWidth:"calc(100% - 110px)"}}>
-                  {isMobile?"Search a supplement...":PLACEHOLDERS[phIdx]}
-                </div>
-              )}
+              {!search&&<span className="evid-search-example" aria-hidden="true" style={{opacity:phFade?1:0}}>{PLACEHOLDERS[phIdx]}</span>}
               <input id="evidstack-search" value={search}
                 onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
                 onFocus={()=>{if(search.length>0)setShowSuggest(true);}}
                 onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter"){setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}}
-                placeholder=""
+                aria-label="Search compounds" placeholder=""
                 style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
-              <button onClick={()=>{setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}} style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search for free →</button>
+              <button onClick={()=>{setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}} style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search →</button>
             </div>
             {/* Autocomplete dropdown */}
             {showSuggest&&search.trim().length>0&&(()=>{
@@ -3585,57 +3510,12 @@ function AppInner(){
               );
             })()}
           </div>
-          <p style={{fontSize:11,color:C.gray,textAlign:"center",margin:"0 auto 12px",maxWidth:500,fontFamily:"Montserrat,sans-serif"}}>T1 = strongest evidence. T4 = experimental. Every compound scored by effect size and study quality.</p>
-          <HeroStats isMobile={isMobile}/>
-          </div>{/* end zIndex:1 */}
-          {/* Social proof */}
-          <div className="evid-reveal visible" style={{maxWidth:680,margin:"0 auto 16px",display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:1,background:C.border}}>
-            {[
-              {val:`${Math.floor(SUPPLEMENTS.length/10)*10}+`,label:"Compounds"},
-              {val:"PubMed",label:"Primary source"},
-              {val:"4 tiers",label:"Evidence levels"},
-              {val:"Free",label:"No card needed"},
-            ].map(({val,label})=>(
-              <div key={label} style={{background:C.white,padding:"14px 12px",textAlign:"center"}}>
-                <p style={{fontSize:15,fontWeight:900,color:C.ink,margin:"0 0 2px",letterSpacing:"-.02em"}}>{val}</p>
-                <p style={{fontSize:10,color:C.gray,margin:0,fontWeight:600,letterSpacing:".06em",textTransform:"uppercase"}}>{label}</p>
-              </div>
-            ))}
+          <div className="evid-access-strip"><span><strong>Free</strong> A first look at the fundamentals</span><span><strong>Pro</strong> Full catalogue + research tools</span><button onClick={openUpgrade}>$9.99 / month ↗</button></div>
           </div>
-
-          <div style={{maxWidth:680,margin:"0 auto 0",background:C.ink,padding:isMobile?"20px 16px":"24px 32px"}}>
-            {user&&!isPro?(
-              <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 6px",fontWeight:700}}>Unlock all {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds + AI Compound Advisor.</p>
-              <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 16px",lineHeight:1.6}}>Tier 2-4 compounds, peptides, AI tools - $9.99/month.</p>
-              <button onClick={openUpgrade} style={{padding:"11px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Upgrade to Pro</button></>
-            ):user&&isPro?(
-              <><p style={{fontSize:13,color:"#e8e5df",margin:"0 0 4px",fontWeight:700}}>Welcome back, Pro member.</p>
-              <p style={{fontSize:12,color:"#9ca3af",margin:0}}>Full access to all compounds and the AI Compound Advisor.</p></>
-            ):(
-              <div>
-                <p style={{fontSize:15,color:"#e8e5df",margin:"0 0 6px",fontWeight:900,letterSpacing:"-.02em"}}>Evidstack Pro is here.</p>
-                <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 20px",lineHeight:1.7}}>AI Compound Advisor, Interaction Checker, Stack Audit AI, Bloodwork History, and {Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including peptides, GLP-1s, and biohacking tier.</p>
-                <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center",justifyContent:"center"}}>
-                  <button onClick={()=>{openUpgrade();}} className="evid-shimmer-btn" style={{padding:"12px 24px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",lineHeight:1}}>
-                    Start for $9.99/mo
-                  </button>
-                  <button onClick={()=>{openAuth("signup");}} style={{padding:"12px 24px",background:"transparent",color:"#9ca3af",border:"1px solid #374151",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",lineHeight:1}}>
-                    Create free account
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-
-        {/* How it works */}
-
+        </section>
 
         {/* Goal Quiz */}
-        <div style={{padding:"0 16px"}}>
-          <GoalQuizSection onNavigate={navigateTo} onAuth={openAuth}/>
-        </div>
+        <details className="evid-optional-quiz"><summary>Not sure where to start? Choose a goal.</summary><GoalQuizSection onNavigate={navigateTo} onAuth={openAuth}/></details>
 
       <div style={{height:1,background:C.border,maxWidth:680,margin:"0 auto 24px"}}/>
 
@@ -3650,7 +3530,7 @@ function AppInner(){
                 {g.id!=="all"&&<button title={`Browse all ${g.label} compounds`}
                   onClick={e=>{e.stopPropagation();window.history.pushState({},"",`/goal/${g.id}`);window.dispatchEvent(new PopStateEvent("popstate"));}}
                   style={{padding:"0 4px 0 0",background:"transparent",border:"none",borderBottom:goal===g.id?`2px solid ${C.ink}`:"2px solid transparent",cursor:"pointer",color:"#9ca3af",fontSize:9,display:"flex",alignItems:"center"}}
-                  title="View full goal page">↗</button>}
+                  >↗</button>}
               </div>
             ))}
           </div>
@@ -3689,7 +3569,7 @@ function AppInner(){
           </div>}
         </div>
 
-        <div style={{maxWidth:1000,margin:"0 auto",padding:isMobile?"16px 12px 60px":"24px 48px 80px"}}>
+        <div id="compounds-grid" style={{scrollMarginTop:90,maxWidth:1000,margin:"0 auto",padding:isMobile?"16px 12px 60px":"24px 48px 80px"}}>
           {goal!=="all"&&(
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,padding:"10px 16px",background:C.white,border:`1px solid ${C.border}`}}>
               <span style={{fontSize:12,color:C.ink,fontWeight:700}}>
@@ -3713,7 +3593,7 @@ function AppInner(){
             </div>
           )}
           {!isPro&&(
-            <div style={{background:`${C.gold}18`,border:`1px solid ${C.gold}40`,padding:"12px 16px",marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
+            <div className="evid-free-plan" style={{background:`${C.gold}18`,border:`1px solid ${C.gold}40`,padding:"12px 16px",marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
               <p style={{fontSize:12,color:C.ink,margin:0}}>
                 <strong>Free plan:</strong> Tier 1 visible. <strong>{SUPPLEMENTS.filter(s=>s.tier>=2).length} compounds</strong> locked behind Pro.
               </p>
@@ -3740,7 +3620,7 @@ function AppInner(){
                   tier1Seen++;
                 }
                 items.push(
-                  <div key={s.id} style={{animation:`fadeUp .35s ${i*.02}s both`}}>
+                  <div key={s.id} data-pro-prompt={i===5?"true":undefined} style={{animation:`fadeUp .25s both`}}>
                     <SupplementCard supp={s} activeGoal={goal} onClick={()=>toggle(s.id)} isSelected={selected===s.id} isPro={isPro} onUpgrade={openUpgrade} onCompare={handleCompare} compareA={compareA} compareB={compareB} cardIndex={i}/>
                   </div>
                 );
@@ -3751,7 +3631,7 @@ function AppInner(){
         </div>
       </>}
 
-      <div style={{borderTop:`1px solid ${C.border}`,background:C.white,padding:isMobile?"28px 16px":"40px 48px"}}>
+      <div className="evid-page-footer" style={{borderTop:`1px solid ${C.border}`,background:C.white,padding:isMobile?"28px 16px":"40px 48px"}}>
         <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:28,marginBottom:32}}>
           <div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
@@ -4015,7 +3895,7 @@ function StackOptimizerScreen({onUpgrade}){
   const analyze=async()=>{
     setLoading(true);setErr("");setResult(null);
     try{
-      const res=await fetch("/api/stack-optimizer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({logs:logEntries,stack})});
+      const res=await authenticatedFetch("/api/stack-optimizer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({logs:logEntries,stack})});
       const data=await res.json();
       if(data.error){setErr(data.error);return;}
       setResult(data);
@@ -4161,7 +4041,7 @@ function BloodWorkScreen({onUpgrade}){
     setLoading(true);setErr("");setResult(null);
     try{
       const stackArr=currentStack.split(",").map(s=>s.trim()).filter(Boolean);
-      const res=await fetch("/api/bloodwork-analyzer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({markers,goals,currentStack:stackArr,userProfile:userProfile||null})});
+      const res=await authenticatedFetch("/api/bloodwork-analyzer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({markers,goals,currentStack:stackArr,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error){setErr(data.error);return;}
       setResult(data);setView("result");
@@ -4407,7 +4287,7 @@ function CompoundAdvisorScreen({onUpgrade}){
   const SCANNING_LINES=[
     "Parsing query intent...",
     `Searching ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds...`,
-    "Cross-referencing PubMed meta-analyses...",
+    "Preparing the AI response...",
     "Scoring efficacy and evidence quality...",
     "Checking compound interactions...",
     "Ranking by combined score...",
@@ -4437,7 +4317,7 @@ function CompoundAdvisorScreen({onUpgrade}){
     setLoading(true);setErr("");setResult(null);setRevealedCount(0);setPhase("scanning");setScanLine(0);setShowUpgradeWall(false);
     const newHistory=[...history,{role:"user",content:q}];
     try{
-      const res=await fetch("/api/symptom-advisor",{
+      const res=await authenticatedFetch("/api/symptom-advisor",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({query:q,conversationHistory:history,userProfile:userProfile||null,tierPriority:tierPriority||null}),
@@ -4517,9 +4397,9 @@ function CompoundAdvisorScreen({onUpgrade}){
           <div style={{border:`2px solid ${C.ink}`,background:C.white,padding:isMob?"24px 20px":"36px 40px",marginBottom:28,textAlign:"center"}}>
             <div style={{fontSize:44,marginBottom:14}}>🔭</div>
             <h2 style={{fontSize:isMob?20:26,fontWeight:900,color:C.ink,margin:"0 0 10px",letterSpacing:"-.03em"}}>You have used your free query.</h2>
-            <p style={{fontSize:14,color:C.gray,margin:"0 auto 28px",maxWidth:460,lineHeight:1.7}}>Upgrade to Pro for unlimited queries, follow-up conversations, synergy detection, and protocol suggestions.</p>
+            <p style={{fontSize:14,color:C.gray,margin:"0 auto 28px",maxWidth:460,lineHeight:1.7}}>Upgrade to Pro for up to 100 AI requests per day, follow-up conversations, synergy detection, and protocol suggestions.</p>
             <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:12,maxWidth:480,margin:"0 auto 28px",textAlign:"left"}}>
-              {[["💬","Unlimited queries","Ask about anything, anytime"],["🔗","Synergy detection","See which compounds stack"],["📈","Protocol suggestions","Step-by-step intro plan"],["🧠","Conversation memory","Follow-up questions in context"]].map(([icon,title,desc])=>(
+              {[["💬","100 AI requests per day","Ask about anything, anytime"],["🔗","Synergy detection","See which compounds stack"],["📈","Protocol suggestions","Step-by-step intro plan"],["🧠","Conversation memory","Follow-up questions in context"]].map(([icon,title,desc])=>(
                 <div key={title} style={{display:"flex",gap:10,padding:"12px 14px",background:C.bg,border:`1px solid ${C.border}`}}>
                   <span style={{fontSize:18,flexShrink:0}}>{icon}</span>
                   <div><p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 2px"}}>{title}</p><p style={{fontSize:11,color:C.gray,margin:0}}>{desc}</p></div>
@@ -4743,7 +4623,7 @@ function CompoundAdvisorScreen({onUpgrade}){
                 ):(
                   <div style={{borderTop:`1px solid ${C.border}`,paddingTop:20,marginTop:8,textAlign:"center"}}>
                     <p style={{fontSize:13,fontWeight:700,color:C.ink,margin:"0 0 6px"}}>Want to ask a follow-up?</p>
-                    <p style={{fontSize:12,color:C.gray,margin:"0 0 16px"}}>Pro members get unlimited queries and full conversation memory.</p>
+                    <p style={{fontSize:12,color:C.gray,margin:"0 0 16px"}}>Pro members get up to 100 AI requests per day and full conversation memory.</p>
                     <button onClick={onUpgrade} style={{padding:"11px 28px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
                       Unlock Pro - $9.99/mo
                     </button>
@@ -4791,7 +4671,7 @@ function InteractionCheckerPro({onUpgrade}){
     if(compounds.length<2){setErr("Add at least 2 compounds.");return;}
     setLoading(true);setErr("");setResult(null);setRevealIdx(0);setPhase("scanning");
     try{
-      const res=await fetch("/api/interaction-checker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds})});
+      const res=await authenticatedFetch("/api/interaction-checker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds})});
       const data=await res.json();
       if(data.error){setErr(data.error);setPhase("idle");return;}
       setResult(data);setPhase("revealing");
@@ -4966,7 +4846,7 @@ function StackAuditScreen({onUpgrade}){
     if(!stack.trim()){setErr("Describe your current stack first.");return;}
     setLoading(true);setErr("");setResult(null);setPhase("scanning");
     try{
-      const res=await fetch("/api/stack-audit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({stack,goals,budget,userProfile:userProfile||null})});
+      const res=await authenticatedFetch("/api/stack-audit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({stack,goals,budget,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error){setErr(data.error);setPhase("idle");return;}
       setResult(data);setPhase("done");
@@ -6146,7 +6026,7 @@ function PricingPage({onUpgrade,onAuth}){
     {feature:"Peptides & GLP-1s",free:false,pro:true},
     {feature:"Biohacking tier (T4)",free:false,pro:true},
     {feature:"Compound pages (full profile)",free:false,pro:true},
-    {feature:"AI Compound Advisor",free:"1 free query",pro:"Unlimited",highlight:true},
+    {feature:"AI Compound Advisor",free:"1 free query",pro:"100 AI requests/day",highlight:true},
     {feature:"Conversation memory",free:false,pro:true},
     {feature:"Synergy and protocol suggestions",free:false,pro:true},
     {feature:"Interaction Checker",free:false,pro:true,highlight:true},
@@ -6171,48 +6051,7 @@ function PricingPage({onUpgrade,onAuth}){
   return(
     <div style={S.page}><div style={S.inner}>
       <h1 style={S.h1}>Simple, honest pricing.</h1>
-      <p style={S.sub}>One Pro plan. Everything included. Cancel anytime.</p>
-
-      {/* Competitor comparison USP6 */}
-      <div style={{maxWidth:700,margin:"0 auto 48px",background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`}}>
-        <div style={{padding:"16px 24px 12px",borderBottom:`1px solid ${C.border}`}}>
-          <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:0,textTransform:"uppercase"}}>How Evidstack compares</p>
-        </div>
-        <div style={{overflowX:"auto"}}>
-          <table style={{width:"100%",borderCollapse:"collapse",fontFamily:"Montserrat,sans-serif",fontSize:12}}>
-            <thead>
-              <tr>
-                <th style={{padding:"12px 16px",textAlign:"left",fontWeight:800,color:C.gray,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid ${C.border}`}}>Feature</th>
-                <th style={{padding:"12px 16px",textAlign:"center",fontWeight:800,color:C.gray,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid ${C.border}`}}>Examine.com</th>
-                <th style={{padding:"12px 16px",textAlign:"center",fontWeight:800,color:C.gray,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid ${C.border}`}}>ConsumerLab</th>
-                <th style={{padding:"12px 16px",textAlign:"center",background:C.ink,fontWeight:800,color:C.gold,fontSize:10,letterSpacing:".1em",textTransform:"uppercase",borderBottom:`1px solid #1f2937`}}>Evidstack Pro</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["Price","$29/mo","$50/yr (~$4/mo)","$9.99/mo"],
-                ["SARMs, AAS, peptides","Partial","No","Full 370+"],
-                ["AI compound advisor","No","No","Yes, unlimited"],
-                ["Interaction checker","Basic","No","Full AI analysis"],
-                ["Stack audit","No","No","Score 0-100"],
-                ["Bloodwork integration","No","No","16 biomarkers"],
-                ["Dosage calibration to body","No","No","Weight/age/sex"],
-                ["Conflict of interest","Zero","Zero","Zero"],
-              ].map(([feat,examine,consumer,evidstack],i)=>(
-                <tr key={feat} style={{background:i%2===0?C.white:C.bg}}>
-                  <td style={{padding:"10px 16px",fontWeight:700,color:C.ink,borderBottom:`1px solid ${C.border}`}}>{feat}</td>
-                  <td style={{padding:"10px 16px",textAlign:"center",color:C.gray,borderBottom:`1px solid ${C.border}`}}>{examine}</td>
-                  <td style={{padding:"10px 16px",textAlign:"center",color:C.gray,borderBottom:`1px solid ${C.border}`}}>{consumer}</td>
-                  <td style={{padding:"10px 16px",textAlign:"center",fontWeight:800,color:C.gold,background:i%2===0?"#1a1a1a":"#111111",borderBottom:"1px solid #1f2937"}}>{evidstack}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div style={{padding:"12px 16px",textAlign:"center"}}>
-          <p style={{fontSize:11,color:C.gray,margin:0}}>Examine.com pricing as of 2025. ConsumerLab $99.95/2 years. Neither covers body-calibrated dosing or AI stack analysis.</p>
-        </div>
-      </div>
+      <p style={S.sub}>One Pro plan. Up to 100 AI requests per day across all AI tools, with 10 requests per minute. Cancel anytime.</p>
 
       {/* Plan cards */}
       <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:16,marginBottom:48}}>
@@ -6245,7 +6084,7 @@ function PricingPage({onUpgrade,onAuth}){
           <p style={{fontSize:12,color:C.green,fontWeight:700,margin:"0 0 4px"}}>Or $79/year - save 34%</p>
           <p style={{fontSize:13,color:C.gray,margin:"0 0 24px"}}>Full access. Cancel in one click.</p>
           <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:28}}>
-            {[`All ${count}+ compounds (Tier 1-4)`,"Peptides, GLP-1s, SARMs, nootropics","AI Compound Advisor - unlimited queries","Interaction Checker - full safety analysis","Stack Audit AI - score and optimize your stack","Bloodwork History - track 16 biomarkers over time","AI Bloodwork Analyzer","My Tracker","Compare compounds","Save your stacks"].map(f=>(
+            {[`All ${count}+ compounds (Tier 1-4)`,"Peptides, GLP-1s, SARMs, nootropics","AI Compound Advisor - up to 100 AI requests per day","Interaction Checker - full safety analysis","Stack Audit AI - score and optimize your stack","Bloodwork History - track 16 biomarkers over time","AI Bloodwork Analyzer","My Tracker","Compare compounds","Save your stacks"].map(f=>(
               <div key={f} style={{display:"flex",gap:10,alignItems:"center"}}>
                 <span style={{color:C.gold,fontWeight:900,fontSize:14}}>✓</span>
                 <span style={{fontSize:13,color:C.ink,fontWeight:600}}>{f}</span>

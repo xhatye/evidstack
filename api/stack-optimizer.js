@@ -1,6 +1,7 @@
+import { secure } from "../server/access.js";
 export const config = { runtime: "nodejs" };
 
-export default async function handler(req) {
+async function handler(req, context) {
   if (req.method !== "POST")
     return new Response("Method not allowed", { status: 405 });
 
@@ -56,6 +57,7 @@ Analyze this data carefully and respond ONLY with valid JSON in this exact forma
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(25000),
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
@@ -84,3 +86,6 @@ Analyze this data carefully and respond ONLY with valid JSON in this exact forma
     });
   }
 }
+
+
+export default secure(handler, {"free":false});

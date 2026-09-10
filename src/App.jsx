@@ -1809,7 +1809,7 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   );
 
   const isLocked=supp.tier>=2&&!isPro;
-  const needsAccount=!user&&supp.tier!==1;
+  const needsAccount=!user;
   const tc=tierColor(supp.tier);
   const tierLabel=TIERS[supp.tier]?.label||"";
   const safetyLabel=["","Risky","Caution","Caution","Safe","Very Safe"][supp.safety]||"";
@@ -3106,72 +3106,6 @@ function SharedStackPage({shareId}){
   );
 }
 
-function ResearchCatalog({items,goal,setGoal,tier,setTier,sort,setSort,search,onClear,isPro,onUpgrade,onCompare,compareA,compareB,onShowCompare}) {
-  const [visible,setVisible]=useState(16);
-  useEffect(()=>setVisible(16),[goal,tier,sort,search]);
-  return <section className="research-catalog" aria-label="Compound database">
-    <div className="catalog-controls">
-      <label>Goal<select value={goal} onChange={e=>setGoal(e.target.value)}>{GOALS.map(g=><option value={g.id} key={g.id}>{g.id==='all'?'All goals':g.label}</option>)}</select></label>
-      <label>Collection<select value={tier} onChange={e=>setTier(Number(e.target.value))}>{[[0,'All compounds'],[1,'Fundamentals (free)'],[2,'Advanced'],[3,'Expert'],[4,'Biohacking']].map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label>
-      <label>Order by<select value={sort} onChange={e=>setSort(e.target.value)}><option value="tier">Collection</option><option value="evidence">Evidence score</option><option value="efficacy">Efficacy score</option></select></label>
-      <span className="catalog-count" role="status">{items.length} result{items.length===1?'':'s'}</span>
-      {(goal!=='all'||tier!==0||search)&&<button className="catalog-clear" onClick={onClear}>Clear filters</button>}
-    </div>
-    {goal!=='all'&&<p className="catalog-context"><a href={`/goal/${goal}`}>Read the {GOALS.find(g=>g.id===goal)?.label.toLowerCase()} research overview ↗</a></p>}
-    {(compareA||compareB)&&<div className="catalog-compare"><span>{[compareA?.name,compareB?.name].filter(Boolean).join(' + ')}</span><button onClick={onShowCompare} disabled={!compareA||!compareB}>{compareA&&compareB?'Compare selected':'Select one more compound'}</button></div>}
-    <div className="catalog-table-label" aria-hidden="true"><span>COMPOUND / RESEARCH RECORD</span><span>COLLECTION</span></div>
-    <ul className="catalog-list">{items.slice(0,visible).map(s=><li key={s.id}>
-      <a href={`/compound/${s.id}`}><span><strong>{s.name}</strong><small>{s.effects.slice(0,2).map(e=>GOALS.find(g=>g.id===e.goal)?.label).filter(Boolean).join(' / ') || 'Compound research'}</small></span><span className="catalog-tier">{['','Fundamentals','Advanced','Expert','Biohacking'][s.tier]}{s.tier>1&&!isPro&&<small>Pro record</small>}</span><span aria-hidden="true">↗</span></a>
-      <button className="catalog-compare-button" aria-label={`Compare ${s.name}`} aria-pressed={compareA?.id===s.id||compareB?.id===s.id} onClick={()=>isPro?onCompare(s):onUpgrade()}>+</button>
-    </li>)}</ul>
-    {items.length===0&&<div className="catalog-empty"><h3>No matching compounds.</h3><p>Try another name, or clear the filters to start again.</p><button onClick={onClear}>Clear search and filters</button></div>}
-    {visible<items.length&&<button className="catalog-more" onClick={()=>setVisible(n=>n+16)}>Show 16 more <span aria-hidden="true">↓</span></button>}
-    <p className="catalog-bottom">Showing {Math.min(visible,items.length)} of {items.length} records. Fundamentals are free to read. <a href="/pricing">Compare plans ↗</a></p>
-  </section>;
-}
-
-function HomeIntroduction({search,setSearch,onBrowse,onGoal,onAuth,user}) {
-  const [help,setHelp]=useState(false);
-  const matches=search.trim()?SUPPLEMENTS.filter(s=>[s.name,...(s.aliases||[])].some(n=>n.toLowerCase().includes(search.toLowerCase()))).slice(0,5):[];
-  return (
-    <section className="home-intro" aria-labelledby="home-title">
-      <div className="home-overline"><span>THE SUPPLEMENT RESEARCH INDEX</span><span>INDEPENDENT THINKING STARTS HERE ↙</span></div>
-      <div className="home-hero">
-        <div className="home-message">
-          <h1 id="home-title">Know what<br/>you're <span>taking.</span></h1>
-          <p className="home-deck">A clearer starting point for supplement research. Explore compounds, compare the evidence, and read the cautions before you decide.</p>
-          <a className="home-primary" href="#research-index" onClick={onBrowse}>Explore the database <span aria-hidden="true">↗</span></a>
-          <p className="home-note">Browse first. No account needed.</p>
-        </div>
-        <aside className="home-index" aria-label="A starting point for your research">
-          <div className="home-index-top"><span>START WITH A NAME</span><span aria-hidden="true">[ E / 01 ]</span></div>
-          <p className="home-index-title">What's on<br/>your shelf?</p>
-          <div className="home-index-links">
-            {[["creatine-monohydrate","Creatine monohydrate","Strength & training"],["magnesium-bisglycinate","Magnesium","Everyday fundamentals"],["caffeine","Caffeine","Focus & energy"]].filter(([id])=>SUPPLEMENTS.some(s=>s.id===id)).map(([id,name,topic],i)=>(
-              <a href={`/compound/${id}`} key={id}><span className="home-number">0{i+1}</span><span><strong>{name}</strong><small>{topic}</small></span><span aria-hidden="true">↗</span></a>
-            ))}
-          </div>
-          <p className="home-index-foot">Open a record. Read beyond the headline.</p>
-        </aside>
-      </div>
-      <div className="home-start" id="research-index">
-        <div><p className="home-eyebrow">YOUR FIRST LOOK</p><h2>One question is enough.</h2><button className="home-text-button" aria-expanded={help} aria-controls="research-help" onClick={()=>setHelp(!help)}>{help?"Hide the quick guide −":"New here? A 30-second guide +"}</button></div>
-        <div className="home-search-wrap">
-          <form role="search" onSubmit={e=>{e.preventDefault();onBrowse(e,true);}}>
-            <label htmlFor="evidstack-search">Find a supplement or compound</label>
-            <div className="home-search"><input id="evidstack-search" type="search" placeholder="Try creatine or magnesium" value={search} onChange={e=>setSearch(e.target.value)} autoComplete="off"/><button type="submit" aria-label="Search the database">Search ↗</button></div>
-          </form>
-          {matches.length>0&&<ul className="home-results" aria-label="Matching compounds">{matches.map(s=><li key={s.id}><a href={`/compound/${s.id}`}>{s.name}<span aria-hidden="true">↗</span></a></li>)}</ul>}
-          <div className="home-goals"><span>Or start with</span>{[["sleep","Sleep"],["focus","Focus"],["force","Strength"],["recovery","Recovery"]].map(([id,label])=><button key={id} onClick={()=>onGoal(id)}>{label} ↗</button>)}</div>
-        </div>
-      </div>
-      {help&&<div className="home-help" id="research-help"><ol><li><strong>Pick one compound.</strong> Search a name you already know, or choose a goal.</li><li><strong>Read the full record.</strong> Look at the study summaries, limitations, side effects and interactions together.</li><li><strong>Keep your own context in mind.</strong> A research summary is not a prescription. Discuss medication or health concerns with a qualified clinician.</li></ol>{!user&&<button onClick={()=>onAuth("signup")}>Create a free account ↗</button>}</div>}
-      <div className="home-reading-note"><span className="home-eyebrow">A NOTE ON EVIDENCE</span><p>A score is a starting point, not a verdict. Study quality, population and dose matter. Check the cited research and its limitations.</p><a href="/about">About Evidstack ↗</a></div>
-    </section>
-  );
-}
-
-
 function AppInner(){
   const {user,isPro,loading,logout}=useAuth();
   // Inject global animation CSS once
@@ -3205,7 +3139,7 @@ function AppInner(){
   const [showSuggest,setShowSuggest]=useState(false);
   const searchContainerRef=useRef(null);
   const [selected,setSelected]=useState(null);
-  const [sortBy,setSortBy]=useState("tier");
+  const [sortBy,setSortBy]=useState("efficacy");
   const [filterTier,setFilterTier]=useState(0);
   const [showAuth,setShowAuth]=useState(false);
   const [authMode,setAuthMode]=useState("login");
@@ -3216,12 +3150,43 @@ function AppInner(){
   const [compareA,setCompareA]=useState(null);
   const [compareB,setCompareB]=useState(null);
   const [showCompareModal,setShowCompareModal]=useState(false);
+  const PLACEHOLDERS=[
+    "Search by compound name...",
+    "Try \"creatine\" for strength and muscle",
+    "Try \"GHK-Cu\" for collagen and skin peptides",
+    "Try \"semaglutide\" for weight loss",
+    "Try \"BPC-157\" for healing peptides",
+    "Try \"finasteride\" for hair retention",
+    "Try \"focus\" for cognitive enhancers",
+    "Try \"longevity\" for anti-aging compounds",
+    "Try \"collagen\" for skin and facial quality",
+    "Try \"skin\" to filter aesthetics compounds",
+    "Try \"astaxanthin\" for photoprotection",
+    "Try \"boron\" for testosterone and bone density",
+  ];
+  const [phIdx,setPhIdx]=useState(0);
+  const [phFade,setPhFade]=useState(true);
+  // Close suggestions when clicking outside search container
+  useEffect(()=>{
+    const handler=(e)=>{if(searchContainerRef.current&&!searchContainerRef.current.contains(e.target))setShowSuggest(false);};
+    document.addEventListener("mousedown",handler);
+    return()=>document.removeEventListener("mousedown",handler);
+  },[]);
+  useEffect(()=>{
+    const iv=setInterval(()=>{
+      setPhFade(false);
+      setTimeout(()=>{setPhIdx(i=>(i+1)%PLACEHOLDERS.length);setPhFade(true);},400);
+    },4000);
+    return()=>clearInterval(iv);
+  },[]);
   const isMobile=useIsMobile();
   const [mobileMenu,setMobileMenu]=useState(false);
+  const [showTools,setShowTools]=useState(false);
+  const [showExitModal,setShowExitModal]=useState(false);
 
   const navigateTo=(p)=>{navigate(p);setPage(p);setCompoundId(null);window.scrollTo({top:0,behavior:"instant"});};
 
-  useEffect(()=>{ applyPageSeo(getPageSeo(window.location.pathname)); },[page,compoundId,goalId,guideId,shareId]);
+  useEffect(()=>{applyPageSeo(getPageSeo(window.location.pathname));},[page,compoundId,goalId,guideId,shareId]);
 
   useEffect(()=>{
     const onPop=()=>{
@@ -3234,6 +3199,21 @@ function AppInner(){
     window.addEventListener("popstate",onPop);
     return()=>window.removeEventListener("popstate",onPop);
   },[]);
+  useEffect(()=>{
+    if(page!=="supplements"||isPro)return;
+    let shown=false;
+    try{shown=sessionStorage.getItem("evid_pro_prompt_seen")==="1";}catch{}
+    const onScroll=()=>{
+      if(shown||showAuth||showUpgrade||showAccount||mobileMenu)return;
+      const marker=document.querySelector('[data-pro-prompt="true"]');
+      if(!marker||window.scrollY<400||marker.getBoundingClientRect().top>window.innerHeight*0.75)return;
+      if(document.getElementById("cookie-banner")?.offsetHeight)return;
+      shown=true;try{sessionStorage.setItem("evid_pro_prompt_seen","1");}catch{}
+      setShowExitModal(true);
+    };
+    window.addEventListener("scroll",onScroll,{passive:true});
+    return()=>window.removeEventListener("scroll",onScroll);
+  },[page,isPro,showAuth,showUpgrade,showAccount,mobileMenu]);
   const openAuth=(mode="login")=>{setAuthMode(mode);setShowAuth(true);};
   const openUpgrade=()=>setShowUpgrade(true);
   const toggle=(id)=>setSelected(p=>p===id?null:id);
@@ -3315,6 +3295,17 @@ function AppInner(){
       {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
       {showCompareModal&&compareA&&compareB&&<CompareModal compA={compareA} compB={compareB} onClose={()=>{setShowCompareModal(false);setCompareA(null);setCompareB(null);}}/>}
       {showEmailCapture&&<EmailCaptureModal onClose={()=>setShowEmailCapture(false)} compoundId={emailCaptureCompound}/>}
+      {showExitModal&&!isPro&&page==="supplements"&&!showAuth&&!showUpgrade&&!showAccount&&!mobileMenu&&(
+        <aside className="pro-browse-prompt" aria-label="Evidstack Pro">
+          <button className="pro-prompt-close" aria-label="Dismiss Pro suggestion" onClick={()=>setShowExitModal(false)}>×</button>
+          <span className="pro-prompt-label">EVIDSTACK PRO</span>
+          <p>More of the research.<br/><strong>All in one place.</strong></p>
+          <span className="pro-prompt-detail">Unlock Tier 2–4 compounds and Pro tools.<br/>$9.99/month. Cancel anytime.</span>
+          <button className="pro-prompt-cta" onClick={()=>{setShowExitModal(false);openUpgrade();}}>Explore Pro <span aria-hidden="true">↗</span></button>
+          <button className="pro-prompt-later" onClick={()=>setShowExitModal(false)}>Keep browsing</button>
+        </aside>
+      )}
+
       {/* Mobile menu drawer */}
       {isMobile&&mobileMenu&&(
         <div onClick={()=>setMobileMenu(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200}}>
@@ -3352,14 +3343,81 @@ function AppInner(){
         </div>
       )}
 
-      <a className="skip-link" href="#main-content">Skip to content</a>
-      <header className="site-header">
-        <a className="site-brand" href="/" aria-label="Evidstack home"><span className="site-brand-mark" aria-hidden="true">e.</span>evidstack</a>
-        <nav className="site-links" aria-label="Main navigation">{[["/supplements","Database"],["/guides","Guides"],["/pricing","Pricing"],["/about","About"]].map(([href,label])=><a key={href} href={href} aria-current={window.location.pathname===href?"page":undefined}>{label}</a>)}</nav>
-        <div className="site-account">{user?<><a href="/advisor">Advisor</a><button onClick={()=>setShowAccount(true)}>Account</button></>:<><button onClick={()=>openAuth("login")}>Sign in</button><button className="site-signup" onClick={()=>openAuth("signup")}>Create account ↗</button></>}<button className="site-mobile-toggle" aria-label="Open navigation menu" aria-expanded={mobileMenu} onClick={()=>setMobileMenu(true)}>☰</button></div>
-      </header>
-      <main id="main-content" tabIndex={-1}>
-
+      <nav style={{borderBottom:`1px solid ${C.border}`,padding:isMobile?"0 16px":"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:72,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
+        <div onClick={()=>navigateTo("supplements")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+          <div style={{width:30,height:30,border:`2px solid ${C.black}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:10,fontWeight:900}}>E</span></div>
+          <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink,cursor:"pointer"}} onClick={()=>navigateTo("supplements")}>EVIDSTACK</span>
+        </div>
+        {isMobile?(
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            {user&&!isPro&&<button onClick={openUpgrade} style={{padding:"6px 12px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
+            {isPro&&<span style={{fontSize:9,fontWeight:800,color:C.gold,border:`1px solid ${C.gold}`,padding:"2px 6px"}}>PRO</span>}
+            {!user&&<button onClick={()=>openAuth("login")} style={{padding:"6px 10px",background:"transparent",border:`1px solid ${C.border}`,color:C.ink,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Sign in</button>}
+            {!user&&<button onClick={()=>{openAuth("signup");}} style={{padding:"6px 10px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Free account</button>}
+            <button onClick={()=>setMobileMenu(true)} style={{background:"none",border:"none",cursor:"pointer",padding:4,display:"flex",flexDirection:"column",gap:5}}>
+              <span style={{display:"block",width:22,height:2,background:C.ink}}/>
+              <span style={{display:"block",width:22,height:2,background:C.ink}}/>
+              <span style={{display:"block",width:22,height:2,background:C.ink}}/>
+            </button>
+          </div>
+        ):(
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            {navItems.map(item=>(
+              <button key={item.id} onClick={()=>navigateTo(item.id)}
+                style={{padding:"8px 14px",fontSize:12,fontWeight:700,
+                  background:page===item.id?C.ink:"transparent",
+                  color:page===item.id?C.white:C.gray,
+                  border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s"}}>
+                {item.label}
+              </button>
+            ))}
+            <div style={{position:"relative"}}
+              onMouseEnter={()=>setShowTools(true)}
+              onMouseLeave={()=>setShowTools(false)}>
+              <button
+                style={{padding:"8px 14px",fontSize:12,fontWeight:700,
+                  background:proPages.includes(page)?C.ink:"transparent",
+                  color:proPages.includes(page)?C.white:isPro?C.gray:C.gold,
+                  border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s",
+                  display:"flex",alignItems:"center",gap:5}}>
+                <span style={{color:proPages.includes(page)?C.white:C.gold,marginRight:2}}>+</span><span>Pro Tools</span><span style={{fontSize:8,marginLeft:4}}>{showTools?"▲":"▼"}</span>
+              </button>
+              {showTools&&(
+                <div style={{position:"absolute",top:"100%",left:0,background:C.white,
+                  border:`1px solid ${C.border}`,boxShadow:"0 8px 24px rgba(0,0,0,.12)",
+                  zIndex:500,minWidth:210}}>
+                  {proTools.map(t=>(
+                    <button key={t.id} onClick={()=>{navigateTo(t.id);setShowTools(false);}}
+                      style={{width:"100%",padding:"12px 16px",fontSize:12,fontWeight:700,
+                        background:page===t.id?C.bg:"transparent",
+                        color:C.ink,border:"none",
+                        borderBottom:`1px solid ${C.border}`,
+                        cursor:"pointer",textAlign:"left",
+                        fontFamily:"Montserrat,sans-serif",
+                        display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                      {t.label}
+                      {!isPro&&<span style={{fontSize:8,color:C.gold,fontWeight:900,letterSpacing:".08em"}}>PRO</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div style={{width:1,height:24,background:C.border,margin:"0 10px"}}/>
+            {user?(
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                {isPro&&<span className="evid-pulse-pro" style={{fontSize:10,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px"}}>PRO</span>}
+                {!isPro&&<button onClick={openUpgrade} className="evid-shimmer-btn" style={{padding:"8px 16px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",letterSpacing:".04em"}}>Upgrade</button>}
+                <button onClick={()=>setShowAccount(true)} style={{padding:"8px 14px",fontSize:11,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Account</button>
+              </div>
+            ):(
+              <div style={{display:"flex",gap:6}}>
+                <button onClick={()=>openAuth("login")}  style={{padding:"8px 14px",fontSize:12,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Sign in</button>
+                <button onClick={()=>{openAuth("signup");}} className="evid-shimmer-btn" style={{padding:"8px 16px",fontSize:12,fontWeight:800,background:C.gold,color:C.ink,border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".02em"}}>Create free account<span style={{fontSize:9,color:C.gray,display:"block",textAlign:"center",marginTop:2}}>No card required</span></button>
+              </div>
+            )}
+          </div>
+        )}
+      </nav>
 
       {page==="about"         &&<AboutPage/>}
       {page==="pricing"        &&<PricingPage onUpgrade={openUpgrade} onAuth={openAuth}/>}
@@ -3384,17 +3442,260 @@ function AppInner(){
       {page==="changelog"    &&<ChangelogPage onNavigate={navigateTo}/>}
 
       {page==="supplements"&&<>
-        <HomeIntroduction search={search} setSearch={value=>{setSearch(value);setGoal("all");setFilterTier(0);}} user={user} onAuth={openAuth}
-          onBrowse={(event,results=false)=>{event.preventDefault();document.getElementById(results?"compounds-grid":"research-index")?.scrollIntoView({behavior:"smooth",block:"start"});if(!results)document.getElementById("evidstack-search")?.focus({preventScroll:true});}}
-          onGoal={id=>{setGoal(id);setSearch("");setFilterTier(0);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}/>
-        <div className="catalog-heading" id="compounds-grid" tabIndex={-1}><h2>The research index</h2><p>{SUPPLEMENTS.length} compounds to explore. Filter by goal, then open a record for the details.</p></div>
-        <ResearchCatalog items={filtered} goal={goal} setGoal={setGoal} tier={filterTier} setTier={setFilterTier} sort={sortBy} setSort={setSortBy} search={search} isPro={isPro} onUpgrade={openUpgrade}
-          onClear={()=>{setSearch("");setGoal("all");setFilterTier(0);}} onCompare={handleCompare} compareA={compareA} compareB={compareB} onShowCompare={()=>setShowCompareModal(true)}/>
+        <section className="evid-home-hero" aria-labelledby="evid-home-title">
+          <div className="evid-hero-art" aria-hidden="true"><div className="evid-orbit orbit-one"/><div className="evid-orbit orbit-two"/><div className="evid-orbit orbit-three"/><span className="orbit-point point-one"/><span className="orbit-point point-two"/><div className="evid-hero-grid"/></div>
+          <div className="evid-hero-content">
+          <p className="evid-hero-kicker">SUPPLEMENTS. COMPOUNDS. CONTEXT.</p>
+          <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>
+          <p className="evid-hero-description">Look closer at what you're taking. Explore the research, dosing, interactions and trade-offs behind {SUPPLEMENTS.length} compounds.</p>
+          <div className="evid-hero-actions"><button onClick={()=>{document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Find a compound <span aria-hidden="true">↓</span></button><button onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
+          <p className="evid-hero-access">Start with a free preview. Go deeper with Pro.</p>
+          <div ref={searchContainerRef} style={{maxWidth:680,margin:"0 auto 20px",position:"relative"}}>
+            <div style={{display:"flex",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
+              <input id="evidstack-search" value={search}
+                onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
+                onFocus={()=>{if(search.length>0)setShowSuggest(true);}}
+                onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter"){setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}}
+                aria-label="Search compounds" placeholder="Search a compound, e.g. creatine"
+                style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
+              <button onClick={()=>{setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}} style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search →</button>
+            </div>
+            {/* Autocomplete dropdown */}
+            {showSuggest&&search.trim().length>0&&(()=>{
+              const q=search.toLowerCase();
+              // Goal-level semantic suggestions
+              const goalHits=GOALS.filter(g=>g.id!=="all"&&(g.label.toLowerCase().replace(" / ","").replace(/ /g,"").includes(q)||g.id.includes(q))).slice(0,3);
+              // Compound name suggestions: prefix first, then includes
+              const prefixHits=SUPPLEMENTS.filter(s=>s.name.toLowerCase().startsWith(q)).slice(0,6);
+              const includeHits=SUPPLEMENTS.filter(s=>!s.name.toLowerCase().startsWith(q)&&(s.name.toLowerCase().includes(q)||(s.aliases||[]).some(a=>a.toLowerCase().includes(q)))).slice(0,4);
+              const compoundHits=[...prefixHits,...includeHits].slice(0,8);
+              if(!goalHits.length&&!compoundHits.length)return null;
+              return(
+                <div style={{position:"absolute",top:"100%",left:0,right:0,background:C.white,border:`1px solid ${C.border}`,boxShadow:"0 8px 24px rgba(0,0,0,.12)",zIndex:50,maxHeight:360,overflowY:"auto",marginTop:2}}>
+                  {goalHits.length>0&&(
+                    <div>
+                      <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:0,padding:"8px 16px 4px",textTransform:"uppercase",background:C.bg,borderBottom:`1px solid ${C.border}`}}>Filter by goal</p>
+                      {goalHits.map(g=>(
+                        <div key={g.id} onMouseDown={()=>{setSearch(g.label);setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}
+                          style={{padding:"10px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,borderBottom:`1px solid ${C.border}`}}
+                          onMouseEnter={e=>e.currentTarget.style.background=C.bg}
+                          onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                          <span style={{fontSize:16}}>{g.icon}</span>
+                          <div>
+                            <p style={{fontSize:13,fontWeight:700,color:C.ink,margin:0}}>{g.label}</p>
+                            <p style={{fontSize:10,color:C.gray,margin:0}}>Show all compounds for this goal</p>
+                          </div>
+                          <span style={{marginLeft:"auto",fontSize:9,fontWeight:700,color:C.gold,letterSpacing:".08em",background:`${C.gold}18`,padding:"2px 7px"}}>GOAL</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {compoundHits.length>0&&(
+                    <div>
+                      {(goalHits.length>0||true)&&<p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:0,padding:"8px 16px 4px",textTransform:"uppercase",background:C.bg,borderBottom:`1px solid ${C.border}`}}>Compounds</p>}
+                      {compoundHits.map(s=>{
+                        const tierColor=["","#16a34a","#2563eb","#7c3aed","#d97706"][s.tier]||C.gray;
+                        const tierLabel=["","T1","T2","T3","T4"][s.tier]||"";
+                        const bestEff=s.effects.length?Math.max(...s.effects.map(e=>e.efficacy)):0;
+                        return(
+                          <div key={s.id} onMouseDown={()=>{setSearch(s.name);setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}
+                            style={{padding:"10px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:12,borderBottom:`1px solid ${C.border}`}}
+                            onMouseEnter={e=>e.currentTarget.style.background=C.bg}
+                            onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                            <span style={{fontSize:10,fontWeight:800,color:tierColor,border:`1px solid ${tierColor}`,padding:"2px 6px",flexShrink:0,minWidth:24,textAlign:"center"}}>{tierLabel}</span>
+                            <div style={{flex:1,minWidth:0}}>
+                              <p style={{fontSize:13,fontWeight:700,color:C.ink,margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.name}</p>
+                              {s.aliases&&s.aliases[0]&&<p style={{fontSize:10,color:C.gray,margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.aliases[0]}</p>}
+                            </div>
+                            <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
+                              <div style={{width:32,height:4,background:C.border,borderRadius:2,overflow:"hidden"}}>
+                                <div style={{width:`${(bestEff/5)*100}%`,height:"100%",background:tierColor,borderRadius:2}}/>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
+          <div className="evid-access-strip"><span><strong>Free</strong> A first look at the fundamentals</span><span><strong>Pro</strong> Full catalogue + research tools</span><button onClick={openUpgrade}>$9.99 / month ↗</button></div>
+          </div>
+        </section>
+
+        {/* Goal Quiz */}
+        <details className="evid-optional-quiz"><summary>Not sure where to start? Choose a goal.</summary><GoalQuizSection onNavigate={navigateTo} onAuth={openAuth}/></details>
+
+      <div style={{height:1,background:C.border,maxWidth:680,margin:"0 auto 24px"}}/>
+
+        <div style={{borderBottom:`1px solid ${C.border}`,background:C.white}}>
+          <div style={{display:"flex",gap:0,overflowX:"auto",padding:isMobile?"0 12px":"0 32px"}}>
+            {GOALS.map((g,i)=>(
+              <div key={g.id} style={{display:"flex",alignItems:"stretch",position:"relative"}}>
+                <button onClick={()=>setGoal(g.id)}
+                  style={{padding:"14px 12px",fontSize:11,fontWeight:700,letterSpacing:".04em",background:"transparent",color:goal===g.id?C.ink:C.gray,border:"none",borderBottom:goal===g.id?`2px solid ${C.ink}`:"2px solid transparent",cursor:"pointer",fontFamily:"Montserrat,sans-serif",whiteSpace:"nowrap"}}>
+                  {g.icon} {T.controls.goals[i]||g.label}
+                </button>
+                {g.id!=="all"&&<button title={`Browse all ${g.label} compounds`}
+                  onClick={e=>{e.stopPropagation();window.history.pushState({},"",`/goal/${g.id}`);window.dispatchEvent(new PopStateEvent("popstate"));}}
+                  style={{padding:"0 4px 0 0",background:"transparent",border:"none",borderBottom:goal===g.id?`2px solid ${C.ink}`:"2px solid transparent",cursor:"pointer",color:"#9ca3af",fontSize:9,display:"flex",alignItems:"center"}}
+                  >↗</button>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{padding:isMobile?"10px 12px":"12px 32px",borderBottom:`1px solid ${C.border}`,background:C.bg}}>
+          <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:isMobile?8:0}}>
+            <span style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".1em"}}>TIER:</span>
+            <button onClick={()=>setFilterTier(0)} style={{padding:"4px 8px",fontSize:10,fontWeight:700,background:filterTier===0?C.ink:"transparent",color:filterTier===0?C.white:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>{isMobile?"All":T.controls.tierAll}</button>
+            {[1,2,3,4].map((ti,i)=>(
+              <button key={ti} onClick={()=>setFilterTier(filterTier===ti?0:ti)}
+                style={{padding:"4px 8px",fontSize:10,fontWeight:700,background:filterTier===ti?tierColor(ti):"transparent",color:filterTier===ti?C.white:tierColor(ti),border:`1px solid ${tierColor(ti)}`,cursor:"pointer"}}>
+                {isMobile?`T${ti}`:`T${ti} / ${T.controls.tiers[i]}`}
+              </button>
+            ))}
+            {!isMobile&&<div style={{marginLeft:"auto",display:"flex",gap:0,alignItems:"center"}}>
+              <span style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".08em",padding:"4px 8px"}}>SORT:</span>
+              {[["efficacy",T.controls.sortEfficacy],["evidence",T.controls.sortEvidence],["tier",T.controls.sortTier]].map(([id,label])=>(
+                <button key={id} onClick={()=>setSortBy(id)}
+                  style={{padding:"5px 12px",fontSize:10,fontWeight:700,letterSpacing:".04em",background:sortBy===id?C.ink:C.white,color:sortBy===id?C.white:C.gray,border:`1px solid ${C.border}`,marginLeft:-1,cursor:"pointer"}}>
+                  {label}
+                </button>
+              ))}
+              <span style={{fontSize:11,color:C.gray,fontWeight:600,padding:"4px 0 4px 12px"}}>{T.controls.result(filtered.length)}</span>
+            </div>}
+          </div>
+          {isMobile&&<div style={{display:"flex",gap:0,alignItems:"center"}}>
+            <span style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".08em",padding:"4px 8px 4px 0"}}>SORT:</span>
+            {[["efficacy",T.controls.sortEfficacy],["evidence",T.controls.sortEvidence],["tier",T.controls.sortTier]].map(([id,label])=>(
+              <button key={id} onClick={()=>setSortBy(id)}
+                style={{padding:"5px 10px",fontSize:10,fontWeight:700,background:sortBy===id?C.ink:C.white,color:sortBy===id?C.white:C.gray,border:`1px solid ${C.border}`,marginLeft:-1,cursor:"pointer"}}>
+                {label}
+              </button>
+            ))}
+            <span style={{fontSize:10,color:C.gray,fontWeight:600,padding:"4px 0 4px 10px",marginLeft:"auto"}}>{T.controls.result(filtered.length)}</span>
+          </div>}
+        </div>
+
+        <div style={{maxWidth:1000,margin:"0 auto",padding:isMobile?"16px 12px 60px":"24px 48px 80px"}}>
+          {goal!=="all"&&(
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,padding:"10px 16px",background:C.white,border:`1px solid ${C.border}`}}>
+              <span style={{fontSize:12,color:C.ink,fontWeight:700}}>
+                {GOALS.find(g=>g.id===goal)?.icon} Showing {filtered.length} compound{filtered.length!==1?"s":""} for <strong>{T.controls.goals[GOALS.findIndex(g=>g.id===goal)]||goal}</strong>
+              </span>
+              <button onClick={()=>setGoal("all")} style={{fontSize:11,color:C.gray,background:"transparent",border:"none",cursor:"pointer",fontWeight:600,textDecoration:"underline"}}>Clear filter</button>
+            </div>
+          )}
+          {(compareA||compareB)&&(
+            <div style={{background:C.ink,padding:"12px 16px",marginBottom:12,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
+              <div style={{display:"flex",alignItems:"center",gap:12}}>
+                <span style={{fontSize:10,fontWeight:800,color:C.gold,letterSpacing:".1em",textTransform:"uppercase"}}>Comparing:</span>
+                {compareA&&<span style={{fontSize:11,fontWeight:700,color:C.white,border:`1px solid ${C.blue}`,padding:"3px 10px"}}>{compareA.name}</span>}
+                {compareA&&!compareB&&<span style={{fontSize:10,color:"#9ca3af"}}>Select one more compound</span>}
+                {compareB&&<span style={{fontSize:11,fontWeight:700,color:C.white,border:`1px solid ${C.blue}`,padding:"3px 10px"}}>{compareB.name}</span>}
+              </div>
+              <div style={{display:"flex",gap:8}}>
+                {compareA&&compareB&&<button onClick={e=>{e.stopPropagation();setShowCompareModal(true);}} style={{padding:"7px 16px",background:C.blue,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Compare now</button>}
+                <button onClick={()=>{setCompareA(null);setCompareB(null);}} style={{padding:"7px 12px",background:"transparent",border:"1px solid #374151",color:"#9ca3af",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Clear</button>
+              </div>
+            </div>
+          )}
+          {!isPro&&(
+            <div style={{background:`${C.gold}18`,border:`1px solid ${C.gold}40`,padding:"12px 16px",marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
+              <p style={{fontSize:12,color:C.ink,margin:0}}>
+                <strong>Free plan:</strong> Tier 1 visible. <strong>{SUPPLEMENTS.filter(s=>s.tier>=2).length} compounds</strong> locked behind Pro.
+              </p>
+              <button onClick={openUpgrade} style={{padding:"6px 16px",background:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",letterSpacing:".04em"}}>Unlock all - $9.99/mo</button>
+            </div>
+          )}
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            {filtered.length===0&&<div style={{textAlign:"center",padding:"60px 0",color:C.gray}}><p style={{fontSize:32,fontWeight:900,margin:"0 0 8px",letterSpacing:"-.04em"}}>0</p><p style={{fontSize:13}}>{T.noResults}</p></div>}
+            {(()=>{
+              let tier1Seen=0;
+              const items=[];
+              for(let i=0;i<filtered.length;i++){
+                const s=filtered[i];
+                const isTier1=s.tier===1;
+                if(!user&&isTier1){
+                  if(tier1Seen===FREE_VISIBLE){
+                    const locked=filtered.filter(s2=>s2.tier===1).slice(FREE_VISIBLE,FREE_VISIBLE+10);
+                    items.push(<BlurredPreviewPaywall key="blurred-paywall" lockedCompounds={locked} onAuth={openAuth} onUpgrade={openUpgrade} user={user} isMob={isMobile}/>);
+                  }
+                  if(tier1Seen>=FREE_VISIBLE){
+                    tier1Seen++;
+                    continue;
+                  }
+                  tier1Seen++;
+                }
+                items.push(
+                  <div key={s.id} data-pro-prompt={i===5?"true":undefined} style={{animation:`fadeUp .25s both`}}>
+                    <SupplementCard supp={s} activeGoal={goal} onClick={()=>toggle(s.id)} isSelected={selected===s.id} isPro={isPro} onUpgrade={openUpgrade} onCompare={handleCompare} compareA={compareA} compareB={compareB} cardIndex={i}/>
+                  </div>
+                );
+              }
+              return items;
+            })()}
+          </div>
+        </div>
       </>}
 
-      </main>
-      <footer className="site-footer"><div><a className="site-brand" href="/">evidstack</a><p>Research starts with a better question.</p></div><nav aria-label="Footer navigation"><a href="/guides">Guides</a><a href="/advisor">AI Advisor</a><a href="/pricing">Pricing</a><a href="/about">About</a><a href="/legal">Terms & privacy</a><a href="mailto:evidstack@protonmail.com">Contact</a></nav><p className="site-footer-note">For information, not medical advice. Research summaries can contain errors. Check sources and consult a qualified professional about your health.</p></footer>
-
+      <div style={{borderTop:`1px solid ${C.border}`,background:C.white,padding:isMobile?"28px 16px":"40px 48px"}}>
+        <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:28,marginBottom:32}}>
+          <div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+              <div style={{width:26,height:26,border:`2px solid ${C.ink}`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <span style={{fontSize:10,fontWeight:900,color:C.ink}}>E</span>
+              </div>
+              <span style={{fontSize:11,fontWeight:900,letterSpacing:".08em",color:C.ink}}>EVIDSTACK</span>
+            </div>
+            <p style={{fontSize:11,color:C.gray,margin:"0 0 6px",lineHeight:1.7}}>{Math.floor(SUPPLEMENTS.length/10)*10}+ compounds from PubMed and Cochrane.</p>
+            <p style={{fontSize:11,color:C.gray,margin:0}}>evidstack@protonmail.com</p>
+          </div>
+          <div>
+            <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Database</p>
+            {[["supplements","Supplements"]].map(([p,l])=>(
+              <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
+            ))}
+          </div>
+          <div>
+            <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Tools</p>
+            {[["tracker","My Tracker"],["bloodwork","AI Bloodwork Analyzer"],["interaction-checker","Interaction Checker"],["stack-audit","Stack Audit AI"],["bloodwork-history","Bloodwork History"]].map(([p,l])=>(
+              <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
+            ))}
+          </div>
+          <div>
+            <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Company</p>
+            {[["about","About"],["pricing","Pricing"],["affiliate","Affiliate Program"],["legal","Terms & Privacy"],["changelog","Changelog"]].map(([p,l])=>(
+              <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
+            ))}
+          </div>
+        </div>
+        <div style={{borderTop:`1px solid ${C.border}`,paddingTop:16,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+          <p style={{fontSize:10,color:C.gray,margin:0}}>{T.footer}</p>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <a href="https://www.tiktok.com/@evidstack" target="_blank" rel="noopener noreferrer"
+              style={{display:"flex",alignItems:"center",justifyContent:"center",width:28,height:28,color:C.gray,transition:"color .15s",textDecoration:"none"}}
+              onMouseEnter={e=>e.currentTarget.style.color=C.ink}
+              onMouseLeave={e=>e.currentTarget.style.color=C.gray}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.87a8.18 8.18 0 004.79 1.52V7a4.85 4.85 0 01-1.02-.31z"/>
+              </svg>
+            </a>
+            <a href="https://www.instagram.com/evidstack" target="_blank" rel="noopener noreferrer"
+              style={{display:"flex",alignItems:"center",justifyContent:"center",width:28,height:28,color:C.gray,transition:"color .15s",textDecoration:"none"}}
+              onMouseEnter={e=>e.currentTarget.style.color=C.ink}
+              onMouseLeave={e=>e.currentTarget.style.color=C.gray}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162S8.597 18.163 12 18.163s6.162-2.759 6.162-6.162S15.403 5.838 12 5.838zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </a>
+            <p style={{fontSize:10,color:C.gray,margin:0}}>Not medical advice.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

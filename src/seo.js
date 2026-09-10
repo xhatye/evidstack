@@ -4,8 +4,8 @@ export const SITE = 'https://evidstack.com';
 export const HOME_DESCRIPTION = 'Explore the Evidstack supplement database. Find compound research summaries, dosage information, side effects and interactions, and read the limitations.';
 export const GUIDE_IDS = ['sleep','focus','hormones','force','longevity','skin','weight','recovery'];
 const pages = {
-  '/': ['Supplement Research, Without the Noise | Evidstack', HOME_DESCRIPTION],
-  '/supplements': ['Supplement Research, Without the Noise | Evidstack', HOME_DESCRIPTION],
+  '/': ['Supplement & Compound Research | Evidstack', HOME_DESCRIPTION],
+  '/supplements': ['Supplement & Compound Research | Evidstack', HOME_DESCRIPTION],
   '/about': ['About Evidstack | Supplement Research', 'Learn about Evidstack, its supplement database, research approach and limitations.'],
   '/guides': ['Supplement Research Guides | Evidstack', 'Explore supplement guides organized by goal. Read compound summaries, cautions and research limitations before making a decision.'],
   '/pricing': ['Pricing | Evidstack Free and Pro', 'Compare Evidstack Free and Pro. Browse the database for free, or explore paid research tools and their usage limits.'],

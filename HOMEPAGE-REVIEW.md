@@ -9,3 +9,5 @@ No automatic onboarding or exit popup. A small non-modal Pro suggestion appears 
 Retains the SEO metadata generator, canonical fixes, sitemap and robots settings from the preceding work. Page bodies remain client-rendered. Retains actual signup CTAs and the improved signup dialog.
 
 Checked locally: original locked cards visible, no initial Pro suggestion, scroll-triggered suggestion and persistent dismissal; production build and existing tests. No purchases or account creation performed. Production deployment still depends on the security rollout in PR #1 and a Vercel Preview routing check.
+
+The homepage now uses a continuous animated charcoal-and-gold background, including the catalogue and footer. Navigation, filters and cards retain light readable surfaces. Navigation becomes compact below 1280px. Clearer introductory copy and rotating search examples are restored, with reduced-motion support. The search button and Enter key scroll to the catalogue. Build and all 20 tests pass.

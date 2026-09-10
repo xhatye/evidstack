@@ -5,9 +5,9 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { db } from "./firebase.js";
 import { doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
 
-function useIsMobile(){ 
-  const [m,setM]=useState(()=>typeof window!=="undefined"&&window.innerWidth<768);
-  useEffect(()=>{const h=()=>setM(window.innerWidth<768);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h);},[]);
+function useIsMobile(breakpoint=768){ 
+  const [m,setM]=useState(()=>typeof window!=="undefined"&&window.innerWidth<breakpoint);
+  useEffect(()=>{const h=()=>setM(window.innerWidth<breakpoint);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h);},[breakpoint]);
   return m;
 }
 
@@ -3150,20 +3150,7 @@ function AppInner(){
   const [compareA,setCompareA]=useState(null);
   const [compareB,setCompareB]=useState(null);
   const [showCompareModal,setShowCompareModal]=useState(false);
-  const PLACEHOLDERS=[
-    "Search by compound name...",
-    "Try \"creatine\" for strength and muscle",
-    "Try \"GHK-Cu\" for collagen and skin peptides",
-    "Try \"semaglutide\" for weight loss",
-    "Try \"BPC-157\" for healing peptides",
-    "Try \"finasteride\" for hair retention",
-    "Try \"focus\" for cognitive enhancers",
-    "Try \"longevity\" for anti-aging compounds",
-    "Try \"collagen\" for skin and facial quality",
-    "Try \"skin\" to filter aesthetics compounds",
-    "Try \"astaxanthin\" for photoprotection",
-    "Try \"boron\" for testosterone and bone density",
-  ];
+  const PLACEHOLDERS=["Try creatine for strength...","Try sleep to explore a goal...","Search magnesium or omega-3...","Try focus for a clearer starting point..."];
   const [phIdx,setPhIdx]=useState(0);
   const [phFade,setPhFade]=useState(true);
   // Close suggestions when clicking outside search container
@@ -3173,13 +3160,13 @@ function AppInner(){
     return()=>document.removeEventListener("mousedown",handler);
   },[]);
   useEffect(()=>{
-    const iv=setInterval(()=>{
-      setPhFade(false);
-      setTimeout(()=>{setPhIdx(i=>(i+1)%PLACEHOLDERS.length);setPhFade(true);},400);
-    },4000);
-    return()=>clearInterval(iv);
-  },[]);
+    if(search||page!=="supplements"||window.matchMedia("(prefers-reduced-motion: reduce)").matches){setPhFade(true);return;}
+    let transition;
+    const iv=setInterval(()=>{setPhFade(false);transition=setTimeout(()=>{setPhIdx(i=>(i+1)%PLACEHOLDERS.length);setPhFade(true);},300);},4000);
+    return()=>{clearInterval(iv);clearTimeout(transition);};
+  },[search,page]);
   const isMobile=useIsMobile();
+  const compactNav=useIsMobile(1280);
   const [mobileMenu,setMobileMenu]=useState(false);
   const [showTools,setShowTools]=useState(false);
   const [showExitModal,setShowExitModal]=useState(false);
@@ -3289,7 +3276,7 @@ function AppInner(){
   const proPages=proTools.map(t=>t.id);
 
   return(
-    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
+    <div className={page==="supplements"?"evid-homepage":undefined} style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} initialMode={authMode}/>}
       {showUpgrade&&<UpgradeModal onClose={()=>setShowUpgrade(false)} onAuthNeeded={()=>openAuth("signup")}/>}
       {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
@@ -3307,7 +3294,7 @@ function AppInner(){
       )}
 
       {/* Mobile menu drawer */}
-      {isMobile&&mobileMenu&&(
+      {compactNav&&mobileMenu&&(
         <div onClick={()=>setMobileMenu(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200}}>
           <div onClick={e=>e.stopPropagation()} onTouchMove={e=>e.stopPropagation()} style={{position:"absolute",top:0,right:0,width:280,height:"100%",background:C.white,padding:"24px 20px",display:"flex",flexDirection:"column",gap:4,overflowY:"auto",WebkitOverflowScrolling:"touch"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
@@ -3343,18 +3330,18 @@ function AppInner(){
         </div>
       )}
 
-      <nav style={{borderBottom:`1px solid ${C.border}`,padding:isMobile?"0 16px":"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:72,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
+      <nav className="evid-main-nav" style={{borderBottom:`1px solid ${C.border}`,padding:compactNav?"0 16px":"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:72,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
         <div onClick={()=>navigateTo("supplements")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
           <div style={{width:30,height:30,border:`2px solid ${C.black}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:10,fontWeight:900}}>E</span></div>
           <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink,cursor:"pointer"}} onClick={()=>navigateTo("supplements")}>EVIDSTACK</span>
         </div>
-        {isMobile?(
+        {compactNav?(
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             {user&&!isPro&&<button onClick={openUpgrade} style={{padding:"6px 12px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
             {isPro&&<span style={{fontSize:9,fontWeight:800,color:C.gold,border:`1px solid ${C.gold}`,padding:"2px 6px"}}>PRO</span>}
             {!user&&<button onClick={()=>openAuth("login")} style={{padding:"6px 10px",background:"transparent",border:`1px solid ${C.border}`,color:C.ink,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Sign in</button>}
             {!user&&<button onClick={()=>{openAuth("signup");}} style={{padding:"6px 10px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Free account</button>}
-            <button onClick={()=>setMobileMenu(true)} style={{background:"none",border:"none",cursor:"pointer",padding:4,display:"flex",flexDirection:"column",gap:5}}>
+            <button aria-label="Open navigation" aria-expanded={mobileMenu} onClick={()=>setMobileMenu(true)} style={{background:"none",border:"none",cursor:"pointer",padding:4,display:"flex",flexDirection:"column",gap:5}}>
               <span style={{display:"block",width:22,height:2,background:C.ink}}/>
               <span style={{display:"block",width:22,height:2,background:C.ink}}/>
               <span style={{display:"block",width:22,height:2,background:C.ink}}/>
@@ -3447,16 +3434,18 @@ function AppInner(){
           <div className="evid-hero-content">
           <p className="evid-hero-kicker">SUPPLEMENTS. COMPOUNDS. CONTEXT.</p>
           <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>
-          <p className="evid-hero-description">Look closer at what you're taking. Explore the research, dosing, interactions and trade-offs behind {SUPPLEMENTS.length} compounds.</p>
+          <p className="evid-hero-description">A research database for supplements and compounds. Compare evidence, understand doses and spot potential interactions before building your stack.</p>
+          <p className="evid-hero-support">Explore {SUPPLEMENTS.length} compound profiles, from everyday supplements to specialist compounds. Pro adds the full catalogue, stack analysis and research tools.</p>
           <div className="evid-hero-actions"><button onClick={()=>{document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Find a compound <span aria-hidden="true">↓</span></button><button onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
           <p className="evid-hero-access">Start with a free preview. Go deeper with Pro.</p>
           <div ref={searchContainerRef} style={{maxWidth:680,margin:"0 auto 20px",position:"relative"}}>
             <div style={{display:"flex",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
+              {!search&&<span className="evid-search-example" aria-hidden="true" style={{opacity:phFade?1:0}}>{PLACEHOLDERS[phIdx]}</span>}
               <input id="evidstack-search" value={search}
                 onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
                 onFocus={()=>{if(search.length>0)setShowSuggest(true);}}
                 onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter"){setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}}
-                aria-label="Search compounds" placeholder="Search a compound, e.g. creatine"
+                aria-label="Search compounds" placeholder=""
                 style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
               <button onClick={()=>{setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}} style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search →</button>
             </div>
@@ -3580,7 +3569,7 @@ function AppInner(){
           </div>}
         </div>
 
-        <div style={{maxWidth:1000,margin:"0 auto",padding:isMobile?"16px 12px 60px":"24px 48px 80px"}}>
+        <div id="compounds-grid" style={{scrollMarginTop:90,maxWidth:1000,margin:"0 auto",padding:isMobile?"16px 12px 60px":"24px 48px 80px"}}>
           {goal!=="all"&&(
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,padding:"10px 16px",background:C.white,border:`1px solid ${C.border}`}}>
               <span style={{fontSize:12,color:C.ink,fontWeight:700}}>
@@ -3604,7 +3593,7 @@ function AppInner(){
             </div>
           )}
           {!isPro&&(
-            <div style={{background:`${C.gold}18`,border:`1px solid ${C.gold}40`,padding:"12px 16px",marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
+            <div className="evid-free-plan" style={{background:`${C.gold}18`,border:`1px solid ${C.gold}40`,padding:"12px 16px",marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
               <p style={{fontSize:12,color:C.ink,margin:0}}>
                 <strong>Free plan:</strong> Tier 1 visible. <strong>{SUPPLEMENTS.filter(s=>s.tier>=2).length} compounds</strong> locked behind Pro.
               </p>
@@ -3642,7 +3631,7 @@ function AppInner(){
         </div>
       </>}
 
-      <div style={{borderTop:`1px solid ${C.border}`,background:C.white,padding:isMobile?"28px 16px":"40px 48px"}}>
+      <div className="evid-page-footer" style={{borderTop:`1px solid ${C.border}`,background:C.white,padding:isMobile?"28px 16px":"40px 48px"}}>
         <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:28,marginBottom:32}}>
           <div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>

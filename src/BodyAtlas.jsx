@@ -125,8 +125,8 @@ function BodySilhouette({ model, view = "front", selectedId, hoveredId, onHover,
         <radialGradient id={`${uid}-halo`}><stop stopColor="#dfc77c" stopOpacity=".24"/><stop offset="1" stopColor="#dfc77c" stopOpacity="0"/></radialGradient>
         <clipPath id={`${uid}-model-clip`}><rect x="0" y="0" width="360" height="680" rx="8" /></clipPath>
       </defs>
-      <g className="atlas-rendered-model" clipPath={`url(#${uid}-model-clip)`} transform={back ? "translate(360 0) scale(-1 1)" : undefined}>
-        <image href="/body-atlas-models.png" x={female ? -360 : 0} y="0" width="720" height="680" preserveAspectRatio="none" />
+      <g className="atlas-rendered-model" clipPath={`url(#${uid}-model-clip)`}>
+        <image href={back ? (female ? "/body-atlas-female-back.png" : "/body-atlas-male-back.png") : (female ? "/body-atlas-female.png" : "/body-atlas-male.png")} x="0" y="0" width="360" height="680" preserveAspectRatio="xMidYMid meet" />
       </g>
       <ellipse className="atlas-legacy-body" cx="180" cy="330" rx="159" ry="302" fill={`url(#${uid}-halo)`}/>
       <g className="atlas-coordinate-lines" aria-hidden="true"><path d="M180 18V653 M35 88H325 M35 170H325 M35 312H325 M35 450H325 M35 612H325"/><ellipse cx="180" cy="648" rx="80" ry="9"/></g>

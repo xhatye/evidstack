@@ -1067,7 +1067,7 @@ function WeeklyProtocolAI({onUpgrade}){
   );
 
   return(
-    <div style={{maxWidth:800,margin:"0 auto",padding:isMob?"24px 16px 60px":"48px 48px 80px"}}>
+    <div className="evid-pro-tool-page" style={{maxWidth:800,margin:"0 auto",padding:isMob?"24px 16px 60px":"48px 48px 80px"}}>
       <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Pro Feature</p>
       <h2 style={{fontSize:isMob?24:36,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 8px"}}>Weekly Protocol AI</h2>
       <p style={{fontSize:13,color:C.gray,margin:"0 0 28px",lineHeight:1.7}}>A 4-week personalized plan that introduces compounds progressively.</p>
@@ -1245,7 +1245,7 @@ function InteractionChecker({onUpgrade}){
   );
 
   return(
-    <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"24px 16px 60px":"48px 48px 80px"}}>
+    <div className="evid-pro-tool-page" style={{maxWidth:760,margin:"0 auto",padding:isMob?"24px 16px 60px":"48px 48px 80px"}}>
       <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Pro Feature</p>
       <h2 style={{fontSize:isMob?24:36,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 8px"}}>Interaction Checker</h2>
       <p style={{fontSize:13,color:C.gray,margin:"0 0 28px",lineHeight:1.7}}>Add 2-8 compounds from your stack for a full safety and synergy analysis.</p>
@@ -1468,8 +1468,8 @@ function MyTracker({onUpgrade}){
   const daysThisWeek=last7.filter(d=>logs[d]?.taken?.length>0).length;
 
   return(
-    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
-        <div style={{background:"#f59e0b",padding:"12px 0",marginBottom:0}}>
+    <div className="evid-pro-tool-page" style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+        <div className="evid-pro-tool-topbar" style={{background:"#f59e0b",padding:"12px 0",marginBottom:0}}>
           <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18}}>📊</span>
             <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>My Tracker</span>
@@ -1487,8 +1487,8 @@ function MyTracker({onUpgrade}){
           ["Days logged this week",`${daysThisWeek}/7`],
           ["Today's intake",`${log.taken.length}/${stack.length}`],
         ].map(([label,val])=>(
-          <div key={label} style={{background:C.ink,padding:"16px 14px",textAlign:"center"}}>
-            <p style={{fontSize:isMob?20:24,fontWeight:900,color:C.white,margin:"0 0 4px"}}>{val}</p>
+          <div key={label} style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"16px 14px",textAlign:"center"}}>
+            <p style={{fontSize:isMob?20:24,fontWeight:900,color:C.ink,margin:"0 0 4px"}}>{val}</p>
             <p style={{fontSize:9,color:"#6b7280",fontWeight:700,letterSpacing:".08em",margin:0,textTransform:"uppercase"}}>{label}</p>
           </div>
         ))}
@@ -2502,7 +2502,7 @@ function StackBuilder({onUpgrade}){
   );
 
   return(
-    <div style={{maxWidth:840,margin:"0 auto",padding:isMob?"32px 16px 60px":"56px 48px 100px"}}>
+    <div className="evid-pro-tool-page" style={{maxWidth:840,margin:"0 auto",padding:isMob?"32px 16px 60px":"56px 48px 100px"}}>
       <p style={{fontSize:11,fontWeight:700,letterSpacing:".2em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Pro Feature</p>
       <h2 style={{fontSize:40,fontWeight:900,letterSpacing:"-.05em",color:C.ink,margin:"0 0 8px"}}>Stack Builder AI</h2>
       <p style={{fontSize:14,color:C.gray,margin:"0 0 40px",lineHeight:1.7}}>Select your goals, set your budget, and get a personalized evidence-based protocol in seconds.</p>
@@ -3533,6 +3533,7 @@ function AppInner(){
     {id:"bloodwork-history",label:"Bloodwork History"},
   ];
   const proPages=proTools.map(t=>t.id);
+  const isProToolPage=["weekly-protocol","interactions","tracker","advisor","interaction-checker","stack-audit","bloodwork-history","stack-builder","cycle-alerts","stack-optimizer","bloodwork"].includes(page);
 
   const scrollToResults=()=>{
     if(page!=="supplements")navigateTo("supplements");
@@ -3574,7 +3575,7 @@ function AppInner(){
   );
 
   return(
-    <div className={page==="supplements"?"evid-homepage":undefined} style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
+    <div className={page==="supplements"?"evid-homepage":isProToolPage?"evid-pro-page":undefined} style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} initialMode={authMode}/>}
       {showUpgrade&&<UpgradeModal onClose={()=>setShowUpgrade(false)} onAuthNeeded={()=>openAuth("signup")}/>}
       {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
@@ -4030,7 +4031,7 @@ function CycleAlertsScreen({onUpgrade}){
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
-        <div style={{background:"#6366f1",padding:"12px 0",marginBottom:0}}>
+        <div className="evid-pro-tool-topbar" style={{background:"#6366f1",padding:"12px 0",marginBottom:0}}>
           <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18}}>🔄</span>
             <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>AI Cycle Alerts</span>
@@ -4361,7 +4362,7 @@ function BloodWorkScreen({onUpgrade}){
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
-        <div style={{background:"#10b981",padding:"12px 0",marginBottom:0}}>
+        <div className="evid-pro-tool-topbar" style={{background:"#10b981",padding:"12px 0",marginBottom:0}}>
           <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18}}>🩸</span>
             <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>AI Bloodwork Analyzer</span>
@@ -4619,7 +4620,7 @@ function CompoundAdvisorScreen({onUpgrade}){
         .adv-score-bar{animation:advisorScoreGrow .8s cubic-bezier(.22,1,.36,1) both}
       `}</style>
 
-        <div style={{background:"#e2c97e",padding:"12px 0",marginBottom:0}}>
+        <div className="evid-pro-tool-topbar" style={{background:"#e2c97e",padding:"12px 0",marginBottom:0}}>
           <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18}}>🔭</span>
             <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>AI Compound Advisor</span>
@@ -4987,7 +4988,7 @@ function InteractionCheckerPro({onUpgrade}){
         @keyframes icScan{0%{width:0%}100%{width:100%}}
         .ic-card{animation:icFadeIn .35s ease both}
       `}</style>
-        <div style={{background:"#3b82f6",padding:"12px 0",marginBottom:0}}>
+        <div className="evid-pro-tool-topbar" style={{background:"#3b82f6",padding:"12px 0",marginBottom:0}}>
           <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18}}>⚗️</span>
             <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>Interaction Checker</span>
@@ -5175,7 +5176,7 @@ function StackAuditScreen({onUpgrade}){
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
       <style>{`@keyframes auditFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.audit-card{animation:auditFade .4s ease both}`}</style>
-        <div style={{background:"#8b5cf6",padding:"12px 0",marginBottom:0}}>
+        <div className="evid-pro-tool-topbar" style={{background:"#8b5cf6",padding:"12px 0",marginBottom:0}}>
           <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18}}>🎯</span>
             <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>Stack Audit AI</span>
@@ -5483,7 +5484,7 @@ function BloodworkHistoryScreen({onUpgrade}){
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
-        <div style={{background:"#ef4444",padding:"12px 0",marginBottom:0}}>
+        <div className="evid-pro-tool-topbar" style={{background:"#ef4444",padding:"12px 0",marginBottom:0}}>
           <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18}}>🩸</span>
             <span style={{fontSize:11,fontWeight:900,color:"rgba(0,0,0,.65)",letterSpacing:".16em",textTransform:"uppercase"}}>Bloodwork History</span>

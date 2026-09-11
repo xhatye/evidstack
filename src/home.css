@@ -96,6 +96,17 @@ body{background:#fff;color:#1a1a1a}
 @media(max-width:767px){html{scroll-padding-top:76px}.evid-home-hero{padding:50px 16px 28px}.evid-hero-content h1{font-size:clamp(45px,11vw,70px)}.evid-hero-search,.evid-hero-search.is-expanded{width:100%}.evid-hero-search-row input{padding:14px}.evid-hero-search-row button{padding:14px 16px;font-size:11px}.evid-nav-search-expanded{width:min(205px,calc(100vw - 180px));padding:6px 8px}.evid-nav-search-expanded .evid-search-suggestions{position:fixed;top:76px;right:12px;width:min(320px,calc(100vw - 24px))}.evid-about-hero h2{font-size:clamp(34px,10vw,52px)}.evid-about-lede{font-size:14px}.evid-about-body{font-size:14px;line-height:1.85}.evid-about-rule{margin:38px 0 34px}.evid-about-founder{gap:13px}.evid-about-founder-copy{font-size:12px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.evid-nav-search-expanded{animation:none}.evid-hero-search,.evid-hero-search-row button{transition:none}.evid-reveal{transition:none!important}}
 
+/* Pro tools share the same quiet research surface as My Stack. */
+.evid-pro-page{background:#f4f2ee!important;color:#1a1a1a}
+.evid-pro-tool-topbar{background:#fff!important;border-top:3px solid #e2c97e!important;border-bottom:1px solid #d4d0c8!important;padding:16px 0!important}
+.evid-pro-tool-topbar>div{max-width:980px!important}
+.evid-pro-tool-topbar span:nth-child(2){color:#1a1a1a!important;letter-spacing:.12em!important}
+.evid-pro-tool-topbar span:last-child{color:#75632d!important;background:rgba(226,201,126,.22)!important;border:1px solid rgba(226,201,126,.45);border-radius:0!important}
+.evid-pro-page input,.evid-pro-page textarea,.evid-pro-page select{border-radius:0!important;box-shadow:none!important}
+.evid-pro-page button{border-radius:0!important}
+.evid-pro-page .evid-pro-tool-page{background:#f4f2ee!important}
+@media(max-width:767px){.evid-pro-tool-topbar{padding:13px 0!important}.evid-pro-tool-topbar>div{padding:0 16px!important}}
+
 /* Focus stays clear of the central search icon and button. */
 .evid-hero-search-row input:focus-visible{outline:none!important;outline-offset:0}
 
@@ -114,4 +125,3 @@ body{background:#fff;color:#1a1a1a}
   .evid-pricing-table-cell{padding:10px 7px!important}
   .evid-pricing-table-cell span{font-size:10px!important;line-height:1.35;display:inline-block;max-width:100%}
 }
-

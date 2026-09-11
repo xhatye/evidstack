@@ -18,11 +18,11 @@ const PALETTE = {
 
 const REGIONS = [
   { id: "brain", label: "Brain & cognition", shortLabel: "Brain", goals: ["focus", "memory", "mood", "stress"], copy: "Compounds studied for attention, memory, mood and the stress response." },
-  { id: "eyes", label: "Eyes & vision", shortLabel: "Eyes", goals: ["eye-health", "longevity"], copy: "Research context for visual health and age-related eye outcomes." },
+  { id: "eyes", label: "Eyes & vision", shortLabel: "Eyes", goals: ["eyes", "longevity"], copy: "Research context for visual health and age-related eye outcomes." },
   { id: "heart", label: "Heart & circulation", shortLabel: "Heart", goals: ["cardio", "longevity"], copy: "Evidence related to cardiovascular markers and circulation." },
   { id: "lungs", label: "Lungs & breathing", shortLabel: "Lungs", goals: ["recovery", "longevity"], copy: "Compounds with relevant recovery or respiratory research in the catalogue." },
   { id: "thyroid", label: "Thyroid & metabolism", shortLabel: "Thyroid", goals: ["energy", "hormones", "weight"], copy: "Research linked to energy, thyroid-related hormones and metabolism." },
-  { id: "liver", label: "Liver", shortLabel: "Liver", goals: ["longevity", "liver-detox"], copy: "A cautious view of compounds studied in liver and detoxification contexts." },
+  { id: "liver", label: "Liver", shortLabel: "Liver", goals: ["liver", "longevity"], copy: "A cautious view of compounds studied in liver and detoxification contexts." },
   { id: "gut", label: "Digestion & gut", shortLabel: "Gut", goals: ["recovery", "mood", "weight"], copy: "Evidence connected to digestion, gut comfort and the gut-brain axis." },
   { id: "kidneys", label: "Kidneys & hydration", shortLabel: "Kidneys", goals: ["recovery", "cardio"], copy: "Only evidence recorded in the catalogue is shown here." },
   { id: "muscles", label: "Muscles & performance", shortLabel: "Muscles", goals: ["force", "recovery", "energy"], copy: "Compounds studied for strength, power, training recovery and energy." },

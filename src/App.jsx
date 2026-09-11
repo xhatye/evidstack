@@ -144,7 +144,47 @@ function HeroStats({isMobile}){
   );
 }
 
+function SearchSuggestions({query,onSelect,compact=false}){
+  const q=query.trim().toLowerCase();
+  if(!q)return null;
+  const goalHits=GOALS.filter(g=>g.id!=="all"&&(g.label.toLowerCase().replace(" / ","").replace(/ /g,"").includes(q)||g.id.includes(q))).slice(0,3);
+  const prefixHits=SUPPLEMENTS.filter(s=>s.name.toLowerCase().startsWith(q)).slice(0,6);
+  const includeHits=SUPPLEMENTS.filter(s=>!s.name.toLowerCase().startsWith(q)&&(s.name.toLowerCase().includes(q)||(s.aliases||[]).some(a=>a.toLowerCase().includes(q)))).slice(0,4);
+  const compoundHits=[...prefixHits,...includeHits].slice(0,8);
+  if(!goalHits.length&&!compoundHits.length)return null;
+  return(
+    <div className={`evid-search-suggestions${compact?" is-nav":""}`} role="listbox" aria-label="Search suggestions">
+      {goalHits.length>0&&<div>
+        <p className="evid-suggestion-heading">Filter by goal</p>
+        {goalHits.map(g=>(
+          <button key={g.id} className="evid-suggestion-row" onClick={()=>onSelect(g.label)} role="option">
+            <span className="evid-suggestion-icon" aria-hidden="true">{g.icon}</span>
+            <span><strong>{g.label}</strong><small>Show compounds for this goal</small></span>
+            <em>GOAL</em>
+          </button>
+        ))}
+      </div>}
+      {compoundHits.length>0&&<div>
+        <p className="evid-suggestion-heading">Compounds</p>
+        {compoundHits.map(s=>{
+          const tierColorValue=["",C.green,C.blue,C.purple,C.amber][s.tier]||C.gray;
+          const tierLabel=["","T1","T2","T3","T4"][s.tier]||"";
+          const bestEff=s.effects.length?Math.max(...s.effects.map(e=>e.efficacy)):0;
+          return(
+            <button key={s.id} className="evid-suggestion-row" onClick={()=>onSelect(s.name)} role="option">
+              <span className="evid-suggestion-tier" style={{color:tierColorValue,borderColor:tierColorValue}}>{tierLabel}</span>
+              <span className="evid-suggestion-copy"><strong>{s.name}</strong>{s.aliases?.[0]&&<small>{s.aliases[0]}</small>}</span>
+              <span className="evid-suggestion-meter" aria-label={`Efficacy ${bestEff} out of 5`}><span style={{width:`${(bestEff/5)*100}%`,background:tierColorValue}}/></span>
+            </button>
+          );
+        })}
+      </div>}
+    </div>
+  );
+}
+
 function SourceProofSection(){
+  const [ref,visible]=useScrollReveal(0.16);
   const cards=[
     {
       index:"01",
@@ -169,7 +209,7 @@ function SourceProofSection(){
     },
   ];
   return(
-    <section className="evid-source-proof" aria-labelledby="evid-source-title">
+    <section ref={ref} className={`evid-source-proof evid-reveal${visible?" visible":""}`} aria-labelledby="evid-source-title">
       <div className="evid-source-proof-inner">
         <div className="evid-source-proof-heading">
           <div>
@@ -2533,52 +2573,62 @@ function LegalPage(){
 }
 
 /* ABOUT */
+function AboutSection({label,body}){
+  const [ref,visible]=useScrollReveal(0.18);
+  return(
+    <section ref={ref} className={`evid-about-section evid-reveal${visible?" visible":""}`}>
+      <p className="evid-about-label">{label}</p>
+      <p className="evid-about-body">{body}</p>
+    </section>
+  );
+}
+
 function AboutPage(){
   const isMob=useIsMobile();
+  const sections=[
+    {
+      label:"Why it exists",
+      body:"Supplement advice is often a confident sentence built from a complicated paper. Evidstack gives you the missing context: what was studied, how large the reported effect was, and where the evidence is still thin. The aim is simple: help you make a more informed choice before you add something to a routine."
+    },
+    {
+      label:"How the scores work",
+      body:"Every profile keeps two questions separate. Efficacy measures the size of the effect seen in human studies. Evidence measures how solid the research base is. A compound can look promising in a small trial and still have a low evidence score. That distinction is why the database shows both numbers instead of one blended rating."
+    },
+    {
+      label:"Where the research comes from",
+      body:"We start with peer-reviewed studies and systematic reviews, then record the source trail when a citation is available. PubMed and MEDLINE provide the primary literature. Cochrane reviews help with higher-level evidence. Independent research summaries can add context, but they do not replace the underlying paper. No supplement brand pays for a better score."
+    },
+    {
+      label:"The catalogue",
+      body:`The database currently covers ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds, from familiar options such as creatine, magnesium and omega-3 to peptides, metabolic drugs, nootropics and performance compounds. Each profile brings the same questions together: studied doses, timing, possible interactions, safety notes, legal context and the limits of the evidence.`
+    },
+    {
+      label:"How to read the tiers",
+      body:"Fundamentals have the broadest research base. Advanced and Expert entries have useful human data with more uncertainty or fewer replications. Biohacking entries are included so you can find the research, even when the evidence is early or incomplete. A tier describes the state of the evidence. It is not a recommendation to take a compound."
+    },
+    {
+      label:"What Evidstack is not",
+      body:"Evidstack is an information service. It is not a clinic, pharmacy or prescriber. The database is for education and research, and it cannot account for your full medical history. Some entries are prescription medicines, controlled substances or research chemicals. Speak with a qualified clinician before changing a medication or supplement routine."
+    },
+  ];
   return(
-    <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"32px 16px 60px":"64px 48px 100px"}}>
-      <h2 style={{fontSize:isMob?28:44,fontWeight:900,lineHeight:1.05,letterSpacing:"-.05em",margin:"0 0 12px",color:C.ink}}>The supplement industry runs on marketing. Evidstack runs on data.</h2>
-      <p style={{fontSize:15,color:C.gray,lineHeight:1.9,margin:"0 0 48px",maxWidth:600}}>And then tells you what to actually do with it - with AI tools calibrated to your body, not a generic 70kg male from a clinical trial.</p>
-      <div style={{height:1,background:C.border,margin:"0 0 48px"}}/>
-      {[
-        {
-          label:"The problem",
-          body:"The supplement market is worth over $200 billion globally. The vast majority of that revenue is built on marketing claims that would not survive basic scientific scrutiny. Brands routinely cite studies funded by their own companies, cherry-pick favorable outcomes, and present weak correlational findings as established facts. Influencers promote products based on sponsorship deals, not evidence. The result is an ecosystem where the loudest voices are almost always the least reliable ones. Most people end up cycling through dozens of supplements based on hype, spending hundreds of dollars on compounds with marginal or no real effect, while ignoring the handful that are genuinely transformative. Evidstack was built to fix that information problem. Every compound in the database is rated on exactly two dimensions: how large the actual effect is in human studies, and how confident we are in the body of evidence behind it."
-        },
-        {
-          label:"How scoring works",
-          body:"Efficacy scores (1 to 5) measure the magnitude of the real-world effect observed in human trials. A score of 5 means a large, clinically meaningful effect. A score of 1 means the effect exists but is too small to matter in practice. Evidence scores (1 to 5) measure the quality and volume of research behind the claim. A score of 5 means multiple large-scale RCTs and meta-analyses with consistent results. A score of 1 means animal data or isolated case reports only. These two dimensions are independent by design. A compound can have a 5/5 efficacy score with a 2/5 evidence score, meaning the effect is large but poorly studied in humans. That distinction is critical for making informed decisions. All scores are sourced from peer-reviewed literature on PubMed, Cochrane systematic reviews, and cross-referenced with independent research summaries. No brand partnerships influence the ratings."
-        },
-        {
-          label:"The tier system",
-          body:"Tier 1 (Fundamentals) covers compounds with a broad research base, well-established safety profiles, and consistent replication across independent labs. Think creatine, magnesium, omega-3. Tier 2 (Advanced) includes compounds with solid clinical evidence across 10 or more trials, but slightly newer or less mature research pipelines. Tier 3 (Expert) covers compounds showing genuine promise in early human studies, with fewer replications or smaller sample sizes. Use with awareness of the limitations. Tier 4 (Biohacking) includes cutting-edge research compounds, peptides, and experimental agents with limited or no formal human clinical trial data. These are documented for completeness and research purposes only. The tier system is not a recommendation to use or avoid any compound. It is a map of where the evidence currently stands."
-        },
-        {
-          label:"What we cover",
-          body:`Evidstack covers ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds across the full spectrum of evidence-based supplementation: foundational supplements like vitamin D, zinc, and omega-3; advanced nootropics and cognitive enhancers including racetams, cholinergics, and dopaminergic agents; peptides spanning healing compounds like BPC-157 and TB-500, GH secretagogues like Ipamorelin and CJC-1295, and skin and longevity peptides like GHK-Cu and Epithalon; GLP-1 receptor agonists and metabolic compounds including semaglutide and tirzepatide; hair retention and facial aesthetic compounds including finasteride, dutasteride, minoxidil, GHK-Cu, collagen peptides, and compounds targeting facial fat distribution and bone density; SARMs and performance compounds with available human trial data; anti-aging interventions including rapamycin, metformin, and senolytic compounds; and adaptogenic and stress-response compounds. Each entry includes clinical dosing ranges, timing recommendations, known interactions, safety rating, legal status, and estimated monthly cost.`
-        },
-        {
-          label:"What others won't cover",
-          body:"Most supplement databases stop at vitamins, minerals, and mainstream nootropics. They avoid the compounds serious optimizers actually want data on, either for legal caution or to stay palatable to advertisers. Evidstack has no advertisers and no conflicts of interest, so we document the full spectrum: anabolic androgenic steroids (testosterone, nandrolone, oxandrolone, trenbolone, and 50+ others), the complete SARM landscape (RAD-140, LGD-4033, Ostarine, Andarine, YK-11, S-23), peptides including BPC-157, TB-500, Ipamorelin, CJC-1295, Epithalon, GHK-Cu, and growth hormone analogs, GLP-1 receptor agonists including semaglutide and tirzepatide, beta-agonists, aromatase inhibitors, and progestins relevant to endocrinology and performance. Every entry is treated with the same scientific rigor as creatine: efficacy score, evidence score, dosing, interactions, safety rating, and legal status. The goal is not to recommend these compounds but to ensure that people who encounter them have access to the same quality of information as they do for any other compound."
-        },
-        {
-          label:"What we are not",
-          body:"Evidstack is not a medical provider, a pharmacy, or a clinical service. Nothing on this platform constitutes medical advice, diagnosis, or treatment. The information is compiled for educational and research purposes only. Dosing ranges reflect what has been used in published clinical literature, not personalized recommendations for you specifically. Some compounds covered on this platform are prescription medications, controlled substances, or research chemicals. Their inclusion in the database does not constitute an endorsement of their use outside of appropriate medical or research contexts. Always consult a qualified healthcare provider before starting, stopping, or modifying any supplementation or medication protocol."
-        },
-      ].map(s=>(<div key={s.label} style={{marginBottom:44}}><p style={{fontSize:11,fontWeight:700,letterSpacing:".2em",color:C.gray,margin:"0 0 14px",textTransform:"uppercase"}}>{s.label}</p><p style={{fontSize:14,color:C.gray,lineHeight:1.95,margin:0,maxWidth:640}}>{s.body}</p></div>))}
-
-      {/* Founder note */}
-      <div style={{height:1,background:C.border,margin:"0 0 40px"}}/>
-      <div style={{display:"flex",gap:20,alignItems:"flex-start",maxWidth:600}}>
-        <div style={{width:44,height:44,background:C.ink,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-          <span style={{fontSize:14,fontWeight:900,color:C.white}}>M</span>
-        </div>
+    <main className="evid-about-page" style={{maxWidth:820,margin:"0 auto",padding:isMob?"32px 16px 60px":"64px 48px 100px"}}>
+      <div className="evid-about-hero">
+        <p className="evid-about-kicker">ABOUT EVIDSTACK</p>
+        <h2>Good decisions need more than a headline.</h2>
+        <p className="evid-about-lede">Evidstack is a research index for people who want to understand a supplement or compound before it becomes part of their stack.</p>
+      </div>
+      <div className="evid-about-rule"/>
+      {sections.map(section=><AboutSection key={section.label} {...section}/>)}
+      <div className="evid-about-rule evid-about-rule-last"/>
+      <div className="evid-about-founder">
+        <div className="evid-about-avatar" aria-hidden="true">M</div>
         <div>
-          <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 4px"}}>Marcus B.  -  Founder</p>
-          <p style={{fontSize:13,color:C.gray,lineHeight:1.9,margin:0}}>Obsessed with evidence-based optimization. Built Evidstack because I was tired of spending hours cross-referencing studies just to answer basic questions about my stack. The goal: make rigorous supplement science accessible to anyone who actually wants to optimize  -  not just be marketed to.</p>
+          <p className="evid-about-founder-name">Marcus B. <span>Founder</span></p>
+          <p className="evid-about-founder-copy">I built Evidstack after spending too much time jumping between papers, labels and conflicting advice. The product is meant to make that first research pass clearer, faster and easier to check.</p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -3200,6 +3250,9 @@ function AppInner(){
   const [search,setSearch]=useState("");
   const [showSuggest,setShowSuggest]=useState(false);
   const searchContainerRef=useRef(null);
+  const navSearchRef=useRef(null);
+  const [searchFocused,setSearchFocused]=useState(false);
+  const [navSearchOpen,setNavSearchOpen]=useState(false);
   const [selected,setSelected]=useState(null);
   const [sortBy,setSortBy]=useState("efficacy");
   const [filterTier,setFilterTier]=useState(0);
@@ -3217,7 +3270,11 @@ function AppInner(){
   const [phFade,setPhFade]=useState(true);
   // Close suggestions when clicking outside search container
   useEffect(()=>{
-    const handler=(e)=>{if(searchContainerRef.current&&!searchContainerRef.current.contains(e.target))setShowSuggest(false);};
+    const handler=(e)=>{
+      const inHero=searchContainerRef.current?.contains(e.target);
+      const inNav=navSearchRef.current?.contains(e.target);
+      if(!inHero&&!inNav)setShowSuggest(false);
+    };
     document.addEventListener("mousedown",handler);
     return()=>document.removeEventListener("mousedown",handler);
   },[]);
@@ -3233,7 +3290,7 @@ function AppInner(){
   const [showTools,setShowTools]=useState(false);
   const [showExitModal,setShowExitModal]=useState(false);
 
-  const navigateTo=(p)=>{navigate(p);setPage(p);setCompoundId(null);window.scrollTo({top:0,behavior:"instant"});};
+  const navigateTo=(p)=>{navigate(p);setPage(p);setCompoundId(null);setNavSearchOpen(false);setShowSuggest(false);window.scrollTo({top:0,behavior:"instant"});};
 
   useEffect(()=>{applyPageSeo(getPageSeo(window.location.pathname));},[page,compoundId,goalId,guideId,shareId]);
 
@@ -3337,6 +3394,43 @@ function AppInner(){
   ];
   const proPages=proTools.map(t=>t.id);
 
+  const scrollToResults=()=>{
+    if(page!=="supplements")navigateTo("supplements");
+    requestAnimationFrame(()=>document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"}));
+  };
+  const selectSearchResult=(value)=>{
+    setSearch(value);
+    setShowSuggest(false);
+    setSearchFocused(false);
+    setNavSearchOpen(false);
+    scrollToResults();
+  };
+  const runSearch=()=>{
+    setShowSuggest(false);
+    setNavSearchOpen(false);
+    scrollToResults();
+  };
+  const renderNavSearch=()=> (
+    <div ref={navSearchRef} className={`evid-nav-search${navSearchOpen?" is-open":""}`}>
+      {!navSearchOpen&&(
+        <button className="evid-nav-search-trigger" aria-label="Search supplements" onClick={()=>{setNavSearchOpen(true);setShowSuggest(search.length>0);}}>
+          <span className="evid-search-icon" aria-hidden="true"/>
+        </button>
+      )}
+      {navSearchOpen&&(
+        <div className="evid-nav-search-expanded">
+          <span className="evid-search-icon" aria-hidden="true"/>
+          <input autoFocus value={search} aria-label="Search supplements" placeholder="Search supplements..."
+            onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
+            onFocus={()=>setShowSuggest(search.length>0)}
+            onKeyDown={e=>{if(e.key==="Escape"){setNavSearchOpen(false);setShowSuggest(false);}if(e.key==="Enter")runSearch();}}/>
+          <button className="evid-nav-search-close" aria-label="Close search" onClick={()=>{setNavSearchOpen(false);setShowSuggest(false);}}>×</button>
+          {showSuggest&&<SearchSuggestions query={search} onSelect={selectSearchResult} compact/>}
+        </div>
+      )}
+    </div>
+  );
+
   return(
     <div className={page==="supplements"?"evid-homepage":undefined} style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} initialMode={authMode}/>}
@@ -3398,8 +3492,9 @@ function AppInner(){
           <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink,cursor:"pointer"}} onClick={()=>navigateTo("supplements")}>EVIDSTACK</span>
         </div>
         {compactNav?(
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            {user&&!isPro&&<button onClick={openUpgrade} style={{padding:"6px 12px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
+           <div style={{display:"flex",alignItems:"center",gap:8}}>
+             {renderNavSearch()}
+             {user&&!isPro&&<button onClick={openUpgrade} style={{padding:"6px 12px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
             {isPro&&<span style={{fontSize:9,fontWeight:800,color:C.gold,border:`1px solid ${C.gold}`,padding:"2px 6px"}}>PRO</span>}
             {!user&&<button onClick={()=>openAuth("login")} style={{padding:"6px 10px",background:"transparent",border:`1px solid ${C.border}`,color:C.ink,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Sign in</button>}
             {!user&&<button onClick={()=>{openAuth("signup");}} style={{padding:"6px 10px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Free account</button>}
@@ -3449,9 +3544,10 @@ function AppInner(){
                     </button>
                   ))}
                 </div>
-              )}
-            </div>
-            <div style={{width:1,height:24,background:C.border,margin:"0 10px"}}/>
+               )}
+             </div>
+             {renderNavSearch()}
+             <div style={{width:1,height:24,background:C.border,margin:"0 10px"}}/>
             {user?(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
                 {isPro&&<span className="evid-pulse-pro" style={{fontSize:10,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px"}}>PRO</span>}
@@ -3492,7 +3588,7 @@ function AppInner(){
 
       {page==="supplements"&&<>
         <section className="evid-home-hero" aria-labelledby="evid-home-title">
-          <div className="evid-hero-art" aria-hidden="true"><div className="evid-orbit orbit-one"/><div className="evid-orbit orbit-two"/><div className="evid-orbit orbit-three"/><span className="orbit-point point-one"/><span className="orbit-point point-two"/><div className="evid-hero-grid"/></div>
+          <div className="evid-hero-art" aria-hidden="true"/>
           <div className="evid-hero-content">
           <p className="evid-hero-kicker">SUPPLEMENTS. COMPOUNDS. CONTEXT.</p>
           <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>
@@ -3500,77 +3596,19 @@ function AppInner(){
           <p className="evid-hero-support">Explore {SUPPLEMENTS.length} compound profiles, from everyday supplements to specialist compounds. Pro adds the full catalogue, stack analysis and research tools.</p>
           <div className="evid-hero-actions"><button onClick={()=>{document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Find a compound <span aria-hidden="true">↓</span></button><button onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
           <p className="evid-hero-access">Start with a free preview. Go deeper with Pro.</p>
-          <div ref={searchContainerRef} style={{maxWidth:680,margin:"0 auto 20px",position:"relative"}}>
-            <div style={{display:"flex",boxShadow:"0 2px 16px rgba(0,0,0,.08)",position:"relative"}}>
+          <div ref={searchContainerRef} className={`evid-hero-search${searchFocused||search?" is-expanded":""}`}>
+            <div className="evid-hero-search-row">
               {!search&&<span className="evid-search-example" aria-hidden="true" style={{opacity:phFade?1:0}}>{PLACEHOLDERS[phIdx]}</span>}
               <input id="evidstack-search" value={search}
                 onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
-                onFocus={()=>{if(search.length>0)setShowSuggest(true);}}
-                onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter"){setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}}
+                onFocus={()=>{setSearchFocused(true);if(search.length>0)setShowSuggest(true);}}
+                onBlur={()=>window.setTimeout(()=>setSearchFocused(false),140)}
+                onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter")runSearch();}}
                 aria-label="Search compounds" placeholder=""
-                style={{flex:1,padding:isMobile?"13px 14px":"16px 20px",border:`1px solid ${C.border}`,borderRight:"none",background:C.white,fontSize:isMobile?13:14,fontFamily:"Montserrat,sans-serif",outline:"none",color:C.ink,minWidth:0}}/>
-              <button onClick={()=>{setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}} style={{padding:isMobile?"13px 16px":"16px 24px",background:C.ink,color:C.white,border:"none",fontSize:isMobile?12:13,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Search →</button>
+                />
+              <button onClick={runSearch}>Search <span aria-hidden="true">→</span></button>
             </div>
-            {/* Autocomplete dropdown */}
-            {showSuggest&&search.trim().length>0&&(()=>{
-              const q=search.toLowerCase();
-              // Goal-level semantic suggestions
-              const goalHits=GOALS.filter(g=>g.id!=="all"&&(g.label.toLowerCase().replace(" / ","").replace(/ /g,"").includes(q)||g.id.includes(q))).slice(0,3);
-              // Compound name suggestions: prefix first, then includes
-              const prefixHits=SUPPLEMENTS.filter(s=>s.name.toLowerCase().startsWith(q)).slice(0,6);
-              const includeHits=SUPPLEMENTS.filter(s=>!s.name.toLowerCase().startsWith(q)&&(s.name.toLowerCase().includes(q)||(s.aliases||[]).some(a=>a.toLowerCase().includes(q)))).slice(0,4);
-              const compoundHits=[...prefixHits,...includeHits].slice(0,8);
-              if(!goalHits.length&&!compoundHits.length)return null;
-              return(
-                <div style={{position:"absolute",top:"100%",left:0,right:0,background:C.white,border:`1px solid ${C.border}`,boxShadow:"0 8px 24px rgba(0,0,0,.12)",zIndex:50,maxHeight:360,overflowY:"auto",marginTop:2}}>
-                  {goalHits.length>0&&(
-                    <div>
-                      <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:0,padding:"8px 16px 4px",textTransform:"uppercase",background:C.bg,borderBottom:`1px solid ${C.border}`}}>Filter by goal</p>
-                      {goalHits.map(g=>(
-                        <div key={g.id} onMouseDown={()=>{setSearch(g.label);setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}
-                          style={{padding:"10px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,borderBottom:`1px solid ${C.border}`}}
-                          onMouseEnter={e=>e.currentTarget.style.background=C.bg}
-                          onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                          <span style={{fontSize:16}}>{g.icon}</span>
-                          <div>
-                            <p style={{fontSize:13,fontWeight:700,color:C.ink,margin:0}}>{g.label}</p>
-                            <p style={{fontSize:10,color:C.gray,margin:0}}>Show all compounds for this goal</p>
-                          </div>
-                          <span style={{marginLeft:"auto",fontSize:9,fontWeight:700,color:C.gold,letterSpacing:".08em",background:`${C.gold}18`,padding:"2px 7px"}}>GOAL</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {compoundHits.length>0&&(
-                    <div>
-                      {(goalHits.length>0||true)&&<p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:0,padding:"8px 16px 4px",textTransform:"uppercase",background:C.bg,borderBottom:`1px solid ${C.border}`}}>Compounds</p>}
-                      {compoundHits.map(s=>{
-                        const tierColor=["","#16a34a","#2563eb","#7c3aed","#d97706"][s.tier]||C.gray;
-                        const tierLabel=["","T1","T2","T3","T4"][s.tier]||"";
-                        const bestEff=s.effects.length?Math.max(...s.effects.map(e=>e.efficacy)):0;
-                        return(
-                          <div key={s.id} onMouseDown={()=>{setSearch(s.name);setShowSuggest(false);document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"});}}
-                            style={{padding:"10px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:12,borderBottom:`1px solid ${C.border}`}}
-                            onMouseEnter={e=>e.currentTarget.style.background=C.bg}
-                            onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                            <span style={{fontSize:10,fontWeight:800,color:tierColor,border:`1px solid ${tierColor}`,padding:"2px 6px",flexShrink:0,minWidth:24,textAlign:"center"}}>{tierLabel}</span>
-                            <div style={{flex:1,minWidth:0}}>
-                              <p style={{fontSize:13,fontWeight:700,color:C.ink,margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.name}</p>
-                              {s.aliases&&s.aliases[0]&&<p style={{fontSize:10,color:C.gray,margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.aliases[0]}</p>}
-                            </div>
-                            <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
-                              <div style={{width:32,height:4,background:C.border,borderRadius:2,overflow:"hidden"}}>
-                                <div style={{width:`${(bestEff/5)*100}%`,height:"100%",background:tierColor,borderRadius:2}}/>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
+            {showSuggest&&!navSearchOpen&&<SearchSuggestions query={search} onSelect={selectSearchResult}/>} 
           </div>
           <div className="evid-access-strip"><span><strong>Free</strong> A first look at the fundamentals</span><span><strong>Pro</strong> Full catalogue + research tools</span><button onClick={openUpgrade}>$9.99 / month ↗</button></div>
           </div>
@@ -6210,3 +6248,4 @@ function PricingPage({onUpgrade,onAuth}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
+

@@ -40,46 +40,6 @@ function useCountUp(target,duration,started){
   return count;
 }
 
-function useWheelMomentum(){
-  useEffect(()=>{
-    if(typeof window==="undefined")return;
-    const reduced=window.matchMedia("(prefers-reduced-motion: reduce)");
-    const coarse=window.matchMedia("(pointer: coarse)");
-    if(reduced.matches||coarse.matches)return;
-    let current=window.scrollY;
-    let target=current;
-    let frame=0;
-    const clamp=(value)=>Math.max(0,Math.min(value,document.documentElement.scrollHeight-window.innerHeight));
-    const step=()=>{
-      current+=(target-current)*0.17;
-      window.scrollTo(0,current);
-      if(Math.abs(target-current)>0.35){
-        frame=requestAnimationFrame(step);
-      }else{
-        current=target;
-        window.scrollTo(0,current);
-        frame=0;
-      }
-    };
-    const onWheel=(event)=>{
-      const element=event.target instanceof Element?event.target:null;
-      if(event.ctrlKey||event.shiftKey||Math.abs(event.deltaX)>Math.abs(event.deltaY)||element?.closest("input,textarea,select,button,[role=dialog],.evid-horizontal-scroll"))return;
-      event.preventDefault();
-      target=clamp(target+event.deltaY*1.05);
-      if(!frame)frame=requestAnimationFrame(step);
-    };
-    const onScroll=()=>{
-      if(!frame){current=window.scrollY;target=current;}
-    };
-    window.addEventListener("wheel",onWheel,{passive:false});
-    window.addEventListener("scroll",onScroll,{passive:true});
-    return()=>{
-      window.removeEventListener("wheel",onWheel);
-      window.removeEventListener("scroll",onScroll);
-      if(frame)cancelAnimationFrame(frame);
-    };
-  },[]);
-}
 
 const ROUTES = {
   "/":"supplements",
@@ -2624,41 +2584,6 @@ function AboutSection({label,body}){
   );
 }
 
-function AboutEvidenceChart(){
-  const [ref,visible]=useScrollReveal(0.2);
-  return(
-    <section ref={ref} className={`evid-about-chart evid-reveal${visible?" visible":""}`} aria-labelledby="evid-about-chart-title">
-      <div className="evid-about-chart-copy">
-        <p className="evid-about-label">THE MODEL</p>
-        <h3 id="evid-about-chart-title">Two signals. One clearer decision.</h3>
-        <p>Every profile keeps the size of an effect separate from the confidence behind it. This illustrative view shows why a promising result can still need more research.</p>
-      </div>
-      <div className="evid-about-chart-visual">
-        <svg viewBox="0 0 420 220" role="img" aria-label="Illustrative chart comparing efficacy signal and evidence strength">
-          <defs>
-            <linearGradient id="evid-chart-fill" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stopColor="#e2c97e" stopOpacity=".28"/>
-              <stop offset="1" stopColor="#e2c97e" stopOpacity="0"/>
-            </linearGradient>
-          </defs>
-          <g className="evid-chart-grid" aria-hidden="true">
-            <path d="M26 24H400M26 68H400M26 112H400M26 156H400M26 200H400"/>
-            <path d="M26 24V200M120 24V200M214 24V200M308 24V200M400 24V200"/>
-          </g>
-          <path className="evid-chart-area" d="M26 181C78 173 94 155 120 160C153 166 166 119 214 124C253 128 265 84 308 92C349 100 365 58 400 46V200H26Z"/>
-          <path className="evid-chart-line evid-chart-line-efficacy" d="M26 181C78 173 94 155 120 160C153 166 166 119 214 124C253 128 265 84 308 92C349 100 365 58 400 46"/>
-          <path className="evid-chart-line evid-chart-line-evidence" d="M26 190C78 186 99 181 120 176C153 168 178 157 214 151C255 144 270 128 308 119C348 109 372 93 400 82"/>
-          <g className="evid-chart-dots" aria-hidden="true">
-            <circle cx="120" cy="160" r="4"/><circle cx="214" cy="124" r="4"/><circle cx="308" cy="92" r="4"/><circle cx="400" cy="46" r="4"/>
-          </g>
-          <text x="26" y="216">Early signal</text><text x="327" y="216">More context</text>
-        </svg>
-        <div className="evid-about-chart-legend"><span><i className="evid-legend-efficacy"/>Efficacy signal</span><span><i className="evid-legend-evidence"/>Evidence strength</span></div>
-      </div>
-    </section>
-  );
-}
-
 function AboutPage(){
   const isMob=useIsMobile();
   const sections=[
@@ -2695,7 +2620,6 @@ function AboutPage(){
         <p className="evid-about-lede">Evidstack is a research index for people who want to understand a supplement or compound before it becomes part of their stack.</p>
       </div>
       <div className="evid-about-rule"/>
-      <AboutEvidenceChart/>
       {sections.map(section=><AboutSection key={section.label} {...section}/>)}
       <div className="evid-about-rule evid-about-rule-last"/>
       <div className="evid-about-founder">
@@ -3297,7 +3221,6 @@ function SharedStackPage({shareId}){
 
 function AppInner(){
   const {user,isPro,loading,logout}=useAuth();
-  useWheelMomentum();
   // Inject global animation CSS once
   useEffect(()=>{
     if(document.getElementById("evid-anim-css"))return;

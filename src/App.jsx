@@ -110,9 +110,9 @@ const C = {
 
 const T = {
   nav: { supplements:"Supplements", protocols:"Protocols", about:"About" },
-  controls: { search:"Search a supplement...", sortEfficacy:"Efficacy", sortEvidence:"Evidence", sortTier:"Tier", tierAll:"All Tiers", tiers:["Fundamentals","Advanced","Expert","Biohacking"], result:(n)=>`${n} result${n!==1?"s":""}`, goals:["All","Sleep","Focus","Memory","Mood","Strength","Recovery","Energy","Testosterone","Stress","Longevity","Aesthetics","Cardio","Fat Loss","Hair","Liver / Detox","Body Recomp","Eye Health"] },
+  controls: { search:"Search a supplement...", sortEfficacy:"Efficacy", sortEvidence:"Evidence", sortTier:"Tier", tierAll:"All Tiers", tiers:["Fundamentals","Advanced","Expert","Biohacking"], result:(n)=>`${n} result${n!==1?"s":""}`, goals:["All","Sleep","Focus","Memory","Mood","Strength","Recovery","Endurance","Energy","Testosterone","Stress","Longevity","Skin / Hair","Cardio","Weight Loss","Hair","Liver / Detox","Body Recomp","Eye Health"] },
   card: { dosage:"Dosage", interactions:"Interactions", noInteractions:"None known", negative:"NEGATIVE", efficacy:"Efficacy", evidence:"Evidence", avgEfficacy:"Avg. efficacy", avgEvidence:"Avg. evidence", safety:["","RISKY","CAUTION","CAUTION","SAFE","VERY SAFE"], studies:(n,tp)=>`${n} studies / ${tp}` },
-  footer:"Data sourced from PubMed meta-analyses and Cochrane reviews. For informational purposes only. Consult a healthcare professional before supplementing.",
+  footer:"Evidence summaries link to PubMed or review sources when available; some entries remain under scientific review. For informational purposes only. Consult a healthcare professional before supplementing.",
   noResults:"No results",
 };
 
@@ -217,7 +217,7 @@ function SourceProofSection(){
             <p className="evid-source-kicker">THE PROOF IS IN THE SOURCE</p>
             <h2 id="evid-source-title">Research you can trace.</h2>
           </div>
-          <p className="evid-source-intro">Evidstack turns published research into clear compound summaries. We keep effect size and evidence quality separate, and show the source trail on profiles when a citation is available.</p>
+          <p className="evid-source-intro">Evidstack turns published research into clear compound summaries. We keep effect size and evidence quality separate, show the source trail when a reference is attached, and mark uncited entries for review.</p>
         </div>
         <div className="evid-source-grid">
           {cards.map(card=>(
@@ -230,7 +230,7 @@ function SourceProofSection(){
           ))}
         </div>
         <div className="evid-source-proof-footer">
-          <span><strong>{EVIDENCE_SOURCE_STATS.sourcedEffects}+</strong> evidence summaries with cited references</span>
+          <span><strong>{EVIDENCE_SOURCE_STATS.sourcedEffects}+</strong> evidence summaries with attached references</span>
           <span>Scores are editorial research context, not medical advice</span>
         </div>
       </div>
@@ -865,7 +865,7 @@ function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade,onCo
   const effects=activeGoal==="all"?supp.effects:supp.effects.filter(e=>e.goal===activeGoal);
   if(!effects.length)return null;
   const tc=tierColor(supp.tier);
-  const avgEff=Math.round(effects.reduce((s,e)=>s+Math.abs(e.efficacy),0)/effects.length);
+  const avgEff=Math.round(effects.reduce((s,e)=>s+e.efficacy,0)/effects.length);
   const avgEv=Math.round(effects.reduce((s,e)=>s+e.evidence,0)/effects.length);
   return(
     <div
@@ -2016,7 +2016,7 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
                       <div style={{display:"flex",alignItems:"center",gap:10}}>
                         <span style={{fontSize:18}}>{goal?.icon||"•"}</span>
                         <span style={{fontSize:14,fontWeight:900,color:C.ink,textTransform:"capitalize"}}>{e.goal}</span>
-                        <span style={{fontSize:9,fontWeight:700,color:C.gray,background:C.bg,border:`1px solid ${C.border}`,padding:"2px 8px",letterSpacing:".06em"}}>{e.type}</span>
+                        <span style={{fontSize:9,fontWeight:700,color:C.gray,background:C.bg,border:`1px solid ${C.border}`,padding:"2px 8px",letterSpacing:".06em"}}>{e.type||e.study_type||"Source type not recorded"}</span>
                       </div>
                       <div style={{display:"flex",gap:12}}>
                         {[["Efficacy",e.efficacy],["Evidence",e.evidence]].map(([label,val])=>(
@@ -2027,12 +2027,13 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
                         ))}
                         <div style={{textAlign:"center"}}>
                           <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 2px",textTransform:"uppercase"}}>Studies</p>
-                          <p style={{fontSize:18,fontWeight:900,color:C.ink,margin:0}}>{e.studies||"?"}</p>
+                          <p style={{fontSize:18,fontWeight:900,color:C.ink,margin:0}}>{e.studies??e.study_count??"?"}</p>
                         </div>
                       </div>
                     </div>
                     {e.efficacy<0&&<p style={{fontSize:11,fontWeight:800,color:C.red,margin:"0 0 8px"}}>WARNING: Negative effect on this goal</p>}
                     <p style={{fontSize:13,color:C.gray,lineHeight:1.8,margin:"0 0 8px"}}>{e.summary}</p>
+                    {(!e.sources||e.sources.length===0)&&<p style={{fontSize:11,fontWeight:700,color:C.amber,margin:"0 0 8px"}}>No source attached — treat this effect as unestablished until it is reviewed.</p>}
                     {e.sources&&e.sources.length>0&&(
                       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:8}}>
                         {e.sources.map(src=>(
@@ -2110,7 +2111,8 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
                 const goal=GOALS.find(g=>g.id===e.goal);
                 const eff=Math.abs(e.efficacy);
                 const ev=e.evidence;
-                const rowColor=eff>=4?C.green:eff>=3?C.blue:eff>=2?C.amber:C.red;
+                const isNegative=e.efficacy<0;
+                const rowColor=isNegative?C.red:eff>=4?C.green:eff>=3?C.blue:eff>=2?C.amber:C.red;
                 return(
                   <div key={i}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6,gap:8,flexWrap:"wrap"}}>
@@ -2119,8 +2121,8 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
                         <span style={{fontSize:12,fontWeight:700,color:C.ink,textTransform:"capitalize"}}>{e.goal}</span>
                       </div>
                       <div style={{display:"flex",gap:16,alignItems:"center"}}>
-                        <span style={{fontSize:10,color:C.gray,fontWeight:600}}>{e.studies} {e.type?.split(" ")[0]||"studies"}</span>
-                        <span style={{fontSize:11,fontWeight:900,color:rowColor}}>{eff}/5</span>
+                        <span style={{fontSize:10,color:C.gray,fontWeight:600}}>{e.studies??e.study_count??"?"} {(e.type||e.study_type||"studies").split(" ")[0]}</span>
+                        <span style={{fontSize:11,fontWeight:900,color:rowColor}}>{isNegative?"-":""}{eff}/5</span>
                       </div>
                     </div>
                     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
@@ -2151,7 +2153,7 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
                 ["Tier",`${supp.tier} / ${TIERS[supp.tier]?.label||""}`,tc],
                 ["Safety",safetyLabel,safetyColor],
                 ["Goals covered",`${supp.effects.length} goal${supp.effects.length>1?"s":""}`,C.blue],
-                ["Avg Efficacy",`${(supp.effects.reduce((s,e)=>s+Math.abs(e.efficacy),0)/supp.effects.length).toFixed(1)}/5`,C.green],
+                ["Avg Efficacy",`${(supp.effects.reduce((s,e)=>s+e.efficacy,0)/supp.effects.length).toFixed(1)}/5`,C.green],
               ].map(([label,val,color])=>(
                 <div key={label} style={{padding:"14px 14px",background:C.bg,textAlign:"center"}}>
                   <p style={{fontSize:9,fontWeight:700,color:C.gray,letterSpacing:".1em",margin:"0 0 4px",textTransform:"uppercase"}}>{label}</p>
@@ -2176,7 +2178,7 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
                 <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:10}}>
                   {related.map(r=>{
                     const tc2=tierColor(r.tier);
-                    const avgEff2=(r.effects.reduce((s,e)=>s+Math.abs(e.efficacy),0)/r.effects.length).toFixed(1);
+                    const avgEff2=(r.effects.reduce((s,e)=>s+e.efficacy,0)/r.effects.length).toFixed(1);
                     return(
                       <div key={r.id}
                         onClick={()=>{window.history.pushState({},"","/compound/"+r.id);window.dispatchEvent(new PopStateEvent("popstate"));}}
@@ -2209,7 +2211,7 @@ function CompareModal({compA,compB,onClose}){
   const efColor=(v)=>v<0?C.red:v>=4?C.green:v===3?C.blue:v===2?C.amber:C.gray;
   const avgStat=(s,key)=>{
     if(!s.effects.length)return 0;
-    return(s.effects.reduce((sum,e)=>sum+(key==="efficacy"?Math.abs(e.efficacy):e.evidence),0)/s.effects.length).toFixed(1);
+    return(s.effects.reduce((sum,e)=>sum+(key==="efficacy"?e.efficacy:e.evidence),0)/s.effects.length).toFixed(1);
   };
   const safetyLabel=["","RISKY","CAUTION","CAUTION","SAFE","VERY SAFE"];
   const safetyColor=["",C.red,C.amber,C.amber,C.green,C.green];
@@ -3363,7 +3365,7 @@ function AppInner(){
       const score=(s,k)=>{
         const ef=goal==="all"?s.effects:s.effects.filter(e=>e.goal===goal);
         if(!ef.length)return 0;
-        const raw=ef.reduce((sum,e)=>sum+(k==="efficacy"?Math.abs(e.efficacy):e.evidence),0)/ef.length;
+        const raw=ef.reduce((sum,e)=>sum+(k==="efficacy"?e.efficacy:e.evidence),0)/ef.length;
         const safetyPenalty=s.safety<=1?-3:0;
         const evidencePenalty=ef.every(e=>e.evidence<=1)?-2:0;
         return raw+safetyPenalty+evidencePenalty;

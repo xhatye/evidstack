@@ -2423,6 +2423,7 @@ const GOAL_OPTIONS=[
 
 function StackBuilder({onUpgrade}){
   const {isPro,user:sbUser,userProfile}=useAuth();
+  const {stackIds}=useMyStack();
   const user=sbUser; // alias for share button
   const isMob=useIsMobile();
   const [goals,setGoals]=useState([]);
@@ -2435,6 +2436,14 @@ function StackBuilder({onUpgrade}){
   const [savedStacks,setSavedStacks]=useState(()=>{try{return JSON.parse(localStorage.getItem("evidstack_stacks_sb")||"[]");}catch(e){return[];}});
   const [showSaved,setShowSaved]=useState(false);
   const [saveMsg,setSaveMsg]=useState("");
+  const savedStackNames=useMemo(()=>stackIds.map(id=>SUPPLEMENTS.find(s=>s.id===id)?.name).filter(Boolean),[stackIds]);
+
+  const loadSavedStack=()=>{
+    if(!savedStackNames.length){setError("Save a compound in My Stack first.");return;}
+    setExisting(savedStackNames.join(", "));
+    setError("");
+    trackEvent("pro_tool_prefill",{tool:"stack_builder",count:savedStackNames.length});
+  };
 
   const saveStack=()=>{
     if(!result)return;
@@ -2538,7 +2547,10 @@ function StackBuilder({onUpgrade}){
       </div>
 
       <div style={{marginBottom:32}}>
-        <p style={{fontSize:11,fontWeight:800,color:C.ink,letterSpacing:".1em",textTransform:"uppercase",margin:"0 0 14px"}}>3. Already taking <span style={{color:C.gray,fontWeight:400,textTransform:"none",letterSpacing:0}}>(optional)</span></p>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap",marginBottom:14}}>
+          <p style={{fontSize:11,fontWeight:800,color:C.ink,letterSpacing:".1em",textTransform:"uppercase",margin:0}}>3. Already taking <span style={{color:C.gray,fontWeight:400,textTransform:"none",letterSpacing:0}}>(optional)</span></p>
+          {savedStackNames.length>0&&<button onClick={loadSavedStack} style={{padding:"6px 11px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:10,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Use My Stack</button>}
+        </div>
         <input value={existing} onChange={e=>setExisting(e.target.value)} placeholder="e.g. Creatine, Vitamin D, Omega-3..."
           style={{width:"100%",maxWidth:500,padding:"11px 16px",border:`1px solid ${C.border}`,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",background:C.white,boxSizing:"border-box"}}/>
       </div>

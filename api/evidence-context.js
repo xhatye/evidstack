@@ -41,6 +41,49 @@ export function contextForCompounds(compounds) {
     .map(compactSupplement);
 }
 
+const GOAL_ALIASES = {
+  strength: "force",
+  muscle: "force",
+  testosterone: "hormones",
+  anxiety: "stress",
+  cognition: "focus",
+  "weight loss": "weight",
+};
+
+function goalKey(value) {
+  const normalized = String(value || "").toLowerCase().trim();
+  return GOAL_ALIASES[normalized] || normalized.replace(/[^a-z0-9]+/g, "-");
+}
+
+export function contextForGoals(goals) {
+  const raw = (goals || []).map(value => String(value || "").toLowerCase()).join(" | ");
+  const knownGoals = [...new Set(SUPPLEMENTS.flatMap(s => (s.effects || []).map(effect => goalKey(effect.goal))))];
+  const query = knownGoals.filter(goal => raw.includes(goal.replace(/-/g, " ")));
+  query.push(...Object.keys(GOAL_ALIASES).filter(alias => raw.includes(alias)).map(alias => GOAL_ALIASES[alias]));
+  for (const value of goals || []) {
+    const key = goalKey(value);
+    if (key && SUPPLEMENTS.some(s => (s.effects || []).some(effect => goalKey(effect.goal) === key))) query.push(key);
+  }
+  const wanted = [...new Set(query)].filter(Boolean);
+  if (!wanted.length) return [];
+  return SUPPLEMENTS.filter(s => (s.effects || []).some(effect => wanted.includes(goalKey(effect.goal))))
+    .sort((a, b) => {
+      const score = supplement => (supplement.effects || [])
+        .filter(effect => wanted.includes(goalKey(effect.goal)))
+        .reduce((sum, effect) => sum + Number(effect.evidence || 0) + Number(effect.efficacy || 0), 0);
+      return score(b) - score(a);
+    })
+    .slice(0, 40)
+    .map(compactSupplement);
+}
+
+export function contextForQuery(query) {
+  const direct = contextForCompounds([query]);
+  const goals = contextForGoals([query]);
+  const merged = new Map([...direct, ...goals].map(entry => [entry.name, entry]));
+  return [...merged.values()].slice(0, 40);
+}
+
 export function contextBlock(entries) {
   if (!entries.length) return "No matching entry was found in the verified Evidstack database.";
   return JSON.stringify(entries).slice(0, 16000);

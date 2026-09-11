@@ -16,12 +16,12 @@
 .body-atlas-canvas-wrap{min-height:0;position:sticky;top:84px;background:#f8f8f2;border-color:#cbd2c7;box-shadow:0 18px 45px #283c3010}
 .body-atlas-canvas{flex:none;min-height:0;height:clamp(440px,68vh,660px);margin-top:16px;background:linear-gradient(#81948109 1px,transparent 1px),linear-gradient(90deg,#81948109 1px,transparent 1px),radial-gradient(ellipse,#edf1e5,#f8f8f2 70%);background-size:28px 28px,28px 28px,auto;border:1px solid #80978220;border-radius:4px}
 .body-atlas-svg{width:100%;height:100%;max-width:410px;overflow:hidden}
-.atlas-rendered-model{pointer-events:none}.atlas-rendered-model image{filter:drop-shadow(0 12px 14px rgba(45,62,45,.16))}.atlas-legacy-body,.atlas-anatomy-lines,.atlas-coordinate-lines,.atlas-coordinate-labels{display:none}
+.atlas-rendered-model{pointer-events:none}.atlas-rendered-model image{mix-blend-mode:multiply;filter:drop-shadow(0 12px 14px rgba(45,62,45,.16))}.atlas-legacy-body,.atlas-anatomy-lines,.atlas-coordinate-lines,.atlas-coordinate-labels{display:none}
 .body-atlas-canvas-back .body-atlas-svg{filter:none;transform:none}
 .atlas-coordinate-lines{fill:none;stroke:#8f9d882b;stroke-width:.7;stroke-dasharray:3 7;pointer-events:none}
 .atlas-coordinate-labels{font:8px monospace;letter-spacing:1px;fill:#667a68;pointer-events:none}
 .atlas-anatomy-lines{fill:none;stroke:#6f8477;stroke-width:.85;opacity:.55;stroke-linecap:round;pointer-events:none}
-.body-atlas-hotspot{fill:#55796714;stroke:#607f6d70;stroke-width:1;transition:fill 120ms ease,stroke 120ms ease;cursor:pointer;pointer-events:all}
+.body-atlas-hotspot{fill:transparent;stroke:transparent;stroke-width:1;transition:fill 120ms ease,stroke 120ms ease;cursor:pointer;pointer-events:all}
 .body-atlas-hotspot:hover,.body-atlas-hotspot:focus,.body-atlas-hotspot.is-hovered{fill:#53b69860;stroke:#267960;filter:drop-shadow(0 0 5px #4eae9260);outline:none}
 .body-atlas-hotspot.is-selected{fill:#ddbe6290;stroke:#8b6e24;filter:drop-shadow(0 0 5px #ddbe6260);animation:none}
 .body-atlas-hotspot:focus-visible{stroke:#143c32;stroke-width:2.5}

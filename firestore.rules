@@ -5,7 +5,10 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow create: if request.auth != null && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['email', 'createdAt', 'isPro', 'profile', 'myStack', 'myStackUpdatedAt', 'tracker', 'trackerUpdatedAt'])
-        && request.resource.data.isPro == false;
+        && request.resource.data.isPro == false
+        && (!request.resource.data.keys().hasAny(['myStack']) || request.resource.data.myStack is list)
+        && (!request.resource.data.keys().hasAny(['myStack']) || request.resource.data.myStack.size() <= 20)
+        && (!request.resource.data.keys().hasAny(['tracker']) || request.resource.data.tracker is map);
       allow update: if request.auth != null && request.auth.uid == uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['profile', 'myStack', 'myStackUpdatedAt', 'tracker', 'trackerUpdatedAt'])
         && (!request.resource.data.keys().hasAny(['myStack']) || request.resource.data.myStack is list)

@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { SUPPLEMENTS } from "./data.js";
 import { trackEvent } from "./analytics.js";
 import "./body-atlas.css";
@@ -90,66 +90,69 @@ function ModelChoice({ onChoose }) {
   );
 }
 
-function BodySilhouette({ model, view = "front", selectedId, hoveredId, onHover, onSelect, decorative = false }) {
-  const uid = useId().replace(/:/g, "");
-  const female = model === "female";
-  const back = view === "back";
-  const torso = female
-    ? "M165 112 C163 128 147 132 132 137 Q118 144 121 165 C124 188 140 209 143 231 Q146 252 132 280 C121 304 125 329 142 348 Q161 360 180 344 Q199 360 218 348 C235 329 239 304 228 280 Q214 252 217 231 C220 209 236 188 239 165 Q242 144 228 137 C213 132 197 128 195 112 Z"
-    : "M164 112 C162 130 145 133 124 137 Q105 143 112 174 C120 204 133 223 139 250 Q142 268 135 290 Q128 314 140 340 Q156 356 180 342 Q204 356 220 340 Q232 314 225 290 Q218 268 221 250 C227 223 240 204 248 174 Q255 143 236 137 C215 133 198 130 196 112 Z";
-  const arm = female
-    ? "M131 139 Q111 135 104 157 C96 182 92 207 84 229 Q76 244 75 260 L59 314 Q52 328 54 338 L53 356 Q55 363 58 354 L62 341 L61 363 Q63 368 66 360 L70 342 L70 360 Q74 364 76 353 L80 335 Q85 333 87 323 L88 310 Q102 284 105 260 Q103 247 110 232 Q121 205 128 183 Z"
-    : "M121 140 Q101 134 94 158 Q83 184 85 205 L77 231 Q69 249 72 263 L56 315 Q50 326 51 339 L50 355 Q52 364 56 354 L60 340 L59 362 Q62 368 65 359 L69 342 L70 361 Q74 364 76 353 L80 334 Q86 333 87 322 L88 309 Q104 282 104 260 Q101 246 109 230 Q122 209 125 183 Z";
-  const leg = female
-    ? "M136 310 Q124 337 134 376 L146 443 Q141 468 145 487 Q149 522 153 552 L153 604 Q151 617 143 626 Q138 634 145 638 L166 638 Q177 636 173 626 L168 608 L172 550 Q181 512 174 484 L169 458 Q176 407 180 353 L174 321 Z"
-    : "M138 309 Q126 340 134 375 L143 442 Q138 461 142 483 Q140 510 151 548 L153 604 Q151 617 142 625 Q137 634 144 638 L166 638 Q177 636 173 626 L168 607 L172 550 Q185 511 176 484 L169 456 Q181 402 180 350 L173 320 Z";
+// Coordinates are measured against each original 1024 × 1536 asset.
+// Image and hit areas share this viewBox, so resizing cannot separate them.
+const ATLAS_GEOMETRY = {
+  'male-front': {
+    arms: ['M335 335 Q315 370 310 428 L286 504 L327 523 Q354 475 366 421 Q374 361 355 338Z', 'M281 549 Q258 580 247 625 L223 683 L248 697 Q279 647 296 615 L318 559Z', 'M675 335 Q698 374 705 433 L725 505 L684 522 Q663 476 649 423 Q638 368 654 340Z', 'M697 551 L725 541 Q753 584 767 633 L785 685 L765 697 Q736 654 718 618Z'],
+    legs: ['M375 810 Q367 862 384 918 L393 971 L441 970 Q459 914 469 821Z','M539 822 Q550 909 575 970 L621 970 Q644 894 632 812Z','M371 1080 Q353 1123 367 1190 L376 1260 L394 1258 Q407 1205 414 1155 L409 1084Z','M600 1081 Q589 1132 608 1200 L624 1259 L643 1258 Q651 1196 644 1147 L628 1080Z'],
+    joints: [[306,529],[710,529],[412,1018],[607,1018],[374,1301],[632,1301]],
+    head:[508,83,56,37], eyes:[[476,123],[535,123]], neck:269, chest:373, abdomen:572, pelvis:737, skin:[196,771]
+  },
+  'female-front': {
+    arms:['M354 331 Q337 351 335 401 L324 468 L311 514 L343 528 Q362 477 371 432 L379 372Z','M299 564 Q277 597 262 646 L237 697 L258 703 Q291 660 313 617 L329 570Z','M647 332 Q669 357 670 401 L685 476 L699 514 L668 528 Q648 482 638 430 L628 375Z','M686 565 L710 558 Q734 599 752 647 L772 698 L752 705 Q722 666 701 621Z'],
+    legs:['M374 810 Q369 882 389 949 L400 1001 L455 1000 Q475 916 477 816Z','M532 816 Q537 920 555 1001 L611 1001 Q634 913 631 811Z','M393 1090 Q377 1127 386 1193 L400 1296 L426 1296 Q442 1212 444 1165 L437 1090Z','M568 1090 Q558 1140 572 1209 L587 1297 L612 1297 Q630 1199 626 1157 L610 1090Z'],
+    joints:[[322,543],[687,543],[427,1047],[583,1047],[411,1330],[599,1330]],
+    head:[503,110,49,28], eyes:[[478,153],[533,153]], neck:282, chest:410, abdomen:576, pelvis:736, skin:[207,776]
+  },
+  'male-back': {
+    arms:['M334 300 Q315 340 312 397 L291 468 L326 485 Q351 435 363 382 L363 321Z','M281 519 Q261 555 251 610 L238 666 L261 673 Q285 630 301 582 L316 531Z','M684 302 Q704 345 704 397 L723 470 L689 484 Q663 434 650 382 L650 322Z','M704 519 L727 520 Q751 559 765 611 L777 668 L753 675 Q730 628 719 581Z'],
+    legs:['M380 807 Q373 871 395 933 L409 982 L455 979 Q475 890 477 808Z','M539 808 Q546 899 566 980 L610 981 Q634 900 631 809Z','M383 1076 Q365 1125 382 1190 L392 1273 L418 1273 Q436 1178 435 1129 L423 1078Z','M580 1077 Q568 1124 580 1190 L597 1273 L621 1273 Q639 1168 627 1120 L614 1077Z'],
+    joints:[[306,502],[708,502],[429,1028],[586,1028],[407,1320],[610,1320]],
+    head:[508,104,53,57], kidneys:[[451,559],[565,559]], skin:[228,764]
+  },
+  'female-back': {
+    arms:['M363 309 Q345 339 341 393 L323 458 L356 478 Q381 418 384 366 L380 318Z','M302 530 Q285 555 273 606 L253 665 L274 675 Q304 628 323 580 L335 540Z','M655 308 Q676 343 682 399 L696 460 L665 477 Q643 424 631 366 L636 318Z','M681 531 L704 525 Q730 558 746 611 L765 667 L743 679 Q717 633 698 589Z'],
+    legs:['M384 804 Q382 883 402 950 L411 989 L465 985 Q485 894 482 805Z','M537 805 Q542 898 558 986 L609 989 Q632 909 632 804Z','M401 1087 Q385 1134 398 1212 L410 1286 L432 1286 Q451 1188 447 1140 L438 1090Z','M567 1086 Q554 1130 565 1204 L577 1286 L603 1286 Q624 1188 616 1140 L602 1087Z'],
+    joints:[[330,507],[681,507],[432,1031],[583,1031],[420,1318],[591,1318]],
+    head:[508,120,52,52], kidneys:[[454,550],[561,550]], skin:[230,750]
+  }
+};
+
+function BodySilhouette({ model, view = 'front', selectedId, hoveredId, onHover, onSelect, decorative = false }) {
+  const female = model === 'female';
+  const back = view === 'back';
+  const sex = female ? 'female' : 'male';
+  const geo = ATLAS_GEOMETRY[sex + '-' + view];
+  const ellipse = ([cx, cy, rx = 24, ry = 24]) => <ellipse key={cx + '-' + cy} cx={cx} cy={cy} rx={rx} ry={ry}/>;
   const shape = (id, children) => decorative ? null : (
-    <g key={id} className={`body-atlas-hotspot ${selectedId === id ? "is-selected" : ""} ${hoveredId === id ? "is-hovered" : ""}`}
-      role="button" tabIndex={0} aria-label={`Explore ${REGION_BY_ID[id].label}`} aria-pressed={selectedId === id}
+    <g key={id} className={['body-atlas-hotspot', selectedId === id ? 'is-selected' : '', hoveredId === id ? 'is-hovered' : ''].join(' ')}
+      role="button" tabIndex={0} aria-label={'Explore ' + REGION_BY_ID[id].label} aria-pressed={selectedId === id}
       onMouseEnter={() => onHover?.(id)} onMouseLeave={() => onHover?.(null)}
       onFocus={() => onHover?.(id)} onBlur={() => onHover?.(null)} onClick={() => onSelect(id)}
-      onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onSelect(id); } }}>
+      onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onSelect(id); } }}>
       <title>{REGION_BY_ID[id].label}</title>{children}
     </g>
   );
   return (
-    <svg className="body-atlas-svg" viewBox="0 0 360 680" role={decorative ? undefined : "group"} aria-label={decorative ? undefined : `${female ? "Female" : "Male"} body, ${view} view. Choose a region.`} aria-hidden={decorative || undefined}>
-      <defs>
-        <linearGradient id={`${uid}-body`} x1="0" x2="1"><stop stopColor="#8c9c97"/><stop offset=".3" stopColor="#dce4dc"/><stop offset=".5" stopColor="#f1eee0"/><stop offset=".73" stopColor="#bbc9c1"/><stop offset="1" stopColor="#7c918a"/></linearGradient>
-        <radialGradient id={`${uid}-halo`}><stop stopColor="#dfc77c" stopOpacity=".24"/><stop offset="1" stopColor="#dfc77c" stopOpacity="0"/></radialGradient>
-      </defs>
-      <ellipse cx="180" cy="330" rx="159" ry="302" fill={`url(#${uid}-halo)`}/>
-      <g className="atlas-coordinate-lines" aria-hidden="true"><path d="M180 18V653 M35 88H325 M35 170H325 M35 312H325 M35 450H325 M35 612H325"/><ellipse cx="180" cy="648" rx="80" ry="9"/></g>
-      <g fill={`url(#${uid}-body)`} stroke="#85968b" strokeWidth=".85" strokeLinejoin="round">
-        <path d={arm}/><path d={arm} transform="translate(360 0) scale(-1 1)"/>
-        <path d={leg}/><path d={leg} transform="translate(360 0) scale(-1 1)"/>
-        <path d={torso}/>
-        <path d={female ? "M155 62 C154 25 204 25 205 62 L203 89 Q199 108 180 118 Q161 108 157 89 Z" : "M152 61 C151 24 208 24 208 61 L205 90 Q199 112 180 119 Q161 112 155 90 Z"}/>
-        <path d="M155 70 Q148 63 150 80 L157 89 M205 70 Q212 63 210 80 L203 89"/>
+    <svg className="body-atlas-svg" viewBox="0 0 1024 1536" role={decorative ? undefined : 'group'}
+      aria-label={decorative ? undefined : (female ? 'Female' : 'Male') + ' body, ' + view + ' view. Choose a region.'} aria-hidden={decorative || undefined}>
+      <g className="atlas-rendered-model">
+        <image href={'/body-atlas-' + sex + (back ? '-back' : '') + '.png'} width="1024" height="1536"/>
       </g>
-      <g className="atlas-anatomy-lines" aria-hidden="true">
-        {back ? <>
-          <path d="M180 126V319 M170 145 Q143 149 137 172 L163 204 Q176 179 170 145 M190 145 Q217 149 223 172 L197 204 Q184 179 190 145 M153 208 Q161 253 148 282 M207 208 Q199 253 212 282 M139 308 Q157 326 179 311 Q201 326 221 308 M180 318V343 M150 357L158 430 M210 357L202 430 M153 466Q159 507 161 548 M207 466Q201 507 199 548"/>
-          <path d="M159 62Q180 43 201 62 M174 112L174 129 M186 112L186 129"/>
-        </> : <>
-          <path d="M158 68Q168 62 175 68 M185 68Q192 62 202 68 M180 71L176 87L182 88 M171 98Q180 101 189 98 M167 119L174 140 M193 119L186 140 M174 145Q150 136 132 152 M186 145Q210 136 228 152"/>
-          <path d={female ? "M137 172 Q130 199 157 202 Q176 202 177 181 M223 172 Q230 199 203 202 Q184 202 183 181 M151 215Q156 247 148 272 M209 215Q204 247 212 272" : "M128 168 Q142 154 174 166 L174 194 Q147 207 128 189 M232 168 Q218 154 186 166 L186 194 Q213 207 232 189 M154 211H174 M186 211H206 M154 232H174 M186 232H206 M157 253H174 M186 253H203"}/>
-          <path d="M180 205V267 M177 276Q180 279 183 276 M140 296L168 320 M220 296L192 320 M149 351Q154 389 157 426 M211 351Q206 389 203 426 M150 450Q157 440 165 450 M195 450Q203 440 210 450 M156 474L162 546 M204 474L198 546 M103 175L91 226 M257 175L269 226 M87 263L68 309 M273 263L292 309"/>
-        </>}
-      </g>
-      {shape("skin", <path d="M68 283L60 310L77 315L88 287 Z M292 283L300 310L283 315L272 287 Z"/>)}
-      {shape("muscles", <path d="M108 163Q94 181 94 209L86 228L100 234Q117 203 120 177 Z M252 163Q266 181 266 209L274 228L260 234Q243 203 240 177 Z M142 348Q143 394 151 430L165 431L173 351 Z M218 348Q217 394 209 430L195 431L187 351 Z M149 480Q147 507 158 540L169 539Q175 511 168 482 Z M211 480Q213 507 202 540L191 539Q185 511 192 482 Z"/>)}
-      {shape("joints", <g>{[[94,247],[266,247],[157,452],[203,452],[161,591],[199,591]].map(([cx,cy])=><circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="10"/>)}</g>)}
-      {shape("brain", <path d="M159 58C158 31 201 31 201 58L197 65Q180 59 163 65Z"/>)}
-      {!back && shape("eyes", <g><ellipse cx="167" cy="73" rx="10" ry="6"/><ellipse cx="193" cy="73" rx="10" ry="6"/></g>)}
-      {!back && shape("thyroid", <path d="M169 127Q175 121 180 129Q185 121 191 127L188 140L180 137L172 140Z"/>)}
-      {!back && shape("lungs", <path d="M170 159Q148 148 138 178L136 206Q149 219 172 208 Z M190 159Q212 148 222 178L224 206Q211 219 188 208Z"/>)}
-      {!back && shape("heart", <path d="M184 185C186 174 199 177 203 188Q209 202 191 218Q178 206 179 194Z"/>)}
-      {!back && shape("liver", <path d="M142 222Q161 212 188 223L204 230Q179 233 165 245Q146 250 141 238Z"/>)}
-      {!back && shape("gut", <path d="M154 253Q180 246 206 253L205 284Q193 303 180 298Q162 304 155 287Z"/>)}
-      {back && shape("kidneys", <path d="M153 232C136 229 137 256 150 260Q165 257 156 247Q166 238 153 232Z M207 232C224 229 223 256 210 260Q195 257 204 247Q194 238 207 232Z"/>)}
-      {!back && shape("reproductive", female ? <path d="M160 313Q168 305 180 319Q192 305 200 313L195 322L186 322L183 338H177L174 322L165 322Z"/> : <path d="M165 322Q180 314 195 322L190 340Q180 350 170 340Z"/>)}
-      <g className="atlas-coordinate-labels" aria-hidden="true"><text x="24" y="25">{back ? "POSTERIOR" : "ANTERIOR"}</text><text x="282" y="25">{female ? "F / 02" : model === "neutral" ? "N / 03" : "M / 01"}</text><text x="24" y="661">EVIDSTACK / ATLAS</text><text x="282" y="661">01 : 12</text></g>
+      {shape('muscles', [...geo.arms, ...geo.legs].map((d,i) => <path key={i} d={d}/>))}
+      {shape('joints', geo.joints.map(point => ellipse([...point, 23, 22])))}
+      {shape('brain', ellipse(geo.head))}
+      {shape('skin', ellipse([...geo.skin, 20, 24]))}
+      {back ? shape('kidneys', geo.kidneys.map(point => ellipse([...point, 23, 34]))) : <>
+        {shape('eyes', geo.eyes.map(point => ellipse([...point, 18, 10])))}
+        {shape('thyroid', <path d={'M482 '+geo.neck+' Q494 '+(geo.neck-9)+' 505 '+(geo.neck+4)+' Q516 '+(geo.neck-9)+' 528 '+geo.neck+' L524 '+(geo.neck+21)+' L505 '+(geo.neck+14)+' L486 '+(geo.neck+21)+'Z'}/>)}
+        {shape('lungs', <g>{ellipse([462,geo.chest,34,57])}{ellipse([548,geo.chest,34,57])}</g>)}
+        {shape('heart', ellipse([531,geo.chest+37,22,30]))}
+        {shape('liver', ellipse([465,geo.chest+109,43,23]))}
+        {shape('gut', ellipse([505,geo.abdomen,67,64]))}
+        {shape('reproductive', ellipse([505,geo.pelvis,38,26]))}
+      </>}
     </svg>
   );
 }
@@ -291,3 +294,4 @@ export default function BodyAtlasPage({ isPro, onUpgrade, onAuth, onNavigate }) 
     </main>
   );
 }
+

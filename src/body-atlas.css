@@ -15,7 +15,8 @@
 .body-atlas-workspace{align-items:start}
 .body-atlas-canvas-wrap{min-height:0;position:sticky;top:84px;background:#f8f8f2;border-color:#cbd2c7;box-shadow:0 18px 45px #283c3010}
 .body-atlas-canvas{flex:none;min-height:0;height:clamp(440px,68vh,660px);margin-top:16px;background:linear-gradient(#81948109 1px,transparent 1px),linear-gradient(90deg,#81948109 1px,transparent 1px),radial-gradient(ellipse,#edf1e5,#f8f8f2 70%);background-size:28px 28px,28px 28px,auto;border:1px solid #80978220;border-radius:4px}
-.body-atlas-svg{width:100%;height:100%;max-width:410px;overflow:visible}
+.body-atlas-svg{width:100%;height:100%;max-width:410px;overflow:hidden}
+.atlas-rendered-model{pointer-events:none}.atlas-rendered-model image{filter:drop-shadow(0 12px 14px rgba(45,62,45,.16))}.atlas-legacy-body,.atlas-anatomy-lines,.atlas-coordinate-lines,.atlas-coordinate-labels{display:none}
 .body-atlas-canvas-back .body-atlas-svg{filter:none;transform:none}
 .atlas-coordinate-lines{fill:none;stroke:#8f9d882b;stroke-width:.7;stroke-dasharray:3 7;pointer-events:none}
 .atlas-coordinate-labels{font:8px monospace;letter-spacing:1px;fill:#667a68;pointer-events:none}
@@ -39,3 +40,4 @@
 @media(max-width:900px){.body-atlas-canvas-wrap{position:relative;top:auto}.body-atlas-canvas{height:580px}.body-atlas-empty-state{min-height:200px}}
 @media(max-width:600px){.body-atlas-canvas{height:510px}.body-atlas-model-preview{width:115px;height:220px}.body-atlas-choice-card{min-height:290px}.body-atlas-region-pills button{padding:10px 12px}.body-atlas-hero h1{font-size:clamp(36px,10vw,48px)}}
 @media(prefers-reduced-motion:reduce){.body-atlas-hotspot,.body-atlas-region-pills button,.evid-hero-actions .atlas-home-feature{transition:none}.evid-hero-actions .atlas-home-feature:hover{transform:none}}
+

@@ -118,6 +118,15 @@ const T = {
 const tierColor=(t)=>[null,C.green,C.blue,C.purple,C.amber][t]||C.gray;
 const efColor=(v)=>v<0?C.red:v>=4?C.green:v===3?C.blue:v===2?C.amber:C.gray;
 
+const EVIDENCE_SOURCE_STATS=(()=>{
+  const effects=SUPPLEMENTS.flatMap(s=>s.effects||[]);
+  const sources=effects.flatMap(e=>e.sources||[]);
+  return {
+    sourcedEffects:effects.filter(e=>e.sources?.length).length,
+    pubmed:new Set(sources.filter(source=>source.startsWith("PMID:"))).size,
+  };
+})();
+
 /* HERO STATS with count-up */
 function HeroStats({isMobile}){
   const [ref,visible]=useScrollReveal(0.1);
@@ -132,6 +141,59 @@ function HeroStats({isMobile}){
       <div><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>Cochrane</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>systematic reviews</span></div>
       <div><span style={{fontSize:isMobile?13:15,fontWeight:900,color:C.ink}}>1,000+</span><span style={{fontSize:10,color:C.gray,marginLeft:4}}>side effects documented</span></div>
     </div>
+  );
+}
+
+function SourceProofSection(){
+  const cards=[
+    {
+      index:"01",
+      name:"PubMed / MEDLINE",
+      detail:`${EVIDENCE_SOURCE_STATS.pubmed}+ PMID references appear across the current catalogue.`,
+      note:"Primary literature and clinical studies",
+      href:"https://pubmed.ncbi.nlm.nih.gov/",
+    },
+    {
+      index:"02",
+      name:"Cochrane Library",
+      detail:"Systematic reviews are used when a higher-level synthesis is available.",
+      note:"Independent evidence synthesis",
+      href:"https://www.cochranelibrary.com/",
+    },
+    {
+      index:"03",
+      name:"Examine",
+      detail:"A secondary cross-check for supplement context, claims and study quality.",
+      note:"Research summary cross-reference",
+      href:"https://examine.com/",
+    },
+  ];
+  return(
+    <section className="evid-source-proof" aria-labelledby="evid-source-title">
+      <div className="evid-source-proof-inner">
+        <div className="evid-source-proof-heading">
+          <div>
+            <p className="evid-source-kicker">THE PROOF IS IN THE SOURCE</p>
+            <h2 id="evid-source-title">Research you can trace.</h2>
+          </div>
+          <p className="evid-source-intro">Evidstack turns published research into clear compound summaries. We keep effect size and evidence quality separate, and show the source trail on profiles when a citation is available.</p>
+        </div>
+        <div className="evid-source-grid">
+          {cards.map(card=>(
+            <a key={card.name} className="evid-source-card" href={card.href} target="_blank" rel="noreferrer">
+              <span className="evid-source-index">{card.index}</span>
+              <span className="evid-source-name">{card.name}</span>
+              <span className="evid-source-detail">{card.detail}</span>
+              <span className="evid-source-note">{card.note}<span aria-hidden="true"> ↗</span></span>
+            </a>
+          ))}
+        </div>
+        <div className="evid-source-proof-footer">
+          <span><strong>{EVIDENCE_SOURCE_STATS.sourcedEffects}+</strong> evidence summaries with cited references</span>
+          <span>Scores are editorial research context, not medical advice</span>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -3515,6 +3577,8 @@ function AppInner(){
         </section>
 
         {/* Goal Quiz */}
+        <SourceProofSection/>
+
         <details className="evid-optional-quiz"><summary>Not sure where to start? Choose a goal.</summary><GoalQuizSection onNavigate={navigateTo} onAuth={openAuth}/></details>
 
       <div style={{height:1,background:C.border,maxWidth:680,margin:"0 auto 24px"}}/>

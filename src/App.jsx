@@ -1,6 +1,7 @@
 import "./home.css";
 import { getPageSeo, applyPageSeo } from "./seo.js";
 import { authenticatedFetch } from "./api.js";
+import { trackEvent } from "./analytics.js";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { db } from "./firebase.js";
 import { doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
@@ -61,6 +62,7 @@ const ROUTES = {
   "/bloodwork-history":"bloodwork-history",
   "/guides":"guides",
   "/changelog":"changelog",
+  "/founding-testers":"founding-testers",
 };
 
 function getShareIdFromPath(){
@@ -543,8 +545,8 @@ function AuthModal({onClose,initialMode="login"}){
     if(mode==="signup"&&pw.length<6){setError("Password must be at least 6 characters.");return;}
     setLoading(true);
     try{
-      if(mode==="login"){await loginEmail(email,pw);onClose();}
-      else if(mode==="signup"){await signupEmail(email,pw);onClose();}
+      if(mode==="login"){await loginEmail(email,pw);trackEvent("account_signed_in",{method:"email"});onClose();}
+      else if(mode==="signup"){await signupEmail(email,pw);trackEvent("account_created",{method:"email"});onClose();}
     }catch(e){
       setError(e.code==="auth/invalid-credential"?"Incorrect email or password.":
                e.code==="auth/email-already-in-use"?"This email is already registered.":
@@ -569,6 +571,7 @@ function AuthModal({onClose,initialMode="login"}){
     setError("");setLoading(true);
     try{
       await loginGoogle();
+      trackEvent("account_signed_in",{method:"google"});
       onClose();
     }
     catch(e){setError("Google sign-in failed.");setLoading(false);}
@@ -642,6 +645,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
       const res=await authenticatedFetch("/api/stripe-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({uid:user.uid,email:user.email,plan})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
+      trackEvent("pro_checkout_started",{plan});
       window.location.href=data.url;
     }catch(e){setError(e.message||"Something went wrong.");setLoading(false);}
   };
@@ -1901,6 +1905,9 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   const supp=SUPPLEMENTS.find(s=>s.id===compoundId);
 
   useEffect(()=>{window.scrollTo({top:0,behavior:"instant"});},[compoundId]);
+  useEffect(()=>{
+    if(supp)trackEvent("compound_view",{compound:supp.id,tier:supp.tier});
+  },[supp?.id,supp?.tier]);
 
   if(!supp)return(
     <div style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
@@ -3402,6 +3409,7 @@ function AppInner(){
     requestAnimationFrame(()=>document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"}));
   };
   const selectSearchResult=(value)=>{
+    trackEvent("compound_search",{query:value.slice(0,80),source:"suggestion"});
     setSearch(value);
     setShowSuggest(false);
     setSearchFocused(false);
@@ -3409,6 +3417,7 @@ function AppInner(){
     scrollToResults();
   };
   const runSearch=()=>{
+    if(search.trim())trackEvent("compound_search",{query:search.trim().slice(0,80),source:"search"});
     setShowSuggest(false);
     setNavSearchOpen(false);
     scrollToResults();
@@ -3568,6 +3577,7 @@ function AppInner(){
       </nav>
 
       {page==="about"         &&<AboutPage/>}
+      {page==="founding-testers"&&<FoundingTestersPage onAuth={openAuth}/>}
       {page==="pricing"        &&<PricingPage onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="affiliate"&&<AffiliatePage/>}
       {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
@@ -3597,7 +3607,7 @@ function AppInner(){
           <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>
           <p className="evid-hero-description">A research database for supplements and compounds. Compare evidence, understand doses and spot potential interactions before building your stack.</p>
           <p className="evid-hero-support">Explore {SUPPLEMENTS.length} compound profiles, from everyday supplements to specialist compounds. Pro adds the full catalogue, stack analysis and research tools.</p>
-          <div className="evid-hero-actions"><button onClick={()=>{document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Find a compound <span aria-hidden="true">↓</span></button><button onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
+          <div className="evid-hero-actions"><button onClick={()=>{document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Find a compound <span aria-hidden="true">↓</span></button><button onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button><button onClick={()=>{trackEvent("pilot_interest",{source:"homepage"});navigateTo("founding-testers");}}>Join the pilot <span aria-hidden="true">↗</span></button></div>
           <p className="evid-hero-access">Start with a free preview. Go deeper with Pro.</p>
           <div ref={searchContainerRef} className={`evid-hero-search${searchFocused||search?" is-expanded":""}`}>
             <div className="evid-hero-search-row">
@@ -6121,6 +6131,45 @@ function ChangelogPage({onNavigate}){
   );
 }
 
+function FoundingTestersPage({onAuth}){
+  const isMob=useIsMobile();
+  const email="evidstack@protonmail.com";
+  const [copied,setCopied]=useState(false);
+  const copyEmail=async()=>{
+    trackEvent("pilot_interest",{source:"founding_testers"});
+    try{await navigator.clipboard.writeText(email);setCopied(true);setTimeout(()=>setCopied(false),1800);}catch{}
+  };
+  return(
+    <main style={{minHeight:"100vh",background:C.bg,padding:isMob?"44px 16px 80px":"72px 24px 110px",fontFamily:"Montserrat,sans-serif"}}>
+      <div style={{maxWidth:840,margin:"0 auto"}}>
+        <p style={{fontSize:10,fontWeight:800,letterSpacing:".18em",color:C.gold,margin:"0 0 14px",textTransform:"uppercase",textAlign:"center"}}>FOUNDING TESTERS</p>
+        <h1 style={{fontSize:isMob?34:58,fontWeight:900,letterSpacing:"-.05em",lineHeight:1.02,color:C.ink,margin:"0 auto 18px",textAlign:"center",maxWidth:680}}>Help make supplement research easier to trust.</h1>
+        <p style={{fontSize:15,color:C.gray,lineHeight:1.75,textAlign:"center",maxWidth:580,margin:"0 auto 38px"}}>We are inviting a small group of people who already research supplements, nootropics or performance compounds. You will get early access and help us make every page clearer and more useful.</p>
+        <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"repeat(3,1fr)",gap:12,marginBottom:28}}>
+          {["Search three compounds and compare the evidence.","Return later and tell us what you still needed.","Get early access to the research tools as they improve."].map((text,index)=>(
+            <div key={text} style={{background:C.white,border:`1px solid ${C.border}`,padding:"20px 18px"}}>
+              <span style={{display:"block",fontSize:11,fontWeight:900,color:C.gold,letterSpacing:".12em",marginBottom:12}}>0{index+1}</span>
+              <p style={{fontSize:13,fontWeight:700,lineHeight:1.55,color:C.ink,margin:0}}>{text}</p>
+            </div>
+          ))}
+        </div>
+        <div style={{background:C.ink,padding:isMob?"24px 20px":"32px 36px",textAlign:"center"}}>
+          <p style={{fontSize:13,color:"#d1d5db",lineHeight:1.6,margin:"0 0 18px"}}>Send a short note with your main research goal and the compounds you usually look up. We will reply personally.</p>
+          <div style={{display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap"}}>
+            <a href={`mailto:${email}?subject=Evidstack founding tester`} onClick={()=>trackEvent("pilot_interest",{source:"email_link"})} style={{display:"inline-block",padding:"12px 20px",background:C.gold,color:C.ink,fontSize:12,fontWeight:900,textDecoration:"none",letterSpacing:".03em"}}>Email the team</a>
+            <button onClick={copyEmail} style={{padding:"12px 20px",background:"transparent",color:C.white,border:`1px solid #4b5563`,fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>{copied?"Copied":"Copy email"}</button>
+          </div>
+          <p style={{fontSize:11,color:"#9ca3af",margin:"16px 0 0"}}>{email}</p>
+        </div>
+        <div style={{textAlign:"center",marginTop:28}}>
+          <p style={{fontSize:12,color:C.gray,margin:"0 0 12px"}}>Prefer to explore first?</p>
+          <button onClick={()=>{trackEvent("pilot_signup_cta",{source:"founding_testers"});onAuth("signup");}} style={{padding:"11px 20px",background:"transparent",color:C.ink,border:`1px solid ${C.border}`,fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Create a free account</button>
+        </div>
+      </div>
+    </main>
+  );
+}
+
 function PricingPage({onUpgrade,onAuth}){
   const {user,isPro}=useAuth();
   const isMob=useIsMobile();
@@ -6251,4 +6300,3 @@ function PricingPage({onUpgrade,onAuth}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
-

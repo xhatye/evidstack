@@ -1,4 +1,5 @@
 import { secure } from "../server/access.js";
+import { contextBlock, contextForGoals, contextForStack } from "./evidence-context.js";
 export const config = { runtime: "nodejs" };
 
 async function handler(req, context) {
@@ -15,6 +16,10 @@ async function handler(req, context) {
     });
   }
 
+  const goalContext = contextForGoals(goals);
+  const stackContext = contextForStack(existing);
+  const evidenceContext = contextBlock([...new Map([...goalContext, ...stackContext].map(entry => [entry.name, entry])).values()]);
+
   const prompt = `You are an expert supplement consultant with deep knowledge of sports medicine, clinical nutrition, and evidence-based supplementation.
 
 A user wants a personalized supplement stack. Build them a precise, evidence-based protocol.
@@ -25,12 +30,15 @@ USER INPUT:
 - Already taking: ${existing || "nothing"}
 - Restrictions / notes: ${restrictions || "none"}
 
+VERIFIED EVIDSTACK DATABASE CONTEXT:
+${evidenceContext}
+
 INSTRUCTIONS:
-- Recommend 4-8 compounds that synergize for their goals
+- Recommend 4-8 compounds only from the supplied database context. If the context does not support a compound or claim, do not invent it.
 - Focus on Tier 1 and Tier 2 compounds (best evidence, best safety)
 - Include Tier 3-4 only if explicitly relevant and user seems experienced
-- For each compound include: exact dose, timing, why it fits their goals
-- Check interactions between all recommended compounds
+- For each compound include: the studied dose when recorded, timing, why it fits their goals, evidence level, and source identifiers when available
+- Check interactions using the supplied context. Say when no verified interaction is recorded rather than calling the combination safe.
 - Fit within their budget (include estimated cost)
 - Respond ONLY with valid JSON, no markdown, no explanation outside the JSON
 
@@ -46,7 +54,9 @@ RESPONSE FORMAT (strict JSON only):
       "timing": "string e.g. Post-workout",
       "reason": "string 1 sentence",
       "tier": 1,
-      "cost": "string e.g. $10-15/month"
+      "cost": "string e.g. $10-15/month",
+      "evidence": 1,
+      "sources": ["PMID:12345678"]
     }
   ],
   "interactions": "string or None identified",
@@ -92,3 +102,4 @@ RESPONSE FORMAT (strict JSON only):
 
 
 export default secure(handler, {"free":false});
+

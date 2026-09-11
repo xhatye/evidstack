@@ -399,6 +399,29 @@ function OnboardingModal({onClose}){
   );
 }
 
+function ActivationNudge({onClose,onChooseGoal,onOpenStack}){
+  const isMob=useIsMobile();
+  const goals=[
+    {id:"sleep",icon:"😴",label:"Sleep"},
+    {id:"focus",icon:"🧠",label:"Focus"},
+    {id:"force",icon:"💪",label:"Strength"},
+  ];
+  const dismiss=()=>{trackEvent("activation_nudge_dismissed");onClose();};
+  return(
+    <aside role="dialog" aria-label="Your first steps on Evidstack" style={{position:"fixed",right:isMob?12:24,bottom:isMob?12:24,width:isMob?"calc(100vw - 24px)":360,maxWidth:"calc(100vw - 24px)",background:C.ink,color:C.white,zIndex:950,padding:isMob?"20px":"24px",boxShadow:"0 18px 50px rgba(0,0,0,.24)",fontFamily:"Montserrat,sans-serif"}}>
+      <button aria-label="Close first steps" onClick={dismiss} style={{position:"absolute",top:10,right:12,background:"none",border:"none",color:"#9ca3af",fontSize:20,cursor:"pointer",lineHeight:1}}>×</button>
+      <p style={{fontSize:9,fontWeight:900,letterSpacing:".16em",color:C.gold,margin:"0 0 10px"}}>YOUR FIRST 2 MINUTES</p>
+      <h2 style={{fontSize:isMob?21:24,fontWeight:900,letterSpacing:"-.04em",lineHeight:1.1,margin:"0 0 10px"}}>Start with one question.</h2>
+      <p style={{fontSize:12,color:"#c5c7cc",lineHeight:1.6,margin:"0 0 16px"}}>Pick a goal, open a compound and save one profile to My Stack. That gives you a useful starting point without asking for a card.</p>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
+        {goals.map(goal=><button key={goal.id} onClick={()=>onChooseGoal(goal.id)} style={{padding:"9px 11px",background:"#1f2937",color:C.white,border:"1px solid #374151",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>{goal.icon} {goal.label}</button>)}
+      </div>
+      <button onClick={onOpenStack} style={{padding:"10px 14px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Open My Stack →</button>
+      <button onClick={dismiss} style={{padding:"10px 10px",marginLeft:8,background:"transparent",color:"#9ca3af",border:"none",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Later</button>
+    </aside>
+  );
+}
+
 // ── PROFILE SETUP MODAL ───────────────────────────────────────────────────────
 function ProfileSetupModal({onClose}){
   const {saveProfile}=useAuth();
@@ -597,7 +620,7 @@ function AuthModal({onClose,initialMode="login"}){
     setLoading(true);
     try{
       if(mode==="login"){await loginEmail(email,pw);trackEvent("account_signed_in",{method:"email"});onClose();}
-      else if(mode==="signup"){await signupEmail(email,pw);trackEvent("account_created",{method:"email"});onClose();}
+      else if(mode==="signup"){await signupEmail(email,pw);trackEvent("account_created",{method:"email"});window.dispatchEvent(new CustomEvent("evidstack:account-created"));onClose();}
     }catch(e){
       setError(e.code==="auth/invalid-credential"?"Incorrect email or password.":
                e.code==="auth/email-already-in-use"?"This email is already registered.":
@@ -3383,6 +3406,28 @@ function AppInner(){
   const [mobileMenu,setMobileMenu]=useState(false);
   const [showTools,setShowTools]=useState(false);
   const [showExitModal,setShowExitModal]=useState(false);
+  const [showActivation,setShowActivation]=useState(false);
+
+  useEffect(()=>{
+    const onAccountCreated=()=>{
+      let alreadySeen=false;
+      try{alreadySeen=sessionStorage.getItem("evid_activation_seen")==="1";}catch{}
+      if(alreadySeen)return;
+      try{sessionStorage.setItem("evid_activation_seen","1");}catch{}
+      trackEvent("activation_welcome_shown");
+      setShowActivation(true);
+    };
+    window.addEventListener("evidstack:account-created",onAccountCreated);
+    return()=>window.removeEventListener("evidstack:account-created",onAccountCreated);
+  },[]);
+
+  const chooseActivationGoal=(nextGoal)=>{
+    trackEvent("activation_goal_selected",{goal:nextGoal});
+    setGoal(nextGoal);
+    setShowActivation(false);
+    navigateTo("supplements");
+    requestAnimationFrame(()=>document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"}));
+  };
 
   const navigateTo=(p)=>{navigate(p);setPage(p);setCompoundId(null);setNavSearchOpen(false);setShowSuggest(false);window.scrollTo({top:0,behavior:"instant"});};
 
@@ -3535,6 +3580,11 @@ function AppInner(){
       {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
       {showCompareModal&&compareA&&compareB&&<CompareModal compA={compareA} compB={compareB} goalId={goal} onClose={()=>{setShowCompareModal(false);setCompareA(null);setCompareB(null);}}/>}
       {showEmailCapture&&<EmailCaptureModal onClose={()=>setShowEmailCapture(false)} compoundId={emailCaptureCompound}/>}
+      {showActivation&&!showAuth&&!showUpgrade&&!showAccount&&!mobileMenu&&<ActivationNudge
+        onClose={()=>setShowActivation(false)}
+        onChooseGoal={chooseActivationGoal}
+        onOpenStack={()=>{trackEvent("activation_stack_opened");setShowActivation(false);navigateTo("my-stack");}}
+      />}
       {showExitModal&&!isPro&&page==="supplements"&&!showAuth&&!showUpgrade&&!showAccount&&!mobileMenu&&(
         <aside className="pro-browse-prompt" aria-label="Evidstack Pro">
           <button className="pro-prompt-close" aria-label="Dismiss Pro suggestion" onClick={()=>setShowExitModal(false)}>×</button>
@@ -6472,4 +6522,3 @@ function PricingPage({onUpgrade,onAuth}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
-

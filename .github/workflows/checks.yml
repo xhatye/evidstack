@@ -12,6 +12,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci --ignore-scripts
+      - run: npm run audit:deps
       - run: npm run check:secrets
       - run: npm run build
       - run: npm test
+

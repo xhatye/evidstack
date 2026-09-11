@@ -41,6 +41,56 @@ function useCountUp(target,duration,started){
   return count;
 }
 
+function useMyStack(){
+  const {user}=useAuth();
+  const [stackIds,setStackIds]=useState([]);
+  const [stackLoading,setStackLoading]=useState(false);
+  const [stackError,setStackError]=useState("");
+
+  useEffect(()=>{
+    let active=true;
+    if(!user){setStackIds([]);setStackLoading(false);setStackError("");return()=>{active=false;};}
+    setStackLoading(true);
+    getDoc(doc(db,"users",user.uid)).then(snap=>{
+      if(!active)return;
+      const saved=snap.exists()&&Array.isArray(snap.data().myStack)?snap.data().myStack:[];
+      setStackIds(saved.filter(id=>SUPPLEMENTS.some(s=>s.id===id)).slice(0,20));
+      setStackError("");
+    }).catch(error=>{
+      if(!active)return;
+      console.error("Unable to load My Stack",error);
+      setStackError("Your saved stack could not be loaded. Please try again.");
+    }).finally(()=>{if(active)setStackLoading(false);});
+    return()=>{active=false;};
+  },[user?.uid]);
+
+  const saveStack=async(next)=>{
+    if(!user)return false;
+    const clean=[...new Set(next)].filter(id=>SUPPLEMENTS.some(s=>s.id===id)).slice(0,20);
+    const added=clean.filter(id=>!stackIds.includes(id));
+    const removed=stackIds.filter(id=>!clean.includes(id));
+    added.forEach(id=>trackEvent("stack_item_saved",{compound:id}));
+    removed.forEach(id=>trackEvent("stack_item_removed",{compound:id}));
+    setStackIds(clean);
+    setStackError("");
+    try{
+      await setDoc(doc(db,"users",user.uid),{myStack:clean,myStackUpdatedAt:Date.now()},{merge:true});
+      return true;
+    }catch(error){
+      console.error("Unable to save My Stack",error);
+      setStackError("Your change could not be saved. Please try again.");
+      return false;
+    }
+  };
+
+  const toggleStack=(id,limit=20)=>{
+    if(!stackIds.includes(id)&&stackIds.length>=limit)return false;
+    saveStack(stackIds.includes(id)?stackIds.filter(x=>x!==id):[...stackIds,id]);
+    return true;
+  };
+  return {stackIds,stackLoading,stackError,saveStack,toggleStack};
+}
+
 
 const ROUTES = {
   "/":"supplements",
@@ -63,6 +113,7 @@ const ROUTES = {
   "/guides":"guides",
   "/changelog":"changelog",
   "/founding-testers":"founding-testers",
+  "/my-stack":"my-stack",
 };
 
 function getShareIdFromPath(){
@@ -652,6 +703,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
 
   const features=[
     {icon:"🔬",text:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including Tier 2-4`},
+    {icon:"📌",text:"My Stack - save up to 20 compounds and return across devices"},
     {icon:"🔭",text:"AI Compound Advisor - up to 100 AI requests per day"},
     {icon:"⚗️",text:"Interaction Checker - full stack safety analysis"},
     {icon:"🎯",text:"Stack Audit AI - score and optimize your current stack"},
@@ -669,7 +721,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
         <div style={{background:C.ink,padding:"32px 28px 24px",textAlign:"center"}}>
           <p style={{fontSize:9,fontWeight:800,letterSpacing:".2em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Evidstack Pro</p>
           <h2 style={{fontSize:26,fontWeight:900,color:C.white,margin:"0 0 6px",letterSpacing:"-.04em"}}>Evidence without limits.</h2>
-          <p style={{fontSize:13,color:"#9ca3af",margin:0}}>Full access to every tool and compound.</p>
+          <p style={{fontSize:13,color:"#9ca3af",margin:0}}>Keep your research, stack and follow-up questions in one place.</p>
         </div>
 
         {/* Plan toggle */}
@@ -1286,18 +1338,41 @@ function MyTracker({onUpgrade}){
   const [trackerSugg,setTrackerSugg]=useState([]);
   const [logs,setLogs]=useState({}); // {YYYY-MM-DD: {taken:[],mood:3,energy:3,note:""}}
   const [selectedDay,setSelectedDay]=useState(new Date().toISOString().slice(0,10));
-  const [saving,setSaving]=useState(false);
+  const [trackerError,setTrackerError]=useState("");
 
-  // Load from localStorage (no Firebase reads to avoid cost)
+  // Tracker data belongs to the account so it follows the user across devices.
   useEffect(()=>{
-    const saved=localStorage.getItem(`evidstack_tracker_${user?.uid}`);
-    if(saved)try{const d=JSON.parse(saved);setStack(d.stack||[]);setLogs(d.logs||{});}catch(e){}
-  },[user]);
+    let active=true;
+    if(!user){setStack([]);setLogs({});return()=>{active=false;};}
+    getDoc(doc(db,"users",user.uid)).then(async snap=>{
+      if(!active)return;
+      const data=snap.exists()?snap.data():{};
+      if(data.tracker&&typeof data.tracker==="object"){
+        setStack(Array.isArray(data.tracker.stack)?data.tracker.stack:[]);
+        setLogs(data.tracker.logs&&typeof data.tracker.logs==="object"?data.tracker.logs:{});
+        return;
+      }
+      // One-time migration for users of the previous device-local tracker.
+      try{
+        const legacy=localStorage.getItem(`evidstack_tracker_${user.uid}`);
+        if(!legacy)return;
+        const d=JSON.parse(legacy);
+        const migrated={stack:Array.isArray(d.stack)?d.stack:[],logs:d.logs&&typeof d.logs==="object"?d.logs:{}};
+        setStack(migrated.stack);setLogs(migrated.logs);
+        await setDoc(doc(db,"users",user.uid),{tracker:migrated,trackerUpdatedAt:Date.now()},{merge:true});
+      }catch(error){console.error("Unable to migrate tracker",error);}
+    }).catch(error=>{
+      if(active){console.error("Unable to load tracker",error);setTrackerError("Your tracker could not be loaded. Please try again.");}
+    });
+    return()=>{active=false;};
+  },[user?.uid]);
 
-  const save=(newStack,newLogs)=>{
+  const save=async(newStack,newLogs)=>{
     if(!user)return;
     const data={stack:newStack??stack,logs:newLogs??logs};
-    localStorage.setItem(`evidstack_tracker_${user.uid}`,JSON.stringify(data));
+    setTrackerError("");
+    try{await setDoc(doc(db,"users",user.uid),{tracker:data,trackerUpdatedAt:Date.now()},{merge:true});}
+    catch(error){console.error("Unable to save tracker",error);setTrackerError("Your latest tracker change could not be saved.");}
   };
 
   const addToStack=()=>{
@@ -1380,6 +1455,7 @@ function MyTracker({onUpgrade}){
         </div>
       <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"24px 16px 80px":"48px 48px 80px"}}>
       <h2 style={{fontSize:isMob?24:36,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 24px"}}>My Tracker</h2>
+      {trackerError&&<p role="alert" style={{fontSize:12,color:C.red,margin:"0 0 16px"}}>{trackerError}</p>}
 
       {/* Stats bar */}
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:28}}>
@@ -1901,6 +1977,7 @@ function AffiliatePage(){
 /* COMPOUND PAGE */
 function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   const {user,isPro}=useAuth();
+  const {stackIds,toggleStack}=useMyStack();
   const isMob=useIsMobile();
   const supp=SUPPLEMENTS.find(s=>s.id===compoundId);
 
@@ -1919,12 +1996,14 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   );
 
   const isLocked=supp.tier>=2&&!isPro;
-  const needsAccount=!user;
+  const inStack=!!supp&&stackIds.includes(supp.id);
   const tc=tierColor(supp.tier);
   const tierLabel=TIERS[supp.tier]?.label||"";
   const safetyLabel=["","Risky","Caution","Caution","Safe","Very Safe"][supp.safety]||"";
   const safetyColor=[null,C.red,C.amber,C.amber,C.green,C.green][supp.safety]||C.gray;
   const efColor=(v)=>v>=4?C.green:v===3?C.blue:v===2?C.amber:C.red;
+  const sourcedEffects=(supp.effects||[]).filter(e=>e.sources?.length>0).length;
+  const sourceCount=new Set((supp.effects||[]).flatMap(e=>e.sources||[])).size;
 
   return(
     <div style={{maxWidth:900,margin:"0 auto",padding:isMob?"24px 16px 80px":"48px 48px 100px"}}>
@@ -1962,19 +2041,19 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
           <div style={{padding:"10px 14px",background:`${tc}0a`,borderLeft:`3px solid ${tc}`,marginBottom:0}}>
             <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}><strong style={{color:C.ink}}>Legal status:</strong> {supp.legal}</p>
           </div>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap",marginTop:18}}>
+            <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>Save compounds you are considering so your research stays in one place.</p>
+            <button onClick={()=>{if(!user){onAuth("signup");return;}if(!inStack&&!isPro&&stackIds.length>=5){onUpgrade();return;}toggleStack(supp.id,isPro?20:5);}} style={{padding:"10px 16px",background:inStack?C.bg:C.ink,color:inStack?C.ink:C.white,border:`1px solid ${inStack?C.border:C.ink}`,fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
+              {inStack?"Saved to My Stack":user?"Save to My Stack":"Create a free account to save"}
+            </button>
+          </div>
+          <div style={{marginTop:14,padding:"10px 14px",background:`${C.blue}08`,borderLeft:`3px solid ${C.blue}`}}>
+            <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}><strong style={{color:C.ink}}>Evidence record:</strong> {sourcedEffects} of {supp.effects.length} effect summaries have linked references ({sourceCount} total). {sourcedEffects<supp.effects.length?"Some claims are still awaiting source review.":"Each listed effect has a linked reference."}</p>
+          </div>
         </div>
       </div>
 
-      {needsAccount?(
-        <div style={{border:`1.5px solid ${C.ink}`,background:C.white,padding:"36px",textAlign:"center",marginBottom:24}}>
-          <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 8px",letterSpacing:"-.02em"}}>Create a free account to see the full profile.</p>
-          <p style={{fontSize:13,color:C.gray,margin:"0 0 24px",lineHeight:1.6}}>Dosage protocol, evidence scores, study count, interactions, and related compounds. Free forever, no credit card.</p>
-          <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
-            <button onClick={()=>onAuth("signup")} style={{padding:"12px 28px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>Create free account</button>
-            <button onClick={()=>onAuth("login")} style={{padding:"12px 20px",background:"transparent",color:C.gray,border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Sign in</button>
-          </div>
-        </div>
-      ):isLocked?(
+      {isLocked?(
         <div style={{background:C.ink,padding:"40px 36px",textAlign:"center",marginBottom:24}}>
           <p style={{fontSize:11,fontWeight:800,color:C.gold,letterSpacing:".16em",margin:"0 0 8px",textTransform:"uppercase"}}>Pro Feature</p>
           <h2 style={{fontSize:24,fontWeight:900,color:C.white,margin:"0 0 12px",letterSpacing:"-.03em"}}>Full profile locked</h2>
@@ -2040,7 +2119,7 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
                     </div>
                     {e.efficacy<0&&<p style={{fontSize:11,fontWeight:800,color:C.red,margin:"0 0 8px"}}>WARNING: Negative effect on this goal</p>}
                     <p style={{fontSize:13,color:C.gray,lineHeight:1.8,margin:"0 0 8px"}}>{e.summary}</p>
-                    {(!e.sources||e.sources.length===0)&&<p style={{fontSize:11,fontWeight:700,color:C.amber,margin:"0 0 8px"}}>No source attached — treat this effect as unestablished until it is reviewed.</p>}
+                    {(!e.sources||e.sources.length===0)&&<p style={{fontSize:11,fontWeight:700,color:C.amber,margin:"0 0 8px"}}>No source attached - treat this effect as unestablished until it is reviewed.</p>}
                     {e.sources&&e.sources.length>0&&(
                       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:8}}>
                         {e.sources.map(src=>(
@@ -2212,13 +2291,14 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
 }
 
 /* COMPARE MODAL */
-function CompareModal({compA,compB,onClose}){
+function CompareModal({compA,compB,onClose,goalId="all"}){
   const isMob=useIsMobile();
   const tierColor=(t)=>[null,C.green,C.blue,C.purple,C.amber][t]||C.gray;
   const efColor=(v)=>v<0?C.red:v>=4?C.green:v===3?C.blue:v===2?C.amber:C.gray;
   const avgStat=(s,key)=>{
-    if(!s.effects.length)return 0;
-    return(s.effects.reduce((sum,e)=>sum+(key==="efficacy"?e.efficacy:e.evidence),0)/s.effects.length).toFixed(1);
+    const effects=goalId!=="all"?s.effects.filter(e=>e.goal===goalId):s.effects;
+    if(!effects.length)return "-";
+    return(effects.reduce((sum,e)=>sum+(key==="efficacy"?e.efficacy:e.evidence),0)/effects.length).toFixed(1);
   };
   const safetyLabel=["","RISKY","CAUTION","CAUTION","SAFE","VERY SAFE"];
   const safetyColor=["",C.red,C.amber,C.amber,C.green,C.green];
@@ -2232,7 +2312,8 @@ function CompareModal({compA,compB,onClose}){
     {label:"Dosage",a:compA.dosage?.amount||" -",b:compB.dosage?.amount||" -"},
   ];
 
-  const sharedGoals=compA.effects.filter(e=>compB.effects.some(e2=>e2.goal===e.goal)).map(e=>e.goal);
+  const sharedGoals=compA.effects.filter(e=>goalId==="all"||e.goal===goalId).filter(e=>compB.effects.some(e2=>e2.goal===e.goal)).map(e=>e.goal);
+  const goalLabel=goalId!=="all"?(GOALS.find(g=>g.id===goalId)?.label||goalId):"all shared goals";
 
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
@@ -2248,6 +2329,9 @@ function CompareModal({compA,compB,onClose}){
             </div>
           ))}
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:C.gray,fontWeight:900}}>VS</div>
+        </div>
+        <div style={{padding:"10px 20px",background:`${C.blue}08`,borderBottom:`1px solid ${C.border}`}}>
+          <p style={{fontSize:10,fontWeight:800,color:C.blue,letterSpacing:".1em",margin:0,textTransform:"uppercase"}}>Comparison focus: {goalLabel}</p>
         </div>
 
         {/* Stats rows */}
@@ -3390,6 +3474,7 @@ function AppInner(){
 
   const navItems=[
     {id:"supplements",label:"Supplements"},
+    {id:"my-stack",label:"My Stack"},
     {id:"advisor",label:"AI Compound Advisor"},
     {id:"guides",label:"Guides"},
     {id:"pricing",label:"Pricing"},
@@ -3430,7 +3515,7 @@ function AppInner(){
         </button>
       )}
       {navSearchOpen&&(
-        <div className="evid-nav-search-expanded">
+          <div className="evid-nav-search-expanded">
           <span className="evid-search-icon" aria-hidden="true"/>
           <input autoFocus value={search} aria-label="Search supplements" placeholder="Search supplements..."
             onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
@@ -3448,7 +3533,7 @@ function AppInner(){
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} initialMode={authMode}/>}
       {showUpgrade&&<UpgradeModal onClose={()=>setShowUpgrade(false)} onAuthNeeded={()=>openAuth("signup")}/>}
       {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
-      {showCompareModal&&compareA&&compareB&&<CompareModal compA={compareA} compB={compareB} onClose={()=>{setShowCompareModal(false);setCompareA(null);setCompareB(null);}}/>}
+      {showCompareModal&&compareA&&compareB&&<CompareModal compA={compareA} compB={compareB} goalId={goal} onClose={()=>{setShowCompareModal(false);setCompareA(null);setCompareB(null);}}/>}
       {showEmailCapture&&<EmailCaptureModal onClose={()=>setShowEmailCapture(false)} compoundId={emailCaptureCompound}/>}
       {showExitModal&&!isPro&&page==="supplements"&&!showAuth&&!showUpgrade&&!showAccount&&!mobileMenu&&(
         <aside className="pro-browse-prompt" aria-label="Evidstack Pro">
@@ -3578,6 +3663,7 @@ function AppInner(){
 
       {page==="about"         &&<AboutPage/>}
       {page==="founding-testers"&&<FoundingTestersPage onAuth={openAuth}/>}
+      {page==="my-stack"&&<MyStackPage onNavigate={navigateTo} onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="pricing"        &&<PricingPage onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="affiliate"&&<AffiliatePage/>}
       {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
@@ -4908,13 +4994,19 @@ function InteractionCheckerPro({onUpgrade}){
             <div style={{background:verdictColor(result.overall_verdict),padding:"20px 24px",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
               <div>
                 <p style={{fontSize:10,fontWeight:800,color:"rgba(255,255,255,.7)",letterSpacing:".14em",margin:"0 0 4px",textTransform:"uppercase"}}>Overall Verdict</p>
-                <p style={{fontSize:22,fontWeight:900,color:C.white,margin:0,letterSpacing:"-.02em"}}>{result.overall_verdict} - {result.safe_to_stack?"Safe to stack":"Do not stack as-is"}</p>
+                <p style={{fontSize:22,fontWeight:900,color:C.white,margin:0,letterSpacing:"-.02em"}}>{result.overall_verdict} - {result.safe_to_stack?"No major issue found in supplied data":"Do not stack as-is"}</p>
               </div>
               <span style={{fontSize:40}}>{result.overall_verdict==="SAFE"?"✅":result.overall_verdict==="CAUTION"?"⚠️":"🚫"}</span>
             </div>
             <div style={{background:C.white,border:`1px solid ${C.border}`,padding:"16px 20px",marginBottom:20}}>
               <p style={{fontSize:13,color:C.gray,margin:0,lineHeight:1.7}}>{result.overall_summary}</p>
             </div>
+            {result.evidence_notes?.length>0&&(
+              <div className="ic-card" style={{background:`${C.blue}08`,borderLeft:`3px solid ${C.blue}`,padding:"14px 18px",marginBottom:20}}>
+                <p style={{fontSize:10,fontWeight:800,color:C.blue,letterSpacing:".12em",margin:"0 0 8px",textTransform:"uppercase"}}>Evidence basis and limits</p>
+                {result.evidence_notes.map((note,i)=><p key={i} style={{fontSize:12,color:C.gray,margin:i?"6px 0 0":0,lineHeight:1.5}}>{note}</p>)}
+              </div>
+            )}
 
             {/* Individual interactions */}
             <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Interaction Analysis</p>
@@ -5100,6 +5192,13 @@ function StackAuditScreen({onUpgrade}){
                 <p style={{fontSize:13,color:C.gray,margin:0,lineHeight:1.6}}>{result.summary}</p>
               </div>
             </div>
+
+            {result.evidence_notes?.length>0&&(
+              <div className="audit-card" style={{background:`${C.blue}08`,borderLeft:`3px solid ${C.blue}`,padding:"14px 18px",marginBottom:16}}>
+                <p style={{fontSize:10,fontWeight:800,color:C.blue,letterSpacing:".12em",margin:"0 0 8px",textTransform:"uppercase"}}>Evidence basis and limits</p>
+                {result.evidence_notes.map((note,i)=><p key={i} style={{fontSize:12,color:C.gray,margin:i?"6px 0 0":0,lineHeight:1.5}}>{note}</p>)}
+              </div>
+            )}
 
             {/* Priority changes */}
             {result.priority_changes?.length>0&&(
@@ -6170,6 +6269,79 @@ function FoundingTestersPage({onAuth}){
   );
 }
 
+function MyStackPage({onNavigate,onUpgrade,onAuth}){
+  const {user,isPro}=useAuth();
+  const {stackIds,stackLoading,stackError,saveStack}=useMyStack();
+  const isMob=useIsMobile();
+  const limit=isPro?20:5;
+  const items=stackIds.map(id=>SUPPLEMENTS.find(s=>s.id===id)).filter(Boolean);
+  const remove=(id)=>saveStack(stackIds.filter(x=>x!==id));
+  useEffect(()=>{if(user)trackEvent("my_stack_view",{count:stackIds.length});},[user?.uid]);
+
+  if(!user)return(
+    <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"48px 18px 90px":"80px 40px 120px"}}>
+      <p style={{fontSize:10,fontWeight:900,color:C.gold,letterSpacing:".18em",margin:"0 0 14px"}}>MY STACK</p>
+      <h1 style={{fontSize:isMob?34:52,fontWeight:900,color:C.ink,letterSpacing:"-.06em",lineHeight:1.05,margin:"0 0 16px"}}>Keep your research together.</h1>
+      <p style={{fontSize:16,color:C.gray,lineHeight:1.7,maxWidth:600,margin:"0 0 28px"}}>Save compounds, compare options and return to the evidence you care about. Create a free account to keep your list across devices.</p>
+      <button onClick={()=>onAuth("signup")} style={{padding:"13px 22px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Create a free account</button>
+    </div>
+  );
+
+  return(
+    <div style={{maxWidth:980,margin:"0 auto",padding:isMob?"36px 16px 90px":"58px 40px 120px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",gap:20,flexWrap:"wrap",marginBottom:28}}>
+        <div>
+          <p style={{fontSize:10,fontWeight:900,color:C.gold,letterSpacing:".18em",margin:"0 0 12px"}}>MY STACK</p>
+          <h1 style={{fontSize:isMob?34:48,fontWeight:900,color:C.ink,letterSpacing:"-.06em",lineHeight:1.05,margin:"0 0 12px"}}>Your saved compounds.</h1>
+          <p style={{fontSize:15,color:C.gray,lineHeight:1.6,maxWidth:600,margin:0}}>A personal shortlist for your goals, questions and next research session.</p>
+        </div>
+        <button onClick={()=>onNavigate("supplements")} style={{padding:"10px 15px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Browse compounds</button>
+      </div>
+
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap",padding:"14px 16px",background:C.white,border:`1px solid ${C.border}`,marginBottom:18}}>
+        <span style={{fontSize:12,fontWeight:800,color:C.ink}}>{items.length} of {limit} saved on {isPro?"Pro":"Free"}</span>
+        {!isPro&&items.length>=limit&&<button onClick={onUpgrade} style={{padding:"8px 12px",background:C.gold,color:C.ink,border:"none",fontSize:10,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Save up to 20 with Pro</button>}
+      </div>
+
+      {stackError&&<p role="alert" style={{fontSize:12,color:C.red,margin:"0 0 16px"}}>{stackError}</p>}
+      {stackLoading?(
+        <div style={{padding:"44px 20px",background:C.white,border:`1px solid ${C.border}`,textAlign:"center"}}><p style={{fontSize:13,color:C.gray,margin:0}}>Loading your stack...</p></div>
+      ):items.length===0?(
+        <div style={{padding:isMob?"44px 20px":"64px 32px",background:C.white,border:`1px solid ${C.border}`,textAlign:"center"}}>
+          <p style={{fontSize:30,margin:"0 0 14px"}}>+</p>
+          <h2 style={{fontSize:20,fontWeight:900,color:C.ink,margin:"0 0 8px"}}>Your stack is empty.</h2>
+          <p style={{fontSize:13,color:C.gray,lineHeight:1.6,margin:"0 auto 22px",maxWidth:480}}>Open a compound, read the evidence preview and save the ones you want to revisit.</p>
+          <button onClick={()=>onNavigate("supplements")} style={{padding:"11px 18px",background:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Find a compound</button>
+        </div>
+      ):(
+        <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"repeat(2,1fr)",gap:12}}>
+          {items.map(s=>{
+            const avg=(s.effects.reduce((sum,e)=>sum+Math.abs(e.efficacy),0)/Math.max(1,s.effects.length)).toFixed(1);
+            const tc=tierColor(s.tier);
+            return <article key={s.id} style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${tc}`,padding:"18px"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:10}}>
+                <div>
+                  <p style={{fontSize:9,fontWeight:900,color:tc,letterSpacing:".13em",margin:"0 0 7px",textTransform:"uppercase"}}>TIER {s.tier}</p>
+                  <h2 style={{fontSize:17,fontWeight:900,color:C.ink,margin:"0 0 6px"}}>{s.name}</h2>
+                  <p style={{fontSize:11,color:C.gray,margin:0}}>{s.effects.slice(0,3).map(e=>e.goal).join(" · ")}</p>
+                </div>
+                <button aria-label={`Remove ${s.name} from My Stack`} onClick={()=>remove(s.id)} style={{background:"none",border:"none",color:C.gray,fontSize:18,cursor:"pointer",lineHeight:1}}>×</button>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginTop:18,paddingTop:12,borderTop:`1px solid ${C.border}`}}>
+                <span style={{fontSize:11,fontWeight:800,color:C.green}}>Avg. efficacy {avg}/5</span>
+                <button onClick={()=>{window.history.pushState({},"",`/compound/${s.id}`);window.dispatchEvent(new PopStateEvent("popstate"));}} style={{background:"transparent",border:"none",padding:0,color:C.blue,fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Open profile →</button>
+              </div>
+            </article>;
+          })}
+        </div>
+      )}
+      <div style={{marginTop:22,padding:"16px 18px",background:`${C.blue}08`,borderLeft:`3px solid ${C.blue}`}}>
+        <p style={{fontSize:12,color:C.gray,lineHeight:1.6,margin:0}}>My Stack keeps your shortlist organized. It does not replace medical advice or tell you what you should take.</p>
+      </div>
+    </div>
+  );
+}
+
 function PricingPage({onUpgrade,onAuth}){
   const {user,isPro}=useAuth();
   const isMob=useIsMobile();
@@ -6179,7 +6351,7 @@ function PricingPage({onUpgrade,onAuth}){
     {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${count}+`,highlight:true},
     {feature:"Peptides & GLP-1s",free:false,pro:true},
     {feature:"Biohacking tier (T4)",free:false,pro:true},
-    {feature:"Compound pages (full profile)",free:false,pro:true},
+    {feature:"Compound pages",free:"Tier 1 evidence profiles",pro:"Full Tier 2-4 profiles"},
     {feature:"AI Compound Advisor",free:"1 free query",pro:"100 AI requests/day",highlight:true},
     {feature:"Conversation memory",free:false,pro:true},
     {feature:"Synergy and protocol suggestions",free:false,pro:true},
@@ -6189,7 +6361,7 @@ function PricingPage({onUpgrade,onAuth}){
     {feature:"AI Bloodwork Analyzer",free:false,pro:true},
     {feature:"My Tracker",free:false,pro:true},
     {feature:"Compare compounds",free:false,pro:true},
-    {feature:"Save your stacks",free:false,pro:true,highlight:true},
+    {feature:"My Stack",free:"Up to 5 saved compounds",pro:"Up to 20, synced across devices",highlight:true},
   ];
 
   const S={
@@ -6217,7 +6389,7 @@ function PricingPage({onUpgrade,onAuth}){
           </div>
           <p style={{fontSize:13,color:C.gray,margin:"0 0 24px"}}>Forever free. No credit card needed.</p>
           <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:28}}>
-            {["Tier 1 compounds (33)","Browse the full database","1 free AI Compound Advisor query","Compound header info (name, tier, safety)"].map(f=>(
+            {["Tier 1 compounds (33)","Browse the full database","1 free AI Compound Advisor query","Save up to 5 compounds in My Stack","Compound header info (name, tier, safety)"].map(f=>(
               <div key={f} style={{display:"flex",gap:10,alignItems:"center"}}>
                 <span style={{color:C.green,fontWeight:900,fontSize:14}}>✓</span>
                 <span style={{fontSize:13,color:C.ink}}>{f}</span>
@@ -6300,3 +6472,4 @@ function PricingPage({onUpgrade,onAuth}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
+

@@ -1,10 +1,14 @@
 import { secure } from "../server/access.js";
+import { contextBlock, contextForGoals, contextForStack } from "./evidence-context.js";
 export const config = { runtime: "nodejs" };
 
 async function handler(req, context) {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
   const { goals, stack, budget, experience } = await req.json();
+  const goalContext = contextForGoals(goals);
+  const stackContext = contextForStack(stack);
+  const evidenceContext = contextBlock([...new Map([...goalContext, ...stackContext].map(entry => [entry.name, entry])).values()]);
 
   const prompt = `You are an expert supplement coach. Create a detailed 4-week progressive supplement protocol.
 
@@ -14,7 +18,10 @@ User profile:
 - Monthly budget: $${budget}
 - Experience level: ${experience}
 
-Create a week-by-week protocol that introduces compounds progressively, explains the rationale, and includes practical timing.
+VERIFIED EVIDSTACK DATABASE CONTEXT:
+${evidenceContext}
+
+Use only compounds and compound-specific facts supported by the supplied context. Do not invent study counts, doses, interactions, prices, or safety claims. If a dose, interaction, or result is not recorded, say it is not recorded and recommend professional review. Create a week-by-week protocol that introduces compounds progressively, explains the rationale, and includes practical timing.
 
 Respond ONLY with valid JSON:
 {
@@ -30,7 +37,9 @@ Respond ONLY with valid JSON:
           "name": "string",
           "dose": "string",
           "timing": "string",
-          "why_now": "Why introduced this week"
+          "why_now": "Why introduced this week",
+          "evidence": 1,
+          "sources": ["PMID:12345678"]
         }
       ],
       "what_to_expect": "Expected effects and adjustment period"
@@ -60,3 +69,4 @@ Respond ONLY with valid JSON:
 
 
 export default secure(handler, {"free":false});
+

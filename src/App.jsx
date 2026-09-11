@@ -1024,6 +1024,7 @@ function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade,onCo
 /* WEEKLY PROTOCOL AI */
 function WeeklyProtocolAI({onUpgrade}){
   const {isPro}=useAuth();
+  const {stackIds}=useMyStack();
   const isMob=useIsMobile();
   const [goals,setGoals]=useState([]);
   const [stack,setStack]=useState("");
@@ -1033,6 +1034,7 @@ function WeeklyProtocolAI({onUpgrade}){
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
   const [activeWeek,setActiveWeek]=useState(0);
+  const savedStackNames=useMemo(()=>stackIds.map(id=>SUPPLEMENTS.find(s=>s.id===id)?.name).filter(Boolean),[stackIds]);
 
   const GOAL_OPTS=[
     {id:"sleep",label:"Sleep",icon:"😴"},{id:"focus",label:"Focus",icon:"🎯"},
@@ -1044,6 +1046,13 @@ function WeeklyProtocolAI({onUpgrade}){
   ];
 
   const toggleGoal=(id)=>setGoals(g=>g.includes(id)?g.filter(x=>x!==id):[...g,id]);
+
+  const loadSavedStack=()=>{
+    if(!savedStackNames.length){setError("Save a compound in My Stack first.");return;}
+    setStack(savedStackNames.join(", "));
+    setError("");
+    trackEvent("pro_tool_prefill",{tool:"weekly_protocol",count:savedStackNames.length});
+  };
 
   const build=async()=>{
     if(!goals.length){setError("Select at least one goal.");return;}
@@ -1106,7 +1115,10 @@ function WeeklyProtocolAI({onUpgrade}){
           </div>
 
           <div style={{marginBottom:20}}>
-            <p style={{fontSize:10,fontWeight:800,letterSpacing:".12em",color:C.gray,margin:"0 0 8px",textTransform:"uppercase"}}>4. Already taking (optional)</p>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap",marginBottom:8}}>
+              <p style={{fontSize:10,fontWeight:800,letterSpacing:".12em",color:C.gray,margin:0,textTransform:"uppercase"}}>4. Already taking (optional)</p>
+              {savedStackNames.length>0&&<button onClick={loadSavedStack} style={{padding:"6px 11px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:10,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Use My Stack</button>}
+            </div>
             <input value={stack} onChange={e=>setStack(e.target.value)} placeholder="e.g. Creatine, Vitamin D, Omega-3..."
               style={{width:"100%",padding:"11px 14px",border:`1px solid ${C.border}`,fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"}}/>
           </div>

@@ -4,12 +4,16 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow create: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'isPro', 'profile'])
+        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'isPro', 'profile', 'myStack', 'myStackUpdatedAt', 'tracker', 'trackerUpdatedAt'])
         && request.resource.data.isPro == false;
       allow update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['profile']);
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['profile', 'myStack', 'myStackUpdatedAt', 'tracker', 'trackerUpdatedAt'])
+        && (!request.resource.data.keys().hasAny(['myStack']) || request.resource.data.myStack is list)
+        && (!request.resource.data.keys().hasAny(['myStack']) || request.resource.data.myStack.size() <= 20)
+        && (!request.resource.data.keys().hasAny(['tracker']) || request.resource.data.tracker is map);
     }
     // Billing and quota documents are writable only through the Admin SDK.
     match /{document=**} { allow read, write: if false; }
   }
 }
+

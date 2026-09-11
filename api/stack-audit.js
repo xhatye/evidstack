@@ -1,4 +1,5 @@
 import { secure } from "../server/access.js";
+import { contextBlock, contextForStack } from "./evidence-context.js";
 export const config = { runtime: "nodejs" };
 
 async function handler(req, context) {
@@ -9,6 +10,7 @@ async function handler(req, context) {
     return new Response(JSON.stringify({ error: "Describe your current stack." }), { status: 400, headers: { "Content-Type": "application/json" } });
 
   const profile = body.userProfile || null;
+  const evidenceContext = contextBlock(contextForStack(stack));
   const profileCtx = profile && profile.weightKg
     ? `\nUSER PROFILE: ${profile.weightKg}kg, age ${profile.age||"unknown"}, biological sex ${profile.sex||"unknown"}. Adjust all dosage recommendations to this profile using weight-based dosing where applicable, age-adjusted metabolism considerations, and sex-specific reference ranges.`
     : "";
@@ -18,6 +20,11 @@ async function handler(req, context) {
 CURRENT STACK: ${stack}
 GOALS: ${goals || "not specified"}
 MONTHLY BUDGET: $${budget || "not specified"}${profileCtx}
+
+VERIFIED EVIDSTACK DATABASE CONTEXT:
+${evidenceContext}
+
+Use this database context as the factual source for compound-specific statements. Do not invent a study count, dosage, interaction, legal status, or source. If the context does not answer a point, say that the database does not establish it and recommend professional review where appropriate.
 
 Perform a comprehensive audit covering:
 1. Redundancies (compounds doing the same thing)
@@ -48,6 +55,7 @@ Respond ONLY with valid JSON, no markdown:
   "cost_analysis": "Assessment of budget efficiency",
   "optimized_stack": "Your recommended final stack in plain text",
   "priority_changes": ["Most important change #1", "Most important change #2", "Most important change #3"]
+  ,"evidence_notes": ["Which conclusions are supported by the supplied database context", "Which important questions remain unresolved"]
 }`;
 
   try {
@@ -68,3 +76,4 @@ Respond ONLY with valid JSON, no markdown:
 
 
 export default secure(handler, {free:false,textFields:["stack","goals"]});
+

@@ -13,6 +13,7 @@ const pages = {
   '/affiliate': ['Affiliate Information | Evidstack', 'Learn about the Evidstack affiliate program.'],
   '/changelog': ['Product Updates | Evidstack', 'Read recent Evidstack product updates.'],
   '/founding-testers': ['Evidstack Founding Testers | Evidence-Based Supplement Research', 'Join a small pilot group helping improve Evidstack research tools and compound pages.'],
+  '/my-stack': ['My Stack | Evidstack', 'Save supplement compounds, compare your shortlist and return to the evidence you want to review.'],
 };
 export function getPageSeo(pathname) {
   const path = pathname.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
@@ -30,6 +31,7 @@ export function getPageSeo(pathname) {
     if (GUIDE_IDS.includes(id)) { const name=id.replace(/-/g,' ').replace(/^./,s=>s.toUpperCase()); title=`${name} Supplement Guide | Evidstack`; description=`Read the Evidstack ${name.toLowerCase()} guide, with compound information, research context and cautions. For information, not a personal prescription.`; }
   }
   if (!title) { title = 'Research Tools | Evidstack'; description = 'Sign in to access your Evidstack research tools and account.'; indexable = false; }
+  if (path === '/my-stack') indexable = false;
   return { title, description, canonical, robots: indexable ? 'index,follow' : 'noindex,follow' };
 }
 export function applyPageSeo(seo) {
@@ -42,7 +44,7 @@ export function applyPageSeo(seo) {
   ]) document.querySelector(selector)?.setAttribute(attr,value);
 }
 export function publicPaths() {
-  return [...Object.keys(pages).filter(p=>!['/supplements','/legal','/affiliate','/changelog'].includes(p)),
+  return [...Object.keys(pages).filter(p=>!['/supplements','/legal','/affiliate','/changelog','/my-stack'].includes(p)),
     ...GOALS.filter(g=>g.id!=='all').map(g=>`/goal/${g.id}`), ...GUIDE_IDS.map(id=>`/guide/${id}`),
     ...SUPPLEMENTS.map(s=>`/compound/${s.id}`)];
 }

@@ -1,4 +1,5 @@
 import { secure } from "../server/access.js";
+import { contextBlock, contextForCompounds } from "./evidence-context.js";
 export const config = { runtime: "nodejs" };
 
 async function handler(req, context) {
@@ -9,6 +10,7 @@ async function handler(req, context) {
     return new Response(JSON.stringify({ error: "Add at least 2 compounds." }), { status: 400, headers: { "Content-Type": "application/json" } });
 
   const profile = body.userProfile || null;
+  const evidenceContext = contextBlock(contextForCompounds(compounds));
   const profileCtx = profile && profile.weightKg
     ? `\nUSER PROFILE: ${profile.weightKg}kg, age ${profile.age||"unknown"}, biological sex ${profile.sex||"unknown"}. Factor this into timing recommendations and flag any interactions that are especially relevant to this profile.`
     : "";
@@ -20,6 +22,11 @@ Evaluate every pair and group for:
 - Pharmacodynamic interactions (additive, synergistic, or antagonistic effects)
 - Safety concerns (cardiovascular, hepatotoxic, hormonal, CNS)
 - Optimal timing adjustments
+
+VERIFIED EVIDSTACK DATABASE CONTEXT:
+${evidenceContext}
+
+Use the supplied context for compound-specific facts. Do not claim that an interaction is established when the context does not support it. If the database has no verified interaction for a pair, say that no verified interaction is recorded in Evidstack and distinguish that from proof of safety. Include uncertainty in the summary.
 
 Respond ONLY with valid JSON, no markdown:
 {
@@ -36,6 +43,7 @@ Respond ONLY with valid JSON, no markdown:
   ],
   "timing_protocol": "Optimal daily timing schedule for all compounds listed",
   "safe_to_stack": true | false
+  ,"evidence_notes": ["What the supplied database supports", "What remains unknown"]
 }`;
 
   try {
@@ -56,3 +64,4 @@ Respond ONLY with valid JSON, no markdown:
 
 
 export default secure(handler, {"free":false});
+

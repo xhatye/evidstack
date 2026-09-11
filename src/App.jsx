@@ -3764,7 +3764,7 @@ function AppInner(){
         ):(
           <div style={{display:"flex",alignItems:"center",gap:4}}>
             {navItems.map(item=>(
-              <button key={item.id} onClick={()=>navigateTo(item.id)}
+              <button key={item.id} className={item.id==="body-atlas"?"atlas-nav-feature":undefined} onClick={()=>navigateTo(item.id)}
                 style={{padding:"8px 14px",fontSize:12,fontWeight:700,
                   background:page===item.id?C.ink:"transparent",
                   color:page===item.id?C.white:C.gray,
@@ -3854,7 +3854,7 @@ function AppInner(){
           <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>
           <p className="evid-hero-description">A research database for supplements and compounds. Compare evidence, understand doses and spot potential interactions before building your stack.</p>
           <p className="evid-hero-support">Explore {SUPPLEMENTS.length} compound profiles, from everyday supplements to specialist compounds. Pro adds the full catalogue, stack analysis and research tools.</p>
-          <div className="evid-hero-actions"><button onClick={()=>{document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Find a compound <span aria-hidden="true">↓</span></button><button onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button><button onClick={()=>{trackEvent("pilot_interest",{source:"homepage"});navigateTo("founding-testers");}}>Join the pilot <span aria-hidden="true">↗</span></button></div>
+          <div className="evid-hero-actions"><button className="atlas-home-feature" onClick={()=>navigateTo("body-atlas")}><span aria-hidden="true">◎</span> Body Atlas <span className="atlas-new-badge">NEW</span></button><button onClick={()=>{document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Find a compound <span aria-hidden="true">↓</span></button><button onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button><button onClick={()=>{trackEvent("pilot_interest",{source:"homepage"});navigateTo("founding-testers");}}>Join the pilot <span aria-hidden="true">↗</span></button></div>
           <p className="evid-hero-access">Start with a free preview. Go deeper with Pro.</p>
           <div ref={searchContainerRef} className={`evid-hero-search${searchFocused||search?" is-expanded":""}`}>
             <div className="evid-hero-search-row">
@@ -6666,4 +6666,3 @@ function PricingPage({onUpgrade,onAuth}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
-

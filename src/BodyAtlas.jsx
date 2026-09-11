@@ -98,8 +98,14 @@ function BodySilhouette({ model, view = "front", selectedId, hoveredId, onHover,
     ? "M165 112 C163 128 147 132 132 137 Q118 144 121 165 C124 188 140 209 143 231 Q146 252 132 280 C121 304 125 329 142 348 Q161 360 180 344 Q199 360 218 348 C235 329 239 304 228 280 Q214 252 217 231 C220 209 236 188 239 165 Q242 144 228 137 C213 132 197 128 195 112 Z"
     : "M164 112 C162 130 145 133 124 137 Q105 143 112 174 C120 204 133 223 139 250 Q142 268 135 290 Q128 314 140 340 Q156 356 180 342 Q204 356 220 340 Q232 314 225 290 Q218 268 221 250 C227 223 240 204 248 174 Q255 143 236 137 C215 133 198 130 196 112 Z";
   const arm = female
-    ? "M131 139 Q111 135 104 157 C96 182 92 207 84 229 Q76 244 75 260 L59 314 Q52 328 54 338 L53 356 Q55 363 58 354 L62 341 L61 363 Q63 368 66 360 L70 342 L70 360 Q74 364 76 353 L80 335 Q85 333 87 323 L88 310 Q102 284 105 260 Q103 247 110 232 Q121 205 128 183 Z"
-    : "M121 140 Q101 134 94 158 Q83 184 85 205 L77 231 Q69 249 72 263 L56 315 Q50 326 51 339 L50 355 Q52 364 56 354 L60 340 L59 362 Q62 368 65 359 L69 342 L70 361 Q74 364 76 353 L80 334 Q86 333 87 322 L88 309 Q104 282 104 260 Q101 246 109 230 Q122 209 125 183 Z";
+    ? "M131 139 Q111 135 104 157 C96 182 92 207 84 229 Q77 245 75 261 L83 303 Q87 311 92 306 L105 260 Q103 247 110 232 Q121 205 128 183 Z"
+    : "M121 140 Q101 134 94 158 Q83 184 85 205 L77 231 Q70 249 72 263 L80 307 Q85 314 90 306 L104 260 Q101 246 109 230 Q122 209 125 183 Z";
+  const hand = female
+    ? "M84 298 C78 299 74 304 70 311 L56 326 C52 331 54 337 59 338 C63 339 68 333 72 328 L66 342 C64 348 68 351 72 347 L78 335 L75 350 C75 356 80 358 83 352 L86 338 L86 350 C87 355 92 355 93 349 L93 322 C94 312 91 303 84 298 Z"
+    : "M82 300 C76 301 72 306 68 313 L54 328 C50 333 52 339 57 340 C61 341 66 335 70 330 L64 344 C62 350 66 353 70 349 L76 337 L73 352 C73 358 78 360 81 354 L84 340 L84 352 C85 357 90 357 91 351 L91 325 C92 315 89 305 82 300 Z";
+  const foot = female
+    ? "M143 602 Q151 608 164 607 L169 625 Q173 634 166 639 L143 639 Q136 635 142 628 Q148 620 143 602 Z"
+    : "M143 602 Q151 608 164 607 L169 625 Q173 634 166 639 L143 639 Q136 635 142 628 Q148 620 143 602 Z";
   const leg = female
     ? "M136 310 Q124 337 134 376 L146 443 Q141 468 145 487 Q149 522 153 552 L153 604 Q151 617 143 626 Q138 634 145 638 L166 638 Q177 636 173 626 L168 608 L172 550 Q181 512 174 484 L169 458 Q176 407 180 353 L174 321 Z"
     : "M138 309 Q126 340 134 375 L143 442 Q138 461 142 483 Q140 510 151 548 L153 604 Q151 617 142 625 Q137 634 144 638 L166 638 Q177 636 173 626 L168 607 L172 550 Q185 511 176 484 L169 456 Q181 402 180 350 L173 320 Z";
@@ -115,17 +121,22 @@ function BodySilhouette({ model, view = "front", selectedId, hoveredId, onHover,
   return (
     <svg className="body-atlas-svg" viewBox="0 0 360 680" role={decorative ? undefined : "group"} aria-label={decorative ? undefined : `${female ? "Female" : "Male"} body, ${view} view. Choose a region.`} aria-hidden={decorative || undefined}>
       <defs>
-        <linearGradient id={`${uid}-body`} x1="0" x2="1"><stop stopColor="#8c9c97"/><stop offset=".3" stopColor="#dce4dc"/><stop offset=".5" stopColor="#f1eee0"/><stop offset=".73" stopColor="#bbc9c1"/><stop offset="1" stopColor="#7c918a"/></linearGradient>
+        <linearGradient id={`${uid}-body`} x1="0" x2="1"><stop stopColor="#825c54"/><stop offset=".18" stopColor="#c38b72"/><stop offset=".42" stopColor="#f0c1a1"/><stop offset=".55" stopColor="#f7d3b4"/><stop offset=".76" stopColor="#d69a7a"/><stop offset="1" stopColor="#8a6258"/></linearGradient>
         <radialGradient id={`${uid}-halo`}><stop stopColor="#dfc77c" stopOpacity=".24"/><stop offset="1" stopColor="#dfc77c" stopOpacity="0"/></radialGradient>
       </defs>
       <ellipse cx="180" cy="330" rx="159" ry="302" fill={`url(#${uid}-halo)`}/>
       <g className="atlas-coordinate-lines" aria-hidden="true"><path d="M180 18V653 M35 88H325 M35 170H325 M35 312H325 M35 450H325 M35 612H325"/><ellipse cx="180" cy="648" rx="80" ry="9"/></g>
       <g fill={`url(#${uid}-body)`} stroke="#85968b" strokeWidth=".85" strokeLinejoin="round">
         <path d={arm}/><path d={arm} transform="translate(360 0) scale(-1 1)"/>
+        <path d={hand}/><path d={hand} transform="translate(360 0) scale(-1 1)"/>
         <path d={leg}/><path d={leg} transform="translate(360 0) scale(-1 1)"/>
+        <path d={foot}/><path d={foot} transform="translate(360 0) scale(-1 1)"/>
         <path d={torso}/>
+        <path d="M163 102 L163 130 Q180 143 197 130 L197 102 Q180 111 163 102 Z"/>
         <path d={female ? "M155 62 C154 25 204 25 205 62 L203 89 Q199 108 180 118 Q161 108 157 89 Z" : "M152 61 C151 24 208 24 208 61 L205 90 Q199 112 180 119 Q161 112 155 90 Z"}/>
         <path d="M155 70 Q148 63 150 80 L157 89 M205 70 Q212 63 210 80 L203 89"/>
+        <path d={female ? "M155 63 Q148 45 153 32 Q161 17 180 22 Q199 17 207 32 Q212 45 205 63 L198 50 Q180 59 162 50 Z" : "M152 61 Q154 27 180 23 Q206 27 208 61 L201 51 Q180 45 159 51 Z"} fill="#4b3533" stroke="#3a2929"/>
+        {female && <path d="M154 47 Q143 53 149 75 M206 47 Q217 53 211 75" fill="none" stroke="#4b3533" strokeWidth="9" strokeLinecap="round"/>}
       </g>
       <g className="atlas-anatomy-lines" aria-hidden="true">
         {back ? <>
@@ -133,6 +144,8 @@ function BodySilhouette({ model, view = "front", selectedId, hoveredId, onHover,
           <path d="M159 62Q180 43 201 62 M174 112L174 129 M186 112L186 129"/>
         </> : <>
           <path d="M158 68Q168 62 175 68 M185 68Q192 62 202 68 M180 71L176 87L182 88 M171 98Q180 101 189 98 M167 119L174 140 M193 119L186 140 M174 145Q150 136 132 152 M186 145Q210 136 228 152"/>
+          <path d="M58 330L69 319 M66 343L77 328 M75 349L84 333 M84 350L89 335 M302 330L291 319 M294 343L283 328 M285 349L276 333 M276 350L271 335"/>
+          <path d="M143 627L164 627 M217 627L196 627"/>
           <path d={female ? "M137 172 Q130 199 157 202 Q176 202 177 181 M223 172 Q230 199 203 202 Q184 202 183 181 M151 215Q156 247 148 272 M209 215Q204 247 212 272" : "M128 168 Q142 154 174 166 L174 194 Q147 207 128 189 M232 168 Q218 154 186 166 L186 194 Q213 207 232 189 M154 211H174 M186 211H206 M154 232H174 M186 232H206 M157 253H174 M186 253H203"}/>
           <path d="M180 205V267 M177 276Q180 279 183 276 M140 296L168 320 M220 296L192 320 M149 351Q154 389 157 426 M211 351Q206 389 203 426 M150 450Q157 440 165 450 M195 450Q203 440 210 450 M156 474L162 546 M204 474L198 546 M103 175L91 226 M257 175L269 226 M87 263L68 309 M273 263L292 309"/>
         </>}
@@ -291,3 +304,4 @@ export default function BodyAtlasPage({ isPro, onUpgrade, onAuth, onNavigate }) 
     </main>
   );
 }
+

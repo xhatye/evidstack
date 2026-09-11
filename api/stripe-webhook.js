@@ -15,6 +15,17 @@ function initAdmin() {
   });
 }
 
+export function eventUid(obj) {
+  return obj?.metadata?.uid
+    || obj?.subscription_details?.metadata?.uid
+    || obj?.parent?.subscription_details?.metadata?.uid
+    || null;
+}
+
+export function activeSubscription(status) {
+  return status === "active" || status === "trialing";
+}
+
 async function getRawBody(req) {
   const chunks = [];
   for await (const chunk of req) chunks.push(chunk);
@@ -80,13 +91,20 @@ export default async function handler(req, res) {
 
   initAdmin();
   const db = getFirestore();
-  const getUid = (obj) => obj?.metadata?.uid;
+  const claimRef = db.doc(`_stripeEvents/${event.id}`);
+  const claimed = await db.runTransaction(async tx => {
+    const snap = await tx.get(claimRef);
+    if (snap.exists) return false;
+    tx.create(claimRef, { type: event.type, status: "processing", createdAt: Date.now() });
+    return true;
+  });
+  if (!claimed) return res.json({ received: true, duplicate: true });
 
   try {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
-        const uid = getUid(session);
+        const uid = eventUid(session);
         if (!uid) break;
         if (session.mode === "subscription" && session.payment_status === "paid") {
           await db.doc(`users/${uid}`).set(
@@ -106,24 +124,41 @@ export default async function handler(req, res) {
         break;
       }
       case "invoice.paid": {
-        const uid = getUid(event.data.object.subscription_details);
+        const invoice = event.data.object;
+        const uid = eventUid(invoice);
         if (!uid) break;
         await db.doc(`users/${uid}`).set({ isPro: true, proExpiresAt: null }, { merge: true });
+        break;
+      }
+      case "customer.subscription.updated": {
+        const subscription = event.data.object;
+        const uid = eventUid(subscription);
+        if (!uid) break;
+        const isActive = activeSubscription(subscription.status);
+        await db.doc(`users/${uid}`).set({
+          isPro: isActive,
+          proExpiresAt: isActive && subscription.current_period_end ? subscription.current_period_end * 1000 : null,
+          stripeSubscriptionId: subscription.id,
+          stripeCustomerId: subscription.customer,
+        }, { merge: true });
         break;
       }
       case "customer.subscription.deleted":
       case "invoice.payment_failed": {
         const obj = event.data.object;
-        const uid = getUid(obj.metadata ? obj : obj.subscription_details);
+        const uid = eventUid(obj);
         if (!uid) break;
         await db.doc(`users/${uid}`).set({ isPro: false }, { merge: true });
         break;
       }
     }
+    await claimRef.set({ status: "processed", processedAt: Date.now() }, { merge: true });
   } catch (err) {
     console.error("Webhook handler error:", err);
+    try { await claimRef.delete(); } catch {}
     return res.status(500).end();
   }
 
   res.json({ received: true });
 }
+

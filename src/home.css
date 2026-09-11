@@ -39,3 +39,60 @@
 @media(max-width:767px){.evid-source-proof{padding:48px 16px}.evid-source-proof-heading{display:block;margin-bottom:24px}.evid-source-intro{font-size:13px;margin-top:18px}.evid-source-grid{grid-template-columns:1fr}.evid-source-card{min-height:180px;padding:20px}.evid-source-index{margin-bottom:24px}.evid-source-name{font-size:18px}.evid-source-proof-footer{display:block;font-size:11px}.evid-source-proof-footer span{display:block}.evid-source-proof-footer span+span{margin-top:8px}}
 @media(max-width:360px){.evid-main-nav{padding-left:10px!important;padding-right:10px!important}.evid-main-nav>div:last-child{gap:5px!important}.evid-main-nav>div:last-child>button{padding-left:6px!important;padding-right:6px!important}}
 @media(prefers-reduced-motion:reduce){.evid-homepage::before,.evid-orbit,.orbit-point{animation:none!important}.evid-search-example{transition:none!important}}
+
+/* Calm, editorial surface with static research motifs. */
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{background:#fff;color:#1a1a1a}
+.evid-homepage{background:#fff!important;color:#1a1a1a}
+.evid-homepage::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-color:#fff;background-image:
+  radial-gradient(circle at 11% 18%,rgba(226,201,126,.26) 0 3px,transparent 4px),
+  radial-gradient(circle at 17% 23%,rgba(37,99,235,.14) 0 2px,transparent 3px),
+  radial-gradient(circle at 88% 70%,rgba(226,201,126,.24) 0 3px,transparent 4px),
+  radial-gradient(circle at 93% 64%,rgba(37,99,235,.12) 0 2px,transparent 3px),
+  linear-gradient(28deg,transparent 49.7%,rgba(30,41,59,.06) 50%,transparent 50.3%),
+  linear-gradient(205deg,transparent 49.8%,rgba(30,41,59,.05) 50%,transparent 50.2%);
+  background-size:100% 100%;animation:none!important}
+.evid-home-hero{background:#fff!important;color:#1a1a1a;border-bottom:1px solid #d4d0c8;padding-top:78px}
+.evid-hero-art{z-index:0;background-color:#fff;background-image:
+  radial-gradient(ellipse 150px 52px at 9% 26%,rgba(226,201,126,.16) 0 47%,transparent 49%),
+  radial-gradient(ellipse 130px 44px at 91% 68%,rgba(37,99,235,.07) 0 47%,transparent 49%),
+  radial-gradient(circle at 13% 25%,rgba(226,201,126,.48) 0 3px,transparent 4px),
+  radial-gradient(circle at 20% 33%,rgba(37,99,235,.22) 0 2px,transparent 3px),
+  radial-gradient(circle at 87% 66%,rgba(226,201,126,.42) 0 3px,transparent 4px),
+  radial-gradient(circle at 81% 73%,rgba(37,99,235,.18) 0 2px,transparent 3px),
+  linear-gradient(26deg,transparent 49.7%,rgba(30,41,59,.07) 50%,transparent 50.3%),
+  linear-gradient(204deg,transparent 49.7%,rgba(30,41,59,.06) 50%,transparent 50.3%);opacity:1}
+.evid-hero-art::before,.evid-hero-art::after{content:"";position:absolute;pointer-events:none;border-radius:999px;filter:drop-shadow(0 14px 20px rgba(30,41,59,.10))}
+.evid-hero-art::before{width:132px;height:44px;left:7%;top:22%;background:linear-gradient(90deg,rgba(226,201,126,.20) 0 49%,rgba(255,255,255,.8) 50% 100%);transform:rotate(-24deg)}
+.evid-hero-art::after{width:110px;height:36px;right:7%;bottom:20%;background:linear-gradient(90deg,rgba(37,99,235,.10) 0 49%,rgba(226,201,126,.16) 50% 100%);transform:rotate(24deg)}
+.evid-orbit,.orbit-point,.evid-hero-grid{display:none!important}
+.evid-hero-content{z-index:1}
+.evid-hero-kicker{color:#75632d}
+.evid-hero-content h1{color:#1a1a1a}
+.evid-hero-content h1 span{color:#a47b22}
+.evid-hero-description{color:#4b5563}
+.evid-hero-support{color:#6b7280}
+.evid-hero-actions button:first-child{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.evid-hero-actions button+button{color:#1a1a1a;border-color:#b9b4a8}
+.evid-hero-access{color:#6b7280}
+.evid-access-strip{border-top-color:#d4d0c8}
+.evid-access-strip span{color:#6b7280}.evid-access-strip strong,.evid-access-strip button{color:#75632d}
+.evid-hero-search{position:relative;width:min(100%,540px);margin:0 auto 20px;transition:width .55s cubic-bezier(.16,1,.3,1)}
+.evid-hero-search.is-expanded{width:min(100%,760px)}
+.evid-hero-search-row{display:flex;position:relative;background:#fff;box-shadow:0 12px 32px rgba(30,41,59,.10);border:1px solid #d4d0c8}
+.evid-hero-search-row input{flex:1;min-width:0;padding:16px 20px;border:0;background:#fff;color:#1a1a1a;font:14px Montserrat,sans-serif;outline:none}
+.evid-hero-search-row button{padding:16px 24px;background:#1a1a1a;color:#fff;border:0;font:700 13px Montserrat,sans-serif;letter-spacing:.04em;cursor:pointer;flex-shrink:0;transition:background .2s,transform .2s}
+.evid-hero-search-row button:hover{background:#75632d;transform:translateX(2px)}
+.evid-search-suggestions{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:80;max-height:360px;overflow-y:auto;background:#fff;border:1px solid #d4d0c8;box-shadow:0 16px 40px rgba(30,41,59,.14);text-align:left}
+.evid-suggestion-heading{margin:0;padding:9px 16px 5px;background:#f4f2ee;border-bottom:1px solid #d4d0c8;color:#6b7280;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.evid-suggestion-row{width:100%;display:flex;align-items:center;gap:12px;padding:11px 16px;background:#fff;border:0;border-bottom:1px solid #e8e5df;color:#1a1a1a;text-align:left;cursor:pointer;font-family:Montserrat,sans-serif}
+.evid-suggestion-row:hover,.evid-suggestion-row:focus-visible{background:#f4f2ee;outline:none}
+.evid-suggestion-row strong{display:block;font-size:13px;font-weight:700}.evid-suggestion-row small{display:block;margin-top:2px;color:#6b7280;font-size:10px;font-weight:500}.evid-suggestion-row em{margin-left:auto;padding:2px 7px;background:rgba(226,201,126,.18);color:#75632d;font-size:9px;font-style:normal;font-weight:800;letter-spacing:.08em}.evid-suggestion-icon{font-size:16px}.evid-suggestion-tier{min-width:26px;padding:2px 5px;border:1px solid;font-size:10px;font-weight:800;text-align:center}.evid-suggestion-copy{min-width:0;flex:1}.evid-suggestion-copy strong,.evid-suggestion-copy small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.evid-suggestion-meter{width:34px;height:4px;background:#d4d0c8;border-radius:3px;overflow:hidden;flex-shrink:0}.evid-suggestion-meter span{display:block;height:100%;border-radius:3px}
+.evid-main-nav{background:rgba(255,255,255,.92)!important;backdrop-filter:blur(18px) saturate(110%)!important}
+.evid-nav-search{position:relative;display:flex;align-items:center;flex:none}.evid-nav-search-trigger{width:34px;height:34px;display:grid;place-items:center;background:transparent;border:1px solid transparent;color:#1a1a1a;cursor:pointer}.evid-nav-search-trigger:hover{border-color:#d4d0c8;background:#f4f2ee}.evid-search-icon{position:relative;display:block;width:15px;height:15px;border:1.8px solid currentColor;border-radius:50%}.evid-search-icon::after{content:"";position:absolute;width:6px;height:1.8px;right:-5px;bottom:-2px;background:currentColor;transform:rotate(45deg);transform-origin:left center;border-radius:2px}.evid-nav-search-expanded{position:relative;width:min(280px,30vw);display:flex;align-items:center;gap:9px;padding:7px 9px;background:#fff;border:1px solid #b9b4a8;box-shadow:0 8px 22px rgba(30,41,59,.10);animation:evidSearchIn .42s cubic-bezier(.16,1,.3,1) both}.evid-nav-search-expanded input{min-width:0;flex:1;border:0;outline:none;background:transparent;color:#1a1a1a;font:12px Montserrat,sans-serif}.evid-nav-search-close{border:0;background:transparent;color:#6b7280;font-size:20px;line-height:1;cursor:pointer;padding:0 2px}.evid-nav-search-expanded .evid-search-suggestions{top:calc(100% + 9px);left:auto;right:0;width:320px;max-width:calc(100vw - 24px)}
+@keyframes evidSearchIn{from{opacity:0;transform:translateX(12px) scaleX(.86);transform-origin:right center}to{opacity:1;transform:translateX(0) scaleX(1)}}
+.evid-about-page{background:transparent}.evid-about-hero{max-width:700px}.evid-about-kicker{margin:0 0 16px;color:#75632d;font-size:10px;font-weight:800;letter-spacing:.2em}.evid-about-hero h2{margin:0 0 18px;color:#1a1a1a;font-size:clamp(34px,5.8vw,64px);font-weight:900;line-height:1.02;letter-spacing:-.065em}.evid-about-lede{max-width:600px;margin:0;color:#6b7280;font-size:16px;line-height:1.85}.evid-about-rule{height:1px;margin:52px 0 44px;background:#d4d0c8}.evid-about-section{max-width:690px;margin:0 0 42px}.evid-about-label{margin:0 0 13px;color:#75632d;font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}.evid-about-body{margin:0;color:#4b5563;font-size:15px;line-height:1.95}.evid-about-rule-last{margin:8px 0 38px}.evid-about-founder{display:flex;align-items:flex-start;gap:18px;max-width:620px}.evid-about-avatar{width:44px;height:44px;display:grid;place-items:center;flex:none;background:#1a1a1a;color:#fff;font-size:14px;font-weight:900}.evid-about-founder-name{margin:0 0 7px;color:#1a1a1a;font-size:12px;font-weight:800}.evid-about-founder-name span{margin-left:8px;color:#9ca3af;font-weight:600}.evid-about-founder-copy{margin:0;color:#6b7280;font-size:13px;line-height:1.9}
+.evid-reveal{will-change:opacity,transform}
+@media(max-width:767px){html{scroll-padding-top:76px}.evid-home-hero{padding:50px 16px 28px}.evid-hero-content h1{font-size:clamp(45px,11vw,70px)}.evid-hero-search,.evid-hero-search.is-expanded{width:100%}.evid-hero-search-row input{padding:14px}.evid-hero-search-row button{padding:14px 16px;font-size:11px}.evid-nav-search-expanded{width:min(205px,calc(100vw - 180px));padding:6px 8px}.evid-nav-search-expanded .evid-search-suggestions{position:fixed;top:76px;right:12px;width:min(320px,calc(100vw - 24px))}.evid-about-hero h2{font-size:clamp(34px,10vw,52px)}.evid-about-lede{font-size:14px}.evid-about-body{font-size:14px;line-height:1.85}.evid-about-rule{margin:38px 0 34px}.evid-about-founder{gap:13px}.evid-about-founder-copy{font-size:12px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.evid-nav-search-expanded{animation:none}.evid-hero-search,.evid-hero-search-row button{transition:none}.evid-reveal{transition:none!important}}
+

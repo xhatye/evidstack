@@ -1,4 +1,5 @@
 import { secure } from "../server/access.js";
+import { contextBlock, contextForQuery } from "./evidence-context.js";
 export const config = { runtime: "nodejs" };
 
 async function handler(req, context) {
@@ -13,7 +14,12 @@ async function handler(req, context) {
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
 
+  const evidenceContext = contextBlock(contextForQuery(query));
+
   const systemPrompt = `You are the Evidstack Compound Advisor — a rigorous, evidence-based supplement research engine. Users describe a health goal, symptom, or optimization target, and you respond with the most relevant compounds from the Evidstack database ranked strictly by quality of evidence and strength of effect.
+
+VERIFIED EVIDSTACK DATABASE CONTEXT:
+${evidenceContext}
 
 STRICT RULES:
 - Never recommend more than 8 compounds per response
@@ -24,6 +30,8 @@ STRICT RULES:
 - Be concise — each compound entry should be scannable, not a wall of text
 - If the query is vague, ask one clarifying question before listing compounds
 - If the query involves a serious medical condition, note to consult a doctor first
+- Recommend compounds only when they appear in the supplied database context. If the context is insufficient, say so and return an empty list rather than inventing a compound or study.
+- Never invent a study count, dose, evidence score, interaction, or source. Use the exact source identifiers from the supplied context when available.
 
 Respond ONLY with valid JSON in exactly this structure (no markdown, no preamble):
 {
@@ -43,7 +51,9 @@ Respond ONLY with valid JSON in exactly this structure (no markdown, no preamble
       "synergy": ["Beta-Alanine"],
       "conflict": [],
       "study_count": 500,
-      "study_type": "Meta-analyses"
+      "study_type": "Meta-analyses",
+      "sources": ["PMID:12345678"],
+      "evidence_note": "What the supplied database supports and what remains uncertain"
     }
   ],
   "synergy_note": "Compounds 1 and 3 work via complementary mechanisms and can be stacked. Take compound 2 separately from compound 4 (absorption competition).",
@@ -98,3 +108,4 @@ TIER PRIORITY: The user has chosen to prioritize Tier ${tierPriority} compounds 
 
 
 export default secure(handler, {"free":true});
+

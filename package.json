@@ -4,11 +4,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/build-seo.js",
+    "build": "npm run validate:catalog && vite build && node scripts/build-seo.js",
     "preview": "vite preview",
     "test": "node --test tests/*.test.js",
     "audit:deps": "npm audit --omit=dev",
-    "check:secrets": "node scripts/check-secrets.js"
+    "check:secrets": "node scripts/check-secrets.js",
+    "validate:catalog": "node scripts/validate-catalog.js"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

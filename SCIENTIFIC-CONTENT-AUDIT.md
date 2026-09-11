@@ -22,11 +22,12 @@ This audit covers the current Evidstack catalogue as of September 2026.
 
 ## Current coverage
 
-- 367 unique PMID references resolve through PubMed.
+- 118 unique PMID references are attached after the relevance pass and all resolve through PubMed.
 - No malformed non-PMID references remain in the catalogue after normalization.
-- 379 effects have no attached source and are now marked in the compound view as unestablished pending review.
+- 100 effects have an attached reference selected by the audit; 633 effects remain marked in the compound view as unestablished pending review.
+- The Retatrutide effect now links to PMID 37366315, the phase 2 obesity trial; the unrelated PMID 37557886 was removed.
 
 ## Remaining work
 
-The remaining 379 uncited effects and the relevance of the 367 resolved PMIDs require batch review against the full text or abstract, including population, intervention, dose, outcome, duration and limitations. Until that work is complete, scores and summaries are editorial research context, not clinical recommendations.
+The remaining 633 effects and the relevance of the 118 attached PMIDs require batch review against the full text or abstract, including population, intervention, dose, outcome, duration and limitations. Until that work is complete, scores and summaries are editorial research context, not clinical recommendations.
 

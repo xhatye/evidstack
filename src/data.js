@@ -1,3 +1,5 @@
+import { SCIENTIFIC_SOURCE_REPAIRS } from "./scientific-sources.js";
+
 // SUPRAI  - Supplement Database v1.0
 // Sources: PubMed, Cochrane, Examine.com cross-referenced
 // Efficacy 1-5: amplitude of effect in humans
@@ -25,6 +27,7 @@ export const GOALS = [
   { id: "eyes",      label: "Eye Health",       icon: "👁️" },
 
 ];
+
 export const TIERS = {
   1: { label: "Fundamentals",  color: "#4ade80", desc: "Core supplements, extensively studied" },
   2: { label: "Advanced",       color: "#60a5fa", desc: "Good evidence base, common use" },
@@ -428,4 +431,15 @@ export const SUPPLEMENTS = [
   {id:"dihydromyricetin",name:"Dihydromyricetin (DHM)",aliases:["DHM","Ampelopsin","hovenia dulcis extract","Japanese raisin tree"],tier:2,tags:[],safety:5,legal:"Legal worldwide. Available OTC.",cost:"$15-30/month",effects:[{goal:"liver",efficacy:4,evidence:3,study_count:20,study_type:"RCTs",summary:"Accelerates alcohol metabolism via ADH and ALDH enzyme upregulation. Reduces blood acetaldehyde levels (the toxic byproduct causing hangovers) by 30-40% in controlled trials. Hepatoprotective against alcohol-induced liver damage."},{goal:"stress",efficacy:3,evidence:3,study_count:12,study_type:"Controlled trials",summary:"GABA-A positive allosteric modulator at doses used for hangover prevention. Reduces anxiety without sedation. Used as a non-addictive anxiolytic in some protocols."},{goal:"longevity",efficacy:2,evidence:2,study_count:8,study_type:"Controlled trials",summary:"Potent antioxidant and anti-inflammatory. Reduces NF-kB activation and inflammatory cytokines. Neuroprotective effects in animal models."}],dosage:{amount:"300-1200mg",timing:"Before or during alcohol consumption for hangover prevention; 300mg daily for general use",note:"Take 300-600mg before drinking and another 300mg before bed for best results. Also effective as daily supplement for liver protection and anxiety reduction independent of alcohol use."},interactions:["Alcohol - intentionally combined; reduces intoxication and hangover","Benzodiazepines - additive GABA-A effect; reduce doses","Blood thinners - mild anticoagulant properties"],sideEffects:[{effect:"Reduced alcohol intoxication sensation",severity:"mild",frequency:"common",note:"Users may drink more thinking they are less drunk - alcohol blood levels are not reduced, only acetaldehyde."},{effect:"Drowsiness at high doses",severity:"mild",frequency:"uncommon",note:"GABA-A activity; avoid driving."}]},
   {id:"calcium-d-glucarate",name:"Calcium D-Glucarate",aliases:["CDG","D-glucaric acid","calcium glucarate","estrogen detox"],tier:2,tags:[],safety:5,legal:"Legal worldwide. Available OTC.",cost:"$20-40/month",effects:[{goal:"hormones",efficacy:3,evidence:3,study_count:15,study_type:"RCTs",summary:"Inhibits beta-glucuronidase enzyme in the gut, preventing re-absorption of conjugated estrogens and toxins. Accelerates hepatic estrogen clearance. Used for estrogen dominance, PCOS, and post-cycle therapy."},{goal:"liver",efficacy:3,evidence:3,study_count:12,study_type:"RCTs",summary:"Enhances glucuronidation - a primary liver detoxification pathway. Reduces circulating levels of carcinogens, hormones, and environmental toxins that have been conjugated for excretion."},{goal:"longevity",efficacy:2,evidence:2,study_count:8,study_type:"Controlled trials",summary:"Inverse correlation between D-glucarate intake and cancer incidence in population studies. Detoxification pathway support reduces toxic burden accumulation."}],dosage:{amount:"500-3000mg/day",timing:"With meals, divided doses",note:"1500mg/day is a common starting dose. Higher doses for post-cycle therapy or active estrogen management. Pairs well with DIM and broccoli extract for comprehensive estrogen metabolism support."},interactions:["Hormone therapies - may alter estrogen levels","Medications processed by glucuronidation (some statins, NSAIDs) - may reduce their blood levels"],sideEffects:[{effect:"GI discomfort",severity:"mild",frequency:"uncommon",note:"Start with lower doses and titrate up."},{effect:"Altered medication levels",severity:"moderate",frequency:"rare",note:"Glucuronidation affects many drugs; monitor if on medications."}]}
 ];
+
+// Apply the source audit at load time so every surface uses the same repaired
+// references and every unresolved effect is explicitly marked for review.
+for (const supplement of SUPPLEMENTS) {
+  (supplement.effects || []).forEach((effect, effectIndex) => {
+    const repair = SCIENTIFIC_SOURCE_REPAIRS[`${supplement.id}:${effectIndex}`];
+    if (!repair) return;
+    effect.sources = repair.sources;
+    effect.sourceStatus = repair.status;
+  });
+}
 

@@ -95,6 +95,7 @@ function useMyStack(){
 const ROUTES = {
   "/":"supplements",
   "/supplements":"supplements",
+  "/body-atlas":"body-atlas",
   "/stack-builder":"stack-builder",
   "/interactions":"interactions",
   "/weekly-protocol":"weekly-protocol",
@@ -152,6 +153,7 @@ function navigate(page){
 }
 import { SUPPLEMENTS, GOALS, TIERS } from "./data.js";
 import { AuthProvider, useAuth } from "./AuthContext.jsx";
+import BodyAtlasPage from "./BodyAtlas.jsx";
 
 // v2
 const C = {
@@ -3625,6 +3627,7 @@ function AppInner(){
 
   const navItems=[
     {id:"supplements",label:"Supplements"},
+    {id:"body-atlas",label:"Body Atlas"},
     {id:"my-stack",label:"My Stack"},
     {id:"advisor",label:"AI Compound Advisor"},
     {id:"guides",label:"Guides"},
@@ -3639,7 +3642,7 @@ function AppInner(){
     {id:"bloodwork-history",label:"Bloodwork History"},
   ];
   const proPages=proTools.map(t=>t.id);
-  const isProToolPage=["weekly-protocol","interactions","tracker","advisor","interaction-checker","stack-audit","bloodwork-history","stack-builder","cycle-alerts","stack-optimizer","bloodwork"].includes(page);
+  const isProToolPage=["weekly-protocol","interactions","tracker","advisor","interaction-checker","stack-audit","bloodwork-history","stack-builder","cycle-alerts","stack-optimizer","bloodwork","body-atlas"].includes(page);
 
   const scrollToResults=()=>{
     if(page!=="supplements")navigateTo("supplements");
@@ -3819,6 +3822,7 @@ function AppInner(){
       </nav>
 
       {page==="about"         &&<AboutPage/>}
+      {page==="body-atlas"&&<BodyAtlasPage isPro={isPro} onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
       {page==="founding-testers"&&<FoundingTestersPage onAuth={openAuth}/>}
       {page==="my-stack"&&<MyStackPage onNavigate={navigateTo} onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="pricing"        &&<PricingPage onUpgrade={openUpgrade} onAuth={openAuth}/>}

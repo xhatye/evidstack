@@ -6428,9 +6428,45 @@ function FoundingTestersPage({onAuth}){
   const isMob=useIsMobile();
   const email="evidstack@protonmail.com";
   const [copied,setCopied]=useState(false);
+  const [goal,setGoal]=useState("");
+  const [compounds,setCompounds]=useState("");
+  const [contactEmail,setContactEmail]=useState("");
+  const [error,setError]=useState("");
+  const [prepared,setPrepared]=useState(false);
+  const source=useMemo(()=>{
+    try{
+      const params=new URLSearchParams(window.location.search);
+      return (params.get("utm_source")||params.get("source")||document.referrer||"direct").slice(0,80);
+    }catch{return "direct";}
+  },[]);
+
+  useEffect(()=>{trackEvent("pilot_form_view",{source});},[source]);
+
   const copyEmail=async()=>{
-    trackEvent("pilot_interest",{source:"founding_testers"});
+    trackEvent("pilot_interest",{source:"founding_testers",referrer:source});
     try{await navigator.clipboard.writeText(email);setCopied(true);setTimeout(()=>setCopied(false),1800);}catch{}
+  };
+
+  const prepareEmail=()=>{
+    const trimmedEmail=contactEmail.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)){
+      setError("Enter a valid email so we can reply.");
+      return;
+    }
+    setError("");
+    const body=[
+      "Hi Evidstack team,",
+      "",
+      "I would like to join the founding tester group.",
+      `Reply-to email: ${trimmedEmail}`,
+      `Main research goal: ${goal.trim()||"Not specified"}`,
+      `Compounds I usually look up: ${compounds.trim()||"Not specified"}`,
+      "",
+      "I understand this is an early pilot and will share practical feedback.",
+    ].join("\\n");
+    trackEvent("pilot_application_ready",{source,hasGoal:Boolean(goal.trim()),hasCompounds:Boolean(compounds.trim())});
+    setPrepared(true);
+    window.location.href=`mailto:${email}?subject=${encodeURIComponent("Evidstack founding tester")}&body=${encodeURIComponent(body)}`;
   };
   return(
     <main style={{minHeight:"100vh",background:C.bg,padding:isMob?"44px 16px 80px":"72px 24px 110px",fontFamily:"Montserrat,sans-serif"}}>
@@ -6446,13 +6482,20 @@ function FoundingTestersPage({onAuth}){
             </div>
           ))}
         </div>
-        <div style={{background:C.ink,padding:isMob?"24px 20px":"32px 36px",textAlign:"center"}}>
-          <p style={{fontSize:13,color:"#d1d5db",lineHeight:1.6,margin:"0 0 18px"}}>Send a short note with your main research goal and the compounds you usually look up. We will reply personally.</p>
+        <div style={{background:C.ink,padding:isMob?"24px 20px":"32px 36px"}}>
+          <p style={{fontSize:13,color:"#d1d5db",lineHeight:1.6,margin:"0 0 18px"}}>Tell us what you research so the first pilot session starts with a useful question. Your mail app opens with a draft; Evidstack does not send it automatically.</p>
+          <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:10,marginBottom:10}}>
+            <input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} onFocus={()=>trackEvent("pilot_form_started",{source})} placeholder="Your email" type="email" aria-label="Your email" style={{width:"100%",padding:"11px 12px",border:"1px solid #4b5563",background:"#111827",color:C.white,fontSize:12,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"}} />
+            <input value={goal} onChange={e=>setGoal(e.target.value.slice(0,120))} placeholder="Main research goal (optional)" aria-label="Main research goal" style={{width:"100%",padding:"11px 12px",border:"1px solid #4b5563",background:"#111827",color:C.white,fontSize:12,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box"}} />
+          </div>
+          <textarea value={compounds} onChange={e=>setCompounds(e.target.value.slice(0,240))} placeholder="Compounds you usually look up (optional)" aria-label="Compounds you usually look up" rows={2} style={{width:"100%",padding:"11px 12px",border:"1px solid #4b5563",background:"#111827",color:C.white,fontSize:12,fontFamily:"Montserrat,sans-serif",outline:"none",boxSizing:"border-box",resize:"vertical",marginBottom:8}} />
+          {error&&<p role="alert" style={{fontSize:11,color:"#fca5a5",margin:"0 0 8px"}}>{error}</p>}
+          <p style={{fontSize:10,color:"#9ca3af",margin:"0 0 14px",lineHeight:1.5}}>Please do not include symptoms, lab values, diagnoses or medical history.</p>
           <div style={{display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap"}}>
-            <a href={`mailto:${email}?subject=Evidstack founding tester`} onClick={()=>trackEvent("pilot_interest",{source:"email_link"})} style={{display:"inline-block",padding:"12px 20px",background:C.gold,color:C.ink,fontSize:12,fontWeight:900,textDecoration:"none",letterSpacing:".03em"}}>Email the team</a>
+            <button onClick={prepareEmail} style={{padding:"12px 20px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".03em"}}>{prepared?"Draft opened":"Prepare my note"}</button>
             <button onClick={copyEmail} style={{padding:"12px 20px",background:"transparent",color:C.white,border:`1px solid #4b5563`,fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>{copied?"Copied":"Copy email"}</button>
           </div>
-          <p style={{fontSize:11,color:"#9ca3af",margin:"16px 0 0"}}>{email}</p>
+          <p style={{fontSize:11,color:"#9ca3af",margin:"16px 0 0",textAlign:"center"}}>{email}</p>
         </div>
         <div style={{textAlign:"center",marginTop:28}}>
           <p style={{fontSize:12,color:C.gray,margin:"0 0 12px"}}>Prefer to explore first?</p>
@@ -6666,3 +6709,4 @@ function PricingPage({onUpgrade,onAuth}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
+

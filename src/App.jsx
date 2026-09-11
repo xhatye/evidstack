@@ -2034,8 +2034,11 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   const {stackIds,toggleStack}=useMyStack();
   const isMob=useIsMobile();
   const supp=SUPPLEMENTS.find(s=>s.id===compoundId);
+  const [pageFeedback,setPageFeedback]=useState(null);
+  const [feedbackReason,setFeedbackReason]=useState(null);
 
   useEffect(()=>{window.scrollTo({top:0,behavior:"instant"});},[compoundId]);
+  useEffect(()=>{setPageFeedback(null);setFeedbackReason(null);},[compoundId]);
   useEffect(()=>{
     if(supp)trackEvent("compound_view",{compound:supp.id,tier:supp.tier});
   },[supp?.id,supp?.tier]);
@@ -2067,6 +2070,21 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   const researchLimits=sourcedEffects<((supp.effects||[]).length)||Number(primaryEffect?.evidence||0)<=2
     ?"The evidence record is incomplete or limited. Treat this as an area of uncertainty and review the linked sources before acting."
     :"The entry does not record a specific unresolved limitation beyond the usual differences between study populations and real-world use.";
+  const feedbackReasons=[
+    ["conclusion","The conclusion was unclear"],
+    ["sources","I needed better sources"],
+    ["safety","I needed more safety or dosage detail"],
+    ["other","Something else was missing"],
+  ];
+  const recordFeedback=(value)=>{
+    setPageFeedback(value);
+    setFeedbackReason(null);
+    trackEvent("compound_feedback",{compound:supp.id,feedback:value});
+  };
+  const recordFeedbackReason=(reason)=>{
+    setFeedbackReason(reason);
+    trackEvent("compound_feedback_reason",{compound:supp.id,feedback:pageFeedback,reason});
+  };
 
   return(
     <div style={{maxWidth:900,margin:"0 auto",padding:isMob?"24px 16px 80px":"48px 48px 100px"}}>
@@ -2369,6 +2387,43 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
               </div>
             );
           })()}
+
+      {/* Pilot feedback: a small, non-blocking signal for first-use comprehension. */}
+      <section style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"24px 28px",marginTop:16,marginBottom:16}} aria-labelledby="compound-feedback-title">
+        {!pageFeedback?(
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,flexWrap:"wrap"}}>
+            <div>
+              <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>Quick check</p>
+              <h2 id="compound-feedback-title" style={{fontSize:isMob?16:18,fontWeight:900,color:C.ink,margin:"0 0 5px",letterSpacing:"-.02em"}}>Did this page answer your question?</h2>
+              <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.5}}>One tap helps us improve the research summaries.</p>
+            </div>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              {[["yes","Yes"],["partly","Partly"],["no","Not yet"]].map(([value,label])=>(
+                <button key={value} onClick={()=>recordFeedback(value)} style={{padding:"9px 14px",background:value==="yes"?`${C.green}12`:C.bg,color:C.ink,border:`1px solid ${value==="yes"?`${C.green}45`:C.border}`,fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>{label}</button>
+              ))}
+            </div>
+          </div>
+        ):(
+          <div>
+            <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+              <div>
+                <p id="compound-feedback-title" style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 5px"}}>Thanks — that helps.</p>
+                <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.5}}>{pageFeedback==="yes"?"We’ll keep this format for the pilot.":"What would have made this page more useful?"}</p>
+              </div>
+              {pageFeedback!=="yes"&&<span style={{fontSize:10,color:C.green,fontWeight:800}}>Feedback saved</span>}
+            </div>
+            {pageFeedback!=="yes"&&!feedbackReason&&(
+              <div style={{display:"flex",gap:7,flexWrap:"wrap",marginTop:14}}>
+                {feedbackReasons.map(([reason,label])=>(
+                  <button key={reason} onClick={()=>recordFeedbackReason(reason)} style={{padding:"8px 10px",background:C.bg,color:C.gray,border:`1px solid ${C.border}`,fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>{label}</button>
+                ))}
+                <button onClick={()=>setFeedbackReason("skipped")} style={{padding:"8px 10px",background:"transparent",color:C.gray,border:"none",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Skip</button>
+              </div>
+            )}
+            {feedbackReason&&<p style={{fontSize:10,color:C.gray,margin:"12px 0 0"}}>Noted. No personal or health information is collected here.</p>}
+          </div>
+        )}
+      </section>
 
       {/* Disclaimer */}
       <div style={{padding:"14px 16px",background:C.bg,border:`1px solid ${C.border}`,marginTop:8}}>

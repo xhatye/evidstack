@@ -41,3 +41,13 @@
 @media(max-width:600px){.body-atlas-canvas{height:510px}.body-atlas-model-preview{width:115px;height:220px}.body-atlas-choice-card{min-height:290px}.body-atlas-region-pills button{padding:10px 12px}.body-atlas-hero h1{font-size:clamp(36px,10vw,48px)}}
 @media(prefers-reduced-motion:reduce){.body-atlas-hotspot,.body-atlas-region-pills button,.evid-hero-actions .atlas-home-feature{transition:none}.evid-hero-actions .atlas-home-feature:hover{transform:none}}
 
+/* Blend the existing white-backed artwork into the paper without a rectangular shadow. */
+.body-atlas-canvas{background:#f8f8f2;isolation:isolate}
+.body-atlas-choice-card{background:#f8f8f2;isolation:isolate}
+.body-atlas-svg{mix-blend-mode:multiply}
+.atlas-rendered-model image{filter:none;mix-blend-mode:normal}
+.body-atlas-hotspot{stroke-width:2;pointer-events:visiblePainted}
+.body-atlas-hotspot:focus-visible{stroke-width:5}
+.body-atlas-canvas-hint{bottom:8px}
+.body-atlas-canvas-hint{bottom:0;padding:3px 8px;font-size:9px;background:#f8f8f2;border:0}
+

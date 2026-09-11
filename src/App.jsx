@@ -172,6 +172,17 @@ const T = {
 const tierColor=(t)=>[null,C.green,C.blue,C.purple,C.amber][t]||C.gray;
 const efColor=(v)=>v<0?C.red:v>=4?C.green:v===3?C.blue:v===2?C.amber:C.gray;
 
+function compoundCategory(supplement){
+  const legal=String(supplement?.legal||"").toLowerCase();
+  const name=String(supplement?.name||"").toLowerCase();
+  if(/prescription|fda-approved|approved drug|prescription only|requires prescription|controlled substance/.test(legal))return "medication";
+  if((supplement?.tier||0)>=4||/research|not approved|unscheduled|sarm|peptide/.test(`${legal} ${name}`))return "experimental";
+  return "supplement";
+}
+
+const COMPOUND_CATEGORY_LABELS={supplement:"Supplements",medication:"Medications",experimental:"Experimental compounds"};
+const sourceLabel=(sources)=>Array.isArray(sources)?sources.map(source=>typeof source==="string"?source:(source?.id||source?.title||"")).filter(Boolean).join(", "):"";
+
 const EVIDENCE_SOURCE_STATS=(()=>{
   const effects=SUPPLEMENTS.flatMap(s=>s.effects||[]);
   const sources=effects.flatMap(e=>e.sources||[]);
@@ -849,7 +860,7 @@ function BlurredPreviewPaywall({lockedCompounds,onAuth,onUpgrade,user,isMob}){
       })}
       <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"28px 24px",textAlign:"center"}}>
         <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 6px"}}>You're seeing {FREE_VISIBLE} of {SUPPLEMENTS.length} compounds</p>
-        <p style={{fontSize:12,color:C.gray,margin:"0 0 8px"}}>Pro unlocks all compounds including peptides, SARMs, GLP-1s, and the full biohacking tier - plus AI tools, interaction checker, stack audit, and bloodwork tracking.</p>
+        <p style={{fontSize:12,color:C.gray,margin:"0 0 8px"}}>A free account saves up to 5 compounds and keeps a limited comparison. Pro unlocks full profiles, complete comparisons, peptides, GLP-1s, experimental compounds and research tools.</p>
         <p style={{fontSize:11,color:C.gray,margin:"0 0 20px"}}>$9.99/month. Cancel anytime.</p>
         <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
           {user?(
@@ -859,10 +870,10 @@ function BlurredPreviewPaywall({lockedCompounds,onAuth,onUpgrade,user,isMob}){
           ):(
             <>
               <button onClick={()=>onAuth("signup")} style={{padding:"12px 28px",background:C.ink,color:C.white,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em"}}>
-                Create free account
+                Create free account - save your list
               </button>
               <button onClick={onUpgrade} style={{padding:"12px 20px",background:"transparent",color:C.gray,border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
-                Upgrade to Pro - $9.99/mo
+                See Pro access - $9.99/mo
               </button>
             </>
           )}
@@ -874,6 +885,7 @@ function BlurredPreviewPaywall({lockedCompounds,onAuth,onUpgrade,user,isMob}){
 
 function PaywallCard({supp,onUpgrade,isMob,showCTA=true}){
   const tc=tierColor(supp.tier);
+  const category=compoundCategory(supp);
   return(
     <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${tc}`,position:"relative",overflow:"hidden",minHeight:120}}>
       <div style={{padding:"24px 28px 20px",filter:"blur(4px)",userSelect:"none",pointerEvents:"none",opacity:.6}}>
@@ -884,8 +896,9 @@ function PaywallCard({supp,onUpgrade,isMob,showCTA=true}){
       </div>
       <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(244,242,238,.88)",gap:10}}>
         <div style={{textAlign:"center"}}>
-          <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 2px"}}>Pro compound</p>
-          <p style={{fontSize:11,color:C.gray,margin:0}}>Tier {supp.tier} - {supp.name}</p>
+        <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 2px"}}>Pro compound</p>
+        <p style={{fontSize:11,color:C.gray,margin:0}}>Tier {supp.tier} - {supp.name}</p>
+        <p style={{fontSize:9,fontWeight:800,color:C.amber,letterSpacing:".1em",margin:"6px 0 0",textTransform:"uppercase"}}>{COMPOUND_CATEGORY_LABELS[category]}</p>
         </div>
         {showCTA&&<button onClick={onUpgrade} style={{padding:"8px 18px",background:C.ink,color:C.white,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",letterSpacing:".04em",fontFamily:"Montserrat,sans-serif"}}>
           Upgrade to Pro - $9.99/mo
@@ -944,6 +957,7 @@ function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade,onCo
   const effects=activeGoal==="all"?supp.effects:supp.effects.filter(e=>e.goal===activeGoal);
   if(!effects.length)return null;
   const tc=tierColor(supp.tier);
+  const category=compoundCategory(supp);
   const avgEff=Math.round(effects.reduce((s,e)=>s+e.efficacy,0)/effects.length);
   const avgEv=Math.round(effects.reduce((s,e)=>s+e.evidence,0)/effects.length);
   return(
@@ -963,7 +977,10 @@ function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade,onCo
       <div style={{padding:isMob?"16px 14px 14px":"24px 28px 20px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
           <div>
-            <p style={{fontSize:9,fontWeight:800,color:tc,letterSpacing:".14em",margin:"0 0 6px",textTransform:"uppercase"}}>TIER {supp.tier} / {TIERS[supp.tier]?.label?.toUpperCase()||""}</p>
+            <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:6}}>
+              <p style={{fontSize:9,fontWeight:800,color:tc,letterSpacing:".14em",margin:0,textTransform:"uppercase"}}>TIER {supp.tier} / {TIERS[supp.tier]?.label?.toUpperCase()||""}</p>
+              <span style={{fontSize:8,fontWeight:800,color:C.gray,border:`1px solid ${C.border}`,padding:"2px 6px",letterSpacing:".08em",textTransform:"uppercase"}}>{COMPOUND_CATEGORY_LABELS[category]}</span>
+            </div>
             <h3 style={{fontSize:20,fontWeight:900,color:C.ink,margin:0,letterSpacing:"-.04em",lineHeight:1.1}}>{supp.name}</h3>
           </div>
           <div style={{textAlign:"right"}}>
@@ -1156,7 +1173,7 @@ function WeeklyProtocolAI({onUpgrade}){
                 <div style={{display:"flex",flexDirection:"column",gap:10}}>
                   {result.weeks[activeWeek].compounds?.map((c,i)=>(
                     <div key={i} style={{display:"grid",gridTemplateColumns:isMob?"1fr":"2fr 1fr 1fr",gap:8,padding:"14px 16px",background:C.bg,border:`1px solid ${C.border}`}}>
-                      <div><p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 2px"}}>{c.name}</p><p style={{fontSize:11,color:C.gray,margin:0}}>{c.why_now}</p></div>
+                      <div><p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 2px"}}>{c.name}</p><p style={{fontSize:11,color:C.gray,margin:0}}>{c.why_now}</p>{c.evidence&&<p style={{fontSize:10,color:C.blue,margin:"6px 0 0",fontWeight:700}}>Evidence level: {c.evidence}/5</p>}{sourceLabel(c.sources)&&<p style={{fontSize:10,color:C.gray,margin:"4px 0 0"}}>Sources: {sourceLabel(c.sources)}</p>}</div>
                       <div><p style={{fontSize:9,fontWeight:700,color:C.gray,margin:"0 0 2px",textTransform:"uppercase",letterSpacing:".08em"}}>Dose</p><p style={{fontSize:11,fontWeight:700,color:C.ink,margin:0}}>{c.dose}</p></div>
                       <div><p style={{fontSize:9,fontWeight:700,color:C.gray,margin:"0 0 2px",textTransform:"uppercase",letterSpacing:".08em"}}>When</p><p style={{fontSize:11,fontWeight:700,color:C.ink,margin:0}}>{c.timing}</p></div>
                     </div>
@@ -2034,11 +2051,20 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   const inStack=!!supp&&stackIds.includes(supp.id);
   const tc=tierColor(supp.tier);
   const tierLabel=TIERS[supp.tier]?.label||"";
+  const category=compoundCategory(supp);
   const safetyLabel=["","Risky","Caution","Caution","Safe","Very Safe"][supp.safety]||"";
   const safetyColor=[null,C.red,C.amber,C.amber,C.green,C.green][supp.safety]||C.gray;
   const efColor=(v)=>v>=4?C.green:v===3?C.blue:v===2?C.amber:C.red;
   const sourcedEffects=(supp.effects||[]).filter(e=>e.sources?.length>0).length;
   const sourceCount=new Set((supp.effects||[]).flatMap(e=>e.sources||[])).size;
+  const primaryEffect=[...(supp.effects||[])].sort((a,b)=>(Number(b.evidence||0)+Number(b.efficacy||0))-(Number(a.evidence||0)+Number(a.efficacy||0)))[0];
+  const researchConclusion=primaryEffect?.summary||"No concise research conclusion is recorded for this entry.";
+  const studiedPopulation=primaryEffect?.population||primaryEffect?.populationStudied||primaryEffect?.participants||"Not recorded in this entry";
+  const studyDuration=primaryEffect?.duration||primaryEffect?.studyDuration||primaryEffect?.study_duration||"Not recorded in this entry";
+  const observedResult=primaryEffect?`${Math.abs(primaryEffect.efficacy||0)}/5 efficacy score in the recorded evidence summary (${primaryEffect.studies??primaryEffect.study_count??"study count not recorded"} studies).`:"Not recorded in this entry";
+  const researchLimits=sourcedEffects<((supp.effects||[]).length)||Number(primaryEffect?.evidence||0)<=2
+    ?"The evidence record is incomplete or limited. Treat this as an area of uncertainty and review the linked sources before acting."
+    :"The entry does not record a specific unresolved limitation beyond the usual differences between study populations and real-world use.";
 
   return(
     <div style={{maxWidth:900,margin:"0 auto",padding:isMob?"24px 16px 80px":"48px 48px 100px"}}>
@@ -2053,7 +2079,10 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
         <div style={{padding:isMob?"20px 18px":"32px 36px"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:16}}>
             <div>
-              <p style={{fontSize:9,fontWeight:800,color:tc,letterSpacing:".16em",margin:"0 0 8px",textTransform:"uppercase"}}>TIER {supp.tier} / {tierLabel.toUpperCase()}</p>
+              <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:8}}>
+                <p style={{fontSize:9,fontWeight:800,color:tc,letterSpacing:".16em",margin:0,textTransform:"uppercase"}}>TIER {supp.tier} / {tierLabel.toUpperCase()}</p>
+                <span style={{fontSize:8,fontWeight:800,color:C.gray,border:`1px solid ${C.border}`,padding:"2px 6px",letterSpacing:".08em",textTransform:"uppercase"}}>{COMPOUND_CATEGORY_LABELS[category]}</span>
+              </div>
               <h1 style={{fontSize:isMob?24:38,fontWeight:900,color:C.ink,margin:"0 0 4px",letterSpacing:"-.03em",lineHeight:1.05}}>{supp.name}</h1>
               {(()=>{
                 const filtered=supp.aliases?.filter(a=>a.toLowerCase()!==supp.name.toLowerCase()&&a.toLowerCase()!==supp.id.toLowerCase()).slice(0,3)||[];
@@ -2087,6 +2116,28 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
           </div>
         </div>
       </div>
+
+      {/* Evidence-first research summary: useful preview for everyone, deeper details remain Pro-gated below. */}
+      <section style={{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"20px 18px":"28px 36px",marginBottom:24}} aria-labelledby="research-summary-title">
+        <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Research snapshot</p>
+        <h2 id="research-summary-title" style={{fontSize:isMob?20:26,fontWeight:900,color:C.ink,letterSpacing:"-.04em",margin:"0 0 20px"}}>What the evidence says first.</h2>
+        <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:12}}>
+          {[
+            ["Conclusion",researchConclusion],
+            ["Studied in",studiedPopulation],
+            ["Observed result",observedResult],
+            ["Study duration",studyDuration],
+            ["Limits and unknowns",researchLimits],
+            ["Study record",`${primaryEffect?.type||primaryEffect?.study_type||"Type not recorded"} · ${sourceCount} linked source${sourceCount===1?"":"s"}`],
+          ].map(([label,value])=>(
+            <div key={label} style={{background:C.bg,border:`1px solid ${C.border}`,padding:"14px 16px"}}>
+              <p style={{fontSize:9,fontWeight:800,letterSpacing:".1em",color:C.gray,margin:"0 0 6px",textTransform:"uppercase"}}>{label}</p>
+              <p style={{fontSize:12,color:C.ink,lineHeight:1.6,margin:0}}>{value}</p>
+            </div>
+          ))}
+        </div>
+        <p style={{fontSize:11,color:C.gray,lineHeight:1.6,margin:"16px 0 0"}}>This snapshot reflects the current Evidstack record. “Not recorded” means the entry needs editorial review; it is not proof that the information does not exist.</p>
+      </section>
 
       {isLocked?(
         <div style={{background:C.ink,padding:"40px 36px",textAlign:"center",marginBottom:24}}>
@@ -2330,13 +2381,35 @@ function CompareModal({compA,compB,onClose,goalId="all"}){
   const isMob=useIsMobile();
   const tierColor=(t)=>[null,C.green,C.blue,C.purple,C.amber][t]||C.gray;
   const efColor=(v)=>v<0?C.red:v>=4?C.green:v===3?C.blue:v===2?C.amber:C.gray;
+  const effectsFor=(s)=>goalId!=="all"?(s.effects||[]).filter(e=>e.goal===goalId):(s.effects||[]);
   const avgStat=(s,key)=>{
-    const effects=goalId!=="all"?s.effects.filter(e=>e.goal===goalId):s.effects;
+    const effects=effectsFor(s);
     if(!effects.length)return "-";
     return(effects.reduce((sum,e)=>sum+(key==="efficacy"?e.efficacy:e.evidence),0)/effects.length).toFixed(1);
   };
+  const uniqueText=(values)=>[...new Set(values.filter(Boolean).map(value=>String(value).trim()).filter(Boolean))];
+  const recordFor=(s)=>{
+    const effects=effectsFor(s);
+    const populations=uniqueText(effects.flatMap(e=>[e.population,e.populationStudied,e.participants]).filter(Boolean));
+    const durations=uniqueText(effects.flatMap(e=>[e.duration,e.studyDuration,e.study_duration]).filter(Boolean));
+    const sources=uniqueText(effects.flatMap(e=>e.sources||[]));
+    const uncertainty=effects.some(e=>!e.sources?.length||Number(e.evidence||0)<=2)
+      ? "Limited, mixed or incomplete evidence"
+      : effects.some(e=>Number(e.evidence||0)===3)
+        ? "Some uncertainty remains"
+        : "No additional limitation recorded";
+    return {
+      population:populations.join("; ")||"Not recorded in this entry",
+      duration:durations.join("; ")||"Not recorded in this entry",
+      adverse:uniqueText((s.sideEffects||[]).map(effect=>effect.effect)).slice(0,4).join("; ")||"No adverse effects recorded in this entry",
+      uncertainty,
+      sources:sources.length?`${sources.length} linked source${sources.length===1?"":"s"}`:"No linked source",
+    };
+  };
   const safetyLabel=["","RISKY","CAUTION","CAUTION","SAFE","VERY SAFE"];
   const safetyColor=["",C.red,C.amber,C.amber,C.green,C.green];
+  const detailsA=recordFor(compA);
+  const detailsB=recordFor(compB);
 
   const rows=[
     {label:"Tier",a:`T${compA.tier}`,b:`T${compB.tier}`,aColor:tierColor(compA.tier),bColor:tierColor(compB.tier)},
@@ -2345,9 +2418,14 @@ function CompareModal({compA,compB,onClose,goalId="all"}){
     {label:"Safety",a:safetyLabel[compA.safety]||" -",b:safetyLabel[compB.safety]||" -",aColor:safetyColor[compA.safety],bColor:safetyColor[compB.safety]},
     {label:"Cost",a:compA.cost||" -",b:compB.cost||" -"},
     {label:"Dosage",a:compA.dosage?.amount||" -",b:compB.dosage?.amount||" -"},
+    {label:"Studied in",a:detailsA.population,b:detailsB.population},
+    {label:"Study duration",a:detailsA.duration,b:detailsB.duration},
+    {label:"Adverse effects",a:detailsA.adverse,b:detailsB.adverse},
+    {label:"Evidence limits",a:detailsA.uncertainty,b:detailsB.uncertainty},
+    {label:"Sources",a:detailsA.sources,b:detailsB.sources},
   ];
 
-  const sharedGoals=compA.effects.filter(e=>goalId==="all"||e.goal===goalId).filter(e=>compB.effects.some(e2=>e2.goal===e.goal)).map(e=>e.goal);
+  const sharedGoals=(compA.effects||[]).filter(e=>goalId==="all"||e.goal===goalId).filter(e=>(compB.effects||[]).some(e2=>e2.goal===e.goal)).map(e=>e.goal);
   const goalLabel=goalId!=="all"?(GOALS.find(g=>g.id===goalId)?.label||goalId):"all shared goals";
 
   return(
@@ -2628,6 +2706,8 @@ function StackBuilder({onUpgrade}){
                   </div>
                   <p style={{fontSize:11,color:C.blue,margin:"0 0 4px",fontWeight:700}}>{c.dose} - {c.timing}</p>
                   <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{c.reason}</p>
+                  {c.evidence&&<p style={{fontSize:10,color:C.blue,margin:"6px 0 0",fontWeight:700}}>Evidence level: {c.evidence}/5</p>}
+                  {sourceLabel(c.sources)&&<p style={{fontSize:10,color:C.gray,margin:"4px 0 0"}}>Sources: {sourceLabel(c.sources)}</p>}
                 </div>
               </div>
             ))}
@@ -3397,6 +3477,7 @@ function AppInner(){
   const [selected,setSelected]=useState(null);
   const [sortBy,setSortBy]=useState("efficacy");
   const [filterTier,setFilterTier]=useState(0);
+  const [filterCategory,setFilterCategory]=useState("all");
   const [showAuth,setShowAuth]=useState(false);
   const [authMode,setAuthMode]=useState("login");
   const [showUpgrade,setShowUpgrade]=useState(false);
@@ -3499,6 +3580,7 @@ function AppInner(){
     let list=SUPPLEMENTS;
     if(goal!=="all")list=list.filter(s=>s.effects.some(e=>e.goal===goal));
     if(filterTier)list=list.filter(s=>s.tier===filterTier);
+    if(filterCategory!=="all")list=list.filter(s=>compoundCategory(s)===filterCategory);
     if(search.trim()){
       const q=search.toLowerCase();
       // Semantic goal match: "sleep" → show all sleep compounds even if name doesn't contain "sleep"
@@ -3533,7 +3615,7 @@ function AppInner(){
       if(sortBy==="tier")return a.tier-b.tier;
       return score(b,sortBy)-score(a,sortBy);
     });
-  },[goal,search,sortBy,filterTier]);
+  },[goal,search,sortBy,filterTier,filterCategory]);
 
   if(loading)return(
     <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -3820,6 +3902,14 @@ function AppInner(){
               <button key={ti} onClick={()=>setFilterTier(filterTier===ti?0:ti)}
                 style={{padding:"4px 8px",fontSize:10,fontWeight:700,background:filterTier===ti?tierColor(ti):"transparent",color:filterTier===ti?C.white:tierColor(ti),border:`1px solid ${tierColor(ti)}`,cursor:"pointer"}}>
                 {isMobile?`T${ti}`:`T${ti} / ${T.controls.tiers[i]}`}
+              </button>
+            ))}
+            <span style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".1em",padding:"4px 4px 4px 10px"}}>TYPE:</span>
+            <button onClick={()=>setFilterCategory("all")} style={{padding:"4px 8px",fontSize:10,fontWeight:700,background:filterCategory==="all"?C.ink:"transparent",color:filterCategory==="all"?C.white:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>All</button>
+            {Object.entries(COMPOUND_CATEGORY_LABELS).map(([id,label])=>(
+              <button key={id} onClick={()=>setFilterCategory(filterCategory===id?"all":id)}
+                style={{padding:"4px 8px",fontSize:10,fontWeight:700,background:filterCategory===id?C.ink:"transparent",color:filterCategory===id?C.white:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>
+                {isMobile?(id==="supplement"?"Supplements":id==="medication"?"Meds":"Experimental"):label}
               </button>
             ))}
             {!isMobile&&<div style={{marginLeft:"auto",display:"flex",gap:0,alignItems:"center"}}>
@@ -4851,6 +4941,7 @@ function CompoundAdvisorScreen({onUpgrade}){
                       {c.dose&&<span style={{fontSize:11,color:C.ink}}><strong>Dose:</strong> {c.dose}</span>}
                       {c.timing&&<span style={{fontSize:11,color:C.ink}}><strong>When:</strong> {c.timing}</span>}
                       {c.study_count&&<span style={{fontSize:11,color:C.gray}}>{c.study_count}+ studies ({c.study_type})</span>}
+                      {sourceLabel(c.sources)&&<span style={{fontSize:11,color:C.gray}}>Sources: {sourceLabel(c.sources)}</span>}
                       {c.synergy?.length>0&&(
                         <span style={{fontSize:10,background:"#f0fdf4",color:"#166534",border:"1px solid #bbf7d0",padding:"2px 8px",fontWeight:700,borderRadius:2}}>
                           Synergizes: {c.synergy.join(", ")}
@@ -4861,6 +4952,7 @@ function CompoundAdvisorScreen({onUpgrade}){
                           Separate from: {c.conflict.join(", ")}
                         </span>
                       )}
+                      {c.evidence_note&&<p style={{width:"100%",fontSize:11,color:C.gray,margin:"2px 0 0",lineHeight:1.5}}>{c.evidence_note}</p>}
                     </div>
                   </div>
                 );
@@ -6570,3 +6662,4 @@ function PricingPage({onUpgrade,onAuth}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
+

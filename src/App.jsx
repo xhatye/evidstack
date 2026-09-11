@@ -4894,6 +4894,7 @@ function CompoundAdvisorScreen({onUpgrade}){
 // ── INTERACTION CHECKER ───────────────────────────────────────────────────────
 function InteractionCheckerPro({onUpgrade}){
   const {isPro,userProfile}=useAuth();
+  const {stackIds}=useMyStack();
   const isMob=useIsMobile();
   const [input,setInput]=useState("");
   const [compounds,setCompounds]=useState([]);
@@ -4936,6 +4937,13 @@ function InteractionCheckerPro({onUpgrade}){
   const severityColor=(s)=>({positive:"#16a34a",minor:"#ca8a04",moderate:"#d97706",major:"#dc2626"})[s]||C.gray;
   const severityBg=(s)=>({positive:"#f0fdf4",minor:"#fefce8",moderate:"#fff7ed",major:"#fef2f2"})[s]||C.bg;
   const verdictColor=(v)=>({SAFE:"#16a34a",CAUTION:"#d97706",DANGER:"#dc2626"})[v]||C.gray;
+  const savedStackNames=useMemo(()=>stackIds.map(id=>SUPPLEMENTS.find(s=>s.id===id)?.name).filter(Boolean),[stackIds]);
+  const loadSavedStack=()=>{
+    if(savedStackNames.length<2){setErr("Save at least 2 compounds in My Stack first.");return;}
+    setCompounds(savedStackNames.slice(0,8));
+    setErr("");
+    trackEvent("pro_tool_prefill",{tool:"interaction_checker",count:Math.min(savedStackNames.length,8)});
+  };
 
   if(!isPro)return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
@@ -5000,6 +5008,10 @@ function InteractionCheckerPro({onUpgrade}){
         <p style={{fontSize:14,color:C.gray,margin:"0 0 28px",lineHeight:1.6}}>Examine.com and ConsumerLab stop at the data. Evidstack tells you what to do with it. Add your compounds, get severity-rated interactions, synergy detection, and an exact daily timing protocol.</p>
 
         {/* Input */}
+        {savedStackNames.length>0&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap",marginBottom:10}}>
+          <span style={{fontSize:11,color:C.gray}}>{savedStackNames.length} compound{savedStackNames.length===1?"":"s"} saved in My Stack</span>
+          <button onClick={loadSavedStack} style={{padding:"7px 12px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Use My Stack</button>
+        </div>}
         <div style={{display:"flex",gap:0,border:`2px solid ${C.ink}`,background:C.white,marginBottom:12}}>
           <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")addCompound();}}
             placeholder="Type a compound name and press Enter..."
@@ -5091,6 +5103,7 @@ function InteractionCheckerPro({onUpgrade}){
 // ── STACK AUDIT AI ────────────────────────────────────────────────────────────
 function StackAuditScreen({onUpgrade}){
   const {isPro,userProfile}=useAuth();
+  const {stackIds}=useMyStack();
   const isMob=useIsMobile();
   const [stack,setStack]=useState("");
   const [goals,setGoals]=useState("");
@@ -5116,6 +5129,13 @@ function StackAuditScreen({onUpgrade}){
 
   const verdictColor=(v)=>({KEEP:"#16a34a",OPTIMIZE:"#ca8a04",REPLACE:"#d97706",REMOVE:"#dc2626"})[v]||C.gray;
   const gradeColor=(g)=>({"A":"#16a34a","B":"#22c55e","C":"#ca8a04","D":"#d97706","F":"#dc2626"})[g]||C.gray;
+  const savedStackNames=useMemo(()=>stackIds.map(id=>SUPPLEMENTS.find(s=>s.id===id)?.name).filter(Boolean),[stackIds]);
+  const loadSavedStack=()=>{
+    if(!savedStackNames.length){setErr("Save a compound in My Stack first.");return;}
+    setStack(savedStackNames.join(", "));
+    setErr("");
+    trackEvent("pro_tool_prefill",{tool:"stack_audit",count:savedStackNames.length});
+  };
 
   if(!isPro)return(
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
@@ -5191,7 +5211,10 @@ function StackAuditScreen({onUpgrade}){
         {!result&&(
           <div>
             <div style={{marginBottom:16}}>
-              <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:"0 0 8px",letterSpacing:".08em",textTransform:"uppercase"}}>Your current stack *</p>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap",marginBottom:8}}>
+                <p style={{fontSize:11,fontWeight:700,color:C.gray,margin:0,letterSpacing:".08em",textTransform:"uppercase"}}>Your current stack *</p>
+                {savedStackNames.length>0&&<button onClick={loadSavedStack} style={{padding:"6px 11px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:10,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Use My Stack</button>}
+              </div>
               <textarea value={stack} onChange={e=>setStack(e.target.value)}
                 placeholder="e.g. Creatine 5g, Magnesium glycinate 400mg, Vitamin D3 4000IU, Ashwagandha 600mg, Caffeine 200mg, L-Theanine 400mg, Omega-3 2g..."
                 style={{width:"100%",padding:"14px 16px",border:`2px solid ${C.ink}`,fontSize:13,fontFamily:"Montserrat,sans-serif",resize:"vertical",outline:"none",background:C.white,color:C.ink,minHeight:100,boxSizing:"border-box"}}/>

@@ -1,6 +1,10 @@
+Warning: truncated output (original token count: 107348)
+Total output lines: 6303
+
 import "./home.css";
 import { getPageSeo, applyPageSeo } from "./seo.js";
 import { authenticatedFetch } from "./api.js";
+import { trackEvent } from "./analytics.js";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { db } from "./firebase.js";
 import { doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
@@ -61,6 +65,7 @@ const ROUTES = {
   "/bloodwork-history":"bloodwork-history",
   "/guides":"guides",
   "/changelog":"changelog",
+  "/founding-testers":"founding-testers",
 };
 
 function getShareIdFromPath(){
@@ -543,8 +548,8 @@ function AuthModal({onClose,initialMode="login"}){
     if(mode==="signup"&&pw.length<6){setError("Password must be at least 6 characters.");return;}
     setLoading(true);
     try{
-      if(mode==="login"){await loginEmail(email,pw);onClose();}
-      else if(mode==="signup"){await signupEmail(email,pw);onClose();}
+      if(mode==="login"){await loginEmail(email,pw);trackEvent("account_signed_in",{method:"email"});onClose();}
+      else if(mode==="signup"){await signupEmail(email,pw);trackEvent("account_created",{method:"email"});onClose();}
     }catch(e){
       setError(e.code==="auth/invalid-credential"?"Incorrect email or password.":
                e.code==="auth/email-already-in-use"?"This email is already registered.":
@@ -569,6 +574,7 @@ function AuthModal({onClose,initialMode="login"}){
     setError("");setLoading(true);
     try{
       await loginGoogle();
+      trackEvent("account_signed_in",{method:"google"});
       onClose();
     }
     catch(e){setError("Google sign-in failed.");setLoading(false);}
@@ -642,6 +648,7 @@ function UpgradeModal({onClose,onAuthNeeded}){
       const res=await authenticatedFetch("/api/stripe-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({uid:user.uid,email:user.email,plan})});
       const data=await res.json();
       if(data.error)throw new Error(data.error);
+      trackEvent("pro_checkout_started",{plan});
       window.location.href=data.url;
     }catch(e){setError(e.message||"Something went wrong.");setLoading(false);}
   };
@@ -1901,6 +1908,9 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   const supp=SUPPLEMENTS.find(s=>s.id===compoundId);
 
   useEffect(()=>{window.scrollTo({top:0,behavior:"instant"});},[compoundId]);
+  useEffect(()=>{
+    if(supp)trackEvent("compound_view",{compound:supp.id,tier:supp.tier});
+  },[supp?.id,supp?.tier]);
 
   if(!supp)return(
     <div style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
@@ -3175,438 +3185,7 @@ function SharedStackPage({shareId}){
         const ref=doc(db,"shared_stacks",shareId);
         const snap=await getDoc(ref);
         if(snap.exists()){setData(snap.data());}
-        else setErr("Stack not found or link has expired.");
-      }catch{setErr("Could not load shared stack.");}
-      finally{setLoading(false);}
-    })();
-  },[shareId]);
-
-  if(loading)return<div style={{maxWidth:680,margin:"80px auto",textAlign:"center",fontFamily:"Montserrat,sans-serif"}}><p style={{color:C.gray}}>Loading shared stack...</p></div>;
-  if(err)return<div style={{maxWidth:680,margin:"80px auto",textAlign:"center",fontFamily:"Montserrat,sans-serif"}}><p style={{color:C.red,fontWeight:700}}>{err}</p></div>;
-  if(!data)return null;
-
-  const tierColor=(t)=>["",C.green,C.blue,C.purple,C.amber][t]||C.gray;
-
-  return(
-    <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"24px 16px 80px":"48px 48px 80px",fontFamily:"Montserrat,sans-serif"}}>
-      <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>Shared Stack</p>
-      <h1 style={{fontSize:isMob?24:36,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 6px"}}>{data.stack_name||"Shared Stack"}</h1>
-      <p style={{fontSize:13,color:C.gray,margin:"0 0 6px"}}>Shared via Evidstack.com</p>
-      {data.total_cost&&<p style={{fontSize:13,fontWeight:800,color:C.green,margin:"0 0 24px"}}>{data.total_cost}</p>}
-      {data.summary&&<p style={{fontSize:14,color:C.gray,lineHeight:1.7,margin:"0 0 28px"}}>{data.summary}</p>}
-      <div style={{border:`1px solid ${C.border}`,borderTop:`4px solid ${C.gold}`,background:C.white,marginBottom:20}}>
-        <div style={{padding:"16px 24px",borderBottom:`1px solid ${C.border}`}}>
-          <p style={{fontSize:11,fontWeight:800,color:C.gray,margin:0,letterSpacing:".1em",textTransform:"uppercase"}}>{data.compounds?.length} Compounds</p>
-        </div>
-        {data.compounds?.map((c,i)=>(
-          <div key={i} style={{display:"flex",gap:16,padding:"16px 24px",borderBottom:i<data.compounds.length-1?`1px solid ${C.border}`:"none"}}>
-            <div style={{width:28,height:28,background:tierColor(c.tier),flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",marginTop:2}}>
-              <span style={{fontSize:10,fontWeight:900,color:C.white}}>T{c.tier}</span>
-            </div>
-            <div style={{flex:1}}>
-              <p style={{fontSize:14,fontWeight:900,color:C.ink,margin:"0 0 3px"}}>{c.name}</p>
-              <p style={{fontSize:11,color:C.blue,margin:"0 0 4px",fontWeight:700}}>{c.dose} - {c.timing}</p>
-              <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>{c.reason}</p>
-            </div>
-            {c.cost&&<span style={{fontSize:11,color:C.gray,flexShrink:0}}>{c.cost}</span>}
-          </div>
-        ))}
-      </div>
-      {data.interactions&&<div style={{background:C.bg,border:`1px solid ${C.border}`,padding:"16px 20px",marginBottom:12}}><p style={{fontSize:10,fontWeight:800,color:C.gray,margin:"0 0 6px",letterSpacing:".1em",textTransform:"uppercase"}}>Interactions</p><p style={{fontSize:13,color:C.gray,margin:0,lineHeight:1.6}}>{data.interactions}</p></div>}
-      <div style={{background:C.ink,padding:"20px 24px",textAlign:"center"}}>
-        <p style={{fontSize:13,color:"#9ca3af",margin:"0 0 14px"}}>Build your own evidence-based stack at Evidstack.com</p>
-        <a href="https://evidstack.com" style={{display:"inline-block",padding:"11px 28px",background:C.gold,color:C.ink,fontSize:12,fontWeight:800,textDecoration:"none",letterSpacing:".04em"}}>Build my stack</a>
-      </div>
-    </div>
-  );
-}
-
-function AppInner(){
-  const {user,isPro,loading,logout}=useAuth();
-  // Inject global animation CSS once
-  useEffect(()=>{
-    if(document.getElementById("evid-anim-css"))return;
-    const s=document.createElement("style");
-    s.id="evid-anim-css";
-    s.textContent=`
-@keyframes evidFloat{0%,100%{transform:translateY(0) rotate(0deg);}33%{transform:translateY(-14px) rotate(2deg);}66%{transform:translateY(6px) rotate(-1.5deg);}}
-@keyframes evidShimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
-@keyframes evidPulse{0%,100%{opacity:.55;}50%{opacity:1;}}
-@keyframes evidFadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-@keyframes evidCountIn{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
-@keyframes evidGlow{0%,100%{box-shadow:0 0 0 0 rgba(226,201,126,0);}50%{box-shadow:0 0 0 5px rgba(226,201,126,.18);}}
-.evid-reveal{opacity:0;transform:translateY(20px);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);}
-.evid-reveal.visible{opacity:1;transform:translateY(0);}
-.evid-shimmer-btn{position:relative;overflow:hidden;}
-.evid-shimmer-btn::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);background-size:250% 100%;animation:evidShimmer 3s ease-in-out infinite;}
-.evid-pulse-pro{animation:evidGlow 2.8s ease-in-out infinite;}
-    `;
-    document.head.appendChild(s);
-  },[]);
-
-  const [page,setPage]=useState(()=>getPageFromPath());
-  const [compoundId,setCompoundId]=useState(()=>getCompoundIdFromPath());
-  const [goalId,setGoalId]=useState(()=>getGoalIdFromPath());
-  const [guideId,setGuideId]=useState(()=>getGuideIdFromPath());
-  const [shareId,setShareId]=useState(()=>getShareIdFromPath());
-  const [goal,setGoal]=useState("all");
-  const [search,setSearch]=useState("");
-  const [showSuggest,setShowSuggest]=useState(false);
-  const searchContainerRef=useRef(null);
-  const navSearchRef=useRef(null);
-  const [searchFocused,setSearchFocused]=useState(false);
-  const [navSearchOpen,setNavSearchOpen]=useState(false);
-  const [selected,setSelected]=useState(null);
-  const [sortBy,setSortBy]=useState("efficacy");
-  const [filterTier,setFilterTier]=useState(0);
-  const [showAuth,setShowAuth]=useState(false);
-  const [authMode,setAuthMode]=useState("login");
-  const [showUpgrade,setShowUpgrade]=useState(false);
-  const [showAccount,setShowAccount]=useState(false);
-  const [showEmailCapture,setShowEmailCapture]=useState(false);
-  const [emailCaptureCompound,setEmailCaptureCompound]=useState(null);
-  const [compareA,setCompareA]=useState(null);
-  const [compareB,setCompareB]=useState(null);
-  const [showCompareModal,setShowCompareModal]=useState(false);
-  const PLACEHOLDERS=["Try creatine for strength...","Try sleep to explore a goal...","Search magnesium or omega-3...","Try focus for a clearer starting point..."];
-  const [phIdx,setPhIdx]=useState(0);
-  const [phFade,setPhFade]=useState(true);
-  // Close suggestions when clicking outside search container
-  useEffect(()=>{
-    const handler=(e)=>{
-      const inHero=searchContainerRef.current?.contains(e.target);
-      const inNav=navSearchRef.current?.contains(e.target);
-      if(!inHero&&!inNav)setShowSuggest(false);
-    };
-    document.addEventListener("mousedown",handler);
-    return()=>document.removeEventListener("mousedown",handler);
-  },[]);
-  useEffect(()=>{
-    if(search||page!=="supplements"||window.matchMedia("(prefers-reduced-motion: reduce)").matches){setPhFade(true);return;}
-    let transition;
-    const iv=setInterval(()=>{setPhFade(false);transition=setTimeout(()=>{setPhIdx(i=>(i+1)%PLACEHOLDERS.length);setPhFade(true);},300);},4000);
-    return()=>{clearInterval(iv);clearTimeout(transition);};
-  },[search,page]);
-  const isMobile=useIsMobile();
-  const compactNav=useIsMobile(1280);
-  const [mobileMenu,setMobileMenu]=useState(false);
-  const [showTools,setShowTools]=useState(false);
-  const [showExitModal,setShowExitModal]=useState(false);
-
-  const navigateTo=(p)=>{navigate(p);setPage(p);setCompoundId(null);setNavSearchOpen(false);setShowSuggest(false);window.scrollTo({top:0,behavior:"instant"});};
-
-  useEffect(()=>{applyPageSeo(getPageSeo(window.location.pathname));},[page,compoundId,goalId,guideId,shareId]);
-
-  useEffect(()=>{
-    const onPop=()=>{
-      setPage(getPageFromPath());
-      setCompoundId(getCompoundIdFromPath());
-      setShareId(getShareIdFromPath());
-      setGoalId(getGoalIdFromPath());
-      setGuideId(getGuideIdFromPath());
-    };
-    window.addEventListener("popstate",onPop);
-    return()=>window.removeEventListener("popstate",onPop);
-  },[]);
-  useEffect(()=>{
-    if(page!=="supplements"||isPro)return;
-    let shown=false;
-    try{shown=sessionStorage.getItem("evid_pro_prompt_seen")==="1";}catch{}
-    const onScroll=()=>{
-      if(shown||showAuth||showUpgrade||showAccount||mobileMenu)return;
-      const marker=document.querySelector('[data-pro-prompt="true"]');
-      if(!marker||window.scrollY<400||marker.getBoundingClientRect().top>window.innerHeight*0.75)return;
-      if(document.getElementById("cookie-banner")?.offsetHeight)return;
-      shown=true;try{sessionStorage.setItem("evid_pro_prompt_seen","1");}catch{}
-      setShowExitModal(true);
-    };
-    window.addEventListener("scroll",onScroll,{passive:true});
-    return()=>window.removeEventListener("scroll",onScroll);
-  },[page,isPro,showAuth,showUpgrade,showAccount,mobileMenu]);
-  const openAuth=(mode="login")=>{setAuthMode(mode);setShowAuth(true);};
-  const openUpgrade=()=>setShowUpgrade(true);
-  const toggle=(id)=>setSelected(p=>p===id?null:id);
-  const handleCompare=(supp)=>{
-    if(compareA?.id===supp.id){setCompareA(null);return;}
-    if(compareB?.id===supp.id){setCompareB(null);return;}
-    if(!compareA){setCompareA(supp);return;}
-    if(!compareB){setCompareB(supp);return;}
-    // Both full  - replace oldest (A)
-    setCompareA(compareB);setCompareB(supp);
-  };
-
-  const filtered=useMemo(()=>{
-    let list=SUPPLEMENTS;
-    if(goal!=="all")list=list.filter(s=>s.effects.some(e=>e.goal===goal));
-    if(filterTier)list=list.filter(s=>s.tier===filterTier);
-    if(search.trim()){
-      const q=search.toLowerCase();
-      // Semantic goal match: "sleep" → show all sleep compounds even if name doesn't contain "sleep"
-      const goalMatch=GOALS.find(g=>g.id!=="all"&&(g.label.toLowerCase().replace(" / ","").replace(/ /g,"").includes(q)||g.id===q));
-      if(goalMatch){
-        list=list.filter(s=>s.effects.some(e=>e.goal===goalMatch.id));
-      } else {
-        // Prefix match first, then include match on name + aliases
-        list=list.filter(s=>{
-          const n=s.name.toLowerCase();
-          const aliases=(s.aliases||[]).map(a=>a.toLowerCase());
-          const tags=(s.tags||[]).map(t=>t.toLowerCase());
-          return n.startsWith(q)||n.includes(q)||aliases.some(a=>a.includes(q))||tags.some(t=>t.includes(q));
-        });
-        // Sort so prefix matches come first
-        list=[...list].sort((a,b)=>{
-          const aStarts=a.name.toLowerCase().startsWith(q)?0:1;
-          const bStarts=b.name.toLowerCase().startsWith(q)?0:1;
-          return aStarts-bStarts;
-        });
-      }
-    }
-    return[...list].sort((a,b)=>{
-      const score=(s,k)=>{
-        const ef=goal==="all"?s.effects:s.effects.filter(e=>e.goal===goal);
-        if(!ef.length)return 0;
-        const raw=ef.reduce((sum,e)=>sum+(k==="efficacy"?e.efficacy:e.evidence),0)/ef.length;
-        const safetyPenalty=s.safety<=1?-3:0;
-        const evidencePenalty=ef.every(e=>e.evidence<=1)?-2:0;
-        return raw+safetyPenalty+evidencePenalty;
-      };
-      if(sortBy==="tier")return a.tier-b.tier;
-      return score(b,sortBy)-score(a,sortBy);
-    });
-  },[goal,search,sortBy,filterTier]);
-
-  if(loading)return(
-    <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <p style={{fontSize:13,color:C.gray,fontFamily:"Montserrat,sans-serif"}}>Loading...</p>
-    </div>
-  );
-
-  const navItems=[
-    {id:"supplements",label:"Supplements"},
-    {id:"advisor",label:"AI Compound Advisor"},
-    {id:"guides",label:"Guides"},
-    {id:"pricing",label:"Pricing"},
-    {id:"about",label:"About"},
-  ];
-  const proTools=[
-    {id:"tracker",label:"My Tracker"},
-    {id:"bloodwork",label:"AI Bloodwork Analyzer"},
-    {id:"interaction-checker",label:"Interaction Checker"},
-    {id:"stack-audit",label:"Stack Audit AI"},
-    {id:"bloodwork-history",label:"Bloodwork History"},
-  ];
-  const proPages=proTools.map(t=>t.id);
-
-  const scrollToResults=()=>{
-    if(page!=="supplements")navigateTo("supplements");
-    requestAnimationFrame(()=>document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"}));
-  };
-  const selectSearchResult=(value)=>{
-    setSearch(value);
-    setShowSuggest(false);
-    setSearchFocused(false);
-    setNavSearchOpen(false);
-    scrollToResults();
-  };
-  const runSearch=()=>{
-    setShowSuggest(false);
-    setNavSearchOpen(false);
-    scrollToResults();
-  };
-  const renderNavSearch=()=> (
-    <div ref={navSearchRef} className={`evid-nav-search${navSearchOpen?" is-open":""}`}>
-      {!navSearchOpen&&(
-        <button className="evid-nav-search-trigger" aria-label="Search supplements" onClick={()=>{setNavSearchOpen(true);setShowSuggest(search.length>0);}}>
-          <span className="evid-search-icon" aria-hidden="true"/>
-        </button>
-      )}
-      {navSearchOpen&&(
-        <div className="evid-nav-search-expanded">
-          <span className="evid-search-icon" aria-hidden="true"/>
-          <input autoFocus value={search} aria-label="Search supplements" placeholder="Search supplements..."
-            onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
-            onFocus={()=>setShowSuggest(search.length>0)}
-            onKeyDown={e=>{if(e.key==="Escape"){setNavSearchOpen(false);setShowSuggest(false);}if(e.key==="Enter")runSearch();}}/>
-          <button className="evid-nav-search-close" aria-label="Close search" onClick={()=>{setNavSearchOpen(false);setShowSuggest(false);}}>×</button>
-          {showSuggest&&<SearchSuggestions query={search} onSelect={selectSearchResult} compact/>}
-        </div>
-      )}
-    </div>
-  );
-
-  return(
-    <div className={page==="supplements"?"evid-homepage":undefined} style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
-      {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} initialMode={authMode}/>}
-      {showUpgrade&&<UpgradeModal onClose={()=>setShowUpgrade(false)} onAuthNeeded={()=>openAuth("signup")}/>}
-      {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
-      {showCompareModal&&compareA&&compareB&&<CompareModal compA={compareA} compB={compareB} onClose={()=>{setShowCompareModal(false);setCompareA(null);setCompareB(null);}}/>}
-      {showEmailCapture&&<EmailCaptureModal onClose={()=>setShowEmailCapture(false)} compoundId={emailCaptureCompound}/>}
-      {showExitModal&&!isPro&&page==="supplements"&&!showAuth&&!showUpgrade&&!showAccount&&!mobileMenu&&(
-        <aside className="pro-browse-prompt" aria-label="Evidstack Pro">
-          <button className="pro-prompt-close" aria-label="Dismiss Pro suggestion" onClick={()=>setShowExitModal(false)}>×</button>
-          <span className="pro-prompt-label">EVIDSTACK PRO</span>
-          <p>More of the research.<br/><strong>All in one place.</strong></p>
-          <span className="pro-prompt-detail">Unlock Tier 2–4 compounds and Pro tools.<br/>$9.99/month. Cancel anytime.</span>
-          <button className="pro-prompt-cta" onClick={()=>{setShowExitModal(false);openUpgrade();}}>Explore Pro <span aria-hidden="true">↗</span></button>
-          <button className="pro-prompt-later" onClick={()=>setShowExitModal(false)}>Keep browsing</button>
-        </aside>
-      )}
-
-      {/* Mobile menu drawer */}
-      {compactNav&&mobileMenu&&(
-        <div onClick={()=>setMobileMenu(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200}}>
-          <div onClick={e=>e.stopPropagation()} onTouchMove={e=>e.stopPropagation()} style={{position:"absolute",top:0,right:0,width:280,height:"100%",background:C.white,padding:"24px 20px",display:"flex",flexDirection:"column",gap:4,overflowY:"auto",WebkitOverflowScrolling:"touch"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-              <span style={{fontSize:14,fontWeight:900,letterSpacing:"-.04em"}}>EVIDSTACK</span>
-              <button onClick={()=>setMobileMenu(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:C.gray}}>x</button>
-            </div>
-            {[...navItems,...proTools,{id:"legal",label:"Terms & Privacy"}].map(item=>(
-              <button key={item.id} onClick={()=>{navigateTo(item.id);setMobileMenu(false);}}
-                style={{padding:"14px 16px",fontSize:14,fontWeight:700,
-                  background:page===item.id?C.ink:"transparent",
-                  color:page===item.id?C.white:C.gray,
-                  border:"none",cursor:"pointer",textAlign:"left",borderRadius:4,
-                  display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                <span>{item.label}</span>
-                {proTools.some(t=>t.id===item.id)&&!isPro&&<span style={{fontSize:9,color:C.gold,fontWeight:900,letterSpacing:".06em"}}>PRO</span>}
-              </button>
-            ))}
-            <div style={{height:1,background:C.border,margin:"12px 0"}}/>
-            {user?(
-              <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                {isPro&&<span style={{fontSize:11,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px",alignSelf:"flex-start"}}>PRO MEMBER</span>}
-                {!isPro&&<button onClick={()=>{openUpgrade();setMobileMenu(false);}} style={{padding:"12px 16px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",width:"100%"}}>Upgrade to Pro</button>}
-                <button onClick={()=>{setShowAccount(true);setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:C.bg,color:C.ink,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>My Account</button>
-                <button onClick={()=>{logout();setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>Sign out</button>
-              </div>
-            ):(
-              <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                <button onClick={()=>{openAuth("login");setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:"transparent",color:C.ink,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>Sign in</button>
-                <button onClick={()=>{openAuth("signup");setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:800,background:C.gold,color:C.ink,border:"none",cursor:"pointer",width:"100%",fontFamily:"Montserrat,sans-serif"}}>Create free account</button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <nav className="evid-main-nav" style={{borderBottom:`1px solid ${C.border}`,padding:compactNav?"0 16px":"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:72,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
-        <div onClick={()=>navigateTo("supplements")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
-          <div style={{width:30,height:30,border:`2px solid ${C.black}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:10,fontWeight:900}}>E</span></div>
-          <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink,cursor:"pointer"}} onClick={()=>navigateTo("supplements")}>EVIDSTACK</span>
-        </div>
-        {compactNav?(
-           <div style={{display:"flex",alignItems:"center",gap:8}}>
-             {renderNavSearch()}
-             {user&&!isPro&&<button onClick={openUpgrade} style={{padding:"6px 12px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer"}}>Upgrade</button>}
-            {isPro&&<span style={{fontSize:9,fontWeight:800,color:C.gold,border:`1px solid ${C.gold}`,padding:"2px 6px"}}>PRO</span>}
-            {!user&&<button onClick={()=>openAuth("login")} style={{padding:"6px 10px",background:"transparent",border:`1px solid ${C.border}`,color:C.ink,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Sign in</button>}
-            {!user&&<button onClick={()=>{openAuth("signup");}} style={{padding:"6px 10px",background:C.gold,color:C.ink,border:"none",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Free account</button>}
-            <button aria-label="Open navigation" aria-expanded={mobileMenu} onClick={()=>setMobileMenu(true)} style={{background:"none",border:"none",cursor:"pointer",padding:4,display:"flex",flexDirection:"column",gap:5}}>
-              <span style={{display:"block",width:22,height:2,background:C.ink}}/>
-              <span style={{display:"block",width:22,height:2,background:C.ink}}/>
-              <span style={{display:"block",width:22,height:2,background:C.ink}}/>
-            </button>
-          </div>
-        ):(
-          <div style={{display:"flex",alignItems:"center",gap:4}}>
-            {navItems.map(item=>(
-              <button key={item.id} onClick={()=>navigateTo(item.id)}
-                style={{padding:"8px 14px",fontSize:12,fontWeight:700,
-                  background:page===item.id?C.ink:"transparent",
-                  color:page===item.id?C.white:C.gray,
-                  border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s"}}>
-                {item.label}
-              </button>
-            ))}
-            <div style={{position:"relative"}}
-              onMouseEnter={()=>setShowTools(true)}
-              onMouseLeave={()=>setShowTools(false)}>
-              <button
-                style={{padding:"8px 14px",fontSize:12,fontWeight:700,
-                  background:proPages.includes(page)?C.ink:"transparent",
-                  color:proPages.includes(page)?C.white:isPro?C.gray:C.gold,
-                  border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s",
-                  display:"flex",alignItems:"center",gap:5}}>
-                <span style={{color:proPages.includes(page)?C.white:C.gold,marginRight:2}}>+</span><span>Pro Tools</span><span style={{fontSize:8,marginLeft:4}}>{showTools?"▲":"▼"}</span>
-              </button>
-              {showTools&&(
-                <div style={{position:"absolute",top:"100%",left:0,background:C.white,
-                  border:`1px solid ${C.border}`,boxShadow:"0 8px 24px rgba(0,0,0,.12)",
-                  zIndex:500,minWidth:210}}>
-                  {proTools.map(t=>(
-                    <button key={t.id} onClick={()=>{navigateTo(t.id);setShowTools(false);}}
-                      style={{width:"100%",padding:"12px 16px",fontSize:12,fontWeight:700,
-                        background:page===t.id?C.bg:"transparent",
-                        color:C.ink,border:"none",
-                        borderBottom:`1px solid ${C.border}`,
-                        cursor:"pointer",textAlign:"left",
-                        fontFamily:"Montserrat,sans-serif",
-                        display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                      {t.label}
-                      {!isPro&&<span style={{fontSize:8,color:C.gold,fontWeight:900,letterSpacing:".08em"}}>PRO</span>}
-                    </button>
-                  ))}
-                </div>
-               )}
-             </div>
-             {renderNavSearch()}
-             <div style={{width:1,height:24,background:C.border,margin:"0 10px"}}/>
-            {user?(
-              <div style={{display:"flex",alignItems:"center",gap:8}}>
-                {isPro&&<span className="evid-pulse-pro" style={{fontSize:10,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px"}}>PRO</span>}
-                {!isPro&&<button onClick={openUpgrade} className="evid-shimmer-btn" style={{padding:"8px 16px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",letterSpacing:".04em"}}>Upgrade</button>}
-                <button onClick={()=>setShowAccount(true)} style={{padding:"8px 14px",fontSize:11,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Account</button>
-              </div>
-            ):(
-              <div style={{display:"flex",gap:6}}>
-                <button onClick={()=>openAuth("login")}  style={{padding:"8px 14px",fontSize:12,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Sign in</button>
-                <button onClick={()=>{openAuth("signup");}} className="evid-shimmer-btn" style={{padding:"8px 16px",fontSize:12,fontWeight:800,background:C.gold,color:C.ink,border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".02em"}}>Create free account<span style={{fontSize:9,color:C.gray,display:"block",textAlign:"center",marginTop:2}}>No card required</span></button>
-              </div>
-            )}
-          </div>
-        )}
-      </nav>
-
-      {page==="about"         &&<AboutPage/>}
-      {page==="pricing"        &&<PricingPage onUpgrade={openUpgrade} onAuth={openAuth}/>}
-      {page==="affiliate"&&<AffiliatePage/>}
-      {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
-      {page==="shared-stack"&&<SharedStackPage shareId={shareId}/>}
-      {page==="guides"&&<GuidesIndexPage onNavigate={navigateTo} onUpgrade={openUpgrade} onAuth={openAuth}/>}
-      {page==="goal-page"&&goalId&&<GoalPage goalId={goalId} onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
-      {page==="guide-page"&&guideId&&<GuidePage guideId={guideId} onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
-      {page==="legal"          &&<LegalPage/>}
-      {page==="interactions"   &&<InteractionChecker onUpgrade={openUpgrade}/>}
-      {page==="weekly-protocol"&&<WeeklyProtocolAI onUpgrade={openUpgrade}/>}
-      {page==="tracker"        &&<MyTracker onUpgrade={openUpgrade}/>}
-      {page==="advisor"        &&<CompoundAdvisorScreen onUpgrade={openUpgrade}/>}
-      {page==="interaction-checker"&&<InteractionCheckerPro onUpgrade={openUpgrade}/>}
-      {page==="stack-audit"   &&<StackAuditScreen onUpgrade={openUpgrade}/>}
-      {page==="bloodwork-history"&&<BloodworkHistoryScreen onUpgrade={openUpgrade}/>}
-      {page==="stack-builder" &&<StackBuilder onUpgrade={openUpgrade}/>}
-      {page==="cycle-alerts"  &&<CycleAlertsScreen onUpgrade={openUpgrade}/>}
-      {page==="stack-optimizer"&&<StackOptimizerScreen onUpgrade={openUpgrade}/>}
-      {page==="bloodwork"     &&<BloodWorkScreen onUpgrade={openUpgrade}/>}
-      {page==="changelog"    &&<ChangelogPage onNavigate={navigateTo}/>}
-
-      {page==="supplements"&&<>
-        <section className="evid-home-hero" aria-labelledby="evid-home-title">
-          <div className="evid-hero-art" aria-hidden="true"/>
-          <div className="evid-hero-content">
-          <p className="evid-hero-kicker">SUPPLEMENTS. COMPOUNDS. CONTEXT.</p>
-          <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>
-          <p className="evid-hero-description">A research database for supplements and compounds. Compare evidence, understand doses and spot potential interactions before building your stack.</p>
-          <p className="evid-hero-support">Explore {SUPPLEMENTS.length} compound profiles, from everyday supplements to specialist compounds. Pro adds the full catalogue, stack analysis and research tools.</p>
-          <div className="evid-hero-actions"><button onClick={()=>{document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Find a compound <span aria-hidden="true">↓</span></button><button onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
-          <p className="evid-hero-access">Start with a free preview. Go deeper with Pro.</p>
-          <div ref={searchContainerRef} className={`evid-hero-search${searchFocused||search?" is-expanded":""}`}>
-            <div className="evid-hero-search-row">
-              {!search&&<span className="evid-search-example" aria-hidden="true" style={{opacity:phFade?1:0}}>{PLACEHOLDERS[phIdx]}</span>}
-              <input id="evidstack-search" value={search}
-                onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
-                onFocus={()=>{setSearchFocused(true);if(search.length>0)setShowSuggest(true);}}
-                onBlur={()=>window.setTimeout(()=>setSearchFocused(false),140)}
-                onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter")runSearch();}}
+        else setErr("Stack not found or link has exp…7348 tokens truncated…e.target.blur();}if(e.key==="Enter")runSearch();}}
                 aria-label="Search compounds" placeholder=""
                 />
               <button onClick={runSearch}>Search <span aria-hidden="true">→</span></button>
@@ -6118,6 +5697,45 @@ function ChangelogPage({onNavigate}){
         <p style={{fontSize:11,color:"#9ca3af",textAlign:"center",marginTop:8}}>Updates are logged from March 2025 onward.</p>
       </div>
     </div>
+  );
+}
+
+function FoundingTestersPage({onAuth}){
+  const isMob=useIsMobile();
+  const email="evidstack@protonmail.com";
+  const [copied,setCopied]=useState(false);
+  const copyEmail=async()=>{
+    trackEvent("pilot_interest",{source:"founding_testers"});
+    try{await navigator.clipboard.writeText(email);setCopied(true);setTimeout(()=>setCopied(false),1800);}catch{}
+  };
+  return(
+    <main style={{minHeight:"100vh",background:C.bg,padding:isMob?"44px 16px 80px":"72px 24px 110px",fontFamily:"Montserrat,sans-serif"}}>
+      <div style={{maxWidth:840,margin:"0 auto"}}>
+        <p style={{fontSize:10,fontWeight:800,letterSpacing:".18em",color:C.gold,margin:"0 0 14px",textTransform:"uppercase",textAlign:"center"}}>FOUNDING TESTERS</p>
+        <h1 style={{fontSize:isMob?34:58,fontWeight:900,letterSpacing:"-.05em",lineHeight:1.02,color:C.ink,margin:"0 auto 18px",textAlign:"center",maxWidth:680}}>Help make supplement research easier to trust.</h1>
+        <p style={{fontSize:15,color:C.gray,lineHeight:1.75,textAlign:"center",maxWidth:580,margin:"0 auto 38px"}}>We are inviting a small group of people who already research supplements, nootropics or performance compounds. You will get early access and help us make every page clearer and more useful.</p>
+        <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"repeat(3,1fr)",gap:12,marginBottom:28}}>
+          {["Search three compounds and compare the evidence.","Return later and tell us what you still needed.","Get early access to the research tools as they improve."].map((text,index)=>(
+            <div key={text} style={{background:C.white,border:`1px solid ${C.border}`,padding:"20px 18px"}}>
+              <span style={{display:"block",fontSize:11,fontWeight:900,color:C.gold,letterSpacing:".12em",marginBottom:12}}>0{index+1}</span>
+              <p style={{fontSize:13,fontWeight:700,lineHeight:1.55,color:C.ink,margin:0}}>{text}</p>
+            </div>
+          ))}
+        </div>
+        <div style={{background:C.ink,padding:isMob?"24px 20px":"32px 36px",textAlign:"center"}}>
+          <p style={{fontSize:13,color:"#d1d5db",lineHeight:1.6,margin:"0 0 18px"}}>Send a short note with your main research goal and the compounds you usually look up. We will reply personally.</p>
+          <div style={{display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap"}}>
+            <a href={`mailto:${email}?subject=Evidstack founding tester`} onClick={()=>trackEvent("pilot_interest",{source:"email_link"})} style={{display:"inline-block",padding:"12px 20px",background:C.gold,color:C.ink,fontSize:12,fontWeight:900,textDecoration:"none",letterSpacing:".03em"}}>Email the team</a>
+            <button onClick={copyEmail} style={{padding:"12px 20px",background:"transparent",color:C.white,border:`1px solid #4b5563`,fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>{copied?"Copied":"Copy email"}</button>
+          </div>
+          <p style={{fontSize:11,color:"#9ca3af",margin:"16px 0 0"}}>{email}</p>
+        </div>
+        <div style={{textAlign:"center",marginTop:28}}>
+          <p style={{fontSize:12,color:C.gray,margin:"0 0 12px"}}>Prefer to explore first?</p>
+          <button onClick={()=>{trackEvent("pilot_signup_cta",{source:"founding_testers"});onAuth("signup");}} style={{padding:"11px 20px",background:"transparent",color:C.ink,border:`1px solid ${C.border}`,fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Create a free account</button>
+        </div>
+      </div>
+    </main>
   );
 }
 

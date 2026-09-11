@@ -12,6 +12,7 @@ const pages = {
   '/legal': ['Terms and Privacy | Evidstack', 'Read the terms, privacy information and informational-use limitations for Evidstack.'],
   '/affiliate': ['Affiliate Information | Evidstack', 'Learn about the Evidstack affiliate program.'],
   '/changelog': ['Product Updates | Evidstack', 'Read recent Evidstack product updates.'],
+  '/founding-testers': ['Evidstack Founding Testers | Evidence-Based Supplement Research', 'Join a small pilot group helping improve Evidstack research tools and compound pages.'],
 };
 export function getPageSeo(pathname) {
   const path = pathname.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
@@ -45,3 +46,4 @@ export function publicPaths() {
     ...GOALS.filter(g=>g.id!=='all').map(g=>`/goal/${g.id}`), ...GUIDE_IDS.map(id=>`/guide/${id}`),
     ...SUPPLEMENTS.map(s=>`/compound/${s.id}`)];
 }
+

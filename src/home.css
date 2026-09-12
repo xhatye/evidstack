@@ -504,3 +504,57 @@ body{background:#fff;color:#1a1a1a}
   .evid-compound-profile-not-found{border-radius:20px!important}
   .evid-compound-profile div[style*="background"]{border-radius:14px}
 }
+
+/* Final hierarchy and trust pass: keep the hero focused while making the
+   research trail easier to scan. */
+.evid-hero-actions{gap:10px}
+.evid-hero-actions button{border-radius:999px!important}
+.evid-hero-actions .evid-hero-primary-cta{background:#1a1a1a!important;color:#fff!important;border-color:#1a1a1a!important}
+.evid-hero-actions .evid-hero-pro-cta{background:#f0f7f2!important;color:#315747!important;border-color:#315747!important}
+.evid-hero-actions .evid-hero-primary-cta:hover{background:#315747!important;border-color:#315747!important}
+.evid-hero-actions .evid-hero-pro-cta:hover{background:#e5f1e8!important}
+.evid-hero-secondary-links{flex-wrap:wrap}
+.evid-hero-secondary-links .evid-snapshot-home-link{color:#75632d}
+.evid-hero-secondary-links .evid-snapshot-home-link:hover{color:#a47b22}
+.evid-homepage .evid-hero-art::before{left:2%;top:24%;opacity:.55}
+.evid-homepage .evid-hero-art::after{right:2%;bottom:18%;opacity:.55}
+.evid-homepage .evid-art-pill-one{left:8%;top:15%;opacity:.7}
+.evid-homepage .evid-art-pill-two{right:8%;top:32%;opacity:.65}
+.evid-homepage .evid-art-pill-three{left:12%;bottom:12%;opacity:.6}
+
+.evid-source-proof-heading{align-items:flex-start}
+.evid-source-heading-meta{max-width:470px}
+.evid-source-intro,.evid-source-detail,.evid-source-proof-footer{color:#596273}
+.evid-source-verified-badge{display:inline-flex;align-items:center;margin-top:16px;padding:7px 11px;border:1px solid #b9d6c0;border-radius:999px;background:#f0f7f2;color:#315747;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.evid-source-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:34px}
+.evid-source-card-top .evid-source-index{margin:0}
+.evid-source-mark{display:grid;place-items:center;width:36px;height:36px;border:1px solid #b9b4a8;border-radius:12px;background:#fff;color:#75632d;font-size:10px;font-weight:900;letter-spacing:.04em;transition:transform .2s ease,background .2s ease}
+.evid-source-mark.is-pm{border-color:#cbd5ff;background:#eef2ff;color:#2563eb}
+.evid-source-mark.is-c{border-color:#b9d6c0;background:#f0f7f2;color:#315747}
+.evid-source-mark.is-e{border-color:#e2c97e;background:#fffaf0;color:#a47b22}
+.evid-source-card:hover .evid-source-mark,.evid-source-card:focus-visible .evid-source-mark{background:#fff;color:#1a1a1a;transform:translateY(-2px)}
+
+.evid-filter-label{display:inline-flex;align-items:center;min-height:24px;padding:4px 7px!important;border-radius:8px;background:#ece9e2;color:#596273!important;font-size:9px!important;font-weight:900!important;letter-spacing:.14em!important}
+.evid-filter-label.is-type{margin-left:12px;border-left:3px solid #e2c97e;padding-left:10px!important;background:#fffaf0;color:#75632d!important}
+.evid-catalog-filters{background:#f7f5f1!important}
+.evid-goal-bar{position:relative;z-index:2}
+
+.evid-stack-page h1{letter-spacing:-.055em}
+.evid-stack-page>div[style*="background"][style*="border"],.evid-stack-page article{border-radius:20px!important;overflow:hidden}
+.evid-stack-page button{border-radius:999px!important}
+.evid-stack-page>div[style*="background"]:last-child{border-radius:16px!important}
+
+.evid-pricing-page h1{letter-spacing:-.055em}
+.evid-plan-card{border-radius:22px!important;overflow:hidden;box-shadow:0 12px 30px rgba(30,41,59,.05)}
+.evid-plan-card button{border-radius:999px!important}
+.evid-plan-card>div[style*="position"]{border-radius:0 0 10px 10px}
+.evid-pricing-table{border-radius:22px!important;overflow:hidden;box-shadow:0 12px 30px rgba(30,41,59,.04)}
+.evid-pricing-page .evid-pricing-outcome p{color:#596273}
+
+@media(max-width:767px){
+  .evid-source-verified-badge{font-size:8px}
+  .evid-source-card-top{margin-bottom:25px}
+  .evid-filter-label.is-type{margin-left:4px}
+  .evid-pricing-table{border-radius:18px!important}
+}
+@media(prefers-reduced-motion:reduce){.evid-source-mark{transition:none}}

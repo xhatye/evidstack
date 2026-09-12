@@ -191,7 +191,7 @@ import BodyAtlasPage from "./BodyAtlas.jsx";
 // v2
 const C = {
   bg:"#f4f2ee",white:"#ffffff",black:"#0a0a0a",ink:"#1a1a1a",
-  gray:"#6b7280",light:"#e8e5df",border:"#d4d0c8",
+  gray:"#596273",light:"#e8e5df",border:"#d4d0c8",
   green:"#16a34a",blue:"#2563eb",amber:"#d97706",red:"#dc2626",purple:"#7c3aed",
   gold:"#e2c97e",
 };
@@ -341,6 +341,7 @@ function SourceProofSection({onNavigate}){
   const cards=[
     {
       index:"01",
+      mark:"PM",
       name:"PubMed / MEDLINE",
       detail:`${EVIDENCE_SOURCE_STATS.pubmed}+ PMID references appear across the current catalogue.`,
       note:"Primary literature and clinical studies",
@@ -348,6 +349,7 @@ function SourceProofSection({onNavigate}){
     },
     {
       index:"02",
+      mark:"C",
       name:"Cochrane Library",
       detail:"Systematic reviews are used when a higher-level synthesis is available.",
       note:"Independent evidence synthesis",
@@ -355,6 +357,7 @@ function SourceProofSection({onNavigate}){
     },
     {
       index:"03",
+      mark:"E",
       name:"Examine",
       detail:"A secondary cross-check for supplement context, claims and study quality.",
       note:"Research summary cross-reference",
@@ -369,12 +372,15 @@ function SourceProofSection({onNavigate}){
             <p className="evid-source-kicker">THE PROOF IS IN THE SOURCE</p>
             <h2 id="evid-source-title">Research you can trace.</h2>
           </div>
-          <p className="evid-source-intro">Evidstack turns published research into clear compound summaries. We keep effect size and evidence quality separate, show the source trail when a reference is attached, and mark uncited entries for review.</p>
+          <div className="evid-source-heading-meta">
+            <p className="evid-source-intro">Evidstack turns published research into clear compound summaries. We keep effect size and evidence quality separate, show the source trail when a reference is attached, and mark uncited entries for review.</p>
+            <span className="evid-source-verified-badge">Research record updated Sep 2026</span>
+          </div>
         </div>
         <div className="evid-source-grid">
           {cards.map(card=>(
             <a key={card.name} className="evid-source-card" href={card.href} target="_blank" rel="noreferrer">
-              <span className="evid-source-index">{card.index}</span>
+              <span className="evid-source-card-top"><span className="evid-source-index">{card.index}</span><span className={`evid-source-mark is-${card.mark.toLowerCase()}`} aria-hidden="true">{card.mark}</span></span>
               <span className="evid-source-name">{card.name}</span>
               <span className="evid-source-detail">{card.detail}</span>
               <span className="evid-source-note">{card.note}<span aria-hidden="true"> ↗</span></span>
@@ -4775,9 +4781,9 @@ function AppInner(){
           <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>
           <p className="evid-hero-description">A research database for supplements and compounds. Compare evidence, understand doses and spot potential interactions before building your stack.</p>
           <p className="evid-hero-support">Explore {SUPPLEMENTS.length} compound profiles, from everyday supplements to specialist compounds. Pro adds the full catalogue, stack analysis and research tools.</p>
-          <div className="evid-hero-actions"><button className="atlas-home-feature" onClick={()=>navigateTo("body-atlas")}><span aria-hidden="true">◎</span> Body Atlas <span className="atlas-new-badge">NEW</span></button><button onClick={()=>{trackEvent("search_started",{source:"hero_cta"});document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Find a compound <span aria-hidden="true">↓</span></button><button className="evid-snapshot-home-cta" onClick={openFreeSnapshot}>Free evidence snapshot <span aria-hidden="true">↗</span></button><button onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
+          <div className="evid-hero-actions"><button className="atlas-home-feature" onClick={()=>navigateTo("body-atlas")}><span aria-hidden="true">◎</span> Body Atlas <span className="atlas-new-badge">NEW</span></button><button className="evid-hero-primary-cta" onClick={()=>{trackEvent("search_started",{source:"hero_cta"});document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Browse compounds <span aria-hidden="true">↓</span></button><button className="evid-hero-pro-cta" onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
           <p className="evid-hero-access">Start with a free preview. Go deeper with Pro.</p>
-          <div className="evid-hero-secondary-links"><span>Building a better evidence map?</span><button onClick={()=>{trackEvent("pilot_interest",{source:"homepage-secondary"});navigateTo("founding-testers");}}>Join the pilot <span aria-hidden="true">↗</span></button></div>
+          <div className="evid-hero-secondary-links"><span>Free evidence snapshot</span><button className="evid-snapshot-home-link" onClick={openFreeSnapshot}>Try it free <span aria-hidden="true">↗</span></button><span aria-hidden="true">·</span><span>Building a better evidence map?</span><button onClick={()=>{trackEvent("pilot_interest",{source:"homepage-secondary"});navigateTo("founding-testers");}}>Join the pilot <span aria-hidden="true">↗</span></button></div>
           <div ref={searchContainerRef} className={`evid-hero-search${searchFocused||search?" is-expanded":""}`}>
             <div className="evid-hero-search-row">
               <span className="evid-hero-search-icon" aria-hidden="true"/>
@@ -4820,7 +4826,7 @@ function AppInner(){
 
         <div className="evid-catalog-filters" style={{padding:isMobile?"10px 12px":"12px 32px",borderBottom:`1px solid ${C.border}`,background:C.bg}}>
           <div className="evid-catalog-filter-row" style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:isMobile?8:0}}>
-            <span style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".1em"}}>TIER:</span>
+            <span className="evid-filter-label is-tier" style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".1em"}}>TIER:</span>
             <button onClick={()=>setFilterTier(0)} style={{padding:"4px 10px",fontSize:10,fontWeight:700,background:filterTier===0?C.ink:"transparent",color:filterTier===0?C.white:C.gray,border:`1px solid ${C.border}`,borderRadius:999,cursor:"pointer"}}>{isMobile?"All":T.controls.tierAll}</button>
             {[1,2,3,4].map((ti,i)=>(
               <button key={ti} onClick={()=>setFilterTier(filterTier===ti?0:ti)}
@@ -4828,7 +4834,7 @@ function AppInner(){
                 {isMobile?`T${ti}`:`T${ti} / ${T.controls.tiers[i]}`}
               </button>
             ))}
-            <span style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".1em",padding:"4px 4px 4px 10px"}}>TYPE:</span>
+            <span className="evid-filter-label is-type" style={{fontSize:10,fontWeight:700,color:C.gray,letterSpacing:".1em",padding:"4px 4px 4px 10px"}}>TYPE:</span>
             <button onClick={()=>setFilterCategory("all")} style={{padding:"4px 10px",fontSize:10,fontWeight:700,background:filterCategory==="all"?C.ink:"transparent",color:filterCategory==="all"?C.white:C.gray,border:`1px solid ${C.border}`,borderRadius:999,cursor:"pointer"}}>All</button>
             {Object.entries(COMPOUND_CATEGORY_LABELS).map(([id,label])=>(
               <button key={id} onClick={()=>setFilterCategory(filterCategory===id?"all":id)}
@@ -7607,7 +7613,7 @@ function MyStackPage({onNavigate,onUpgrade,onAuth}){
   if(!user)return(
     <div className="evid-stack-page" style={{maxWidth:760,margin:"0 auto",padding:isMob?"48px 18px 90px":"80px 40px 120px"}}>
       <p style={{fontSize:10,fontWeight:900,color:C.gold,letterSpacing:".18em",margin:"0 0 14px"}}>MY STACK</p>
-      <h1 style={{fontSize:isMob?34:52,fontWeight:900,color:C.ink,letterSpacing:"-.06em",lineHeight:1.05,margin:"0 0 16px"}}>Keep your research together.</h1>
+      <h1 style={{fontSize:isMob?34:46,fontWeight:900,color:C.ink,letterSpacing:"-.06em",lineHeight:1.05,margin:"0 0 16px"}}>Keep your research together.</h1>
       <p style={{fontSize:16,color:C.gray,lineHeight:1.7,maxWidth:600,margin:"0 0 28px"}}>Save compounds, compare options and return to the evidence you care about. Create a free account to keep your list across devices.</p>
       <button onClick={()=>onAuth("signup")} style={{padding:"13px 22px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Create a free account</button>
     </div>
@@ -7618,7 +7624,7 @@ function MyStackPage({onNavigate,onUpgrade,onAuth}){
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",gap:20,flexWrap:"wrap",marginBottom:28}}>
         <div>
           <p style={{fontSize:10,fontWeight:900,color:C.gold,letterSpacing:".18em",margin:"0 0 12px"}}>MY STACK</p>
-          <h1 style={{fontSize:isMob?34:48,fontWeight:900,color:C.ink,letterSpacing:"-.06em",lineHeight:1.05,margin:"0 0 12px"}}>Your saved compounds.</h1>
+          <h1 style={{fontSize:isMob?34:44,fontWeight:900,color:C.ink,letterSpacing:"-.06em",lineHeight:1.05,margin:"0 0 12px"}}>Your saved compounds.</h1>
           <p style={{fontSize:15,color:C.gray,lineHeight:1.6,maxWidth:600,margin:0}}>A personal shortlist for your goals, questions and next research session.</p>
         </div>
         <button onClick={()=>onNavigate("supplements")} style={{padding:"10px 15px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Browse compounds</button>
@@ -7697,7 +7703,7 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
   const S={
     page:{minHeight:"100vh",background:C.bg,padding:isMob?"40px 16px 80px":"60px 24px 100px",fontFamily:"Montserrat,sans-serif"},
     inner:{maxWidth:900,margin:"0 auto"},
-    h1:{fontSize:isMob?32:52,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px",textAlign:"center"},
+    h1:{fontSize:isMob?32:46,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px",textAlign:"center"},
     sub:{fontSize:15,color:C.gray,textAlign:"center",margin:"0 auto 56px",maxWidth:480,lineHeight:1.7},
     card:{background:C.white,border:`1px solid ${C.border}`,padding:isMob?"24px 20px":"36px 32px"},
     btnGold:{padding:"14px 32px",background:C.gold,color:C.ink,border:"none",fontSize:14,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",width:"100%"},
@@ -7705,7 +7711,7 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
   };
 
   return(
-    <div style={S.page}><div style={S.inner}>
+    <div className="evid-pricing-page" style={S.page}><div style={S.inner}>
       <h1 style={S.h1}>Simple, honest pricing.</h1>
       <p style={S.sub}>One Pro plan. Ask better questions, see the evidence behind each answer, and keep your research connected. Cancel anytime.</p>
 

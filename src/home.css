@@ -465,3 +465,41 @@ body{background:#fff;color:#1a1a1a}
 }
 @media(prefers-reduced-motion:reduce){.evid-pro-page .evid-pro-tool-page button:hover:not(:disabled){transform:none}.evid-pro-page .evid-pro-tool-page button{transition:none}}
 
+/* Compound profiles use the same soft, rounded surfaces as the rest of the site.
+   CompoundPage is shared by every catalogue entry, so this covers all profiles
+   without changing their evidence, access rules, or content. */
+.evid-compound-profile > div[style*="background"],
+.evid-compound-profile > section{
+  border-radius:24px!important;
+  overflow:hidden;
+  box-shadow:0 12px 30px rgba(30,41,59,.045);
+}
+.evid-compound-profile > div[style*="background"] > div[style*="background"],
+.evid-compound-profile > section div[style*="background"]{
+  border-radius:16px;
+}
+.evid-compound-profile div[style*="background"]{
+  border-radius:16px;
+}
+.evid-compound-profile .evid-trust-card,
+.evid-compound-profile .evid-evidence-state{
+  overflow:hidden;
+}
+.evid-compound-profile button,
+.evid-compound-profile a[role="button"]{
+  border-radius:12px;
+}
+.evid-compound-profile-not-found{
+  border-radius:24px;
+  padding-top:40px!important;
+  padding-bottom:40px!important;
+  background:#fff;
+  box-shadow:0 12px 30px rgba(30,41,59,.045);
+}
+@media(max-width:767px){
+  .evid-compound-profile > div[style*="background"],
+  .evid-compound-profile > section,
+  .evid-compound-profile-not-found{border-radius:20px!important}
+  .evid-compound-profile div[style*="background"]{border-radius:14px}
+}
+

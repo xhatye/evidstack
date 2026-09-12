@@ -60,3 +60,23 @@
 .body-atlas-canvas-hint{bottom:8px}
 .body-atlas-canvas-hint{bottom:0;padding:3px 8px;font-size:9px;background:#f8f8f2;border:0}
 
+
+/* Atlas accent: a restrained green interface frame gives this tool its own
+   technical identity while keeping the anatomical artwork readable. */
+.body-atlas-page{background:radial-gradient(circle at 8% 8%,rgba(49,87,71,.14),transparent 28%),radial-gradient(circle at 92% 76%,rgba(49,87,71,.08),transparent 30%),#f4f2ee}
+.body-atlas-hero h1 span,.body-atlas-kicker{color:#315747}
+.body-atlas-hero-stat strong{color:#315747}
+.body-atlas-canvas-wrap,.body-atlas-detail-panel{border-color:#9bb6a2;box-shadow:0 18px 45px rgba(49,87,71,.08)}
+.body-atlas-canvas-wrap{background:#f5f8f2}
+.body-atlas-canvas{background:linear-gradient(rgba(49,87,71,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(49,87,71,.055) 1px,transparent 1px),radial-gradient(ellipse at 50% 42%,rgba(49,87,71,.11),#f8f8f2 72%);background-size:28px 28px,28px 28px,auto;border-color:#739885;box-shadow:inset 0 0 0 1px rgba(49,87,71,.08),inset 0 0 55px rgba(49,87,71,.06)}
+.body-atlas-canvas::before{content:"";position:absolute;inset:11px;border:1px solid rgba(49,87,71,.18);border-radius:12px;pointer-events:none;clip-path:polygon(0 0,22% 0,22% 1px,78% 1px,78% 0,100% 0,100% 22%,calc(100% - 1px) 22%,calc(100% - 1px) 78%,100% 78%,100% 100%,78% 100%,78% calc(100% - 1px),22% calc(100% - 1px),22% 100%,0 100%,0 78%,1px 78%,1px 22%,0 22%)}
+.body-atlas-canvas-topline{color:#315747}
+.body-atlas-view-toggle button.is-active{background:#315747;border-color:#315747!important}
+.body-atlas-region-pills button.is-active{background:#315747!important;border-color:#315747!important}
+.body-atlas-result-heading{color:#315747}
+.body-atlas-detail-panel{background:linear-gradient(180deg,#fff,#fbfcf9)}
+.body-atlas-empty-mark{border-color:#9bb6a2;color:#315747;border-radius:12px}
+.body-atlas-inline-upgrade{background:linear-gradient(145deg,#1a1a1a,#315747)}
+.body-atlas-note{border-color:#9bb6a2;box-shadow:0 10px 24px rgba(49,87,71,.05)}
+.body-atlas-note span{color:#315747}
+@media(prefers-reduced-motion:reduce){.body-atlas-canvas::before{display:none}}

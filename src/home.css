@@ -558,3 +558,33 @@ body{background:#fff;color:#1a1a1a}
   .evid-pricing-table{border-radius:18px!important}
 }
 @media(prefers-reduced-motion:reduce){.evid-source-mark{transition:none}}
+
+/* Animated research motifs: the paper stays calm while soft pills, dots and
+   rounded blocks drift at the far edges of the public catalogue. */
+.evid-homepage::after{content:"";position:fixed;inset:-4%;z-index:-1;pointer-events:none;opacity:.68;filter:drop-shadow(0 18px 24px rgba(30,41,59,.08));background:
+  radial-gradient(ellipse 58px 21px at 8% 18%,rgba(226,201,126,.22) 0 48%,transparent 51%),
+  radial-gradient(ellipse 47px 18px at 91% 63%,rgba(37,99,235,.10) 0 48%,transparent 51%),
+  radial-gradient(ellipse 35px 14px at 17% 84%,rgba(49,87,71,.10) 0 48%,transparent 51%),
+  radial-gradient(circle at 13% 31%,rgba(226,201,126,.36) 0 4px,transparent 5px),
+  radial-gradient(circle at 86% 72%,rgba(37,99,235,.20) 0 3px,transparent 4px),
+  radial-gradient(circle at 79% 14%,rgba(49,87,71,.14) 0 3px,transparent 4px),
+  linear-gradient(142deg,transparent 0 47%,rgba(30,41,59,.035) 47.2% 47.45%,transparent 47.7% 100%);
+  animation:evidEdgeMoleculeDrift 32s ease-in-out infinite alternate}
+@keyframes evidEdgeMoleculeDrift{from{transform:translate3d(-.4%,-.25%,0) rotate(-.15deg)}to{transform:translate3d(.55%,.5%,0) rotate(.15deg)}}
+.evid-source-proof-footer{align-items:baseline}
+.evid-source-proof-footer>span,.evid-source-proof-footer>.evid-source-demo-link{align-self:baseline}
+
+/* Guides use the same dark-to-green workspace language as the Pro tools. */
+.evid-guides-page{background:radial-gradient(circle at 92% 4%,rgba(49,87,71,.08),transparent 26%),#f4f2ee!important}
+.evid-guides-page>div:first-child{margin:0 12px 18px;background:linear-gradient(145deg,#1a1a1a 0%,#26352d 58%,#315747 100%)!important;border:0!important;border-radius:0 0 24px 24px!important;box-shadow:0 14px 34px rgba(30,41,59,.13);color:#fff}
+.evid-guides-page>div:first-child h1{color:#fff!important;letter-spacing:-.06em!important}
+.evid-guides-page>div:first-child p{color:#d7ddd7!important}
+.evid-guides-page>div:nth-child(2){padding-top:30px!important}
+.evid-guides-page .evid-guide-card,.evid-guides-page .evid-guide-goal-card{border-radius:20px!important;box-shadow:0 10px 24px rgba(30,41,59,.045);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important}
+.evid-guides-page .evid-guide-card:hover,.evid-guides-page .evid-guide-goal-card:hover{transform:translateY(-3px);box-shadow:0 16px 30px rgba(30,41,59,.09)!important;border-color:#9bb6a2!important}
+.evid-guides-page .evid-guide-card>div:first-child>span:first-child,.evid-guides-page .evid-guide-goal-card>div:first-child{display:grid;place-items:center;width:32px;height:32px;border-radius:11px;background:#f0f7f2;color:#315747;font-size:16px!important;filter:none!important}
+.evid-guides-page .evid-guide-card>div:first-child>span:nth-child(2){letter-spacing:-.035em}
+.evid-guides-page .evid-guides-upgrade{border-radius:20px!important;background:linear-gradient(145deg,#fff,#f3f8f4)!important;box-shadow:0 10px 24px rgba(30,41,59,.05)}
+.evid-guides-page button{border-radius:999px!important}
+@media(max-width:767px){.evid-homepage::after{inset:-10%;opacity:.52}.evid-guides-page>div:first-child{margin:0 8px 14px;border-radius:0 0 20px 20px!important}.evid-guides-page>div:nth-child(2){padding-top:22px!important}}
+@media(prefers-reduced-motion:reduce){.evid-homepage::after{animation:none}.evid-guides-page .evid-guide-card,.evid-guides-page .evid-guide-goal-card{transition:none!important}.evid-guides-page .evid-guide-card:hover,.evid-guides-page .evid-guide-goal-card:hover{transform:none}}

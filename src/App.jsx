@@ -6914,14 +6914,14 @@ function GuidesIndexPage({onNavigate,onUpgrade,onAuth}){
   const isMob=useIsMobile();
   const FREE_GUIDE_IDS=["sleep","force"];
   const GUIDE_ITEMS=[
-    {id:"sleep",label:"Sleep",icon:"😴",desc:"Magnesium, Glycine, L-Theanine, Ashwagandha. Improve onset, depth, and recovery."},
-    {id:"force",label:"Strength",icon:"💪",desc:"Creatine, Citrulline, Beta-Alanine. The highest-evidence performance stack."},
-    {id:"focus",label:"Focus & Cognition",icon:"🧠",desc:"Caffeine + L-Theanine, Lion's Mane, Bacopa. Sustained mental performance without dependence."},
-    {id:"hormones",label:"Testosterone",icon:"🩸",desc:"D3, Zinc, Tongkat Ali, Ashwagandha, Boron. Optimize the hormonal foundation first."},
-    {id:"longevity",label:"Longevity",icon:"❤️",desc:"Omega-3, CoQ10, NMN, Resveratrol. Target NAD+ decline, inflammation, and mitochondrial function."},
-    {id:"skin",label:"Skin Quality",icon:"✨",desc:"Vitamin C, Astaxanthin, Collagen, Hyaluronic Acid. 8-12 weeks to visible improvement."},
-    {id:"weight",label:"Fat Loss",icon:"⚖️",desc:"Berberine, Omega-3, Ashwagandha. Works within a caloric deficit. No thermogenic stack."},
-    {id:"recovery",label:"Recovery",icon:"🔁",desc:"Omega-3, Creatine, Magnesium, BPC-157. Reduce soreness, accelerate repair."},
+    {id:"sleep",label:"Sleep",icon:"◒",desc:"Magnesium, Glycine, L-Theanine, Ashwagandha. Improve onset, depth, and recovery."},
+    {id:"force",label:"Strength",icon:"↗",desc:"Creatine, Citrulline, Beta-Alanine. The highest-evidence performance stack."},
+    {id:"focus",label:"Focus & Cognition",icon:"✦",desc:"Caffeine + L-Theanine, Lion's Mane, Bacopa. Sustained mental performance without dependence."},
+    {id:"hormones",label:"Testosterone",icon:"●",desc:"D3, Zinc, Tongkat Ali, Ashwagandha, Boron. Optimize the hormonal foundation first."},
+    {id:"longevity",label:"Longevity",icon:"♡",desc:"Omega-3, CoQ10, NMN, Resveratrol. Target NAD+ decline, inflammation, and mitochondrial function."},
+    {id:"skin",label:"Skin Quality",icon:"✧",desc:"Vitamin C, Astaxanthin, Collagen, Hyaluronic Acid. 8-12 weeks to visible improvement."},
+    {id:"weight",label:"Fat Loss",icon:"◌",desc:"Berberine, Omega-3, Ashwagandha. Works within a caloric deficit. No thermogenic stack."},
+    {id:"recovery",label:"Recovery",icon:"↻",desc:"Omega-3, Creatine, Magnesium, BPC-157. Reduce soreness, accelerate repair."},
   ];
   const GOAL_ITEMS=GOALS.filter(g=>g.id!=="all");
   const navigateGuide=(id)=>{window.history.pushState({},"",`/guide/${id}`);window.dispatchEvent(new PopStateEvent("popstate"));};

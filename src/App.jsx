@@ -840,7 +840,7 @@ function BlurredPreviewPaywall({lockedCompounds,onAuth,onUpgrade,user,isMob}){
       {lockedCompounds.map((s)=>{
         const tc=tierColor(s.tier);
         return(
-          <div key={s.id} style={{position:"relative",border:`1px solid ${C.border}`,background:C.white,borderTop:`3px solid ${tc}`,padding:isMob?"14px 16px":"18px 24px",opacity:0.7,cursor:"default",marginBottom:12}}>
+          <div key={s.id} className="evid-paywall-preview-card" style={{position:"relative",border:`1px solid ${C.border}`,background:C.white,borderTop:`3px solid ${tc}`,padding:isMob?"14px 16px":"18px 24px",opacity:0.7,cursor:"default",marginBottom:12}}>
             <div style={{position:"absolute",inset:0,background:"rgba(244,242,238,0.5)",pointerEvents:"none"}}/>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
               <div>
@@ -861,7 +861,7 @@ function BlurredPreviewPaywall({lockedCompounds,onAuth,onUpgrade,user,isMob}){
           </div>
         );
       })}
-      <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"28px 24px",textAlign:"center"}}>
+      <div className="evid-paywall-cta" style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"28px 24px",textAlign:"center"}}>
         <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 6px"}}>You're seeing {FREE_VISIBLE} of {SUPPLEMENTS.length} compounds</p>
         <p style={{fontSize:12,color:C.gray,margin:"0 0 8px"}}>A free account saves up to 5 compounds and keeps a limited comparison. Pro unlocks full profiles, complete comparisons, peptides, GLP-1s, experimental compounds and research tools.</p>
         <p style={{fontSize:11,color:C.gray,margin:"0 0 20px"}}>$9.99/month. Cancel anytime.</p>
@@ -890,7 +890,7 @@ function PaywallCard({supp,onUpgrade,isMob,showCTA=true}){
   const tc=tierColor(supp.tier);
   const category=compoundCategory(supp);
   return(
-    <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${tc}`,position:"relative",overflow:"hidden",minHeight:120}}>
+    <div className="evid-paywall-card" style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${tc}`,position:"relative",overflow:"hidden",minHeight:120}}>
       <div style={{padding:"24px 28px 20px",filter:"blur(4px)",userSelect:"none",pointerEvents:"none",opacity:.6}}>
         <p style={{fontSize:9,fontWeight:800,color:tc,letterSpacing:".14em",margin:"0 0 6px",textTransform:"uppercase"}}>TIER {supp.tier} / {TIERS[supp.tier]?.label?.toUpperCase()||""}</p>
         <h3 style={{fontSize:20,fontWeight:900,color:C.ink,margin:0}}>{supp.name}</h3>
@@ -3521,7 +3521,7 @@ function EvidenceWorkspacePage({onNavigate,onUpgrade,onAuth}){
     <main className="evid-workspace">
       <section className="evid-workspace-hero">
         <div className="evid-workspace-hero-copy">
-          <p className="evid-workspace-kicker">PERSONAL EVIDENCE WORKSPACE</p>
+          <p className="evid-workspace-kicker">PERSONAL PRO WORKSPACE</p>
           <h1>Turn research into a plan.</h1>
           <p className="evid-workspace-lede">Keep your goals, compounds, bloodwork, and follow-up questions in one calm place. Evidstack helps you move from “what does the evidence say?” to “what should I review next?”</p>
           <div className="evid-workspace-hero-actions">
@@ -3559,11 +3559,11 @@ function EvidenceWorkspacePage({onNavigate,onUpgrade,onAuth}){
           <p>Each tool uses the same verified compound context, so your research does not get scattered across separate screens.</p>
         </div>
         <div className="evid-workspace-tool-grid">
-          {tools.map(tool=><article key={tool.id} className={`evid-workspace-tool${isPro?"":" is-locked"}`}>
+          {tools.map(tool=><article key={tool.id} className={`evid-workspace-tool${isPro?"":" is-locked"}`} role="button" tabIndex={0} aria-label={`${isPro?"Open":"Unlock"} ${tool.label}`} onClick={()=>openTool(tool.id)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openTool(tool.id);}}}>
             <div className="evid-workspace-tool-top"><span className="evid-workspace-tool-icon" aria-hidden="true">{tool.icon}</span>{!isPro&&<span className="evid-workspace-lock">PRO</span>}</div>
             <h3>{tool.label}</h3>
             <p>{tool.description}</p>
-            <button onClick={()=>openTool(tool.id)}>{isPro?tool.action:"Unlock with Pro"}<span aria-hidden="true">↗</span></button>
+            <button onClick={e=>{e.stopPropagation();openTool(tool.id);}}>{isPro?tool.action:"Unlock with Pro"}<span aria-hidden="true">↗</span></button>
           </article>)}
         </div>
       </section>
@@ -3649,7 +3649,6 @@ function AppInner(){
   const isMobile=useIsMobile();
   const compactNav=useIsMobile(1280);
   const [mobileMenu,setMobileMenu]=useState(false);
-  const [showTools,setShowTools]=useState(false);
   const [showExitModal,setShowExitModal]=useState(false);
   const [showActivation,setShowActivation]=useState(false);
 
@@ -3674,7 +3673,11 @@ function AppInner(){
     requestAnimationFrame(()=>document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"}));
   };
 
-  const navigateTo=(p)=>{navigate(p);setPage(p);setCompoundId(null);setNavSearchOpen(false);setShowSuggest(false);window.scrollTo({top:0,behavior:"instant"});};
+  const navigateTo=(p)=>{
+    const update=()=>{navigate(p);setPage(p);setCompoundId(null);setNavSearchOpen(false);setShowSuggest(false);window.scrollTo({top:0,behavior:"instant"});};
+    if(typeof document.startViewTransition==="function"&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.startViewTransition(update);}
+    else update();
+  };
 
   useEffect(()=>{applyPageSeo(getPageSeo(window.location.pathname));},[page,compoundId,goalId,guideId,shareId]);
 
@@ -3767,20 +3770,11 @@ function AppInner(){
     {id:"supplements",label:"Supplements"},
     {id:"body-atlas",label:"Body Atlas"},
     {id:"my-stack",label:"My Stack"},
-    {id:"workspace",label:"Workspace"},
-    {id:"advisor",label:"AI Compound Advisor"},
+    {id:"workspace",label:"Pro Workspace"},
     {id:"guides",label:"Guides"},
     {id:"pricing",label:"Pricing"},
     {id:"about",label:"About"},
   ];
-  const proTools=[
-    {id:"tracker",label:"My Tracker"},
-    {id:"bloodwork",label:"AI Bloodwork Analyzer"},
-    {id:"interaction-checker",label:"Interaction Checker"},
-    {id:"stack-audit",label:"Stack Audit AI"},
-    {id:"bloodwork-history",label:"Bloodwork History"},
-  ];
-  const proPages=proTools.map(t=>t.id);
   const isProToolPage=["weekly-protocol","interactions","tracker","advisor","interaction-checker","stack-audit","bloodwork-history","stack-builder","cycle-alerts","stack-optimizer","bloodwork","body-atlas","workspace"].includes(page);
 
   const scrollToResults=()=>{
@@ -3853,15 +3847,14 @@ function AppInner(){
               <span style={{fontSize:14,fontWeight:900,letterSpacing:"-.04em"}}>EVIDSTACK</span>
               <button onClick={()=>setMobileMenu(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:C.gray}}>x</button>
             </div>
-            {[...navItems,...proTools,{id:"legal",label:"Terms & Privacy"}].map(item=>(
-              <button key={item.id} onClick={()=>{navigateTo(item.id);setMobileMenu(false);}}
+            {[...navItems,{id:"legal",label:"Terms & Privacy"}].map(item=>(
+              <button key={item.id} className={`evid-mobile-nav-link${page===item.id?" is-active":""}`} onClick={()=>{navigateTo(item.id);setMobileMenu(false);}}
                 style={{padding:"14px 16px",fontSize:14,fontWeight:700,
                   background:page===item.id?C.ink:"transparent",
                   color:page===item.id?C.white:C.gray,
                   border:"none",cursor:"pointer",textAlign:"left",borderRadius:4,
                   display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                 <span>{item.label}</span>
-                {proTools.some(t=>t.id===item.id)&&!isPro&&<span style={{fontSize:9,color:C.gold,fontWeight:900,letterSpacing:".06em"}}>PRO</span>}
               </button>
             ))}
             <div style={{height:1,background:C.border,margin:"12px 0"}}/>
@@ -3903,46 +3896,15 @@ function AppInner(){
         ):(
           <div style={{display:"flex",alignItems:"center",gap:4}}>
             {navItems.map(item=>(
-              <button key={item.id} className={item.id==="body-atlas"?"atlas-nav-feature":undefined} onClick={()=>navigateTo(item.id)}
+              <button key={item.id} className={`evid-nav-link${item.id==="body-atlas"?" atlas-nav-feature":""}${page===item.id?" is-active":""}`} onClick={()=>navigateTo(item.id)}
                 style={{padding:"8px 14px",fontSize:12,fontWeight:700,
-                  background:page===item.id?C.ink:"transparent",
+                  background:"transparent",
                   color:page===item.id?C.white:C.gray,
                   border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s"}}>
-                {item.label}
+                <span>{item.label}</span>
               </button>
             ))}
-            <div style={{position:"relative"}}
-              onMouseEnter={()=>setShowTools(true)}
-              onMouseLeave={()=>setShowTools(false)}>
-              <button
-                style={{padding:"8px 14px",fontSize:12,fontWeight:700,
-                  background:proPages.includes(page)?C.ink:"transparent",
-                  color:proPages.includes(page)?C.white:isPro?C.gray:C.gold,
-                  border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s",
-                  display:"flex",alignItems:"center",gap:5}}>
-                <span style={{color:proPages.includes(page)?C.white:C.gold,marginRight:2}}>+</span><span>Pro Tools</span><span style={{fontSize:8,marginLeft:4}}>{showTools?"▲":"▼"}</span>
-              </button>
-              {showTools&&(
-                <div style={{position:"absolute",top:"100%",left:0,background:C.white,
-                  border:`1px solid ${C.border}`,boxShadow:"0 8px 24px rgba(0,0,0,.12)",
-                  zIndex:500,minWidth:210}}>
-                  {proTools.map(t=>(
-                    <button key={t.id} onClick={()=>{navigateTo(t.id);setShowTools(false);}}
-                      style={{width:"100%",padding:"12px 16px",fontSize:12,fontWeight:700,
-                        background:page===t.id?C.bg:"transparent",
-                        color:C.ink,border:"none",
-                        borderBottom:`1px solid ${C.border}`,
-                        cursor:"pointer",textAlign:"left",
-                        fontFamily:"Montserrat,sans-serif",
-                        display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                      {t.label}
-                      {!isPro&&<span style={{fontSize:8,color:C.gold,fontWeight:900,letterSpacing:".08em"}}>PRO</span>}
-                    </button>
-                  ))}
-                </div>
-               )}
-             </div>
-             {renderNavSearch()}
+            {renderNavSearch()}
              <div style={{width:1,height:24,background:C.border,margin:"0 10px"}}/>
             {user?(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -4288,7 +4250,7 @@ function CycleAlertsScreen({onUpgrade}){
   );
 
   return(
-    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+    <div className="evid-cycle-alerts-page" style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
         <div className="evid-pro-tool-topbar" style={{background:"#6366f1",padding:"12px 0",marginBottom:0}}>
           <div style={{maxWidth:900,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18}}>🔄</span>
@@ -5980,7 +5942,7 @@ function GuidesIndexPage({onNavigate,onUpgrade,onAuth}){
     navigateGuide(g.id);
   };
   return(
-    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+    <div className="evid-guides-page" style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
       <div style={{background:C.white,borderBottom:`1px solid ${C.border}`,padding:isMob?"24px 16px":"40px 48px"}}>
         <div style={{maxWidth:960,margin:"0 auto"}}>
           <h1 style={{fontSize:isMob?26:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 10px"}}>Supplement Guides</h1>

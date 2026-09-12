@@ -32,6 +32,7 @@ const services = {
   },
 };
 const json = (status, error) => Response.json({ error }, { status });
+const MAX_BODY_BYTES = 32768;
 
 // Accept both Vercel's Node request/response and Web Requests used by tests.
 export function secure(handler, { free = false, billing = false, textFields = [] } = {}, deps = services) {
@@ -46,16 +47,19 @@ export function secure(handler, { free = false, billing = false, textFields = []
       try { identity = await deps.verify(match[1]); } catch { throw new ApiError(401, 'Your session has expired. Please sign in again.'); }
       if (!identity?.uid) throw new ApiError(401, 'Invalid session.');
       if (!headers.get('content-type')?.includes('application/json')) throw new ApiError(415, 'Send JSON content.');
-      if (Number(headers.get('content-length')) > 32768) throw new ApiError(413, 'Request too large.');
+      const contentLength = headers.get('content-length');
+      if (contentLength && (!/^\d+$/.test(contentLength) || Number(contentLength) > MAX_BODY_BYTES)) {
+        throw new ApiError(413, 'Request too large.');
+      }
       let text;
       if (req instanceof Request) text = await req.text();
       else if (req.body !== undefined) text = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
       else {
         const chunks = []; let size = 0;
-        for await (const chunk of req) { size += Buffer.byteLength(chunk); if (size > 32768) throw new ApiError(413, 'Request too large.'); chunks.push(Buffer.from(chunk)); }
+        for await (const chunk of req) { size += Buffer.byteLength(chunk); if (size > MAX_BODY_BYTES) throw new ApiError(413, 'Request too large.'); chunks.push(Buffer.from(chunk)); }
         text = Buffer.concat(chunks).toString();
       }
-      if (Buffer.byteLength(text) > 32768) throw new ApiError(413, 'Request too large.');
+      if (Buffer.byteLength(text) > MAX_BODY_BYTES) throw new ApiError(413, 'Request too large.');
       let body;
       try { body = JSON.parse(text); } catch { throw new ApiError(400, 'Invalid JSON.'); }
       if (!body || typeof body !== 'object' || Array.isArray(body)) throw new ApiError(400, 'Invalid request.');
@@ -89,3 +93,4 @@ export function secure(handler, { free = false, billing = false, textFields = []
     res.end(await response.text());
   };
 }
+

@@ -26,9 +26,16 @@ export function activeSubscription(status) {
   return status === "active" || status === "trialing";
 }
 
+const MAX_WEBHOOK_BYTES = 1024 * 1024;
+
 async function getRawBody(req) {
   const chunks = [];
-  for await (const chunk of req) chunks.push(chunk);
+  let size = 0;
+  for await (const chunk of req) {
+    size += Buffer.byteLength(chunk);
+    if (size > MAX_WEBHOOK_BYTES) throw new Error("Webhook payload too large");
+    chunks.push(chunk);
+  }
   return Buffer.concat(chunks);
 }
 
@@ -78,15 +85,26 @@ async function sendWelcomeEmail(email) {
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
+  if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
+    console.error("Stripe webhook is not configured.");
+    return res.status(503).json({ error: "Webhook temporarily unavailable." });
+  }
+  let rawBody;
+  try {
+    rawBody = await getRawBody(req);
+  } catch {
+    return res.status(413).json({ error: "Webhook payload too large." });
+  }
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  const rawBody = await getRawBody(req);
   const sig = req.headers["stripe-signature"];
+  if (!sig) return res.status(400).json({ error: "Missing webhook signature." });
 
   let event;
   try {
     event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    console.error("Stripe webhook signature rejected:", err.message);
+    return res.status(400).json({ error: "Invalid webhook signature." });
   }
 
   initAdmin();

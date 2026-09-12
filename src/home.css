@@ -4,14 +4,6 @@
 @media(max-width:767px){.evid-home-hero{padding:48px 16px 26px}.evid-hero-content h1{font-size:clamp(45px,10vw,68px);letter-spacing:-.055em}.evid-hero-description{font-size:13px;line-height:1.8;max-width:420px}.evid-hero-kicker{font-size:8px;letter-spacing:.18em;margin-bottom:23px}.evid-hero-actions{gap:8px}.evid-hero-actions button{padding:13px 16px;font-size:11px;gap:20px}.evid-access-strip{gap:14px;flex-wrap:wrap}.evid-access-strip span{flex:1;min-width:115px}.evid-access-strip button{font-size:10px}.evid-orbit{opacity:.5}.pro-browse-prompt{right:12px;bottom:12px;width:min(280px,calc(100vw - 24px));padding:18px}.pro-browse-prompt p{font-size:16px;margin:10px 0}.pro-prompt-detail{font-size:10px}.pro-prompt-cta{margin-top:12px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
-/* Continuous backdrop; content panels keep their light surfaces. */
-.evid-homepage{position:relative;isolation:isolate;background:#11120f!important}
-.evid-homepage::before{content:"";position:fixed;inset:-12%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 12% 25%,#a47f3329,transparent 43%),radial-gradient(ellipse at 88% 75%,#e2c97e16,transparent 45%),repeating-radial-gradient(circle at 50% 45%,transparent 0 220px,#e2c97e0c 221px 222px,transparent 223px 350px);animation:evidAtmosphere 24s ease-in-out infinite alternate}
-.evid-homepage .evid-home-hero{background:transparent;border-bottom-color:#e2c97e24}.evid-orbit{animation:evidOrbitDrift 22s ease-in-out infinite alternate}.orbit-two{animation-duration:31s;animation-direction:alternate-reverse}.orbit-three{animation:evidOrbitTurn 150s linear infinite}.orbit-point{animation:evidPointGlow 7s ease-in-out infinite alternate}.point-two{animation-delay:-3s}
-@keyframes evidAtmosphere{from{transform:translate3d(-1%,-1%,0) scale(1)}to{transform:translate3d(2%,3%,0) scale(1.05)}}
-@keyframes evidOrbitDrift{from{transform:translate3d(-14px,-8px,0) scale(.97)}to{transform:translate3d(14px,15px,0) scale(1.04)}}
-@keyframes evidOrbitTurn{to{transform:rotate(360deg)}}
-@keyframes evidPointGlow{from{opacity:.4;transform:translateY(-9px)}to{opacity:1;transform:translateY(9px)}}
 .evid-hero-description{margin-bottom:15px;max-width:610px}.evid-hero-support{max-width:560px;margin:0 auto 28px;font-size:12px;line-height:1.9;color:#b5b2a5}
 .evid-search-example{position:absolute;left:20px;top:50%;transform:translateY(-50%);max-width:calc(100% - 130px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;z-index:1;font-size:13px;color:#6b7280;transition:opacity .3s}
 .evid-homepage .evid-optional-quiz{color:#d4d0c8}.evid-homepage .evid-optional-quiz summary{color:#d4d0c8}.evid-homepage .evid-optional-quiz[open]{background:#f4f2ee;border:1px solid #d4d0c8;padding:0 20px 20px}.evid-homepage .evid-optional-quiz[open] summary{color:#50534b}
@@ -38,34 +30,13 @@
 @media(max-width:767px){.evid-search-example{left:14px;font-size:11px;max-width:calc(100% - 110px)}.evid-hero-support{font-size:11px;line-height:1.8}.evid-main-nav{gap:8px}}
 @media(max-width:767px){.evid-source-proof{padding:48px 16px}.evid-source-proof-heading{display:block;margin-bottom:24px}.evid-source-intro{font-size:13px;margin-top:18px}.evid-source-grid{grid-template-columns:1fr}.evid-source-card{min-height:180px;padding:20px}.evid-source-index{margin-bottom:24px}.evid-source-name{font-size:18px}.evid-source-proof-footer{display:block;font-size:11px}.evid-source-proof-footer span{display:block}.evid-source-proof-footer span+span{margin-top:8px}}
 @media(max-width:360px){.evid-main-nav{padding-left:10px!important;padding-right:10px!important}.evid-main-nav>div:last-child{gap:5px!important}.evid-main-nav>div:last-child>button{padding-left:6px!important;padding-right:6px!important}}
-@media(prefers-reduced-motion:reduce){.evid-homepage::before,.evid-orbit,.orbit-point{animation:none!important}.evid-search-example{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.evid-search-example{transition:none!important}}
 
-/* Calm, editorial surface with static research motifs. */
+/* Calm, editorial surface. */
 html{scroll-behavior:smooth;scroll-padding-top:88px}
 body{background:#fff;color:#1a1a1a}
 .evid-homepage{background:#fff!important;color:#1a1a1a}
-.evid-homepage::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-color:#fff;background-image:
-  radial-gradient(circle at 11% 18%,rgba(226,201,126,.26) 0 3px,transparent 4px),
-  radial-gradient(circle at 17% 23%,rgba(37,99,235,.14) 0 2px,transparent 3px),
-  radial-gradient(circle at 88% 70%,rgba(226,201,126,.24) 0 3px,transparent 4px),
-  radial-gradient(circle at 93% 64%,rgba(37,99,235,.12) 0 2px,transparent 3px),
-  linear-gradient(28deg,transparent 49.7%,rgba(30,41,59,.06) 50%,transparent 50.3%),
-  linear-gradient(205deg,transparent 49.8%,rgba(30,41,59,.05) 50%,transparent 50.2%);
-  background-size:100% 100%;animation:none!important}
 .evid-home-hero{background:#fff!important;color:#1a1a1a;border-bottom:1px solid #d4d0c8;padding-top:78px}
-.evid-hero-art{z-index:0;background-color:#fff;background-image:
-  radial-gradient(ellipse 150px 52px at 9% 26%,rgba(226,201,126,.16) 0 47%,transparent 49%),
-  radial-gradient(ellipse 130px 44px at 91% 68%,rgba(37,99,235,.07) 0 47%,transparent 49%),
-  radial-gradient(circle at 13% 25%,rgba(226,201,126,.48) 0 3px,transparent 4px),
-  radial-gradient(circle at 20% 33%,rgba(37,99,235,.22) 0 2px,transparent 3px),
-  radial-gradient(circle at 87% 66%,rgba(226,201,126,.42) 0 3px,transparent 4px),
-  radial-gradient(circle at 81% 73%,rgba(37,99,235,.18) 0 2px,transparent 3px),
-  linear-gradient(26deg,transparent 49.7%,rgba(30,41,59,.07) 50%,transparent 50.3%),
-  linear-gradient(204deg,transparent 49.7%,rgba(30,41,59,.06) 50%,transparent 50.3%);opacity:1}
-.evid-hero-art::before,.evid-hero-art::after{content:"";position:absolute;pointer-events:none;border-radius:999px;filter:drop-shadow(0 14px 20px rgba(30,41,59,.10))}
-.evid-hero-art::before{width:132px;height:44px;left:7%;top:22%;background:linear-gradient(90deg,rgba(226,201,126,.20) 0 49%,rgba(255,255,255,.8) 50% 100%);transform:rotate(-24deg)}
-.evid-hero-art::after{width:110px;height:36px;right:7%;bottom:20%;background:linear-gradient(90deg,rgba(37,99,235,.10) 0 49%,rgba(226,201,126,.16) 50% 100%);transform:rotate(24deg)}
-.evid-orbit,.orbit-point,.evid-hero-grid{display:none!important}
 .evid-hero-content{z-index:1}
 .evid-hero-kicker{color:#75632d}
 .evid-hero-content h1{color:#1a1a1a}
@@ -195,18 +166,12 @@ body{background:#fff;color:#1a1a1a}
 .evid-paywall-cta{box-shadow:0 8px 24px rgba(30,41,59,.06)}
 .evid-homepage [data-pro-prompt="true"]>div,.evid-homepage [data-pro-prompt="true"] .evid-paywall-card{border-radius:18px!important;overflow:hidden}
 
-@keyframes evidMoleculeBackdrop{0%{transform:translate3d(-.4%,-.3%,0) scale(1)}100%{transform:translate3d(.5%,.6%,0) scale(1.015)}}
-@keyframes evidMoleculeDrift{0%,100%{transform:translate3d(0,0,0) rotate(-24deg)}50%{transform:translate3d(8px,-5px,0) rotate(-20deg)}}
-@keyframes evidMoleculeDriftReverse{0%,100%{transform:translate3d(0,0,0) rotate(24deg)}50%{transform:translate3d(-7px,6px,0) rotate(28deg)}}
-.evid-homepage::before{animation:evidMoleculeBackdrop 28s ease-in-out infinite alternate!important}
-.evid-homepage .evid-hero-art::before{animation:evidMoleculeDrift 17s ease-in-out infinite}
-.evid-homepage .evid-hero-art::after{animation:evidMoleculeDriftReverse 21s ease-in-out infinite}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
 ::view-transition-old(root){animation-name:evidViewOut}
 ::view-transition-new(root){animation-name:evidViewIn}
 @keyframes evidViewOut{to{opacity:0;transform:translateY(4px)}}
 @keyframes evidViewIn{from{opacity:0;transform:translateY(-4px)}}
-@media(prefers-reduced-motion:reduce){.evid-homepage::before,.evid-homepage .evid-hero-art::before,.evid-homepage .evid-hero-art::after{animation:none!important}::view-transition-old(root),::view-transition-new(root){animation:none!important}}
+@media(prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none!important}}
 
 /* Search treatment inspired by the supplied dark, inset reference. */
 .evid-homepage .evid-hero-search-row{align-items:stretch;padding:5px;background:#4b4b48;border:1px solid #343431;border-radius:15px!important;box-shadow:0 18px 36px rgba(30,41,59,.22)}
@@ -224,11 +189,8 @@ body{background:#fff;color:#1a1a1a}
 .evid-main-nav .evid-nav-link.atlas-nav-feature.is-active::before{background:#16a34a}
 @keyframes evidNavSwipe{from{clip-path:inset(0 100% 0 0);opacity:.25}to{clip-path:inset(0 0 0 0);opacity:1}}
 
-/* A little more visible than the earlier backdrop drift, while staying calm. */
-.evid-homepage .evid-hero-art{will-change:transform;animation:evidHeroBreath 16s ease-in-out infinite alternate}
-@keyframes evidHeroBreath{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(0,3px,0) scale(1.022)}}
 @media(max-width:767px){.evid-homepage .evid-hero-search-row input{padding-left:44px;font-size:13px}.evid-homepage .evid-hero-search-row button{padding:14px 17px;font-size:11px}.evid-homepage .evid-search-example{left:44px;font-size:12px}.evid-hero-search-icon{left:18px;width:15px;height:15px}}
-@media(prefers-reduced-motion:reduce){.evid-homepage .evid-hero-art{animation:none}.evid-main-nav .evid-nav-link.is-active::before{animation:none;clip-path:none;transform:none}}
+@media(prefers-reduced-motion:reduce){.evid-main-nav .evid-nav-link.is-active::before{animation:none;clip-path:none;transform:none}}
 
 /* Keep the live search layer above the following proof section. */
 .evid-homepage .evid-home-hero{overflow:visible;z-index:20}
@@ -243,15 +205,6 @@ body{background:#fff;color:#1a1a1a}
 .evid-hero-actions .atlas-home-feature{background:#315747!important;border-color:#315747!important}
 .evid-hero-actions .atlas-home-feature:hover{background:#3d6755!important}
 
-/* Add a few quiet pill forms to make the homepage backdrop feel intentional. */
-.evid-art-pill{position:absolute;z-index:0;width:88px;height:28px;border-radius:999px;pointer-events:none;filter:drop-shadow(0 12px 18px rgba(30,41,59,.12))}
-.evid-art-pill-one{left:18%;top:16%;background:linear-gradient(90deg,rgba(226,201,126,.2),rgba(255,255,255,.85));transform:rotate(-18deg);animation:evidArtPillOne 18s ease-in-out infinite}
-.evid-art-pill-two{right:16%;top:38%;width:72px;height:24px;background:linear-gradient(90deg,rgba(37,99,235,.12),rgba(226,201,126,.2));transform:rotate(21deg);animation:evidArtPillTwo 21s ease-in-out infinite}
-.evid-art-pill-three{left:27%;bottom:16%;width:64px;height:22px;background:linear-gradient(90deg,rgba(226,201,126,.17),rgba(37,99,235,.1));transform:rotate(12deg);animation:evidArtPillThree 24s ease-in-out infinite}
-@keyframes evidArtPillOne{0%,100%{translate:0 0;rotate:-18deg}50%{translate:9px -5px;rotate:-13deg}}
-@keyframes evidArtPillTwo{0%,100%{translate:0 0;rotate:21deg}50%{translate:-8px 6px;rotate:27deg}}
-@keyframes evidArtPillThree{0%,100%{translate:0 0;rotate:12deg}50%{translate:6px 4px;rotate:8deg}}
-
 /* Round the remaining editorial cards and account actions consistently. */
 .evid-guides-page .evid-guide-card,.evid-guides-page .evid-guides-upgrade,.evid-guides-page .evid-guide-goal-card{border-radius:18px!important;overflow:hidden}
 .evid-guides-page button{border-radius:12px!important}
@@ -260,12 +213,75 @@ body{background:#fff;color:#1a1a1a}
 .evid-stack-page button{border-radius:12px!important}
 .evid-stack-page article,.evid-stack-page>div[style*="background"][style*="border"]{border-radius:16px!important;overflow:hidden}
 
+/* Final hierarchy and trust pass: keep the hero focused while making the
+   research trail easier to scan. */
+.evid-hero-actions{gap:10px}
+.evid-hero-actions button{border-radius:999px!important}
+.evid-hero-actions .evid-hero-primary-cta{background:#1a1a1a!important;color:#fff!important;border-color:#1a1a1a!important}
+.evid-hero-actions .evid-hero-pro-cta{background:#f0f7f2!important;color:#315747!important;border-color:#315747!important}
+.evid-hero-actions .evid-hero-primary-cta:hover{background:#315747!important;border-color:#315747!important}
+.evid-hero-actions .evid-hero-pro-cta:hover{background:#e5f1e8!important}
+.evid-hero-secondary-links{flex-wrap:wrap}
+.evid-hero-secondary-links .evid-snapshot-home-link{color:#75632d}
+.evid-hero-secondary-links .evid-snapshot-home-link:hover{color:#a47b22}
+.evid-source-proof-heading{align-items:flex-start}
+.evid-source-heading-meta{max-width:470px}
+.evid-source-intro,.evid-source-detail,.evid-source-proof-footer{color:#596273}
+.evid-source-verified-badge{display:inline-flex;align-items:center;margin-top:16px;padding:7px 11px;border:1px solid #b9d6c0;border-radius:999px;background:#f0f7f2;color:#315747;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.evid-source-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:34px}
+.evid-source-card-top .evid-source-index{margin:0}
+.evid-source-mark{display:grid;place-items:center;width:36px;height:36px;border:1px solid #b9b4a8;border-radius:12px;background:#fff;color:#75632d;font-size:10px;font-weight:900;letter-spacing:.04em;transition:transform .2s ease,background .2s ease}
+.evid-source-mark.is-pm{border-color:#cbd5ff;background:#eef2ff;color:#2563eb}
+.evid-source-mark.is-c{border-color:#b9d6c0;background:#f0f7f2;color:#315747}
+.evid-source-mark.is-e{border-color:#e2c97e;background:#fffaf0;color:#a47b22}
+.evid-source-card:hover .evid-source-mark,.evid-source-card:focus-visible .evid-source-mark{background:#fff;color:#1a1a1a;transform:translateY(-2px)}
+
+.evid-filter-label{display:inline-flex;align-items:center;min-height:24px;padding:4px 7px!important;border-radius:8px;background:#ece9e2;color:#596273!important;font-size:9px!important;font-weight:900!important;letter-spacing:.14em!important}
+.evid-filter-label.is-type{margin-left:12px;border-left:3px solid #e2c97e;padding-left:10px!important;background:#fffaf0;color:#75632d!important}
+.evid-catalog-filters{background:#f7f5f1!important}
+.evid-goal-bar{position:relative;z-index:2}
+
+.evid-stack-page h1{letter-spacing:-.055em}
+.evid-stack-page>div[style*="background"][style*="border"],.evid-stack-page article{border-radius:20px!important;overflow:hidden}
+.evid-stack-page button{border-radius:999px!important}
+.evid-stack-page>div[style*="background"]:last-child{border-radius:16px!important}
+
+.evid-pricing-page h1{letter-spacing:-.055em}
+.evid-plan-card{border-radius:22px!important;overflow:hidden;box-shadow:0 12px 30px rgba(30,41,59,.05)}
+.evid-plan-card button{border-radius:999px!important}
+.evid-plan-card>div[style*="position"]{border-radius:0 0 10px 10px}
+.evid-pricing-table{border-radius:22px!important;overflow:hidden;box-shadow:0 12px 30px rgba(30,41,59,.04)}
+.evid-pricing-page .evid-pricing-outcome p{color:#596273}
+
 @media(max-width:767px){
-  .evid-art-pill-one{left:7%;top:14%}
-  .evid-art-pill-two{right:5%;top:35%}
-  .evid-art-pill-three{left:12%;bottom:13%}
+  .evid-source-verified-badge{font-size:8px}
+  .evid-source-card-top{margin-bottom:25px}
+  .evid-filter-label.is-type{margin-left:4px}
+  .evid-pricing-table{border-radius:18px!important}
 }
-@media(prefers-reduced-motion:reduce){.evid-art-pill-one,.evid-art-pill-two,.evid-art-pill-three{animation:none}}
+@media(prefers-reduced-motion:reduce){.evid-source-mark{transition:none}}
+
+.evid-source-proof-footer{align-items:baseline}
+.evid-source-proof-footer>span,.evid-source-proof-footer>.evid-source-demo-link{align-self:baseline}
+
+/* Guides use the same dark-to-green workspace language as the Pro tools. */
+.evid-guides-page{background:radial-gradient(circle at 92% 4%,rgba(49,87,71,.08),transparent 26%),#f4f2ee!important}
+.evid-guides-page>div:first-child{margin:0 12px 18px;background:linear-gradient(145deg,#1a1a1a 0%,#26352d 58%,#315747 100%)!important;border:0!important;border-radius:0 0 24px 24px!important;box-shadow:0 14px 34px rgba(30,41,59,.13);color:#fff}
+.evid-guides-page>div:first-child h1{color:#fff!important;letter-spacing:-.06em!important}
+.evid-guides-page>div:first-child p{color:#d7ddd7!important}
+.evid-guides-page>div:nth-child(2){padding-top:30px!important}
+.evid-guides-page .evid-guide-card,.evid-guides-page .evid-guide-goal-card{border-radius:20px!important;box-shadow:0 10px 24px rgba(30,41,59,.045);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important}
+.evid-guides-page .evid-guide-card:hover,.evid-guides-page .evid-guide-goal-card:hover{transform:translateY(-3px);box-shadow:0 16px 30px rgba(30,41,59,.09)!important;border-color:#9bb6a2!important}
+.evid-guides-page .evid-guide-card>div:first-child>span:first-child,.evid-guides-page .evid-guide-goal-card>div:first-child{display:grid;place-items:center;width:32px;height:32px;border-radius:11px;background:#f0f7f2;color:#315747;font-size:16px!important;filter:none!important}
+.evid-guides-page .evid-guide-card>div:first-child>span:nth-child(2){letter-spacing:-.035em}
+.evid-guides-page .evid-guides-upgrade{border-radius:20px!important;background:linear-gradient(145deg,#fff,#f3f8f4)!important;box-shadow:0 10px 24px rgba(30,41,59,.05)}
+.evid-guides-page button{border-radius:999px!important}
+
+@media(max-width:767px){
+  .evid-guides-page>div:first-child{margin:0 8px 14px;border-radius:0 0 20px 20px!important}
+  .evid-guides-page>div:nth-child(2){padding-top:22px!important}
+}
+@media(prefers-reduced-motion:reduce){.evid-guides-page .evid-guide-card,.evid-guides-page .evid-guide-goal-card{transition:none!important}.evid-guides-page .evid-guide-card:hover,.evid-guides-page .evid-guide-goal-card:hover{transform:none}}
 
 /* Keep the pilot invitation available without competing with the main actions. */
 .evid-hero-secondary-links{display:flex;align-items:center;justify-content:center;gap:10px;margin:-5px auto 24px;color:#7a7d79;font-size:10px;line-height:1.5}
@@ -465,8 +481,6 @@ body{background:#fff;color:#1a1a1a}
 }
 @media(prefers-reduced-motion:reduce){.evid-pro-page .evid-pro-tool-page button:hover:not(:disabled){transform:none}.evid-pro-page .evid-pro-tool-page button{transition:none}}
 
-
-
 /* Compound profiles use the same soft, rounded surfaces as the rest of the site.
    CompoundPage is shared by every catalogue entry, so this covers all profiles
    without changing their evidence, access rules, or content. */
@@ -505,86 +519,3 @@ body{background:#fff;color:#1a1a1a}
   .evid-compound-profile div[style*="background"]{border-radius:14px}
 }
 
-/* Final hierarchy and trust pass: keep the hero focused while making the
-   research trail easier to scan. */
-.evid-hero-actions{gap:10px}
-.evid-hero-actions button{border-radius:999px!important}
-.evid-hero-actions .evid-hero-primary-cta{background:#1a1a1a!important;color:#fff!important;border-color:#1a1a1a!important}
-.evid-hero-actions .evid-hero-pro-cta{background:#f0f7f2!important;color:#315747!important;border-color:#315747!important}
-.evid-hero-actions .evid-hero-primary-cta:hover{background:#315747!important;border-color:#315747!important}
-.evid-hero-actions .evid-hero-pro-cta:hover{background:#e5f1e8!important}
-.evid-hero-secondary-links{flex-wrap:wrap}
-.evid-hero-secondary-links .evid-snapshot-home-link{color:#75632d}
-.evid-hero-secondary-links .evid-snapshot-home-link:hover{color:#a47b22}
-.evid-homepage .evid-hero-art::before{left:2%;top:24%;opacity:.55}
-.evid-homepage .evid-hero-art::after{right:2%;bottom:18%;opacity:.55}
-.evid-homepage .evid-art-pill-one{left:8%;top:15%;opacity:.7}
-.evid-homepage .evid-art-pill-two{right:8%;top:32%;opacity:.65}
-.evid-homepage .evid-art-pill-three{left:12%;bottom:12%;opacity:.6}
-
-.evid-source-proof-heading{align-items:flex-start}
-.evid-source-heading-meta{max-width:470px}
-.evid-source-intro,.evid-source-detail,.evid-source-proof-footer{color:#596273}
-.evid-source-verified-badge{display:inline-flex;align-items:center;margin-top:16px;padding:7px 11px;border:1px solid #b9d6c0;border-radius:999px;background:#f0f7f2;color:#315747;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
-.evid-source-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:34px}
-.evid-source-card-top .evid-source-index{margin:0}
-.evid-source-mark{display:grid;place-items:center;width:36px;height:36px;border:1px solid #b9b4a8;border-radius:12px;background:#fff;color:#75632d;font-size:10px;font-weight:900;letter-spacing:.04em;transition:transform .2s ease,background .2s ease}
-.evid-source-mark.is-pm{border-color:#cbd5ff;background:#eef2ff;color:#2563eb}
-.evid-source-mark.is-c{border-color:#b9d6c0;background:#f0f7f2;color:#315747}
-.evid-source-mark.is-e{border-color:#e2c97e;background:#fffaf0;color:#a47b22}
-.evid-source-card:hover .evid-source-mark,.evid-source-card:focus-visible .evid-source-mark{background:#fff;color:#1a1a1a;transform:translateY(-2px)}
-
-.evid-filter-label{display:inline-flex;align-items:center;min-height:24px;padding:4px 7px!important;border-radius:8px;background:#ece9e2;color:#596273!important;font-size:9px!important;font-weight:900!important;letter-spacing:.14em!important}
-.evid-filter-label.is-type{margin-left:12px;border-left:3px solid #e2c97e;padding-left:10px!important;background:#fffaf0;color:#75632d!important}
-.evid-catalog-filters{background:#f7f5f1!important}
-.evid-goal-bar{position:relative;z-index:2}
-
-.evid-stack-page h1{letter-spacing:-.055em}
-.evid-stack-page>div[style*="background"][style*="border"],.evid-stack-page article{border-radius:20px!important;overflow:hidden}
-.evid-stack-page button{border-radius:999px!important}
-.evid-stack-page>div[style*="background"]:last-child{border-radius:16px!important}
-
-.evid-pricing-page h1{letter-spacing:-.055em}
-.evid-plan-card{border-radius:22px!important;overflow:hidden;box-shadow:0 12px 30px rgba(30,41,59,.05)}
-.evid-plan-card button{border-radius:999px!important}
-.evid-plan-card>div[style*="position"]{border-radius:0 0 10px 10px}
-.evid-pricing-table{border-radius:22px!important;overflow:hidden;box-shadow:0 12px 30px rgba(30,41,59,.04)}
-.evid-pricing-page .evid-pricing-outcome p{color:#596273}
-
-@media(max-width:767px){
-  .evid-source-verified-badge{font-size:8px}
-  .evid-source-card-top{margin-bottom:25px}
-  .evid-filter-label.is-type{margin-left:4px}
-  .evid-pricing-table{border-radius:18px!important}
-}
-@media(prefers-reduced-motion:reduce){.evid-source-mark{transition:none}}
-
-/* Animated research motifs: the paper stays calm while soft pills, dots and
-   rounded blocks drift at the far edges of the public catalogue. */
-.evid-homepage::after{content:"";position:fixed;inset:-4%;z-index:-1;pointer-events:none;opacity:.68;filter:drop-shadow(0 18px 24px rgba(30,41,59,.08));background:
-  radial-gradient(ellipse 58px 21px at 8% 18%,rgba(226,201,126,.22) 0 48%,transparent 51%),
-  radial-gradient(ellipse 47px 18px at 91% 63%,rgba(37,99,235,.10) 0 48%,transparent 51%),
-  radial-gradient(ellipse 35px 14px at 17% 84%,rgba(49,87,71,.10) 0 48%,transparent 51%),
-  radial-gradient(circle at 13% 31%,rgba(226,201,126,.36) 0 4px,transparent 5px),
-  radial-gradient(circle at 86% 72%,rgba(37,99,235,.20) 0 3px,transparent 4px),
-  radial-gradient(circle at 79% 14%,rgba(49,87,71,.14) 0 3px,transparent 4px),
-  linear-gradient(142deg,transparent 0 47%,rgba(30,41,59,.035) 47.2% 47.45%,transparent 47.7% 100%);
-  animation:evidEdgeMoleculeDrift 32s ease-in-out infinite alternate}
-@keyframes evidEdgeMoleculeDrift{from{transform:translate3d(-.4%,-.25%,0) rotate(-.15deg)}to{transform:translate3d(.55%,.5%,0) rotate(.15deg)}}
-.evid-source-proof-footer{align-items:baseline}
-.evid-source-proof-footer>span,.evid-source-proof-footer>.evid-source-demo-link{align-self:baseline}
-
-/* Guides use the same dark-to-green workspace language as the Pro tools. */
-.evid-guides-page{background:radial-gradient(circle at 92% 4%,rgba(49,87,71,.08),transparent 26%),#f4f2ee!important}
-.evid-guides-page>div:first-child{margin:0 12px 18px;background:linear-gradient(145deg,#1a1a1a 0%,#26352d 58%,#315747 100%)!important;border:0!important;border-radius:0 0 24px 24px!important;box-shadow:0 14px 34px rgba(30,41,59,.13);color:#fff}
-.evid-guides-page>div:first-child h1{color:#fff!important;letter-spacing:-.06em!important}
-.evid-guides-page>div:first-child p{color:#d7ddd7!important}
-.evid-guides-page>div:nth-child(2){padding-top:30px!important}
-.evid-guides-page .evid-guide-card,.evid-guides-page .evid-guide-goal-card{border-radius:20px!important;box-shadow:0 10px 24px rgba(30,41,59,.045);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important}
-.evid-guides-page .evid-guide-card:hover,.evid-guides-page .evid-guide-goal-card:hover{transform:translateY(-3px);box-shadow:0 16px 30px rgba(30,41,59,.09)!important;border-color:#9bb6a2!important}
-.evid-guides-page .evid-guide-card>div:first-child>span:first-child,.evid-guides-page .evid-guide-goal-card>div:first-child{display:grid;place-items:center;width:32px;height:32px;border-radius:11px;background:#f0f7f2;color:#315747;font-size:16px!important;filter:none!important}
-.evid-guides-page .evid-guide-card>div:first-child>span:nth-child(2){letter-spacing:-.035em}
-.evid-guides-page .evid-guides-upgrade{border-radius:20px!important;background:linear-gradient(145deg,#fff,#f3f8f4)!important;box-shadow:0 10px 24px rgba(30,41,59,.05)}
-.evid-guides-page button{border-radius:999px!important}
-@media(max-width:767px){.evid-homepage::after{inset:-10%;opacity:.52}.evid-guides-page>div:first-child{margin:0 8px 14px;border-radius:0 0 20px 20px!important}.evid-guides-page>div:nth-child(2){padding-top:22px!important}}
-@media(prefers-reduced-motion:reduce){.evid-homepage::after{animation:none}.evid-guides-page .evid-guide-card,.evid-guides-page .evid-guide-goal-card{transition:none!important}.evid-guides-page .evid-guide-card:hover,.evid-guides-page .evid-guide-goal-card:hover{transform:none}}

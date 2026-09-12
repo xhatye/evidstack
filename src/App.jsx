@@ -4771,11 +4771,6 @@ function AppInner(){
 
       {page==="supplements"&&<>
         <section className="evid-home-hero" aria-labelledby="evid-home-title">
-           <div className="evid-hero-art" aria-hidden="true">
-             <span className="evid-art-pill evid-art-pill-one" />
-             <span className="evid-art-pill evid-art-pill-two" />
-             <span className="evid-art-pill evid-art-pill-three" />
-           </div>
           <div className="evid-hero-content">
           <p className="evid-hero-kicker">SUPPLEMENTS. COMPOUNDS. CONTEXT.</p>
           <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>

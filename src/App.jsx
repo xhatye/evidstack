@@ -115,6 +115,7 @@ const ROUTES = {
   "/changelog":"changelog",
   "/founding-testers":"founding-testers",
   "/my-stack":"my-stack",
+  "/workspace":"workspace",
 };
 
 function getShareIdFromPath(){
@@ -964,6 +965,7 @@ function SupplementCard({supp,activeGoal,onClick,isSelected,isPro,onUpgrade,onCo
   const avgEv=Math.round(effects.reduce((s,e)=>s+e.evidence,0)/effects.length);
   return(
     <div
+      className="evid-compound-card"
       onClick={onClick}
       onMouseEnter={()=>setHovered(true)}
       onMouseLeave={()=>setHovered(false)}
@@ -3496,6 +3498,87 @@ function SharedStackPage({shareId}){
   );
 }
 
+// A single entry point for the Pro experience. The existing tools remain
+// available, but this page gives members one clear place to decide what to do
+// next with their goals, stack, and evidence.
+function EvidenceWorkspacePage({onNavigate,onUpgrade,onAuth}){
+  const {user,isPro,userProfile}=useAuth();
+  const {stackIds,stackLoading}=useMyStack();
+  const stack=stackIds.map(id=>SUPPLEMENTS.find(s=>s.id===id)).filter(Boolean);
+  const profileReady=Boolean(userProfile&&Object.values(userProfile).some(Boolean));
+  const tools=[
+    {id:"advisor",icon:"✦",label:"Compound Advisor",description:"Turn a goal into a short list of evidence-ranked options.",action:"Ask a question"},
+    {id:"stack-audit",icon:"◎",label:"Stack Audit",description:"See what your current stack supports, misses, or duplicates.",action:"Audit my stack"},
+    {id:"interaction-checker",icon:"↔",label:"Interaction Checker",description:"Review potential conflicts before you add another compound.",action:"Check interactions"},
+    {id:"bloodwork",icon:"⌁",label:"Bloodwork Analyzer",description:"Read markers alongside your goals and current stack.",action:"Analyze markers"},
+    {id:"tracker",icon:"◷",label:"Outcome Tracker",description:"Keep the loop going with symptoms, habits, and outcomes.",action:"Open tracker"},
+    {id:"bloodwork-history",icon:"↗",label:"Evidence Timeline",description:"Keep past bloodwork and decisions in one continuous view.",action:"View history"},
+  ];
+  const openTool=(id)=>{if(isPro){onNavigate(id);}else{onUpgrade();}};
+  const profileAction=()=>user?onNavigate("my-stack"):onAuth("signup");
+
+  return(
+    <main className="evid-workspace">
+      <section className="evid-workspace-hero">
+        <div className="evid-workspace-hero-copy">
+          <p className="evid-workspace-kicker">PERSONAL EVIDENCE WORKSPACE</p>
+          <h1>Turn research into a plan.</h1>
+          <p className="evid-workspace-lede">Keep your goals, compounds, bloodwork, and follow-up questions in one calm place. Evidstack helps you move from “what does the evidence say?” to “what should I review next?”</p>
+          <div className="evid-workspace-hero-actions">
+            <span className={`evid-workspace-status${isPro?" is-pro":""}`}>{isPro?"PRO ACTIVE":"FREE PREVIEW"}</span>
+            {!user&&<button onClick={()=>onAuth("signup")} className="evid-workspace-primary">Create a free account <span aria-hidden="true">↗</span></button>}
+            {user&&!isPro&&<button onClick={onUpgrade} className="evid-workspace-primary">Unlock the full workspace <span aria-hidden="true">↗</span></button>}
+            {user&&isPro&&<button onClick={()=>onNavigate("my-stack")} className="evid-workspace-primary">Open My Stack <span aria-hidden="true">→</span></button>}
+          </div>
+        </div>
+        <div className="evid-workspace-orbit" aria-hidden="true"><span>GOAL</span><span>STACK</span><span>EVIDENCE</span><i/></div>
+      </section>
+
+      <section className="evid-workspace-stats" aria-label="Workspace overview">
+        <div className="evid-workspace-stat"><strong>{user?(stackLoading?"…":stack.length):"—"}</strong><span>compounds in My Stack</span></div>
+        <div className="evid-workspace-stat"><strong>{user?(profileReady?"Ready":"Next"):"—"}</strong><span>personal context</span></div>
+        <div className="evid-workspace-stat"><strong>{isPro?"6":"1"}</strong><span>evidence tools available</span></div>
+      </section>
+
+      <section className="evid-workspace-start">
+        <div>
+          <p className="evid-workspace-section-kicker">START HERE</p>
+          <h2>Build a clearer evidence trail.</h2>
+          <p>Small actions compound. Set your context, save what you take, then use the right tool when a decision comes up.</p>
+        </div>
+        <div className="evid-workspace-steps">
+          <button onClick={profileAction}><span>01</span><b>{profileReady?"Review your context":"Add your context"}</b><small>{profileReady?"Keep age, weight, and sex up to date.":"Help us make notes more relevant."}<em>→</em></small></button>
+          <button onClick={()=>onNavigate("my-stack")}><span>02</span><b>Save your stack</b><small>{stack.length?`${stack.length} compound${stack.length===1?"":"s"} saved so far.`:"Start with the compounds you already use."}<em>→</em></small></button>
+          <button onClick={()=>openTool("stack-audit")}><span>03</span><b>Run a review</b><small>{isPro?"Find the next useful question.":"See what Pro adds to your review."}<em>→</em></small></button>
+        </div>
+      </section>
+
+      <section className="evid-workspace-toolkit">
+        <div className="evid-workspace-toolkit-heading">
+          <div><p className="evid-workspace-section-kicker">YOUR EVIDENCE TOOLKIT</p><h2>One workspace, six ways to decide.</h2></div>
+          <p>Each tool uses the same verified compound context, so your research does not get scattered across separate screens.</p>
+        </div>
+        <div className="evid-workspace-tool-grid">
+          {tools.map(tool=><article key={tool.id} className={`evid-workspace-tool${isPro?"":" is-locked"}`}>
+            <div className="evid-workspace-tool-top"><span className="evid-workspace-tool-icon" aria-hidden="true">{tool.icon}</span>{!isPro&&<span className="evid-workspace-lock">PRO</span>}</div>
+            <h3>{tool.label}</h3>
+            <p>{tool.description}</p>
+            <button onClick={()=>openTool(tool.id)}>{isPro?tool.action:"Unlock with Pro"}<span aria-hidden="true">↗</span></button>
+          </article>)}
+        </div>
+      </section>
+
+      {isPro&&stack.length>0&&<section className="evid-workspace-stack-preview">
+        <div><p className="evid-workspace-section-kicker">CURRENT STACK</p><h2>Keep the loop visible.</h2><p>Your saved compounds are the starting point for audits, interactions, and follow-up questions.</p></div>
+        <div className="evid-workspace-stack-list">{stack.slice(0,4).map((supp,i)=><div key={supp.id}><span>{String(i+1).padStart(2,"0")}</span><b>{supp.name}</b><em>T{supp.tier}</em></div>)}{stack.length>4&&<div className="evid-workspace-stack-more">+ {stack.length-4} more in My Stack</div>}</div>
+      </section>}
+
+      {!isPro&&<section className="evid-workspace-upgrade"><div><p className="evid-workspace-section-kicker">WHEN YOU ARE READY</p><h2>Make the next decision easier.</h2><p>Pro connects your personal context to the evidence tools, so you can compare, check, and track without starting from zero each time.</p></div><button onClick={onUpgrade}>Explore Pro at $9.99/month <span aria-hidden="true">↗</span></button></section>}
+      <p className="evid-workspace-disclaimer">Evidence summaries are informational and do not replace advice from a qualified clinician.</p>
+    </main>
+  );
+}
+
 function AppInner(){
   const {user,isPro,loading,logout}=useAuth();
   // Inject global animation CSS once
@@ -3684,6 +3767,7 @@ function AppInner(){
     {id:"supplements",label:"Supplements"},
     {id:"body-atlas",label:"Body Atlas"},
     {id:"my-stack",label:"My Stack"},
+    {id:"workspace",label:"Workspace"},
     {id:"advisor",label:"AI Compound Advisor"},
     {id:"guides",label:"Guides"},
     {id:"pricing",label:"Pricing"},
@@ -3697,7 +3781,7 @@ function AppInner(){
     {id:"bloodwork-history",label:"Bloodwork History"},
   ];
   const proPages=proTools.map(t=>t.id);
-  const isProToolPage=["weekly-protocol","interactions","tracker","advisor","interaction-checker","stack-audit","bloodwork-history","stack-builder","cycle-alerts","stack-optimizer","bloodwork","body-atlas"].includes(page);
+  const isProToolPage=["weekly-protocol","interactions","tracker","advisor","interaction-checker","stack-audit","bloodwork-history","stack-builder","cycle-alerts","stack-optimizer","bloodwork","body-atlas","workspace"].includes(page);
 
   const scrollToResults=()=>{
     if(page!=="supplements")navigateTo("supplements");
@@ -3880,6 +3964,7 @@ function AppInner(){
       {page==="body-atlas"&&<BodyAtlasPage isPro={isPro} onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
       {page==="founding-testers"&&<FoundingTestersPage onAuth={openAuth}/>}
       {page==="my-stack"&&<MyStackPage onNavigate={navigateTo} onUpgrade={openUpgrade} onAuth={openAuth}/>}
+      {page==="workspace"&&<EvidenceWorkspacePage onNavigate={navigateTo} onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="pricing"        &&<PricingPage onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="affiliate"&&<AffiliatePage/>}
       {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}

@@ -125,3 +125,55 @@ body{background:#fff;color:#1a1a1a}
   .evid-pricing-table-cell{padding:10px 7px!important}
   .evid-pricing-table-cell span{font-size:10px!important;line-height:1.35;display:inline-block;max-width:100%}
 }
+
+/* Softer surfaces and a single personal evidence workspace. */
+.evid-main-nav{border-radius:0 0 22px 22px!important;box-shadow:0 8px 28px rgba(30,41,59,.06)}
+.evid-main-nav button,.evid-nav-search-trigger,.evid-nav-search-expanded,.evid-hero-actions button,.evid-hero-search-row,.evid-search-suggestions,.evid-source-card,.evid-optional-quiz[open],.pro-browse-prompt,.evid-page-footer>div:first-child{border-radius:14px!important}
+.evid-hero-actions button:first-child,.evid-hero-actions button:last-child{border-radius:999px!important}
+.evid-hero-search-row{overflow:hidden}
+.evid-source-grid{border-radius:18px;overflow:hidden}
+.evid-compound-card{border-radius:18px;overflow:hidden}
+.evid-compound-card span{border-radius:999px}
+.evid-homepage .evid-free-plan,.evid-homepage .evid-access-strip{border-radius:14px}
+.evid-pro-page input,.evid-pro-page textarea,.evid-pro-page select{border-radius:12px!important;box-shadow:0 1px 0 rgba(30,41,59,.04)!important}
+.evid-pro-page button{border-radius:12px!important}
+.evid-pro-tool-topbar{border-radius:0 0 22px 22px!important;box-shadow:0 8px 28px rgba(30,41,59,.06);margin:0 12px 18px}
+.evid-pro-tool-topbar span:last-child{border-radius:999px!important}
+.evid-pro-page .evid-pro-tool-page{border-radius:24px}
+.evid-pro-page .evid-pro-tool-page>div[style*="border"]{border-radius:18px!important}
+.evid-pro-page .evid-pro-tool-page>div[style*="box-shadow"]{border-radius:18px!important}
+.evid-pro-page .evid-pro-tool-page a{border-radius:12px}
+
+.evid-workspace{max-width:1180px;margin:0 auto;padding:48px 24px 96px;color:#1a1a1a}
+.evid-workspace-hero{position:relative;display:flex;align-items:center;justify-content:space-between;gap:44px;min-height:330px;padding:clamp(30px,5vw,58px);overflow:hidden;border-radius:30px;background:linear-gradient(135deg,#191a16 0%,#2c2a21 66%,#52462a 100%);color:#f8f7f2;box-shadow:0 24px 60px rgba(30,41,59,.16)}
+.evid-workspace-hero:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 83% 18%,rgba(226,201,126,.36),transparent 28%),radial-gradient(circle at 20% 100%,rgba(226,201,126,.12),transparent 38%)}
+.evid-workspace-hero-copy{position:relative;z-index:1;max-width:640px}
+.evid-workspace-kicker,.evid-workspace-section-kicker{margin:0 0 14px;color:#9f8b4a;font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
+.evid-workspace-hero .evid-workspace-kicker{color:#e2c97e}
+.evid-workspace-hero h1{margin:0 0 18px;font-size:clamp(40px,6vw,72px);line-height:.98;letter-spacing:-.07em;font-weight:900}
+.evid-workspace-lede{max-width:570px;margin:0;color:#c9c7bd;font-size:15px;line-height:1.85}
+.evid-workspace-hero-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:28px}
+.evid-workspace-status{display:inline-flex;align-items:center;padding:10px 14px;border:1px solid rgba(226,201,126,.42);border-radius:999px;color:#e2c97e;font-size:10px;font-weight:900;letter-spacing:.12em}
+.evid-workspace-status.is-pro{background:rgba(226,201,126,.16)}
+.evid-workspace-primary,.evid-workspace-upgrade button{display:inline-flex;align-items:center;gap:14px;padding:12px 18px;border:0;border-radius:999px;background:#e2c97e;color:#171710;font:800 12px Montserrat,sans-serif;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.evid-workspace-primary:hover,.evid-workspace-upgrade button:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(226,201,126,.22)}
+.evid-workspace-orbit{position:relative;z-index:1;display:grid;place-items:center;width:230px;height:230px;flex:0 0 auto;border:1px solid rgba(226,201,126,.28);border-radius:50%;color:#e2c97e;font-size:9px;font-weight:800;letter-spacing:.12em}
+.evid-workspace-orbit:before,.evid-workspace-orbit:after{content:"";position:absolute;border:1px solid rgba(226,201,126,.2);border-radius:50%}
+.evid-workspace-orbit:before{inset:20px}.evid-workspace-orbit:after{inset:48px;border-style:dashed;opacity:.75}
+.evid-workspace-orbit span{position:absolute}.evid-workspace-orbit span:nth-child(1){top:22px}.evid-workspace-orbit span:nth-child(2){right:2px;top:108px}.evid-workspace-orbit span:nth-child(3){bottom:24px;left:26px}.evid-workspace-orbit i{width:10px;height:10px;border-radius:50%;background:#e2c97e;box-shadow:0 0 28px rgba(226,201,126,.9);animation:evidWorkspacePulse 3s ease-in-out infinite}
+@keyframes evidWorkspacePulse{0%,100%{transform:scale(.8);opacity:.65}50%{transform:scale(1.5);opacity:1}}
+.evid-workspace-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 58px}
+.evid-workspace-stat{display:flex;align-items:baseline;gap:10px;padding:20px 22px;border:1px solid #d4d0c8;border-radius:16px;background:#fff;box-shadow:0 6px 20px rgba(30,41,59,.04)}
+.evid-workspace-stat strong{font-size:28px;line-height:1;font-weight:900;letter-spacing:-.06em;color:#1a1a1a}.evid-workspace-stat span{font-size:11px;color:#6b7280;line-height:1.4}
+.evid-workspace-start,.evid-workspace-stack-preview{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:42px;padding:0 4px 58px;border-bottom:1px solid #d4d0c8}
+.evid-workspace-start h2,.evid-workspace-toolkit h2,.evid-workspace-stack-preview h2,.evid-workspace-upgrade h2{margin:0 0 12px;font-size:clamp(27px,3.4vw,42px);line-height:1.02;letter-spacing:-.06em;font-weight:900}
+.evid-workspace-start>div:first-child>p:last-child,.evid-workspace-stack-preview>div:first-child>p:last-child{max-width:390px;margin:0;color:#6b7280;font-size:14px;line-height:1.8}
+.evid-workspace-steps{display:grid;gap:10px}.evid-workspace-steps button{display:grid;grid-template-columns:34px 1fr auto;grid-template-rows:auto auto;column-gap:12px;align-items:center;padding:16px 18px;text-align:left;border:1px solid #d4d0c8;border-radius:16px;background:#fff;color:#1a1a1a;cursor:pointer;font-family:Montserrat,sans-serif;transition:transform .2s,box-shadow .2s,border-color .2s}.evid-workspace-steps button:hover{transform:translateX(4px);border-color:#b9b4a8;box-shadow:0 8px 22px rgba(30,41,59,.07)}.evid-workspace-steps span{grid-row:1/3;color:#a47b22;font-size:11px;font-weight:900}.evid-workspace-steps b{font-size:13px;font-weight:900}.evid-workspace-steps small{grid-column:2/4;margin-top:4px;color:#6b7280;font-size:11px;line-height:1.5}.evid-workspace-steps em{float:right;color:#a47b22;font-style:normal;font-size:15px}
+.evid-workspace-toolkit{padding:58px 4px}.evid-workspace-toolkit-heading{display:flex;justify-content:space-between;gap:38px;align-items:flex-end;margin-bottom:24px}.evid-workspace-toolkit-heading>p{max-width:360px;margin:0;color:#6b7280;font-size:13px;line-height:1.8}
+.evid-workspace-tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.evid-workspace-tool{display:flex;flex-direction:column;min-height:228px;padding:22px;border:1px solid #d4d0c8;border-radius:18px;background:#fff;box-shadow:0 8px 22px rgba(30,41,59,.04);transition:transform .22s,box-shadow .22s,border-color .22s}.evid-workspace-tool:hover{transform:translateY(-4px);border-color:#b9b4a8;box-shadow:0 14px 30px rgba(30,41,59,.08)}.evid-workspace-tool.is-locked{background:linear-gradient(145deg,#fff,#f8f6f0)}.evid-workspace-tool-top{display:flex;justify-content:space-between;align-items:center}.evid-workspace-tool-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:12px;background:#f4f2ee;color:#a47b22;font-size:18px}.evid-workspace-lock{padding:5px 8px;border:1px solid rgba(164,123,34,.35);border-radius:999px;color:#a47b22;font-size:8px;font-weight:900;letter-spacing:.12em}.evid-workspace-tool h3{margin:20px 0 8px;font-size:16px;letter-spacing:-.03em;font-weight:900}.evid-workspace-tool p{margin:0;color:#6b7280;font-size:12px;line-height:1.7}.evid-workspace-tool button{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding:10px 0 0;border:0;border-top:1px solid #e8e5df;background:none;color:#75632d;font:800 11px Montserrat,sans-serif;text-align:left;cursor:pointer}
+.evid-workspace-stack-preview{padding-top:4px}.evid-workspace-stack-list{display:grid;gap:8px}.evid-workspace-stack-list>div{display:flex;align-items:center;gap:12px;padding:13px 15px;border:1px solid #d4d0c8;border-radius:14px;background:#fff}.evid-workspace-stack-list span{color:#a47b22;font-size:10px;font-weight:900}.evid-workspace-stack-list b{flex:1;font-size:12px;font-weight:800}.evid-workspace-stack-list em{font-style:normal;color:#6b7280;font-size:10px;font-weight:800}.evid-workspace-stack-list .evid-workspace-stack-more{justify-content:center;color:#6b7280;font-size:11px;background:#f4f2ee}
+.evid-workspace-upgrade{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:58px;padding:30px 32px;border-radius:22px;background:#1a1a1a;color:#fff;box-shadow:0 16px 38px rgba(30,41,59,.12)}.evid-workspace-upgrade .evid-workspace-section-kicker{color:#e2c97e}.evid-workspace-upgrade h2{font-size:clamp(25px,3vw,38px);margin-bottom:8px}.evid-workspace-upgrade p:last-child{max-width:600px;margin:0;color:#c4c3ba;font-size:13px;line-height:1.8}.evid-workspace-disclaimer{margin:34px 0 0;text-align:center;color:#9ca3af;font-size:10px;line-height:1.6}
+@media(max-width:900px){.evid-workspace-hero{align-items:flex-start}.evid-workspace-orbit{width:180px;height:180px}.evid-workspace-tool-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:767px){.evid-workspace{padding:24px 14px 70px}.evid-workspace-hero{display:block;min-height:0;padding:30px 24px;border-radius:24px}.evid-workspace-hero h1{font-size:clamp(39px,12vw,58px)}.evid-workspace-lede{font-size:13px;line-height:1.75}.evid-workspace-orbit{width:150px;height:150px;margin:30px auto 0}.evid-workspace-stats{gap:8px;margin:12px 0 40px}.evid-workspace-stat{display:block;padding:14px 12px}.evid-workspace-stat strong{display:block;font-size:23px;margin-bottom:5px}.evid-workspace-stat span{display:block;font-size:9px}.evid-workspace-start,.evid-workspace-stack-preview{display:block;padding-bottom:40px}.evid-workspace-steps{margin-top:24px}.evid-workspace-toolkit{padding:40px 0}.evid-workspace-toolkit-heading{display:block;margin-bottom:20px}.evid-workspace-toolkit-heading>p{margin-top:14px;font-size:12px}.evid-workspace-tool-grid{grid-template-columns:1fr}.evid-workspace-tool{min-height:200px}.evid-workspace-upgrade{display:block;margin-top:40px;padding:24px 20px;border-radius:20px}.evid-workspace-upgrade button{margin-top:20px;width:100%;justify-content:center}.evid-workspace-stack-preview>div+div{margin-top:22px}}
+@media(prefers-reduced-motion:reduce){.evid-workspace-orbit i{animation:none}.evid-workspace-primary,.evid-workspace-upgrade button,.evid-workspace-steps button,.evid-workspace-tool{transition:none}}
+

@@ -230,3 +230,40 @@ body{background:#fff;color:#1a1a1a}
 @media(max-width:767px){.evid-homepage .evid-hero-search-row input{padding-left:44px;font-size:13px}.evid-homepage .evid-hero-search-row button{padding:14px 17px;font-size:11px}.evid-homepage .evid-search-example{left:44px;font-size:12px}.evid-hero-search-icon{left:18px;width:15px;height:15px}}
 @media(prefers-reduced-motion:reduce){.evid-homepage .evid-hero-art{animation:none}.evid-main-nav .evid-nav-link.is-active::before{animation:none;clip-path:none;transform:none}}
 
+/* Keep the live search layer above the following proof section. */
+.evid-homepage .evid-home-hero{overflow:visible;z-index:20}
+.evid-homepage .evid-search-suggestions{z-index:220}
+.evid-homepage .evid-hero-search:focus-within .evid-search-example{opacity:0!important}
+
+/* Use the same deep green accent for Body Atlas everywhere it is active. */
+.evid-main-nav .evid-nav-link.atlas-nav-feature.is-active::before{background:#315747!important}
+.evid-main-nav .evid-nav-link.atlas-nav-feature.is-active{color:#fff!important}
+.evid-main-nav .evid-nav-link,.evid-main-nav .evid-mobile-nav-link{font-family:Montserrat,sans-serif!important}
+.evid-mobile-nav-link.atlas-nav-feature.is-active{background:#315747!important;color:#fff!important;border-color:#315747!important}
+.evid-hero-actions .atlas-home-feature{background:#315747!important;border-color:#315747!important}
+.evid-hero-actions .atlas-home-feature:hover{background:#3d6755!important}
+
+/* Add a few quiet pill forms to make the homepage backdrop feel intentional. */
+.evid-art-pill{position:absolute;z-index:0;width:88px;height:28px;border-radius:999px;pointer-events:none;filter:drop-shadow(0 12px 18px rgba(30,41,59,.12))}
+.evid-art-pill-one{left:18%;top:16%;background:linear-gradient(90deg,rgba(226,201,126,.2),rgba(255,255,255,.85));transform:rotate(-18deg);animation:evidArtPillOne 18s ease-in-out infinite}
+.evid-art-pill-two{right:16%;top:38%;width:72px;height:24px;background:linear-gradient(90deg,rgba(37,99,235,.12),rgba(226,201,126,.2));transform:rotate(21deg);animation:evidArtPillTwo 21s ease-in-out infinite}
+.evid-art-pill-three{left:27%;bottom:16%;width:64px;height:22px;background:linear-gradient(90deg,rgba(226,201,126,.17),rgba(37,99,235,.1));transform:rotate(12deg);animation:evidArtPillThree 24s ease-in-out infinite}
+@keyframes evidArtPillOne{0%,100%{translate:0 0;rotate:-18deg}50%{translate:9px -5px;rotate:-13deg}}
+@keyframes evidArtPillTwo{0%,100%{translate:0 0;rotate:21deg}50%{translate:-8px 6px;rotate:27deg}}
+@keyframes evidArtPillThree{0%,100%{translate:0 0;rotate:12deg}50%{translate:6px 4px;rotate:8deg}}
+
+/* Round the remaining editorial cards and account actions consistently. */
+.evid-guides-page .evid-guide-card,.evid-guides-page .evid-guides-upgrade,.evid-guides-page .evid-guide-goal-card{border-radius:18px!important;overflow:hidden}
+.evid-guides-page button{border-radius:12px!important}
+.evid-goal-page div[style*="background"][style*="border"],.evid-guide-detail-page div[style*="background"][style*="border"]{border-radius:16px!important;overflow:hidden}
+.evid-goal-page button,.evid-guide-detail-page button{border-radius:12px!important}
+.evid-stack-page button{border-radius:12px!important}
+.evid-stack-page article,.evid-stack-page>div[style*="background"][style*="border"]{border-radius:16px!important;overflow:hidden}
+
+@media(max-width:767px){
+  .evid-art-pill-one{left:7%;top:14%}
+  .evid-art-pill-two{right:5%;top:35%}
+  .evid-art-pill-three{left:12%;bottom:13%}
+}
+@media(prefers-reduced-motion:reduce){.evid-art-pill-one,.evid-art-pill-two,.evid-art-pill-three{animation:none}}
+

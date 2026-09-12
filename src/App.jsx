@@ -3848,7 +3848,7 @@ function AppInner(){
               <button onClick={()=>setMobileMenu(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:C.gray}}>x</button>
             </div>
             {[...navItems,{id:"legal",label:"Terms & Privacy"}].map(item=>(
-              <button key={item.id} className={`evid-mobile-nav-link${page===item.id?" is-active":""}`} onClick={()=>{navigateTo(item.id);setMobileMenu(false);}}
+              <button key={item.id} className={`evid-mobile-nav-link${item.id==="body-atlas"?" atlas-nav-feature":""}${page===item.id?" is-active":""}`} onClick={()=>{navigateTo(item.id);setMobileMenu(false);}}
                 style={{padding:"14px 16px",fontSize:14,fontWeight:700,
                   background:page===item.id?C.ink:"transparent",
                   color:page===item.id?C.white:C.gray,
@@ -3897,7 +3897,7 @@ function AppInner(){
           <div style={{display:"flex",alignItems:"center",gap:4}}>
             {navItems.map(item=>(
               <button key={item.id} className={`evid-nav-link${item.id==="body-atlas"?" atlas-nav-feature":""}${page===item.id?" is-active":""}`} onClick={()=>navigateTo(item.id)}
-                style={{padding:"8px 14px",fontSize:12,fontWeight:700,
+                style={{padding:"8px 14px",fontSize:12,fontWeight:700,fontFamily:"Montserrat,sans-serif",
                   background:"transparent",
                   color:page===item.id?C.white:C.gray,
                   border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s"}}>
@@ -3950,7 +3950,11 @@ function AppInner(){
 
       {page==="supplements"&&<>
         <section className="evid-home-hero" aria-labelledby="evid-home-title">
-          <div className="evid-hero-art" aria-hidden="true"/>
+           <div className="evid-hero-art" aria-hidden="true">
+             <span className="evid-art-pill evid-art-pill-one" />
+             <span className="evid-art-pill evid-art-pill-two" />
+             <span className="evid-art-pill evid-art-pill-three" />
+           </div>
           <div className="evid-hero-content">
           <p className="evid-hero-kicker">SUPPLEMENTS. COMPOUNDS. CONTEXT.</p>
           <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>
@@ -3969,7 +3973,7 @@ function AppInner(){
                 onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter")runSearch();}}
                 aria-label="Search compounds" placeholder=""
                 />
-              <button onClick={runSearch}>Browse <span aria-hidden="true">→</span></button>
+              <button onClick={runSearch}>Browse</button>
             </div>
             {showSuggest&&!navSearchOpen&&<SearchSuggestions query={search} onSelect={selectSearchResult}/>} 
           </div>
@@ -5959,7 +5963,7 @@ function GuidesIndexPage({onNavigate,onUpgrade,onAuth}){
           {GUIDE_ITEMS.map(g=>{
             const locked=!isPro&&!FREE_GUIDE_IDS.includes(g.id);
             return(
-              <div key={g.id} onClick={()=>handleGuideClick(g)}
+              <div key={g.id} className="evid-guide-card" onClick={()=>handleGuideClick(g)}
                 style={{background:C.white,border:`1px solid ${C.border}`,borderLeft:`4px solid ${locked?C.gray:C.gold}`,padding:"20px 24px",cursor:"pointer",transition:"box-shadow .15s",opacity:locked?.65:1,position:"relative"}}
                 onMouseEnter={e=>e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,.07)"}
                 onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
@@ -5976,7 +5980,7 @@ function GuidesIndexPage({onNavigate,onUpgrade,onAuth}){
           })}
         </div>
         {!isPro&&(
-          <div style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"18px 22px",marginBottom:40,display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
+          <div className="evid-guides-upgrade" style={{background:C.white,border:`1px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,padding:"18px 22px",marginBottom:40,display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
             <div style={{flex:1,minWidth:180}}>
               <p style={{fontSize:13,fontWeight:900,color:C.ink,margin:"0 0 4px"}}>6 more protocol guides - Pro only</p>
               <p style={{fontSize:11,color:C.gray,margin:0}}>Testosterone, Focus, Longevity, Skin, Fat Loss, and Recovery with full compound lists, dosing, and timing.</p>
@@ -5994,7 +5998,7 @@ function GuidesIndexPage({onNavigate,onUpgrade,onAuth}){
           {GOAL_ITEMS.map(g=>{
             const count=SUPPLEMENTS.filter(s=>s.effects.some(e=>e.goal===g.id)).length;
             return(
-              <div key={g.id} onClick={()=>navigateGoal(g.id)}
+              <div key={g.id} className="evid-guide-goal-card" onClick={()=>navigateGoal(g.id)}
                 style={{background:C.white,border:`1px solid ${C.border}`,padding:"14px 16px",cursor:"pointer",transition:"box-shadow .15s"}}
                 onMouseEnter={e=>e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,.06)"}
                 onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
@@ -6026,7 +6030,7 @@ function GoalPage({goalId,onUpgrade,onAuth,onNavigate}){
   const GUIDE_IDS=["sleep","focus","hormones","force","longevity","skin","weight","recovery"];
   const hasGuide=GUIDE_IDS.includes(goalId);
   return(
-    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+    <div className="evid-goal-page" style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
       <div style={{background:C.white,borderBottom:`1px solid ${C.border}`,padding:isMob?"24px 16px":"32px 48px"}}>
         <div style={{maxWidth:900,margin:"0 auto"}}>
           <button onClick={()=>onNavigate("guides")} style={{fontSize:11,color:C.gray,background:"transparent",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",marginBottom:16,padding:0}}>← All guides</button>
@@ -6260,7 +6264,7 @@ function GuidePage({guideId,onUpgrade,onAuth,onNavigate}){
   const ALL_TIERS=["Primary","Secondary","Advanced"];
   const freeGuide=guideId==="sleep"||guideId==="force";
   return(
-    <div style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+    <div className="evid-guide-detail-page" style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
       <div style={{background:C.ink,padding:isMob?"24px 16px 28px":"40px 48px",position:"relative",overflow:"hidden"}}>
         {!isMob&&<div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px)",backgroundSize:"32px 32px",pointerEvents:"none"}}/>}
         <div style={{maxWidth:860,margin:"0 auto",position:"relative"}}>
@@ -6619,7 +6623,7 @@ function MyStackPage({onNavigate,onUpgrade,onAuth}){
   useEffect(()=>{if(user)trackEvent("my_stack_view",{count:stackIds.length});},[user?.uid]);
 
   if(!user)return(
-    <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"48px 18px 90px":"80px 40px 120px"}}>
+    <div className="evid-stack-page" style={{maxWidth:760,margin:"0 auto",padding:isMob?"48px 18px 90px":"80px 40px 120px"}}>
       <p style={{fontSize:10,fontWeight:900,color:C.gold,letterSpacing:".18em",margin:"0 0 14px"}}>MY STACK</p>
       <h1 style={{fontSize:isMob?34:52,fontWeight:900,color:C.ink,letterSpacing:"-.06em",lineHeight:1.05,margin:"0 0 16px"}}>Keep your research together.</h1>
       <p style={{fontSize:16,color:C.gray,lineHeight:1.7,maxWidth:600,margin:"0 0 28px"}}>Save compounds, compare options and return to the evidence you care about. Create a free account to keep your list across devices.</p>
@@ -6628,7 +6632,7 @@ function MyStackPage({onNavigate,onUpgrade,onAuth}){
   );
 
   return(
-    <div style={{maxWidth:980,margin:"0 auto",padding:isMob?"36px 16px 90px":"58px 40px 120px"}}>
+    <div className="evid-stack-page" style={{maxWidth:980,margin:"0 auto",padding:isMob?"36px 16px 90px":"58px 40px 120px"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",gap:20,flexWrap:"wrap",marginBottom:28}}>
         <div>
           <p style={{fontSize:10,fontWeight:900,color:C.gold,letterSpacing:".18em",margin:"0 0 12px"}}>MY STACK</p>

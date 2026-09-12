@@ -465,6 +465,8 @@ body{background:#fff;color:#1a1a1a}
 }
 @media(prefers-reduced-motion:reduce){.evid-pro-page .evid-pro-tool-page button:hover:not(:disabled){transform:none}.evid-pro-page .evid-pro-tool-page button{transition:none}}
 
+
+
 /* Compound profiles use the same soft, rounded surfaces as the rest of the site.
    CompoundPage is shared by every catalogue entry, so this covers all profiles
    without changing their evidence, access rules, or content. */
@@ -502,4 +504,3 @@ body{background:#fff;color:#1a1a1a}
   .evid-compound-profile-not-found{border-radius:20px!important}
   .evid-compound-profile div[style*="background"]{border-radius:14px}
 }
-

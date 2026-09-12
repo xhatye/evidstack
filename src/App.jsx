@@ -3960,6 +3960,7 @@ function AppInner(){
           <p className="evid-hero-access">Start with a free preview. Go deeper with Pro.</p>
           <div ref={searchContainerRef} className={`evid-hero-search${searchFocused||search?" is-expanded":""}`}>
             <div className="evid-hero-search-row">
+              <span className="evid-hero-search-icon" aria-hidden="true"/>
               {!search&&<span className="evid-search-example" aria-hidden="true" style={{opacity:phFade?1:0}}>{PLACEHOLDERS[phIdx]}</span>}
               <input id="evidstack-search" value={search}
                 onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
@@ -3968,7 +3969,7 @@ function AppInner(){
                 onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter")runSearch();}}
                 aria-label="Search compounds" placeholder=""
                 />
-              <button onClick={runSearch}>Search <span aria-hidden="true">→</span></button>
+              <button onClick={runSearch}>Browse <span aria-hidden="true">→</span></button>
             </div>
             {showSuggest&&!navSearchOpen&&<SearchSuggestions query={search} onSelect={selectSearchResult}/>} 
           </div>

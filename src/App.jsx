@@ -4123,7 +4123,7 @@ function AppInner(){
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Tools</p>
-            {[["tracker","My Tracker"],["bloodwork","AI Bloodwork Analyzer"],["interaction-checker","Interaction Checker"],["stack-audit","Stack Audit AI"],["bloodwork-history","Bloodwork History"]].map(([p,l])=>(
+            {[["workspace","Pro Workspace"]].map(([p,l])=>(
               <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>

@@ -7,13 +7,25 @@ async function handler(req, context) {
   const { uid, email, plan } = await req.json();
   if (!["monthly", "annual"].includes(plan)) return Response.json({ error: "Choose a valid plan." }, { status: 400 });
   if (context.account.isPro) return Response.json({ error: "Use Manage subscription to change your existing plan." }, { status: 409 });
-  if (!uid || !email) return new Response("Missing uid or email", { status: 400 });
+  if (!uid || uid !== context.identity.uid || !email) return new Response("Invalid account.", { status: 400 });
 
   const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
   const PRICE_ID = plan === "annual"
     ? process.env.STRIPE_PRICE_ANNUAL
     : process.env.STRIPE_PRICE_MONTHLY;
   const APP_URL = process.env.APP_URL || "https://evidstack.com";
+  if (!STRIPE_SECRET || !PRICE_ID) {
+    console.error("Stripe checkout is not configured.");
+    return new Response(JSON.stringify({ error: "Checkout is temporarily unavailable." }), { status: 503, headers: { "Content-Type": "application/json" } });
+  }
+  let appUrl;
+  try {
+    appUrl = new URL(APP_URL);
+    if (appUrl.protocol !== "https:") throw new Error("APP_URL must use HTTPS");
+  } catch {
+    console.error("APP_URL is invalid.");
+    return new Response(JSON.stringify({ error: "Checkout is temporarily unavailable." }), { status: 503, headers: { "Content-Type": "application/json" } });
+  }
   const db = database();
   const lockRef = db.doc(`_billingCheckoutLocks/${uid}`);
   const lockNow = Date.now();
@@ -53,8 +65,8 @@ async function handler(req, context) {
         "line_items[0][quantity]": "1",
         customer_email: email,
         "metadata[uid]": uid,
-        success_url: `${APP_URL}?upgrade=success`,
-        cancel_url: `${APP_URL}?upgrade=cancel`,
+        success_url: `${appUrl.origin}${appUrl.pathname}?upgrade=success`,
+        cancel_url: `${appUrl.origin}${appUrl.pathname}?upgrade=cancel`,
         "subscription_data[metadata][uid]": uid,
       }),
     });
@@ -69,7 +81,8 @@ async function handler(req, context) {
         if (snap.exists && snap.data()?.status === "pending") tx.delete(lockRef);
       });
     } catch {}
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+    console.error("Stripe checkout failed:", err);
+    return new Response(JSON.stringify({ error: "Checkout is temporarily unavailable." }), { status: 503, headers: { "Content-Type": "application/json" } });
   }
 }
 

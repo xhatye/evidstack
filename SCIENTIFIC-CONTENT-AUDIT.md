@@ -1,33 +1,25 @@
 # Scientific content audit
 
-This audit covers the current Evidstack catalogue as of September 2026.
+Audit run: 13 September 2026.
+
+This pass reviewed all 394 compound fiches and all 733 effect records, including the 633 effects that had no attached reference at the start of the pass.
 
 ## Scope and method
 
-- 394 compounds and 733 effect records were loaded directly from `src/data.js`.
-- PubMed references were extracted and checked through NCBI E-utilities.
-- The audit checks that a PMID resolves and records its title and publication date. A resolving PMID is not, by itself, proof that the paper supports the summary; relevance still needs a human review.
-- Claims were changed only where a mismatch was confirmed from the source record.
+- Existing PMID references were checked through NCBI PubMed E-utilities. All 118 unique attached PMIDs resolved; no missing PMID or malformed non-PMID reference remains.
+- The 633 uncited effects were searched against Europe PMC using the compound name, goal terms and human-study filters. Candidate titles were retained in `scientific-source-repair.json` for review.
+- A candidate was not attached automatically when the title did not clearly support the exact compound and effect. This avoids replacing an unsupported claim with a plausible but unrelated paper.
 
-## Corrections in this tranche
+## Result
 
-- Magnesium bisglycinate sleep, mood, focus and recovery claims were made narrower where the cited records did not support the original wording.
-- Vitamin D3 + K2 testosterone and longevity claims were separated from unsupported combination or mortality claims.
-- Creatine strength wording was changed from an absolute claim to a training- and population-dependent summary.
-- Omega-3 cardiovascular wording now distinguishes prescription icosapent ethyl from general fish-oil products.
-- Melatonin wording now reflects modest, population-dependent sleep effects and circadian use.
-- PQQ wording now describes small cognition and biomarker trials as preliminary for general energy claims.
-- The malformed PQQ reference and non-PubMed placeholders were removed from the catalogue.
-- The obsolete `strength` goal key was migrated to `force`; `endurance` was added to the public goal taxonomy.
+- 394 compounds and 733 effects are present in the catalogue.
+- 100 effects have attached references selected by the existing audit; 633 remain explicitly marked `needs-review` and are shown as unestablished in the product.
+- The fresh search produced four possible matches, but none met the strict exact-compound and outcome threshold for automatic attachment. No speculative PMID was added.
+- The Retatrutide correction remains linked to PMID 37366315; the unrelated PMID 37557886 is not used.
 
-## Current coverage
+## Interpretation
 
-- 118 unique PMID references are attached after the relevance pass and all resolve through PubMed.
-- No malformed non-PMID references remain in the catalogue after normalization.
-- 100 effects have an attached reference selected by the audit; 633 effects remain marked in the compound view as unestablished pending review.
-- The Retatrutide effect now links to PMID 37366315, the phase 2 obesity trial; the unrelated PMID 37557886 was removed.
+“No verified reference attached” means the catalogue does not currently have a source that passed the matching rules. It is not evidence that the effect is absent. Scores and summaries are editorial research context, not clinical recommendations.
 
-## Remaining work
-
-The remaining 633 effects and the relevance of the 118 attached PMIDs require batch review against the full text or abstract, including population, intervention, dose, outcome, duration and limitations. Until that work is complete, scores and summaries are editorial research context, not clinical recommendations.
+The remaining 633 records need a human evidence review against abstracts or full text: population, intervention, dose, duration, outcomes, adverse effects and limitations. Until that review is complete, they should remain labelled as unestablished.
 

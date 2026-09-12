@@ -1,4 +1,6 @@
 import { secure } from "../server/access.js";
+import { groqChat, parseGroqJson } from "../server/groq.js";
+import { contextBlock, contextForCompounds } from "./evidence-context.js";
 export const config = { runtime: "nodejs" };
 
 const MARKERS = [
@@ -46,6 +48,8 @@ async function handler(req, context) {
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
 
+  const evidenceContext = contextBlock(contextForCompounds(currentStack || []));
+
   const prompt = `You are a world-class evidence-based supplement researcher. Analyze these blood work results and recommend specific supplements. Be precise, cite the mechanism of action, and prioritize by urgency.
 
 Blood markers:
@@ -53,6 +57,11 @@ ${filledMarkers.join("\n")}
 
 User goals: ${goals?.join(", ") || "general optimization"}
 Currently taking: ${currentStack?.join(", ") || "nothing specified"}
+
+VERIFIED EVIDSTACK DATABASE CONTEXT:
+${evidenceContext}
+
+Use only compounds and compound-specific facts present in the verified context. Do not infer a diagnosis, treatment or urgency from a single marker. If the context does not contain a supported option, return an empty recommendation or state that the catalogue does not establish one. Separate a flagged laboratory value from a clinical conclusion and recommend review with a qualified clinician.
 
 Respond ONLY with valid JSON in this exact format (no markdown, no extra text):
 {
@@ -96,37 +105,19 @@ Respond ONLY with valid JSON in this exact format (no markdown, no extra text):
 }`;
 
   try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      signal: AbortSignal.timeout(25000),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-oss-120b",
-        max_tokens: 1800,
-        temperature: 0.3,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
-
-    const data = await res.json();
-    const raw = data.choices?.[0]?.message?.content || "";
-    const clean = raw.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(clean);
+    const raw = await groqChat({ messages: [{ role: "user", content: prompt }], maxTokens: 1800, temperature: 0.3 });
+    const parsed = parseGroqJson(raw);
 
     return new Response(JSON.stringify(parsed), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: "Analysis failed. Please try again." }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    const status = err?.status === 429 ? 429 : 424;
+    return new Response(JSON.stringify({ error: err?.message || "The AI analysis is temporarily unavailable." }), { status, headers: { "Content-Type": "application/json" } });
   }
 }
 
 
 export default secure(handler, {free:false,textFields:["stack","goals"]});
+

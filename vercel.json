@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/research-feed-digest",
+      "schedule": "0 9 * * 1"
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -15,6 +21,18 @@
     {
       "source": "/guide/:id",
       "destination": "/guide/:id/index.html"
+    },
+    {
+      "source": "/evidence-snapshot/:id",
+      "destination": "/evidence-snapshot/:id/index.html"
+    },
+    {
+      "source": "/demo",
+      "destination": "/demo/index.html"
+    },
+    {
+      "source": "/compare/:pair",
+      "destination": "/compare/:pair/index.html"
     },
     {
       "source": "/supplements",
@@ -47,6 +65,14 @@
     {
       "source": "/advisor",
       "destination": "/advisor/index.html"
+    },
+    {
+      "source": "/evidence-answer",
+      "destination": "/evidence-answer/index.html"
+    },
+    {
+      "source": "/study-comparator",
+      "destination": "/study-comparator/index.html"
     },
     {
       "source": "/tracker",
@@ -172,3 +198,4 @@
     }
   ]
 }
+

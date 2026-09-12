@@ -177,3 +177,34 @@ body{background:#fff;color:#1a1a1a}
 @media(max-width:767px){.evid-workspace{padding:24px 14px 70px}.evid-workspace-hero{display:block;min-height:0;padding:30px 24px;border-radius:24px}.evid-workspace-hero h1{font-size:clamp(39px,12vw,58px)}.evid-workspace-lede{font-size:13px;line-height:1.75}.evid-workspace-orbit{width:150px;height:150px;margin:30px auto 0}.evid-workspace-stats{gap:8px;margin:12px 0 40px}.evid-workspace-stat{display:block;padding:14px 12px}.evid-workspace-stat strong{display:block;font-size:23px;margin-bottom:5px}.evid-workspace-stat span{display:block;font-size:9px}.evid-workspace-start,.evid-workspace-stack-preview{display:block;padding-bottom:40px}.evid-workspace-steps{margin-top:24px}.evid-workspace-toolkit{padding:40px 0}.evid-workspace-toolkit-heading{display:block;margin-bottom:20px}.evid-workspace-toolkit-heading>p{margin-top:14px;font-size:12px}.evid-workspace-tool-grid{grid-template-columns:1fr}.evid-workspace-tool{min-height:200px}.evid-workspace-upgrade{display:block;margin-top:40px;padding:24px 20px;border-radius:20px}.evid-workspace-upgrade button{margin-top:20px;width:100%;justify-content:center}.evid-workspace-stack-preview>div+div{margin-top:22px}}
 @media(prefers-reduced-motion:reduce){.evid-workspace-orbit i{animation:none}.evid-workspace-primary,.evid-workspace-upgrade button,.evid-workspace-steps button,.evid-workspace-tool{transition:none}}
 
+/* Navigation transitions and the final soft-surface pass. */
+.evid-main-nav .evid-nav-link{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;border-radius:999px!important;background:transparent!important;transition:color .2s ease!important}
+.evid-main-nav .evid-nav-link::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:#1a1a1a;opacity:0;transform:scale(.72);transition:opacity .2s ease,transform .24s cubic-bezier(.16,1,.3,1)}
+.evid-main-nav .evid-nav-link.is-active::before{opacity:1;transform:scale(1)}
+.evid-main-nav .evid-nav-link>span{position:relative;z-index:1}
+.evid-main-nav .evid-mobile-nav-link{border-radius:14px!important;transition:background .2s ease,color .2s ease,transform .2s ease!important}
+.evid-main-nav .evid-mobile-nav-link:active{transform:scale(.98)}
+.evid-workspace-tool{cursor:pointer}
+.evid-workspace-tool:focus-visible{outline:2px solid #a47b22;outline-offset:3px}
+.evid-workspace-tool button{pointer-events:none}
+.evid-guides-page>div:first-child,.evid-guides-page>div:nth-child(2){border-radius:0 0 22px 22px}
+.evid-guides-page [style*="border"]{border-radius:14px!important}
+.evid-pro-page .evid-pro-tool-page [style*="border:"]{border-radius:16px!important}
+.evid-pro-page .evid-pro-tool-page [style*="borderLeft:"]{border-radius:16px!important}
+.evid-paywall-preview-card,.evid-paywall-card,.evid-paywall-cta{border-radius:18px!important;overflow:hidden}
+.evid-paywall-cta{box-shadow:0 8px 24px rgba(30,41,59,.06)}
+.evid-homepage [data-pro-prompt="true"]>div,.evid-homepage [data-pro-prompt="true"] .evid-paywall-card{border-radius:18px!important;overflow:hidden}
+
+@keyframes evidMoleculeBackdrop{0%{transform:translate3d(-.4%,-.3%,0) scale(1)}100%{transform:translate3d(.5%,.6%,0) scale(1.015)}}
+@keyframes evidMoleculeDrift{0%,100%{transform:translate3d(0,0,0) rotate(-24deg)}50%{transform:translate3d(8px,-5px,0) rotate(-20deg)}}
+@keyframes evidMoleculeDriftReverse{0%,100%{transform:translate3d(0,0,0) rotate(24deg)}50%{transform:translate3d(-7px,6px,0) rotate(28deg)}}
+.evid-homepage::before{animation:evidMoleculeBackdrop 28s ease-in-out infinite alternate!important}
+.evid-homepage .evid-hero-art::before{animation:evidMoleculeDrift 17s ease-in-out infinite}
+.evid-homepage .evid-hero-art::after{animation:evidMoleculeDriftReverse 21s ease-in-out infinite}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.22s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+::view-transition-old(root){animation-name:evidViewOut}
+::view-transition-new(root){animation-name:evidViewIn}
+@keyframes evidViewOut{to{opacity:0;transform:translateY(4px)}}
+@keyframes evidViewIn{from{opacity:0;transform:translateY(-4px)}}
+@media(prefers-reduced-motion:reduce){.evid-homepage::before,.evid-homepage .evid-hero-art::before,.evid-homepage .evid-hero-art::after{animation:none!important}::view-transition-old(root),::view-transition-new(root){animation:none!important}}
+

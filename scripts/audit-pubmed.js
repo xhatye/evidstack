@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { SUPPLEMENTS } from "../src/catalog-data.js";
+import { SUPPLEMENTS } from "../src/data.js";
 
 const output = process.argv[2] || "scientific-audit.json";
 const effects = SUPPLEMENTS.flatMap((compound) => (compound.effects || []).map((effect, index) => ({

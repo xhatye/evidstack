@@ -1,13 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { getPageSeo, publicPaths, SITE } from '../src/seo.js';
-import { loadCatalog } from '../src/data.js';
-
-await loadCatalog();
 
 const escape = text => text.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const template = fs.readFileSync('dist/index.html','utf8');
-const routes=[...new Set([...publicPaths(),'/supplements','/legal','/affiliate','/changelog','/advisor','/evidence-answer','/study-comparator','/tracker','/bloodwork','/stack-audit','/interaction-checker','/bloodwork-history','/stack-builder','/stack-optimizer','/weekly-protocol','/cycle-alerts','/interactions','/body-atlas'])];
+const routes=[...new Set([...publicPaths(),'/supplements','/legal','/affiliate','/changelog','/advisor','/tracker','/bloodwork','/stack-audit','/interaction-checker','/bloodwork-history','/stack-builder','/stack-optimizer','/weekly-protocol','/cycle-alerts','/interactions','/body-atlas'])];
 for (const route of routes) {
   const seo=getPageSeo(route);
   let html=template.replace(/<title>[\s\S]*?<\/title>/,`<title>${escape(seo.title)}</title>`);

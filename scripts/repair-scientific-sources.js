@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { SUPPLEMENTS } from "../src/catalog-data.js";
+import { SUPPLEMENTS } from "../src/data.js";
 
 const OUT = new URL("../scientific-source-repair.json", import.meta.url);
 const API = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils";

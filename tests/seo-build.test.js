@@ -2,9 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { getPageSeo, GUIDE_IDS } from '../src/seo.js';
-import { loadCatalog } from '../src/data.js';
-
-await loadCatalog();
 
 test('guide sitemap IDs correspond to actual guide definitions',()=>{
   const source=fs.readFileSync('src/App.jsx','utf8').split('const GUIDES={')[1].split('function GuidePage')[0];
@@ -19,4 +16,3 @@ test('production HTML has route-specific metadata before JavaScript', {skip:!fs.
     assert.equal((html.match(/rel="canonical"/g)||[]).length,1);
   }
 });
-

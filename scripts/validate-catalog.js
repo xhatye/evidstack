@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GOALS, SUPPLEMENTS } from '../src/catalog-data.js';
+import { GOALS, SUPPLEMENTS } from '../src/data.js';
 import { SCIENTIFIC_SOURCE_REPAIRS } from '../src/scientific-sources.js';
 
 const SOURCE_PATTERNS = [

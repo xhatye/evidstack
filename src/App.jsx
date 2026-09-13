@@ -93,7 +93,7 @@ function useMyStack(){
 
 
 const ROUTES = {
-  "/":"home",
+  "/":"supplements",
   "/supplements":"supplements",
   "/body-atlas":"body-atlas",
   "/stack-builder":"stack-builder",
@@ -181,10 +181,10 @@ function getCompoundIdFromPath(){
 }
 
 function navigate(page){
-  const path = page==="home"?"/":`/${page}`;
+  const path = page==="supplements"?"/":`/${page}`;
   window.history.pushState({},"",path);
 }
-import { SUPPLEMENTS, GOALS, TIERS, CATALOG_COUNT, loadCatalog } from "./data.js";
+import { SUPPLEMENTS, GOALS, TIERS } from "./data.js";
 import { AuthProvider, useAuth } from "./AuthContext.jsx";
 import BodyAtlasPage from "./BodyAtlas.jsx";
 
@@ -210,7 +210,7 @@ const efColor=(v)=>v<0?C.red:v>=4?C.green:v===3?C.blue:v===2?C.amber:C.gray;
 // The About page's coverage map is calculated from the same records shown in
 // the catalogue. A linked source means that the effect record has at least one
 // attached citation; it does not imply that the result is conclusive.
-const buildEvidenceCoverageData=()=>GOALS
+const EVIDENCE_COVERAGE_DATA=GOALS
   .filter(goal=>goal.id!=="all")
   .map(goal=>{
     let effects=0;
@@ -237,6 +237,9 @@ const buildEvidenceCoverageData=()=>GOALS
   })
   .filter(row=>row.effects>0)
   .sort((a,b)=>b.effects-a.effects||a.label.localeCompare(b.label));
+
+const EVIDENCE_COVERAGE_TOTAL_EFFECTS=EVIDENCE_COVERAGE_DATA.reduce((sum,row)=>sum+row.effects,0);
+const EVIDENCE_COVERAGE_LINKED_EFFECTS=EVIDENCE_COVERAGE_DATA.reduce((sum,row)=>sum+row.linked,0);
 
 function compoundCategory(supplement){
   const legal=String(supplement?.legal||"").toLowerCase();
@@ -1556,9 +1559,7 @@ function MyTracker({onUpgrade}){
     if(!user)return;
     const data={stack:newStack??stack,logs:newLogs??logs};
     setTrackerError("");
-    try{
-      await setDoc(doc(db,"users",user.uid),{tracker:data,trackerUpdatedAt:Date.now()},{merge:true});
-    }
+    try{await setDoc(doc(db,"users",user.uid),{tracker:data,trackerUpdatedAt:Date.now()},{merge:true});}
     catch(error){console.error("Unable to save tracker",error);setTrackerError("Your latest tracker change could not be saved.");}
   };
 
@@ -3259,13 +3260,10 @@ function AboutSection({label,body}){
 
 function EvidenceCoverageMap(){
   const [ref,visible]=useScrollReveal(0.14);
-  const coverageData=buildEvidenceCoverageData();
-  const totalEffects=coverageData.reduce((sum,row)=>sum+row.effects,0);
-  const linkedEffects=coverageData.reduce((sum,row)=>sum+row.linked,0);
-  const compounds=useCountUp(SUPPLEMENTS.length||CATALOG_COUNT,900,visible);
-  const effects=useCountUp(totalEffects,1100,visible);
-  const linked=useCountUp(linkedEffects,1000,visible);
-  const maxEffects=Math.max(1,...coverageData.map(row=>row.effects));
+  const compounds=useCountUp(SUPPLEMENTS.length,900,visible);
+  const effects=useCountUp(EVIDENCE_COVERAGE_TOTAL_EFFECTS,1100,visible);
+  const linked=useCountUp(EVIDENCE_COVERAGE_LINKED_EFFECTS,1000,visible);
+  const maxEffects=Math.max(...EVIDENCE_COVERAGE_DATA.map(row=>row.effects));
   return(
     <section ref={ref} className={`evid-coverage-map evid-reveal${visible?" visible":""}`} aria-labelledby="evid-coverage-title">
       <div className="evid-coverage-head">
@@ -3287,7 +3285,7 @@ function EvidenceCoverageMap(){
           <span><i className="evid-coverage-legend-linked"/>Source attached</span>
         </div>
         <ol className="evid-coverage-list">
-          {coverageData.map((row,index)=>{
+          {EVIDENCE_COVERAGE_DATA.map((row,index)=>{
             const totalWidth=Math.max(5,(row.effects/maxEffects)*100);
             const linkedWidth=row.effects?((row.linked/row.effects)*100):0;
             return(
@@ -3306,7 +3304,7 @@ function EvidenceCoverageMap(){
           })}
         </ol>
       </div>
-      <p className="evid-coverage-note"><strong>How to read it:</strong> “Source attached” means a citation is linked to that record for traceability. It is not a guarantee that the result is effective. The current catalogue has {totalEffects-linkedEffects} effect records still awaiting a source attachment or review.</p>
+      <p className="evid-coverage-note"><strong>How to read it:</strong> “Source attached” means a citation is linked to that record for traceability. It is not a guarantee that the result is effective. The current catalogue has {EVIDENCE_COVERAGE_TOTAL_EFFECTS-EVIDENCE_COVERAGE_LINKED_EFFECTS} effect records still awaiting a source attachment or review.</p>
     </section>
   );
 }
@@ -4465,7 +4463,6 @@ function AppInner(){
   },[]);
 
   const [page,setPage]=useState(()=>getPageFromPath());
-  const [catalogReady,setCatalogReady]=useState(()=>SUPPLEMENTS.length>0);
   const [compoundId,setCompoundId]=useState(()=>getCompoundIdFromPath());
   const [goalId,setGoalId]=useState(()=>getGoalIdFromPath());
   const [guideId,setGuideId]=useState(()=>getGuideIdFromPath());
@@ -4518,22 +4515,6 @@ function AppInner(){
   const [showExitModal,setShowExitModal]=useState(false);
   const [showActivation,setShowActivation]=useState(false);
 
-  const ensureCatalog=()=>{
-    if(catalogReady||SUPPLEMENTS.length>0){
-      if(!catalogReady)setCatalogReady(true);
-      return Promise.resolve(SUPPLEMENTS);
-    }
-    return loadCatalog().then(records=>{
-      setCatalogReady(true);
-      return records;
-    });
-  };
-
-  useEffect(()=>{
-    if(page==="home"||catalogReady)return;
-    ensureCatalog();
-  },[page,catalogReady]);
-
   useEffect(()=>{
     trackEvent("page_view",{page,path:window.location.pathname});
   },[page]);
@@ -4581,7 +4562,7 @@ function AppInner(){
     else update();
   };
 
-  useEffect(()=>{applyPageSeo(getPageSeo(window.location.pathname));},[page,compoundId,goalId,guideId,shareId,snapshotId,comparisonIds,catalogReady]);
+  useEffect(()=>{applyPageSeo(getPageSeo(window.location.pathname));},[page,compoundId,goalId,guideId,shareId,snapshotId,comparisonIds]);
 
   useEffect(()=>{
     const onPop=()=>{
@@ -4678,15 +4659,6 @@ function AppInner(){
     </div>
   );
 
-  if(page!=="home"&&!catalogReady)return(
-    <div style={{minHeight:"100vh",background:C.bg,display:"grid",placeItems:"center",fontFamily:"Montserrat,sans-serif",color:C.ink}}>
-      <div style={{display:"grid",gap:12,justifyItems:"center"}}>
-        <span style={{display:"grid",placeItems:"center",width:42,height:42,border:`2px solid ${C.ink}`,fontSize:15,fontWeight:900}}>E</span>
-        <span style={{fontSize:10,fontWeight:800,letterSpacing:".18em"}}>LOADING RESEARCH RECORDS</span>
-      </div>
-    </div>
-  );
-
   const navItems=[
     {id:"supplements",label:"Supplements"},
     {id:"body-atlas",label:"Body Atlas"},
@@ -4699,19 +4671,15 @@ function AppInner(){
   const isProToolPage=["weekly-protocol","interactions","tracker","evidence-answer","study-comparator","share-report","research-feed","interaction-checker","stack-audit","bloodwork-history","stack-builder","cycle-alerts","stack-optimizer","bloodwork","body-atlas","workspace"].includes(page);
 
   const scrollToResults=()=>{
-    ensureCatalog().then(()=>{
-      if(page!=="supplements")navigateTo("supplements");
-      requestAnimationFrame(()=>document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"}));
-    });
+    if(page!=="supplements")navigateTo("supplements");
+    requestAnimationFrame(()=>document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"}));
   };
   const openFreeSnapshot=()=>{
-    ensureCatalog().then(()=>{
-      const featured=SUPPLEMENTS.find(s=>s.id==="creatine-monohydrate")||SUPPLEMENTS.find(s=>s.tier===1);
-      if(!featured)return;
-      trackEvent("evidence_snapshot_cta",{source:"homepage",compound:featured.id});
-      window.history.pushState({},"",`/evidence-snapshot/${featured.id}`);
-      window.dispatchEvent(new PopStateEvent("popstate"));
-    });
+    const featured=SUPPLEMENTS.find(s=>s.id==="creatine-monohydrate")||SUPPLEMENTS.find(s=>s.tier===1);
+    if(!featured)return;
+    trackEvent("evidence_snapshot_cta",{source:"homepage",compound:featured.id});
+    window.history.pushState({},"",`/evidence-snapshot/${featured.id}`);
+    window.dispatchEvent(new PopStateEvent("popstate"));
   };
   const selectSearchResult=(value)=>{
     trackEvent("compound_search",{query:value.slice(0,80),source:"suggestion"});
@@ -4738,8 +4706,8 @@ function AppInner(){
           <div className="evid-nav-search-expanded">
           <span className="evid-search-icon" aria-hidden="true"/>
           <input autoFocus value={search} aria-label="Search supplements" placeholder="Search supplements..."
-            onChange={e=>{ensureCatalog();setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
-            onFocus={()=>{ensureCatalog();setShowSuggest(search.length>0);}}
+            onChange={e=>{setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
+            onFocus={()=>setShowSuggest(search.length>0)}
             onKeyDown={e=>{if(e.key==="Escape"){setNavSearchOpen(false);setShowSuggest(false);}if(e.key==="Enter")runSearch();}}/>
           <button className="evid-nav-search-close" aria-label="Close search" onClick={()=>{setNavSearchOpen(false);setShowSuggest(false);}}>×</button>
           {showSuggest&&<SearchSuggestions query={search} onSelect={selectSearchResult} compact/>}
@@ -4808,9 +4776,9 @@ function AppInner(){
       )}
 
       <nav className="evid-main-nav" style={{borderBottom:`1px solid ${C.border}`,padding:compactNav?"0 16px":"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:72,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
-        <div onClick={()=>navigateTo("home")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+        <div onClick={()=>navigateTo("supplements")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
           <div style={{width:30,height:30,border:`2px solid ${C.black}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:10,fontWeight:900}}>E</span></div>
-          <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink,cursor:"pointer"}} onClick={()=>navigateTo("home")}>EVIDSTACK</span>
+          <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink,cursor:"pointer"}} onClick={()=>navigateTo("supplements")}>EVIDSTACK</span>
         </div>
         {compactNav?(
            <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -4887,37 +4855,6 @@ function AppInner(){
       {page==="stack-optimizer"&&<StackOptimizerScreen onUpgrade={openUpgrade}/>}
       {page==="bloodwork"     &&<BloodWorkScreen onUpgrade={openUpgrade}/>}
       {page==="changelog"    &&<ChangelogPage onNavigate={navigateTo}/>}
-
-      {page==="home"&&<>
-        <section className="evid-home-hero" aria-labelledby="evid-home-title">
-          <div className="evid-hero-content">
-          <p className="evid-hero-kicker">SUPPLEMENTS. COMPOUNDS. CONTEXT.</p>
-          <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>
-          <p className="evid-hero-description">A research database for supplements and compounds. Compare evidence, understand doses and spot potential interactions before building your stack.</p>
-          <p className="evid-hero-support">Explore {CATALOG_COUNT} compound profiles, from everyday supplements to specialist compounds. Pro adds the full catalogue, stack analysis and research tools.</p>
-          <div className="evid-hero-actions"><button className="atlas-home-feature" onClick={()=>navigateTo("body-atlas")}><span aria-hidden="true">◎</span> Body Atlas <span className="atlas-new-badge">NEW</span></button><button className="evid-hero-primary-cta" onClick={()=>navigateTo("supplements")}>Browse compounds <span aria-hidden="true">↓</span></button><button className="evid-hero-pro-cta" onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
-          <p className="evid-hero-access">Start with a free preview. Go deeper with Pro.</p>
-          <div className="evid-hero-secondary-links"><span>Free evidence snapshot</span><button className="evid-snapshot-home-link" onClick={openFreeSnapshot}>Try it free <span aria-hidden="true">↗</span></button><span aria-hidden="true">·</span><span>Building a better evidence map?</span><button onClick={()=>{trackEvent("pilot_interest",{source:"homepage-secondary"});navigateTo("founding-testers");}}>Join the pilot <span aria-hidden="true">↗</span></button></div>
-          <div ref={searchContainerRef} className={`evid-hero-search${searchFocused||search?" is-expanded":""}`}>
-            <div className="evid-hero-search-row">
-              <span className="evid-hero-search-icon" aria-hidden="true"/>
-              {!search&&<span className="evid-search-example" aria-hidden="true" style={{opacity:phFade?1:0}}>{PLACEHOLDERS[phIdx]}</span>}
-              <input id="evidstack-search" value={search}
-                onChange={e=>{ensureCatalog();setSearch(e.target.value);setShowSuggest(e.target.value.length>0);}}
-                onFocus={()=>{trackEvent("search_started",{source:"hero_search"});ensureCatalog();setSearchFocused(true);if(search.length>0)setShowSuggest(true);}}
-                onBlur={()=>window.setTimeout(()=>setSearchFocused(false),140)}
-                onKeyDown={e=>{if(e.key==="Escape"){setShowSuggest(false);e.target.blur();}if(e.key==="Enter")runSearch();}}
-                aria-label="Search compounds" placeholder=""
-                />
-              <button onClick={runSearch}>Browse</button>
-            </div>
-            {showSuggest&&!navSearchOpen&&<SearchSuggestions query={search} onSelect={selectSearchResult}/>} 
-          </div>
-          <div className="evid-access-strip"><span><strong>Free</strong> A first look at the fundamentals</span><span><strong>Pro</strong> Full catalogue + research tools</span><button onClick={openUpgrade}>$9.99 / month ↗</button></div>
-          </div>
-        </section>
-        <SourceProofSection onNavigate={navigateTo}/>
-      </>}
 
       {page==="supplements"&&<>
         <section className="evid-home-hero" aria-labelledby="evid-home-title">
@@ -5081,7 +5018,7 @@ function AppInner(){
               </div>
               <span style={{fontSize:11,fontWeight:900,letterSpacing:".08em",color:C.ink}}>EVIDSTACK</span>
             </div>
-            <p style={{fontSize:11,color:C.gray,margin:"0 0 6px",lineHeight:1.7}}>{Math.floor((SUPPLEMENTS.length||CATALOG_COUNT)/10)*10}+ compounds from PubMed and Cochrane.</p>
+            <p style={{fontSize:11,color:C.gray,margin:"0 0 6px",lineHeight:1.7}}>{Math.floor(SUPPLEMENTS.length/10)*10}+ compounds from PubMed and Cochrane.</p>
             <p style={{fontSize:11,color:C.gray,margin:0}}>evidstack@protonmail.com</p>
           </div>
           <div>

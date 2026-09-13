@@ -338,6 +338,7 @@ function SearchSuggestions({query,onSelect,compact=false}){
 
 function SourceProofSection({onNavigate}){
   const [ref,visible]=useScrollReveal(0.16);
+  const sourceLogos={PM:"/pubmed-mark.png",C:"/cochrane-mark.png",E:"/examine-mark.png"};
   const cards=[
     {
       index:"01",
@@ -380,7 +381,7 @@ function SourceProofSection({onNavigate}){
         <div className="evid-source-grid">
           {cards.map(card=>(
             <a key={card.name} className="evid-source-card" href={card.href} target="_blank" rel="noreferrer">
-              <span className="evid-source-card-top"><span className="evid-source-index">{card.index}</span><span className={`evid-source-mark is-${card.mark.toLowerCase()}`} aria-hidden="true">{card.mark}</span></span>
+              <span className="evid-source-card-top"><span className="evid-source-index">{card.index}</span><span className={`evid-source-mark is-${card.mark.toLowerCase()}`} aria-hidden="true"><img src={sourceLogos[card.mark]} alt="" /></span></span>
               <span className="evid-source-name">{card.name}</span>
               <span className="evid-source-detail">{card.detail}</span>
               <span className="evid-source-note">{card.note}<span aria-hidden="true"> ↗</span></span>

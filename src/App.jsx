@@ -4353,11 +4353,120 @@ function ShareableReportPage({onNavigate,onUpgrade,onAuth}){
   </main>;
 }
 
+const PRO_TOOL_PREVIEWS={
+  "evidence-answer":{
+    eyebrow:"CITED RESEARCH BRIEF",
+    headline:"Start with a conclusion you can verify.",
+    lede:"Evidence Answer turns a question into a short, cited brief with the population, dose, outcome and uncertainty visible.",
+    sampleTitle:"Example question · Does creatine support strength?",
+    rows:[["Conclusion","Likely benefit for strength in trained adults; confidence depends on the outcome and study design."],["Population","Mostly trained adults · protocols commonly studied for 6–12 weeks"],["Evidence signal","Moderate to high across several recorded outcomes"],["Limits","Results vary by training status, baseline intake and endpoint"]],
+    cta:"Ask your first evidence question"
+  },
+  "study-comparator":{
+    eyebrow:"STUDY-BY-STUDY VIEW",
+    headline:"See why two studies disagree.",
+    lede:"Compare the actual populations, participant counts, dose, duration, results, adverse effects and source links side by side.",
+    sampleTitle:"Example comparison · Two strength outcomes",
+    rows:[["Population","Trained adults  ·  older adults"],["Participants","n=32  ·  n=48"],["Dose / duration","5 g/day · 8 weeks  ·  3 g/day · 12 weeks"],["Result","Directionally positive  ·  smaller change"],["Evidence quality","Moderate  ·  moderate"]],
+    cta:"Compare two recorded studies"
+  },
+  "share-report":{
+    eyebrow:"SHAREABLE EVIDENCE REPORT",
+    headline:"Send a brief, not a screenshot.",
+    lede:"Build a calm summary for a clinician, coach or partner with the evidence, studied doses, risks, limits and references together.",
+    sampleTitle:"Example report outline",
+    rows:[["Selected","Creatine · Vitamin D · Omega-3"],["Included","Evidence scores, studied dose and timing"],["Safety section","Recorded cautions and interaction notes"],["Source trail","Linked PubMed and review references" ]],
+    cta:"Create a shareable report"
+  },
+  "research-feed":{
+    eyebrow:"PERSONAL RESEARCH FEED",
+    headline:"Know when the evidence changes.",
+    lede:"Follow a goal or compound and keep a simple timeline of new studies, source corrections and evidence-level changes.",
+    sampleTitle:"Example feed · Strength",
+    rows:[["New study","A human trial was added to the strength record"],["Source check","A reference link was corrected and re-verified"],["Evidence signal","The recorded confidence moved from limited to moderate"],["Your next step","Open the updated study summary"]],
+    cta:"Follow a goal or compound"
+  },
+  "stack-audit":{
+    eyebrow:"STACK REVIEW",
+    headline:"Find what your stack supports or misses.",
+    lede:"Stack Audit groups your saved compounds by goal, evidence strength, overlap and recorded cautions so the next decision is easier to review.",
+    sampleTitle:"Example audit · Current stack",
+    rows:[["Coverage","3 goals covered · 1 goal has no saved option"],["Evidence","2 compounds have linked sources · 1 needs review"],["Overlap","Two compounds target the same goal"],["Next review","Check dose, timing and interaction context"]],
+    cta:"Audit your saved stack"
+  },
+  "interaction-checker":{
+    eyebrow:"TWO-LEVEL INTERACTION CHECK",
+    headline:"Separate evidence from severity.",
+    lede:"Review whether an interaction is supported by evidence and how serious it could be clinically. Those are different questions.",
+    sampleTitle:"Example pair · Caffeine + another stimulant",
+    rows:[["Interaction evidence","Limited · mostly mechanistic or indirect"],["Potential severity","Moderate if taken together or late in the day"],["Timing note","Review total stimulant exposure and sleep impact"],["Source status","Open the linked references before deciding"]],
+    cta:"Check a pair from your stack"
+  },
+  "bloodwork":{
+    eyebrow:"BIOMARKER CONTEXT",
+    headline:"Read markers alongside your goals.",
+    lede:"Bring a small set of lab values into one view with units, reference ranges, trend direction and research context.",
+    sampleTitle:"Example marker view · Recovery",
+    rows:[["Marker","25-OH Vitamin D"],["Latest value","32 ng/mL · within the example range"],["Trend","Stable across two recorded checks"],["Context","Review the source notes with a qualified clinician"]],
+    cta:"Review a marker timeline"
+  },
+  "tracker":{
+    eyebrow:"OUTCOME TRACKER",
+    headline:"Close the loop after the decision.",
+    lede:"Record symptoms, habits and outcomes next to the compounds you are reviewing, then return to the same evidence context over time.",
+    sampleTitle:"Example outcome check-in · Sleep",
+    rows:[["Baseline","Sleep quality · 5/10"],["Week 2","Sleep quality · 6/10"],["Context","Training load and caffeine also changed"],["Interpretation","A personal trend is not proof of causation"]],
+    cta:"Start an outcome check-in"
+  },
+  "bloodwork-history":{
+    eyebrow:"EVIDENCE TIMELINE",
+    headline:"Keep decisions and measurements together.",
+    lede:"See when a compound, goal, lab result or research update entered your record so follow-up conversations start with the same context.",
+    sampleTitle:"Example timeline · Recovery",
+    rows:[["12 Sep","Added a recovery goal"],["18 Sep","Saved a compound for review"],["02 Oct","Recorded a biomarker check"],["Today","Ready to compare the evidence with the trend"]],
+    cta:"Open your evidence timeline"
+  }
+};
+
+function ProToolPreviewModal({tool,onClose,onUpgrade,onAuth,user}){
+  const preview=PRO_TOOL_PREVIEWS[tool?.id];
+  useEffect(()=>{
+    if(!preview)return undefined;
+    const onKeyDown=(event)=>{if(event.key==="Escape")onClose();};
+    document.addEventListener("keydown",onKeyDown);
+    const previous=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    return()=>{document.removeEventListener("keydown",onKeyDown);document.body.style.overflow=previous;};
+  },[preview,onClose]);
+  if(!preview)return null;
+  return(
+    <div className="evid-tool-preview-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)onClose();}}>
+      <section className="evid-tool-preview-modal" role="dialog" aria-modal="true" aria-labelledby="evid-tool-preview-title">
+        <button className="evid-tool-preview-close" onClick={onClose} aria-label="Close preview">×</button>
+        <div className="evid-tool-preview-top"><span className="evid-workspace-tool-icon" aria-hidden="true">{tool.icon}</span><span className="evid-tool-preview-label">FREE PREVIEW</span></div>
+        <p className="evid-tool-preview-eyebrow">{preview.eyebrow}</p>
+        <h2 id="evid-tool-preview-title">{preview.headline}</h2>
+        <p className="evid-tool-preview-lede">{preview.lede}</p>
+        <div className="evid-tool-preview-card">
+          <div className="evid-tool-preview-card-head"><strong>{preview.sampleTitle}</strong><span>EXAMPLE OUTPUT</span></div>
+          <div className="evid-tool-preview-rows">{preview.rows.map(([label,value])=><div key={label} className="evid-tool-preview-row"><b>{label}</b><span>{value}</span></div>)}</div>
+        </div>
+        <p className="evid-tool-preview-note">This preview uses an example record. Pro unlocks the live workflow with your saved compounds and research context.</p>
+        <div className="evid-tool-preview-actions">
+          <button className="evid-tool-preview-primary" onClick={()=>user?onUpgrade():onAuth("signup")}>{user?"Unlock with Pro":"Create a free account"} <span aria-hidden="true">↗</span></button>
+          <button className="evid-tool-preview-secondary" onClick={onClose}>{preview.cta}</button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function EvidenceWorkspacePage({onNavigate,onUpgrade,onAuth}){
   const {user,isPro,userProfile}=useAuth();
   const {stackIds,stackLoading}=useMyStack();
   const stack=stackIds.map(id=>SUPPLEMENTS.find(s=>s.id===id)).filter(Boolean);
   const profileReady=Boolean(userProfile&&Object.values(userProfile).some(Boolean));
+  const [previewTool,setPreviewTool]=useState(null);
   const tools=[
     {id:"evidence-answer",group:"Understand the evidence",icon:"✦",label:"Evidence Answer",description:"Ask a question or describe a goal, then get a cited conclusion and evidence-ranked options in one place.",action:"Ask for an answer",featured:true},
     {id:"study-comparator",group:"Understand the evidence",icon:"⇄",label:"Study Comparator",description:"Compare populations, sample sizes, dose, duration, results, evidence quality and adverse effects.",action:"Compare studies"},
@@ -4369,7 +4478,11 @@ function EvidenceWorkspacePage({onNavigate,onUpgrade,onAuth}){
     {id:"tracker",group:"Track what changes",icon:"◷",label:"Outcome Tracker",description:"Keep the loop going with symptoms, habits, and outcomes.",action:"Open tracker"},
     {id:"bloodwork-history",group:"Track what changes",icon:"↗",label:"Evidence Timeline",description:"Keep past bloodwork and decisions in one continuous view.",action:"View history"},
   ];
-  const openTool=(id)=>{if(id==="research-feed"){if(user)onNavigate(id);else onAuth("signup");return;}if(isPro){onNavigate(id);}else{onUpgrade();}};
+  const openTool=(id)=>{
+    if(isPro){onNavigate(id);return;}
+    const tool=tools.find(item=>item.id===id);
+    if(tool)setPreviewTool(tool);
+  };
   const profileAction=()=>user?onNavigate("my-stack"):onAuth("signup");
 
   return(
@@ -4428,6 +4541,7 @@ function EvidenceWorkspacePage({onNavigate,onUpgrade,onAuth}){
 
       {!isPro&&<section className="evid-workspace-upgrade"><div><p className="evid-workspace-section-kicker">WHEN YOU ARE READY</p><h2>Make the next decision easier.</h2><p>Pro connects your personal context to the evidence tools, so you can compare, check, and track without starting from zero each time.</p></div><button onClick={onUpgrade}>Explore Pro at $9.99/month <span aria-hidden="true">↗</span></button></section>}
       <p className="evid-workspace-disclaimer">Evidence summaries are informational and do not replace advice from a qualified clinician.</p>
+      <ProToolPreviewModal tool={previewTool} user={user} onClose={()=>setPreviewTool(null)} onUpgrade={()=>{setPreviewTool(null);onUpgrade();}} onAuth={(mode)=>{setPreviewTool(null);onAuth(mode);}}/>
     </main>
   );
 }
@@ -7922,4 +8036,5 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
+
 

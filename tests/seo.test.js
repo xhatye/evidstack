@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { getPageSeo,publicPaths } from '../src/seo.js';
+import { loadCatalog } from '../src/data.js';
+
+await loadCatalog();
 test('goal and guide URLs retain their actual canonical path',()=>{
   assert.equal(getPageSeo('/goal/sleep').canonical,'https://evidstack.com/goal/sleep');
   assert.equal(getPageSeo('/guide/sleep').canonical,'https://evidstack.com/guide/sleep');
@@ -16,3 +19,4 @@ test('sitemap includes only unique indexable canonical pages',()=>{
   const routes=publicPaths();assert.equal(routes.length,new Set(routes).size);
   for(const route of routes){const seo=getPageSeo(route);assert.equal(seo.robots,'index,follow');assert.equal(seo.canonical,`https://evidstack.com${route}`);}
 });
+

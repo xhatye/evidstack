@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { GOALS, SUPPLEMENTS } from '../src/data.js';
+import { GOALS, SUPPLEMENTS } from '../src/catalog-data.js';
 import { SCIENTIFIC_SOURCE_REPAIRS } from '../src/scientific-sources.js';
 import { validateCatalog } from '../scripts/validate-catalog.js';
 

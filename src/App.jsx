@@ -207,6 +207,40 @@ const T = {
 const tierColor=(t)=>[null,C.green,C.blue,C.purple,C.amber][t]||C.gray;
 const efColor=(v)=>v<0?C.red:v>=4?C.green:v===3?C.blue:v===2?C.amber:C.gray;
 
+// The About page's coverage map is calculated from the same records shown in
+// the catalogue. A linked source means that the effect record has at least one
+// attached citation; it does not imply that the result is conclusive.
+const EVIDENCE_COVERAGE_DATA=GOALS
+  .filter(goal=>goal.id!=="all")
+  .map(goal=>{
+    let effects=0;
+    let linked=0;
+    let evidenceTotal=0;
+    let evidenceCount=0;
+    SUPPLEMENTS.forEach(supplement=>{
+      (supplement.effects||[]).forEach(effect=>{
+        if(effect.goal!==goal.id)return;
+        effects+=1;
+        if(Array.isArray(effect.sources)&&effect.sources.length>0)linked+=1;
+        const score=Number(effect.evidence);
+        if(Number.isFinite(score)){evidenceTotal+=score;evidenceCount+=1;}
+      });
+    });
+    return {
+      id:goal.id,
+      label:goal.label,
+      effects,
+      linked,
+      coverage:effects?Math.round((linked/effects)*100):0,
+      avgEvidence:evidenceCount?evidenceTotal/evidenceCount:0,
+    };
+  })
+  .filter(row=>row.effects>0)
+  .sort((a,b)=>b.effects-a.effects||a.label.localeCompare(b.label));
+
+const EVIDENCE_COVERAGE_TOTAL_EFFECTS=EVIDENCE_COVERAGE_DATA.reduce((sum,row)=>sum+row.effects,0);
+const EVIDENCE_COVERAGE_LINKED_EFFECTS=EVIDENCE_COVERAGE_DATA.reduce((sum,row)=>sum+row.linked,0);
+
 function compoundCategory(supplement){
   const legal=String(supplement?.legal||"").toLowerCase();
   const name=String(supplement?.name||"").toLowerCase();
@@ -1186,7 +1220,7 @@ function WeeklyProtocolAI({onUpgrade}){
   };
 
   if(!isPro)return(
-    <div className="evid-compound-profile evid-compound-profile-not-found" style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
+    <div style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
       <span style={{fontSize:48,display:"block",marginBottom:20}}>📅</span>
       <h2 style={{fontSize:isMob?24:32,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>Weekly Protocol AI</h2>
       <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 auto 32px",maxWidth:480}}>Get a 4-week progressive protocol customized to your goals. The AI introduces compounds strategically, week by week, for maximum results and minimal side effects.</p>
@@ -2338,7 +2372,7 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   },[supp?.id,supp?.tier]);
 
   if(!supp)return(
-    <div style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
+    <div className="evid-compound-profile evid-compound-profile-not-found" style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
       <p style={{fontSize:48,marginBottom:20}}>404</p>
       <h2 style={{fontSize:24,fontWeight:900,color:C.ink,margin:"0 0 12px"}}>Compound not found</h2>
       <p style={{fontSize:14,color:C.gray,marginBottom:24}}>This compound does not exist in our database.</p>
@@ -3224,6 +3258,57 @@ function AboutSection({label,body}){
   );
 }
 
+function EvidenceCoverageMap(){
+  const [ref,visible]=useScrollReveal(0.14);
+  const compounds=useCountUp(SUPPLEMENTS.length,900,visible);
+  const effects=useCountUp(EVIDENCE_COVERAGE_TOTAL_EFFECTS,1100,visible);
+  const linked=useCountUp(EVIDENCE_COVERAGE_LINKED_EFFECTS,1000,visible);
+  const maxEffects=Math.max(...EVIDENCE_COVERAGE_DATA.map(row=>row.effects));
+  return(
+    <section ref={ref} className={`evid-coverage-map evid-reveal${visible?" visible":""}`} aria-labelledby="evid-coverage-title">
+      <div className="evid-coverage-head">
+        <div>
+          <p className="evid-about-label">Evidence Coverage Map</p>
+          <h2 id="evid-coverage-title">See where the source trail is strongest.</h2>
+          <p className="evid-coverage-lede">This view counts the catalogue's effect records by goal. The green segment shows records with an attached source, while the full bar shows every recorded effect.</p>
+        </div>
+        <div className="evid-coverage-stats" aria-label="Catalogue totals">
+          <div><strong>{compounds}</strong><span>compounds</span></div>
+          <div><strong>{effects}</strong><span>effect records</span></div>
+          <div><strong>{linked}</strong><span>source-linked</span></div>
+        </div>
+      </div>
+
+      <div className="evid-coverage-panel">
+        <div className="evid-coverage-legend" aria-hidden="true">
+          <span><i className="evid-coverage-legend-total"/>All effect records</span>
+          <span><i className="evid-coverage-legend-linked"/>Source attached</span>
+        </div>
+        <ol className="evid-coverage-list">
+          {EVIDENCE_COVERAGE_DATA.map((row,index)=>{
+            const totalWidth=Math.max(5,(row.effects/maxEffects)*100);
+            const linkedWidth=row.effects?((row.linked/row.effects)*100):0;
+            return(
+              <li key={row.id} className="evid-coverage-row" aria-label={`${row.label}: ${row.effects} effect records, ${row.linked} with an attached source, ${row.avgEvidence.toFixed(1)} out of 5 average evidence score`}>
+                <div className="evid-coverage-row-head">
+                  <span className="evid-coverage-goal">{row.label}</span>
+                  <span className="evid-coverage-meta">{row.linked}/{row.effects} sourced · {row.coverage}% · avg {row.avgEvidence.toFixed(1)}/5</span>
+                </div>
+                <div className="evid-coverage-track" aria-hidden="true">
+                  <span className="evid-coverage-total-bar" style={{width:`${totalWidth}%`,transitionDelay:`${index*28}ms`}}>
+                    <span className="evid-coverage-linked-bar" style={{width:`${linkedWidth}%`}}/>
+                  </span>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+      <p className="evid-coverage-note"><strong>How to read it:</strong> “Source attached” means a citation is linked to that record for traceability. It is not a guarantee that the result is effective. The current catalogue has {EVIDENCE_COVERAGE_TOTAL_EFFECTS-EVIDENCE_COVERAGE_LINKED_EFFECTS} effect records still awaiting a source attachment or review.</p>
+    </section>
+  );
+}
+
 function AboutPage(){
   const isMob=useIsMobile();
   const sections=[
@@ -3261,6 +3346,7 @@ function AboutPage(){
       </div>
       <div className="evid-about-rule"/>
       {sections.map(section=><AboutSection key={section.label} {...section}/>)}
+      <EvidenceCoverageMap/>
       <div className="evid-about-rule evid-about-rule-last"/>
       <div className="evid-about-founder">
         <div className="evid-about-avatar" aria-hidden="true">M</div>

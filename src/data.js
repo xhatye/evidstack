@@ -2,6 +2,7 @@ import { SCIENTIFIC_SOURCE_REPAIRS } from "./scientific-sources.js";
 import { BATCH1_EVIDENCE_AUDIT_BY_ID } from "./batch1-audit.js";
 import { BATCH2_EVIDENCE_AUDIT_BY_ID } from "./batch2-audit.js";
 import { BATCH3_EVIDENCE_AUDIT_BY_ID } from "./batch3-audit.js";
+import { BATCH4_EVIDENCE_AUDIT_BY_ID } from "./batch4-audit.js";
 
 // SUPRAI  - Supplement Database v1.0
 // Sources: PubMed and Cochrane references
@@ -447,8 +448,10 @@ for (const supplement of SUPPLEMENTS) {
   const evidenceAudit = BATCH1_EVIDENCE_AUDIT_BY_ID[supplement.id];
   const batch2Audit = BATCH2_EVIDENCE_AUDIT_BY_ID[supplement.id];
   const batch3Audit = BATCH3_EVIDENCE_AUDIT_BY_ID[supplement.id];
+  const batch4Audit = BATCH4_EVIDENCE_AUDIT_BY_ID[supplement.id];
   if (evidenceAudit) supplement.evidenceAudit = evidenceAudit;
   if (batch2Audit) supplement.evidenceAudit = batch2Audit;
   if (batch3Audit) supplement.evidenceAudit = batch3Audit;
+  if (batch4Audit) supplement.evidenceAudit = batch4Audit;
 }
 

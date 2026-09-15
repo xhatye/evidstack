@@ -326,7 +326,7 @@ const studyFreshness=(effects,audit)=>{
   if(audit?.latestVerifiedPublicationYear)return auditFreshness(audit);
   const years=(effects||[]).flatMap(effectStudyYears);
   if(!years.length){
-    if(audit)return {label:"Publication year needs review",detail:"The supplied Batch 1 audit did not verify a year for this record."};
+    if(audit)return {label:"Publication year needs review",detail:"The supplied audit did not verify a year for this record."};
     return {label:"Publication year not recorded",detail:"The current entry does not include a reliable study year."};
   }
   const latest=Math.max(...years);
@@ -337,9 +337,9 @@ const auditFreshness=(audit)=>{
   if(!audit)return null;
   if(audit.latestVerifiedPublicationYear)return {
     label:`Latest audit year: ${audit.latestVerifiedPublicationYear}`,
-    detail:"Year reported in the supplied Batch 1 audit; editorial source confirmation is still required.",
+    detail:"Year reported in the supplied audit; editorial source confirmation is still required.",
   };
-  return {label:"Publication year needs review",detail:"The supplied Batch 1 audit did not verify a publication year for this record."};
+  return {label:"Publication year needs review",detail:"The supplied audit did not verify a publication year for this record."};
 };
 const auditSourceHref=(source)=>{
   if(source?.pmid)return `https://pubmed.ncbi.nlm.nih.gov/${source.pmid}/`;
@@ -357,7 +357,7 @@ function EvidenceAuditPanel({supplement,isMob=false,compact=false}){
   const auditText=(value)=>value||"Not reported in the supplied audit.";
   return <section className="evid-audit-card" aria-labelledby={`audit-${supplement.id}`} style={{background:compact?C.bg:C.white,border:`1px solid ${C.border}`,padding:isMob?"18px 16px":"24px 28px",marginBottom:24}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap",marginBottom:16}}>
-      <div><p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>Batch 1 · source audit</p><h2 id={`audit-${supplement.id}`} style={{fontSize:isMob?20:24,fontWeight:900,color:C.ink,letterSpacing:"-.03em",margin:0}}>What the supplied audit found.</h2></div>
+      <div><p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>Batch {audit.batchNumber||1} · source audit</p><h2 id={`audit-${supplement.id}`} style={{fontSize:isMob?20:24,fontWeight:900,color:C.ink,letterSpacing:"-.03em",margin:0}}>What the supplied audit found.</h2></div>
       <span style={{fontSize:9,fontWeight:800,color:audit.editorialReviewRequired?C.amber:C.green,border:`1px solid ${audit.editorialReviewRequired?C.amber:C.green}55`,padding:"5px 9px",letterSpacing:".08em",textTransform:"uppercase"}}>{audit.editorialReviewRequired?"Editorial review required":"Audit reviewed"}</span>
     </div>
     <p style={{fontSize:11,color:C.gray,lineHeight:1.65,margin:"0 0 16px"}}>Imported from the supplied audit export. It is an audit lead sheet, so unresolved fields remain visible until a human confirms the underlying publication.</p>
@@ -8410,5 +8410,4 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
-
 

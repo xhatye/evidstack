@@ -313,6 +313,23 @@ const sourceHref=(source)=>{
   if(/^https?:\/\//i.test(value))return value;
   return null;
 };
+const auditSourceIdentity=(source)=>{
+  if(!source)return "";
+  if(source.pmid)return `pmid:${source.pmid}`;
+  if(source.doi)return `doi:${source.doi}`;
+  if(source.sourceUrl)return `url:${source.sourceUrl}`;
+  if(source.title)return `title:${source.title}`;
+  return "";
+};
+const uniqueAuditSources=(effects)=>{
+  const seen=new Set();
+  return (effects||[]).flatMap(effect=>effect?.auditSources||[]).filter(source=>{
+    const key=auditSourceIdentity(source);
+    if(!key||seen.has(key))return false;
+    seen.add(key);
+    return true;
+  });
+};
 
 // Trust signals are deliberately explicit about what the catalogue knows and
 // what it does not know. The verification date refers to Evidstack's editorial
@@ -376,20 +393,26 @@ function EvidenceAuditPanel({supplement,isMob=false,compact=false}){
 const compoundConfidence=(supplement)=>{
   const effects=supplement?.effects||[];
   const sourced=effects.filter(effect=>effect.sources?.length).length;
+  const audited=effects.filter(effect=>effect.auditSources?.length).length;
   const flagged=effects.filter(effect=>effect.sourceStatus==="replaced-mismatch").length;
   const average=effects.length?effects.reduce((sum,effect)=>sum+Number(effect.evidence||0),0)/effects.length:0;
   if(!effects.length)return {label:"Not assessed",tone:"neutral",detail:"No outcome record is available for this entry."};
-  if(flagged||!sourced)return {label:"Limited · source review needed",tone:"caution",detail:"Some outcome claims need a verified linked source before they should be relied on."};
+  if(flagged||!sourced){
+    if(audited)return {label:"Limited · audit references available",tone:"caution",detail:`Audit references are available for ${audited} of ${effects.length} outcomes, but the exact effect-to-source matches still need confirmation.`};
+    return {label:"Limited · source review needed",tone:"caution",detail:"Some outcome claims need a verified linked source before they should be relied on."};
+  }
   if(average>=4&&sourced/effects.length>=.75)return {label:"High",tone:"positive",detail:"Most recorded outcomes have linked sources and a strong evidence score."};
   if(average>=3&&sourced/effects.length>=.5)return {label:"Moderate",tone:"neutral",detail:"The record has linked sources, with some uncertainty across outcomes."};
   return {label:"Limited",tone:"caution",detail:"The current evidence record is mixed or incomplete."};
 };
 const effectEvidenceState=(effect)=>{
   const explicitNoEffect=effect?.noEffect===true||effect?.effectDirection==="none"||/no (significant )?effect|no benefit|did not improve/i.test(String(effect?.result||effect?.results||""));
+  const auditCount=effect?.auditSources?.length||0;
   if(explicitNoEffect&&effect?.sources?.length)return {label:"Evidence of no effect reported",tone:"neutral",detail:"This statement refers to the cited study result; it is not a claim that no future study can find an effect."};
   if(effect?.sourceStatus==="auto-linked"&&effect?.sources?.length)return {label:"Candidate source linked",tone:"caution",detail:"A source candidate was found by automated review; editorial confirmation is still pending."};
   if(effect?.sourceStatus==="replaced-mismatch"&&effect?.sources?.length)return {label:"Source corrected and linked",tone:"neutral",detail:"The original citation was replaced during source review. Read the linked paper before relying on the summary."};
   if(effect?.sources?.length)return {label:"Evidence found in linked source",tone:"positive",detail:"At least one reference is attached to this outcome record."};
+  if(auditCount)return {label:"Audit reference available",tone:"neutral",detail:`${auditCount} reference${auditCount===1?"":"s"} is attached to the compound audit. The exact match to this outcome still needs editorial confirmation.`};
   return {label:"No verified evidence found in this entry",tone:"caution",detail:"This is a data gap, not proof that the compound has no effect."};
 };
 const reportSourceHref=(supplement,effect,source)=>{
@@ -2309,6 +2332,8 @@ function EvidenceSnapshotPage({compoundId,onUpgrade}){
   const effects=supp?.effects||[];
   const primaryEffect=[...effects].sort((a,b)=>(Number(b.evidence||0)+Number(b.efficacy||0))-(Number(a.evidence||0)+Number(a.efficacy||0)))[0];
   const sourceCount=new Set(effects.flatMap(effect=>effect.sources||[])).size;
+  const auditedEffects=effects.filter(effect=>effect.auditSources?.length>0).length;
+  const auditReferenceCount=uniqueAuditSources(effects).length;
   const trustConfidence=supp?compoundConfidence(supp):null;
   const trustFreshness=supp?studyFreshness(effects,audit):null;
   const category=supp?compoundCategory(supp):null;
@@ -2321,7 +2346,9 @@ function EvidenceSnapshotPage({compoundId,onUpgrade}){
   const observedResult=primaryEffect?`${Math.abs(primaryEffect.efficacy||0)}/5 efficacy · ${primaryEffect.studies??primaryEffect.study_count??"Study count not recorded"} recorded studies`:"Not recorded in this entry";
   const risks=(supp?.sideEffects||[]).slice(0,3).map(item=>item.effect).filter(Boolean);
   const limits=effects.some(effect=>!effect.sources?.length||Number(effect.evidence||0)<=2)
-    ?"The record is limited or incomplete. Review the linked sources and the study population before making a decision."
+    ?auditedEffects
+      ?`Audit references are available for ${auditedEffects} outcomes (${auditReferenceCount} unique references), but exact effect-to-source matches still need confirmation.`
+      :"The record is limited or incomplete. Review the linked sources and the study population before making a decision."
     :"The record has linked sources, but study results may not generalize to every person or product.";
 
   useEffect(()=>{
@@ -2392,15 +2419,15 @@ function EvidenceSnapshotPage({compoundId,onUpgrade}){
         <div className="evid-snapshot-section-heading"><span>03</span><div><p className="evid-snapshot-section-kicker">RISKS AND LIMITS</p><h2>What to keep in view.</h2></div></div>
         <div className="evid-snapshot-risk-grid">
           <div><span>Recorded cautions</span>{risks.length?<ul>{risks.map(risk=><li key={risk}>{risk}</li>)}</ul>:<p>No caution is recorded in this entry.</p>}</div>
-          <div><span>Evidence status</span><p>{effects.length?`${effects.filter(effect=>effect.sources?.length).length} of ${effects.length} outcomes have an attached source.`:"No outcome record is available."}</p><p className="evid-snapshot-small">“No verified evidence found” is a data gap, not proof of no effect. A no-effect statement is shown only when a cited study reports it.</p></div>
+          <div><span>Evidence status</span><p>{effects.length?`${effects.filter(effect=>effect.sources?.length).length} of ${effects.length} outcomes have a verified attached source.${auditedEffects?` Audit references are available for ${auditedEffects} outcomes; exact effect links remain pending confirmation.`:""}`:"No outcome record is available."}</p><p className="evid-snapshot-small">“No verified evidence found” is a data gap, not proof of no effect. A no-effect statement is shown only when a cited study reports it.</p></div>
         </div>
       </section>
 
       <EvidenceAuditPanel supplement={supp} isMob={isMob} />
 
       <section className="evid-snapshot-card evid-snapshot-sources">
-        <div className="evid-snapshot-section-heading"><span>04</span><div><p className="evid-snapshot-section-kicker">SOURCE TRAIL</p><h2>References attached to this record.</h2></div><span className="evid-snapshot-source-count">{sourceCount} linked</span></div>
-        {effects.map((effect,index)=><div className="evid-snapshot-effect" key={`${effect.goal||"effect"}-${index}`}><div><b>{GOALS.find(goal=>goal.id===effect.goal)?.label||effect.goal||"Outcome"}</b><span>{effect.type||"Study type not recorded"} · {effect.evidence??"-"}/5 evidence</span></div><p>{effect.summary||"No summary recorded."}</p><div className="evid-snapshot-source-list">{effect.sources?.length?effect.sources.map(source=>{const href=sourceHref(source);const label=typeof source==="string"?source:(source?.id||source?.title||"Reference");return href?<a key={`${label}-${href}`} href={href} target="_blank" rel="noreferrer">{label} ↗</a>:<span key={label}>{label}</span>}):<span className="is-muted">No verified source attached to this outcome.</span>}</div></div>)}
+        <div className="evid-snapshot-section-heading"><span>04</span><div><p className="evid-snapshot-section-kicker">SOURCE TRAIL</p><h2>References attached to this record.</h2></div><span className="evid-snapshot-source-count">{sourceCount} verified{auditReferenceCount?` · ${auditReferenceCount} audit`:""}</span></div>
+        {effects.map((effect,index)=><div className="evid-snapshot-effect" key={`${effect.goal||"effect"}-${index}`}><div><b>{GOALS.find(goal=>goal.id===effect.goal)?.label||effect.goal||"Outcome"}</b><span>{effect.type||"Study type not recorded"} · {effect.evidence??"-"}/5 evidence</span></div><p>{effect.summary||"No summary recorded."}</p><div className="evid-snapshot-source-list">{effect.sources?.length?effect.sources.map(source=>{const href=sourceHref(source);const label=typeof source==="string"?source:(source?.id||source?.title||"Reference");return href?<a key={`${label}-${href}`} href={href} target="_blank" rel="noreferrer">{label} ↗</a>:<span key={label}>{label}</span>}):effect.auditSources?.length?<a className="is-audit" href={`#audit-${supp.id}`}>Audit references available ({effect.auditSources.length}) · view source audit ↗</a>:<span className="is-muted">No verified source attached to this outcome.</span>}</div></div>)}
       </section>
 
       <section className="evid-snapshot-cta"><div><p className="evid-snapshot-section-kicker">GO DEEPER WITH EVIDSTACK</p><h2>Compare compounds, audit a stack, and follow source changes.</h2><p>The free snapshot is the starting point. Pro connects it to the full catalogue and the research workspace.</p></div><button className="evid-snapshot-button is-gold" onClick={onUpgrade}>Explore Pro at $9.99/month ↗</button></section>
@@ -2531,17 +2558,25 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   const efColor=(v)=>v>=4?C.green:v===3?C.blue:v===2?C.amber:C.red;
   const sourcedEffects=(supp.effects||[]).filter(e=>e.sources?.length>0).length;
   const sourceCount=new Set((supp.effects||[]).flatMap(e=>e.sources||[])).size;
+  const auditedEffects=(supp.effects||[]).filter(e=>e.auditSources?.length>0).length;
+  const auditReferenceCount=uniqueAuditSources(supp.effects||[]).length;
   const audit=supp.evidenceAudit;
   const trustConfidence=compoundConfidence(supp);
   const trustFreshness=studyFreshness(supp.effects||[],audit);
   const primaryEffect=[...(supp.effects||[])].sort((a,b)=>(Number(b.evidence||0)+Number(b.efficacy||0))-(Number(a.evidence||0)+Number(a.efficacy||0)))[0];
   const primaryHasReviewedSource=Boolean(primaryEffect?.sources?.length&&primaryEffect?.sourceStatus!=="auto-linked");
-  const researchConclusion=primaryHasReviewedSource?primaryEffect.summary:"No verified conclusion is recorded for the selected outcome yet. The catalogue note is still pending source review.";
+  const researchConclusion=primaryHasReviewedSource
+    ? primaryEffect.summary
+    : audit?.evidenceByGoal
+      ? `Audit summary: ${audit.evidenceByGoal}`
+      : "No verified conclusion is recorded for the selected outcome yet. The catalogue note is still pending source review.";
   const studiedPopulation=primaryEffect?.population||primaryEffect?.populationStudied||primaryEffect?.participants||"Not recorded in this entry";
   const studyDuration=primaryEffect?.duration||primaryEffect?.studyDuration||primaryEffect?.study_duration||"Not recorded in this entry";
   const observedResult=primaryEffect&&primaryHasReviewedSource?`${Math.abs(primaryEffect.efficacy||0)}/5 efficacy score in the recorded evidence summary (${primaryEffect.studies??primaryEffect.study_count??"study count not recorded"} studies).`:primaryEffect?"A catalogue score is recorded, but the selected outcome has no verified linked source yet.":"Not recorded in this entry";
   const researchLimits=sourcedEffects<((supp.effects||[]).length)||Number(primaryEffect?.evidence||0)<=2
-    ?"The evidence record is incomplete or limited. Treat this as an area of uncertainty and review the linked sources before acting."
+    ?auditedEffects
+      ?`Audit references are available for ${auditedEffects} of ${supp.effects.length} outcomes (${auditReferenceCount} unique references), but exact effect-to-source matches still need confirmation.`
+      :"The evidence record is incomplete or limited. Treat this as an area of uncertainty and review the linked sources before acting."
     :"The entry does not record a specific unresolved limitation beyond the usual differences between study populations and real-world use.";
   const feedbackReasons=[
     ["conclusion","The conclusion was unclear"],
@@ -2608,7 +2643,7 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
             </div>
           </div>
           <div style={{marginTop:14,padding:"10px 14px",background:`${C.blue}08`,borderLeft:`3px solid ${C.blue}`}}>
-            <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}><strong style={{color:C.ink}}>Evidence record:</strong> {sourcedEffects} of {supp.effects.length} effect summaries have linked references ({sourceCount} total). {sourcedEffects<supp.effects.length?"Some claims are still awaiting source review.":"Each listed effect has a linked reference."}</p>
+            <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}><strong style={{color:C.ink}}>Evidence record:</strong> {sourcedEffects} of {supp.effects.length} effect summaries have verified linked references ({sourceCount} total). {auditedEffects?`Audit references are available for ${auditedEffects} outcomes (${auditReferenceCount} unique references); exact effect-level links remain pending confirmation.` : sourcedEffects<supp.effects.length?"Some claims are still awaiting source review.":"Each listed effect has a linked reference."}</p>
           </div>
           <nav aria-label="Compound research tools" style={{marginTop:14,padding:"12px 14px",background:C.bg,border:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
             <span style={{fontSize:9,fontWeight:800,letterSpacing:".12em",color:C.gray,textTransform:"uppercase",marginRight:4}}>Continue the research</span>
@@ -2731,6 +2766,12 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
                             {src}
                           </a><a className="evid-source-report" href={reportSourceHref(supp,e,src)} onClick={ev=>ev.stopPropagation()}>Report incorrect source</a></span>
                         ))}
+                      </div>
+                    )}
+                    {!e.sources?.length&&e.auditSources?.length>0&&(
+                      <div className="evid-audit-reference-link">
+                        <span>Audit references available ({e.auditSources.length})</span>
+                        <a href={`#audit-${supp.id}`} onClick={ev=>ev.stopPropagation()}>View the source audit ↗</a>
                       </div>
                     )}
                   </div>
@@ -8410,4 +8451,5 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
+
 

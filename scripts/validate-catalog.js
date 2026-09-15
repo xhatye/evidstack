@@ -24,6 +24,8 @@ export function validateCatalog(supplements = SUPPLEMENTS, repairs = SCIENTIFIC_
   const ids = new Set();
   let effectCount = 0;
   let effectsWithoutSources = 0;
+  let effectsWithAuditReferences = 0;
+  let auditReferenceCount = 0;
 
   if (!Array.isArray(supplements) || supplements.length === 0) {
     errors.push('SUPPLEMENTS must be a non-empty array.');
@@ -66,11 +68,20 @@ export function validateCatalog(supplements = SUPPLEMENTS, repairs = SCIENTIFIC_
 
       if (!Array.isArray(effect?.sources) || effect.sources.length === 0) {
         effectsWithoutSources += 1;
-        return;
+      } else {
+        effect.sources.forEach((source) => {
+          if (!hasValidSource(source)) errors.push(`${location}: malformed source "${source}".`);
+        });
       }
-      effect.sources.forEach((source) => {
-        if (!hasValidSource(source)) errors.push(`${location}: malformed source "${source}".`);
-      });
+      if (Array.isArray(effect?.auditSources) && effect.auditSources.length > 0) {
+        effectsWithAuditReferences += 1;
+        auditReferenceCount += effect.auditSources.length;
+        effect.auditSources.forEach((source) => {
+          if (!source || typeof source !== 'object' || (!source.title && !source.doi && !source.pmid && !source.sourceUrl)) {
+            errors.push(`${location}: malformed audit reference.`);
+          }
+        });
+      }
     });
   }
 
@@ -93,12 +104,15 @@ export function validateCatalog(supplements = SUPPLEMENTS, repairs = SCIENTIFIC_
   }
 
   if (effectsWithoutSources > 0) {
-    warnings.push(`${effectsWithoutSources} of ${effectCount} effects have no attached source and remain marked for review.`);
+    const auditNote = effectsWithAuditReferences > 0
+      ? ` Audit references are available for ${effectsWithAuditReferences} outcomes (${auditReferenceCount} attached references) and remain separate until the exact effect match is confirmed.`
+      : '';
+    warnings.push(`${effectsWithoutSources} of ${effectCount} effects have no verified effect-level source and remain marked for review.${auditNote}`);
   }
   const needsReview = supplements.flatMap((item) => item.effects || []).filter((effect) => effect.sourceStatus === 'needs-review').length;
   if (needsReview > 0) warnings.push(`${needsReview} effects are explicitly marked needs-review.`);
 
-  return { errors, warnings, supplementCount: supplements.length, effectCount, effectsWithoutSources };
+  return { errors, warnings, supplementCount: supplements.length, effectCount, effectsWithoutSources, effectsWithAuditReferences, auditReferenceCount };
 }
 
 function run() {

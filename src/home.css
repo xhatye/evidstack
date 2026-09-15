@@ -850,3 +850,13 @@ body{background:#fff;color:#1a1a1a}
   .evid-homepage .evid-hero-actions{margin-bottom:14px}
   .evid-homepage .evid-hero-secondary-links{margin:0 auto 20px}
 }
+
+
+/* Switch to a hand pointer while hovering links and buttons. */
+@media (pointer:fine) and (hover:hover){
+  #root a:hover,
+  #root button:hover,
+  #root [role="button"]:hover{
+    cursor:url("/brand/evidstack-hand.svg") 19 7,pointer!important;
+  }
+}

@@ -9,6 +9,8 @@ test('catalog validation passes for the current scientific dataset', () => {
   assert.deepEqual(result.errors, []);
   assert.equal(result.supplementCount, SUPPLEMENTS.length);
   assert.ok(result.effectCount > 700);
+  assert.ok(result.effectsWithAuditReferences > 700);
+  assert.ok(result.auditReferenceCount > 1000);
   assert.ok(result.warnings.some((warning) => warning.includes('needs-review')));
 });
 

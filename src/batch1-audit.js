@@ -1,4 +1,4 @@
-// Generated from the Elicit Batch 1 export. These records are an editorial audit layer.
+// Generated from the Batch 1 audit export. These records are an editorial audit layer.
 // They do not replace the catalogue's linked evidence until each reference is verified.
 export const BATCH1_EVIDENCE_AUDITS = [
   {
@@ -3656,3 +3656,4 @@ export const BATCH1_EVIDENCE_AUDITS = [
 export const BATCH1_EVIDENCE_AUDIT_BY_ID = Object.fromEntries(
   BATCH1_EVIDENCE_AUDITS.map((audit) => [audit.catalogId, audit]),
 );
+

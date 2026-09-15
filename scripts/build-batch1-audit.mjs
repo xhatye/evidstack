@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = path.resolve(process.cwd());
-const rows = JSON.parse(fs.readFileSync(path.join(root, "batch1-elicit.json"), "utf8"));
+const rows = JSON.parse(fs.readFileSync(path.join(root, "batch1-audit.json"), "utf8"));
 
 const catalogIds = [
   "magnesium-bisglycinate", "creatine-monohydrate", "vitamine-d3-k2", "zinc-bisglycinate", "omega-3",
@@ -124,6 +124,7 @@ if (audits.length !== 50 || audits.some((audit) => !audit.catalogId)) {
   throw new Error(`Expected 50 mapped audit records, received ${audits.length}`);
 }
 
-const output = `// Generated from the Elicit Batch 1 export. These records are an editorial audit layer.\n// They do not replace the catalogue's linked evidence until each reference is verified.\nexport const BATCH1_EVIDENCE_AUDITS = ${JSON.stringify(audits, null, 2)};\n\nexport const BATCH1_EVIDENCE_AUDIT_BY_ID = Object.fromEntries(\n  BATCH1_EVIDENCE_AUDITS.map((audit) => [audit.catalogId, audit]),\n);\n`;
+const output = `// Generated from the Batch 1 audit export. These records are an editorial audit layer.\n// They do not replace the catalogue's linked evidence until each reference is verified.\nexport const BATCH1_EVIDENCE_AUDITS = ${JSON.stringify(audits, null, 2)};\n\nexport const BATCH1_EVIDENCE_AUDIT_BY_ID = Object.fromEntries(\n  BATCH1_EVIDENCE_AUDITS.map((audit) => [audit.catalogId, audit]),\n);\n`;
 fs.writeFileSync(path.join(root, "src", "batch1-audit.js"), output);
 console.log(`Wrote ${audits.length} records to src/batch1-audit.js`);
+

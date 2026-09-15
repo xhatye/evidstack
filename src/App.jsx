@@ -204,7 +204,7 @@ function navigate(page){
   window.history.pushState({},"",path);
 }
 import { SUPPLEMENTS, GOALS, TIERS } from "./data.js";
-import { PEPTIDE_COMPOUNDS } from "./peptide-catalog.js";
+import { PEPTIDE_COMPOUNDS, isPeptideCompound } from "./peptide-catalog.js";
 import { AuthProvider, useAuth } from "./AuthContext.jsx";
 import BodyAtlasPage from "./BodyAtlas.jsx";
 import { SEO_DOSAGE_IDS, PeptideCalculatorPage, PeptideInteractionCheckerPage, CompoundDosagePage, PeptideDosageGuidePage } from "./SeoPages.jsx";
@@ -337,9 +337,9 @@ const auditFreshness=(audit)=>{
   if(!audit)return null;
   if(audit.latestVerifiedPublicationYear)return {
     label:`Latest audit year: ${audit.latestVerifiedPublicationYear}`,
-    detail:"Year reported in the supplied Elicit export; editorial source confirmation is still required.",
+    detail:"Year reported in the supplied Batch 1 audit; editorial source confirmation is still required.",
   };
-  return {label:"Publication year needs review",detail:"The supplied Elicit export did not verify a publication year for this record."};
+  return {label:"Publication year needs review",detail:"The supplied Batch 1 audit did not verify a publication year for this record."};
 };
 const auditSourceHref=(source)=>{
   if(source?.pmid)return `https://pubmed.ncbi.nlm.nih.gov/${source.pmid}/`;
@@ -357,10 +357,10 @@ function EvidenceAuditPanel({supplement,isMob=false,compact=false}){
   const auditText=(value)=>value||"Not reported in the supplied audit.";
   return <section className="evid-audit-card" aria-labelledby={`audit-${supplement.id}`} style={{background:compact?C.bg:C.white,border:`1px solid ${C.border}`,padding:isMob?"18px 16px":"24px 28px",marginBottom:24}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap",marginBottom:16}}>
-      <div><p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>Batch 1 · Elicit audit</p><h2 id={`audit-${supplement.id}`} style={{fontSize:isMob?20:24,fontWeight:900,color:C.ink,letterSpacing:"-.03em",margin:0}}>What the supplied audit found.</h2></div>
+      <div><p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>Batch 1 · source audit</p><h2 id={`audit-${supplement.id}`} style={{fontSize:isMob?20:24,fontWeight:900,color:C.ink,letterSpacing:"-.03em",margin:0}}>What the supplied audit found.</h2></div>
       <span style={{fontSize:9,fontWeight:800,color:audit.editorialReviewRequired?C.amber:C.green,border:`1px solid ${audit.editorialReviewRequired?C.amber:C.green}55`,padding:"5px 9px",letterSpacing:".08em",textTransform:"uppercase"}}>{audit.editorialReviewRequired?"Editorial review required":"Audit reviewed"}</span>
     </div>
-    <p style={{fontSize:11,color:C.gray,lineHeight:1.65,margin:"0 0 16px"}}>Imported from the supplied Elicit export. It is an audit lead sheet, so unresolved fields remain visible until a human confirms the underlying publication.</p>
+    <p style={{fontSize:11,color:C.gray,lineHeight:1.65,margin:"0 0 16px"}}>Imported from the supplied audit export. It is an audit lead sheet, so unresolved fields remain visible until a human confirms the underlying publication.</p>
     <div style={{background:C.white,border:`1px solid ${C.border}`,padding:"12px 14px",marginBottom:16}}><p style={{fontSize:10,color:C.ink,lineHeight:1.55,margin:0}}><strong>Canonical name:</strong> {audit.canonicalName||supplement.name}</p>{audit.aliases&&<p style={{fontSize:10,color:C.gray,lineHeight:1.55,margin:"5px 0 0"}}><strong style={{color:C.ink}}>Alias and name notes:</strong> {audit.aliases}</p>}</div>
     <div style={{display:"grid",gridTemplateColumns:isMob?"1fr 1fr":"repeat(5,1fr)",gap:8,marginBottom:16}}>
       {[["Human studies",humanCount],["Total studies",totalCount],["Latest year",audit.latestVerifiedPublicationYear||"Needs review"],["Efficacy score",Number.isFinite(audit.efficacyScore)?`${audit.efficacyScore}/5`:"Not assessed"],["Quality score",Number.isFinite(audit.evidenceQualityScore)?`${audit.evidenceQualityScore}/5`:"Not assessed"]].map(([label,value])=><div key={label} style={{background:C.white,border:`1px solid ${C.border}`,padding:"11px 12px"}}><span style={{display:"block",fontSize:9,fontWeight:800,color:C.gray,letterSpacing:".08em",textTransform:"uppercase",marginBottom:4}}>{label}</span><strong style={{fontSize:14,color:C.ink}}>{value}</strong></div>)}
@@ -2612,7 +2612,7 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
           </div>
           <nav aria-label="Compound research tools" style={{marginTop:14,padding:"12px 14px",background:C.bg,border:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
             <span style={{fontSize:9,fontWeight:800,letterSpacing:".12em",color:C.gray,textTransform:"uppercase",marginRight:4}}>Continue the research</span>
-            <button onClick={()=>{window.history.pushState({},"","/tools/peptide-interaction-checker");window.dispatchEvent(new PopStateEvent("popstate"));}} style={{padding:"7px 10px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:10,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Check interactions ↗</button>
+            <button onClick={()=>{window.history.pushState({},"",isPeptideCompound(supp)?"/tools/peptide-interaction-checker":"/interaction-checker");window.dispatchEvent(new PopStateEvent("popstate"));}} style={{padding:"7px 10px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:10,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Check interactions ↗</button>
             <button onClick={()=>{window.history.pushState({},"","/tools/peptide-calculator");window.dispatchEvent(new PopStateEvent("popstate"));}} style={{padding:"7px 10px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:10,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Peptide calculator ↗</button>
           </nav>
           <section className="evid-trust-card" aria-labelledby="trust-signals-title">
@@ -5221,7 +5221,7 @@ function AppInner(){
           <p className="evid-hero-support">390+ compounds across peptides, SARMs, GLP-1s, anabolics, nootropics, skin and aesthetics. Start with one evidence question, then connect the full research loop in Pro.</p>
           <div className="evid-hero-actions"><button className="evid-hero-primary-cta" onClick={()=>{trackEvent("search_started",{source:"hero_cta"});document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Browse compounds <span aria-hidden="true">↓</span></button><button className="evid-hero-pro-cta" onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
           <p className="evid-hero-access">Start with one question. Keep the answer connected.</p>
-          <div className="evid-hero-secondary-links"><span>Free evidence snapshot</span><button className="evid-snapshot-home-link" onClick={openFreeSnapshot}>Try it free <span aria-hidden="true">↗</span></button><span aria-hidden="true">·</span><span>Need the full catalogue?</span><button onClick={openUpgrade}>See Pro <span aria-hidden="true">↗</span></button></div>
+          <div className="evid-hero-secondary-links"><span>Free evidence snapshot</span><button className="evid-snapshot-home-link" onClick={openFreeSnapshot}>Try it free <span aria-hidden="true">↗</span></button><span aria-hidden="true">·</span><span>Need the full catalogue?</span><button className="evid-hero-see-pro-link" onClick={openUpgrade}>See Pro <span aria-hidden="true">↗</span></button></div>
           <div ref={searchContainerRef} className={`evid-hero-search${searchFocused||search?" is-expanded":""}`}>
             <div className="evid-hero-search-row">
               <span className="evid-hero-search-icon" aria-hidden="true"/>
@@ -6544,6 +6544,8 @@ function InteractionCheckerPro({onUpgrade}){
   const [err,setErr]=useState("");
   const [phase,setPhase]=useState("idle");
   const [revealIdx,setRevealIdx]=useState(0);
+  const [showSuggestions,setShowSuggestions]=useState(false);
+  const allOptions=useMemo(()=>[...SUPPLEMENTS].sort((a,b)=>a.name.localeCompare(b.name)),[]);
 
   useEffect(()=>{
     if(phase!=="revealing"||!result?.interactions)return;
@@ -6552,12 +6554,24 @@ function InteractionCheckerPro({onUpgrade}){
     return()=>clearTimeout(t);
   },[phase,revealIdx,result]);
 
-  const addCompound=()=>{
-    const v=input.trim();
-    if(!v||compounds.includes(v))return;
-    setCompounds(c=>[...c,v]);
+  const matchingOptions=useMemo(()=>{
+    const q=input.trim().toLowerCase();
+    if(!q)return [];
+    return allOptions.filter(s=>s.name.toLowerCase().includes(q)||(s.aliases||[]).some(a=>String(a).toLowerCase().includes(q))).slice(0,8);
+  },[allOptions,input]);
+  const addCompound=(value=input)=>{
+    const query=String(value||"").trim().toLowerCase();
+    if(!query)return;
+    const match=allOptions.find(s=>s.name.toLowerCase()===query)||(matchingOptions.length===1?matchingOptions[0]:null);
+    if(!match){setErr("Choose a compound from the catalogue suggestions.");setShowSuggestions(true);return;}
+    if(compounds.includes(match.name)){setInput("");setShowSuggestions(false);return;}
+    if(compounds.length>=8){setErr("You can compare up to 8 compounds at a time.");return;}
+    setCompounds(c=>[...c,match.name]);
     setInput("");
+    setShowSuggestions(false);
+    setErr("");
   };
+  const chooseCompound=(name)=>addCompound(name);
 
   const removeCompound=(c)=>setCompounds(cs=>cs.filter(x=>x!==c));
 
@@ -6565,7 +6579,7 @@ function InteractionCheckerPro({onUpgrade}){
     if(compounds.length<2){setErr("Add at least 2 compounds.");return;}
     setLoading(true);setErr("");setResult(null);setRevealIdx(0);setPhase("scanning");
     try{
-      const res=await authenticatedFetch("/api/interaction-checker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds})});
+      const res=await authenticatedFetch("/api/interaction-checker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({compounds,userProfile:userProfile||null})});
       const data=await res.json();
       if(data.error){setErr(data.error);setPhase("idle");return;}
       setResult(data);setPhase("revealing");
@@ -6589,7 +6603,7 @@ function InteractionCheckerPro({onUpgrade}){
   };
 
   if(!isPro)return(
-    <div className="evid-legacy-pro-page" style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+    <div className="evid-legacy-pro-page evid-general-checker-page" style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
       <div style={{maxWidth:720,margin:"0 auto",padding:isMob?"60px 16px":"80px 32px",textAlign:"center"}}>
         <span style={{fontSize:52,display:"block",marginBottom:20}}>⚗️</span>
         <h2 style={{fontSize:isMob?24:36,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 12px"}}>Interaction Checker</h2>
@@ -6633,7 +6647,7 @@ function InteractionCheckerPro({onUpgrade}){
   );
 
   return(
-    <div className="evid-legacy-pro-page" style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
+    <div className="evid-legacy-pro-page evid-general-checker-page" style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif"}}>
       <style>{`
         @keyframes icFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
         @keyframes icScan{0%{width:0%}100%{width:100%}}
@@ -6646,7 +6660,7 @@ function InteractionCheckerPro({onUpgrade}){
             <span style={{marginLeft:"auto",fontSize:10,fontWeight:800,color:"rgba(0,0,0,.5)",background:"rgba(0,0,0,.08)",padding:"3px 8px",letterSpacing:".08em",borderRadius:2}}>PRO</span>
           </div>
         </div>
-      <div style={{maxWidth:800,margin:"0 auto",padding:isMob?"32px 16px 80px":"56px 32px 100px"}}>
+        <div className="evid-interaction-shell" style={{maxWidth:800,margin:"0 auto",padding:isMob?"32px 16px 80px":"56px 32px 100px"}}>
         <h1 style={{fontSize:isMob?28:40,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 8px"}}>Interaction Checker</h1>
         <p style={{fontSize:14,color:C.gray,margin:"0 0 28px",lineHeight:1.6}}>Add your compounds and review two separate questions for every pair: how strong is the evidence that an interaction exists, and how serious could it be clinically?</p>
 
@@ -6655,18 +6669,22 @@ function InteractionCheckerPro({onUpgrade}){
           <span style={{fontSize:11,color:C.gray}}>{savedStackNames.length} compound{savedStackNames.length===1?"":"s"} saved in My Stack</span>
           <button onClick={loadSavedStack} style={{padding:"7px 12px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Use My Stack</button>
         </div>}
-        <div style={{display:"flex",gap:0,border:`2px solid ${C.ink}`,background:C.white,marginBottom:12}}>
-          <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")addCompound();}}
-            placeholder="Type a compound name and press Enter..."
-            style={{flex:1,padding:"14px 16px",border:"none",fontSize:14,fontFamily:"Montserrat,sans-serif",outline:"none",background:"transparent",color:C.ink}}/>
-          <button onClick={addCompound} style={{padding:"0 20px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Add</button>
+        <div className="evid-interaction-picker-row">
+          <div className="evid-interaction-picker">
+            <input value={input} onChange={e=>{setInput(e.target.value);setShowSuggestions(Boolean(e.target.value.trim()));setErr("");}} onFocus={()=>setShowSuggestions(Boolean(input.trim()))} onBlur={()=>window.setTimeout(()=>setShowSuggestions(false),150)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();addCompound();}if(e.key==="Escape")setShowSuggestions(false);}}
+              placeholder="Search the full compound catalogue..."
+              aria-label="Search compounds"
+              style={{flex:1,padding:"14px 16px",border:"none",fontSize:14,fontFamily:"Montserrat,sans-serif",outline:"none",background:"transparent",color:C.ink,width:"100%"}}/>
+            {showSuggestions&&matchingOptions.length>0&&<div className="evid-interaction-suggestions" role="listbox">{matchingOptions.map(option=><button type="button" key={option.id} className="evid-interaction-suggestion" onMouseDown={e=>e.preventDefault()} onClick={()=>chooseCompound(option.name)}><span>{option.name}</span><small>{option.aliases?.slice(0,2).join(" · ")||"Catalogue compound"}</small></button>)}</div>}
+          </div>
+          <button onClick={()=>addCompound()} style={{padding:"0 20px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif",letterSpacing:".04em",flexShrink:0}}>Add</button>
         </div>
 
         {/* Compound chips */}
         {compounds.length>0&&(
           <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:20}}>
             {compounds.map(c=>(
-              <div key={c} style={{display:"flex",alignItems:"center",gap:6,padding:"6px 12px",background:C.ink,color:C.white,fontSize:12,fontWeight:700}}>
+              <div key={c} className="evid-compound-chip" style={{display:"flex",alignItems:"center",gap:6,padding:"6px 12px",background:C.ink,color:C.white,fontSize:12,fontWeight:700}}>
                 {c}
                 <button onClick={()=>removeCompound(c)} style={{background:"none",border:"none",color:"#9ca3af",cursor:"pointer",fontSize:14,padding:0,lineHeight:1}}>x</button>
               </div>
@@ -8392,4 +8410,5 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
+
 

@@ -14,7 +14,7 @@
 .evid-source-kicker{font-size:10px;font-weight:800;letter-spacing:.18em;color:#75632d;margin:0 0 14px}
 .evid-source-proof h2{font-size:clamp(34px,5vw,64px);line-height:1;letter-spacing:-.065em;margin:0;font-weight:900}
 .evid-source-intro{max-width:430px;margin:0;color:#6b7280;font-size:14px;line-height:1.8}
-.evid-source-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #c9c4b9;border-left:1px solid #c9c4b9}
+.evid-source-grid{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid #c9c4b9;border-left:1px solid #c9c4b9}
 .evid-source-card{min-height:220px;padding:24px;border-right:1px solid #c9c4b9;border-bottom:1px solid #c9c4b9;text-decoration:none;color:#1a1a1a;display:flex;flex-direction:column;transition:background .2s,color .2s}
 .evid-source-card:hover,.evid-source-card:focus-visible{background:#1a1a1a;color:#f4f2ee}
 .evid-source-card:focus-visible{outline:2px solid #e2c97e;outline-offset:-4px}
@@ -116,6 +116,32 @@ body{background:#fff;color:#1a1a1a}
 .evid-pro-page .evid-pro-tool-page a{border-radius:12px}
 
 .evid-workspace{max-width:1180px;margin:0 auto;padding:48px 24px 96px;color:#1a1a1a}
+.evid-activation-checklist{margin:18px 0 28px;padding:26px 28px;border:1px solid #b9d6c0;border-radius:24px;background:linear-gradient(135deg,#f0f7f2 0%,#fff 72%);box-shadow:0 10px 24px rgba(49,87,71,.07)}
+.evid-activation-checklist-head{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;margin-bottom:20px}
+.evid-activation-checklist-head>div:first-child{max-width:610px}
+.evid-activation-checklist-head h2{margin:0 0 9px;color:#1a1a1a;font-size:clamp(25px,3.5vw,39px);line-height:1;letter-spacing:-.06em;font-weight:900}
+.evid-activation-checklist-head p:last-child{margin:0;color:#596273;font-size:12px;line-height:1.7}
+.evid-activation-progress{min-width:150px;padding:13px 15px;border:1px solid #b9d6c0;border-radius:16px;background:rgba(255,255,255,.76)}
+.evid-activation-progress strong{display:block;color:#315747;font-size:24px;line-height:1;font-weight:900;letter-spacing:-.05em}
+.evid-activation-progress span{display:block;margin-top:5px;color:#6b7280;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.evid-activation-progress i{display:block;height:5px;margin-top:11px;overflow:hidden;border-radius:999px;background:#dfe9e2}
+.evid-activation-progress i b{display:block;height:100%;border-radius:inherit;background:#315747;transition:width .35s ease}
+.evid-activation-checklist-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.evid-activation-step{display:flex;min-height:156px;flex-direction:column;align-items:flex-start;padding:16px;border:1px solid #d4d0c8;border-radius:17px;background:#fff;color:#1a1a1a;text-align:left;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s}
+.evid-activation-step:hover{transform:translateY(-3px);border-color:#8eb59a;box-shadow:0 10px 22px rgba(49,87,71,.1)}
+.evid-activation-step-number{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#f4f2ee;color:#a47b22;font-size:10px;font-weight:900}
+.evid-activation-step-copy{display:block;margin-top:16px}
+.evid-activation-step-copy b{display:block;font-size:12px;line-height:1.25;font-weight:900}
+.evid-activation-step-copy small{display:block;margin-top:6px;color:#6b7280;font-size:10px;line-height:1.5}
+.evid-activation-step em{display:block;margin-top:auto;padding-top:13px;color:#315747;font-size:9px;font-style:normal;font-weight:900}
+.evid-activation-step.is-done{border-color:#b9d6c0;background:#f8fcf9}
+.evid-activation-step.is-done .evid-activation-step-number{background:#315747;color:#fff}
+.evid-activation-step.is-done em{color:#315747}
+.evid-activation-step.is-pro{border-color:#e2c97e;background:linear-gradient(145deg,#fff,#fffaf0)}
+.evid-activation-step.is-pro .evid-activation-step-number{background:#e2c97e;color:#1a1a1a}
+.evid-activation-step.is-pro em{color:#8d6e21}
+.evid-activation-dismiss{display:block;margin:16px auto 0;padding:3px 8px;border:0;background:transparent;color:#7c8491;font:700 10px Montserrat,sans-serif;cursor:pointer}
+.evid-activation-dismiss:hover{color:#315747}
 .evid-workspace-hero{position:relative;display:flex;align-items:center;justify-content:space-between;gap:44px;min-height:330px;padding:clamp(30px,5vw,58px);overflow:hidden;border-radius:30px;background:linear-gradient(135deg,#191a16 0%,#2c2a21 66%,#52462a 100%);color:#f8f7f2;box-shadow:0 24px 60px rgba(30,41,59,.16)}
 .evid-workspace-hero:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 83% 18%,rgba(226,201,126,.36),transparent 28%),radial-gradient(circle at 20% 100%,rgba(226,201,126,.12),transparent 38%)}
 .evid-workspace-hero-copy{position:relative;z-index:1;max-width:640px}
@@ -145,7 +171,7 @@ body{background:#fff;color:#1a1a1a}
 .evid-workspace-stack-preview{padding-top:4px}.evid-workspace-stack-list{display:grid;gap:8px}.evid-workspace-stack-list>div{display:flex;align-items:center;gap:12px;padding:13px 15px;border:1px solid #d4d0c8;border-radius:14px;background:#fff}.evid-workspace-stack-list span{color:#a47b22;font-size:10px;font-weight:900}.evid-workspace-stack-list b{flex:1;font-size:12px;font-weight:800}.evid-workspace-stack-list em{font-style:normal;color:#6b7280;font-size:10px;font-weight:800}.evid-workspace-stack-list .evid-workspace-stack-more{justify-content:center;color:#6b7280;font-size:11px;background:#f4f2ee}
 .evid-workspace-upgrade{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:58px;padding:30px 32px;border-radius:22px;background:#1a1a1a;color:#fff;box-shadow:0 16px 38px rgba(30,41,59,.12)}.evid-workspace-upgrade .evid-workspace-section-kicker{color:#e2c97e}.evid-workspace-upgrade h2{font-size:clamp(25px,3vw,38px);margin-bottom:8px}.evid-workspace-upgrade p:last-child{max-width:600px;margin:0;color:#c4c3ba;font-size:13px;line-height:1.8}.evid-workspace-disclaimer{margin:34px 0 0;text-align:center;color:#9ca3af;font-size:10px;line-height:1.6}
 @media(max-width:900px){.evid-workspace-hero{align-items:flex-start}.evid-workspace-orbit{width:180px;height:180px}.evid-workspace-tool-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:767px){.evid-workspace{padding:24px 14px 70px}.evid-workspace-hero{display:block;min-height:0;padding:30px 24px;border-radius:24px}.evid-workspace-hero h1{font-size:clamp(39px,12vw,58px)}.evid-workspace-lede{font-size:13px;line-height:1.75}.evid-workspace-orbit{width:150px;height:150px;margin:30px auto 0}.evid-workspace-stats{gap:8px;margin:12px 0 40px}.evid-workspace-stat{display:block;padding:14px 12px}.evid-workspace-stat strong{display:block;font-size:23px;margin-bottom:5px}.evid-workspace-stat span{display:block;font-size:9px}.evid-workspace-start,.evid-workspace-stack-preview{display:block;padding-bottom:40px}.evid-workspace-steps{margin-top:24px}.evid-workspace-toolkit{padding:40px 0}.evid-workspace-toolkit-heading{display:block;margin-bottom:20px}.evid-workspace-toolkit-heading>p{margin-top:14px;font-size:12px}.evid-workspace-tool-grid{grid-template-columns:1fr}.evid-workspace-tool{min-height:200px}.evid-workspace-upgrade{display:block;margin-top:40px;padding:24px 20px;border-radius:20px}.evid-workspace-upgrade button{margin-top:20px;width:100%;justify-content:center}.evid-workspace-stack-preview>div+div{margin-top:22px}}
+@media(max-width:767px){.evid-workspace{padding:24px 14px 70px}.evid-workspace-hero{display:block;min-height:0;padding:30px 24px;border-radius:24px}.evid-workspace-hero h1{font-size:clamp(39px,12vw,58px)}.evid-workspace-lede{font-size:13px;line-height:1.75}.evid-workspace-orbit{width:150px;height:150px;margin:30px auto 0}.evid-activation-checklist{margin:14px 0 22px;padding:21px 17px;border-radius:20px}.evid-activation-checklist-head{display:block;margin-bottom:17px}.evid-activation-checklist-head h2{font-size:29px}.evid-activation-checklist-head p:last-child{font-size:11px}.evid-activation-progress{margin-top:16px}.evid-activation-checklist-grid{grid-template-columns:1fr 1fr;gap:8px}.evid-activation-step{min-height:165px;padding:13px}.evid-activation-step-copy b{font-size:11px}.evid-activation-step-copy small{font-size:9px}.evid-workspace-stats{gap:8px;margin:12px 0 40px}.evid-workspace-stat{display:block;padding:14px 12px}.evid-workspace-stat strong{display:block;font-size:23px;margin-bottom:5px}.evid-workspace-stat span{display:block;font-size:9px}.evid-workspace-start,.evid-workspace-stack-preview{display:block;padding-bottom:40px}.evid-workspace-steps{margin-top:24px}.evid-workspace-toolkit{padding:40px 0}.evid-workspace-toolkit-heading{display:block;margin-bottom:20px}.evid-workspace-toolkit-heading>p{margin-top:14px;font-size:12px}.evid-workspace-tool-grid{grid-template-columns:1fr}.evid-workspace-tool{min-height:200px}.evid-workspace-upgrade{display:block;margin-top:40px;padding:24px 20px;border-radius:20px}.evid-workspace-upgrade button{margin-top:20px;width:100%;justify-content:center}.evid-workspace-stack-preview>div+div{margin-top:22px}}
 @media(prefers-reduced-motion:reduce){.evid-workspace-orbit i{animation:none}.evid-workspace-primary,.evid-workspace-upgrade button,.evid-workspace-steps button,.evid-workspace-tool{transition:none}}
 
 /* Free previews let visitors understand each Pro workflow before the paywall. */
@@ -273,6 +299,14 @@ body{background:#fff;color:#1a1a1a}
 }
 @media(prefers-reduced-motion:reduce){.evid-source-mark{transition:none}}
 
+/* Archéo-futurist still life: marble figures, columns and research vessels
+   frame the hero while the open center keeps the message readable. */
+.evid-homepage .evid-home-hero{isolation:isolate}
+.evid-homepage .evid-hero-art{z-index:0;inset:0;background:none!important;opacity:.74}
+.evid-homepage .evid-hero-art img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.9}
+.evid-homepage .evid-hero-art:before,.evid-homepage .evid-hero-art:after{display:none}
+@media(max-width:767px){.evid-homepage .evid-hero-art{opacity:.6}.evid-homepage .evid-hero-art img{width:150%;max-width:none;transform:translateX(-16%);object-position:center top}}
+
 .evid-source-proof-footer{align-items:baseline}
 .evid-source-proof-footer>span,.evid-source-proof-footer>.evid-source-demo-link{align-self:baseline}
 
@@ -283,8 +317,15 @@ body{background:#fff;color:#1a1a1a}
 .evid-guides-page>div:first-child p{color:#d7ddd7!important}
 .evid-guides-page>div:nth-child(2){padding-top:30px!important}
 .evid-guides-page .evid-guide-card,.evid-guides-page .evid-guide-goal-card{border-radius:20px!important;box-shadow:0 10px 24px rgba(30,41,59,.045);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important}
+.evid-guides-page .evid-guide-card-art-wrap{height:132px;margin:-20px -24px 18px;overflow:hidden;background:linear-gradient(135deg,#eff5f0,#f8f4ea);border-bottom:1px solid #e4e0d7}
+.evid-guides-page .evid-guide-card-art{display:block;width:100%;height:100%;object-fit:cover;object-position:center 42%;mix-blend-mode:multiply;opacity:.9;transition:transform .35s ease,opacity .2s ease}
+.evid-guides-page .evid-guide-card:hover .evid-guide-card-art{transform:scale(1.04);opacity:1}
 .evid-guides-page .evid-guide-card:hover,.evid-guides-page .evid-guide-goal-card:hover{transform:translateY(-3px);box-shadow:0 16px 30px rgba(30,41,59,.09)!important;border-color:#9bb6a2!important}
 .evid-guides-page .evid-guide-card>div:first-child>span:first-child,.evid-guides-page .evid-guide-goal-card>div:first-child{display:grid;place-items:center;width:32px;height:32px;border-radius:11px;background:#f0f7f2;color:#315747;font-size:16px!important;filter:none!important}
+.evid-guides-page .evid-guide-icon,.evid-guides-page .evid-guide-goal-icon{display:grid;place-items:center;box-sizing:border-box;border-radius:11px;background:#f0f7f2;color:#315747;object-fit:contain}
+.evid-guides-page .evid-guide-icon{width:32px;height:32px;padding:7px;flex:none}
+.evid-guides-page .evid-guide-icon.is-locked{filter:grayscale(1)}
+.evid-guides-page .evid-guide-goal-icon{width:32px;height:32px;margin-bottom:6px;padding:6px}
 .evid-guides-page .evid-guide-card>div:first-child>span:nth-child(2){letter-spacing:-.035em}
 .evid-guides-page .evid-guides-upgrade{border-radius:20px!important;background:linear-gradient(145deg,#fff,#f3f8f4)!important;box-shadow:0 10px 24px rgba(30,41,59,.05)}
 .evid-guides-page button{border-radius:999px!important}
@@ -292,8 +333,17 @@ body{background:#fff;color:#1a1a1a}
 @media(max-width:767px){
   .evid-guides-page>div:first-child{margin:0 8px 14px;border-radius:0 0 20px 20px!important}
   .evid-guides-page>div:nth-child(2){padding-top:22px!important}
+  .evid-guides-page .evid-guide-card-art-wrap{height:118px;margin:-20px -24px 16px}
 }
 @media(prefers-reduced-motion:reduce){.evid-guides-page .evid-guide-card,.evid-guides-page .evid-guide-goal-card{transition:none!important}.evid-guides-page .evid-guide-card:hover,.evid-guides-page .evid-guide-goal-card:hover{transform:none}}
+
+/* Generated editorial still lifes add visual anchors without competing with the copy. */
+.evid-tool-preview-art{display:block;width:calc(100% + 48px);height:164px;object-fit:cover;object-position:center 54%;margin:0 -24px 22px;border-radius:16px;background:#20261f;mix-blend-mode:normal;opacity:.96}
+.evid-tool-preview-modal .evid-tool-preview-art + .evid-tool-preview-eyebrow{margin-top:0}
+@media(max-width:767px){.evid-tool-preview-art{width:calc(100% + 32px);height:132px;margin-left:-16px;margin-right:-16px;border-radius:13px}}
+.evid-pro-page-art{display:block;width:min(100%,520px);height:156px;object-fit:cover;object-position:center 52%;margin:0 auto 26px;border-radius:20px;background:#222a24;box-shadow:0 18px 38px rgba(30,41,59,.13);opacity:.96}
+.evid-report-guest .evid-pro-page-art{width:min(100%,560px);height:190px;margin-bottom:28px}
+@media(max-width:767px){.evid-answer-art{height:132px;margin-bottom:22px;border-radius:14px}.evid-pro-page-art,.evid-report-guest .evid-pro-page-art{height:132px;border-radius:16px;margin-bottom:22px}}
 
 /* Keep the pilot invitation available without competing with the main actions. */
 .evid-hero-secondary-links{display:flex;align-items:center;justify-content:center;gap:10px;margin:-5px auto 24px;color:#7a7d79;font-size:10px;line-height:1.5}
@@ -304,7 +354,7 @@ body{background:#fff;color:#1a1a1a}
 .evid-goal-bar>div::-webkit-scrollbar-track{background:transparent;border-radius:999px}
 .evid-goal-bar>div::-webkit-scrollbar-thumb{background:#b8b7ae;border-radius:999px}
 .evid-goal-bar>div::-webkit-scrollbar-thumb:hover{background:#315747}
-.evid-goal-mark{display:inline-grid;place-items:center;width:19px;height:19px;margin-right:5px;border:1px solid currentColor;border-radius:50%;font-size:10px;font-weight:900;line-height:1;vertical-align:-5px;opacity:.9}
+.evid-goal-mark{display:inline-grid;place-items:center;width:19px;height:19px;margin-right:5px;padding:3px;box-sizing:border-box;border:1px solid currentColor;border-radius:50%;font-size:10px;font-weight:900;line-height:1;vertical-align:-5px;object-fit:contain;opacity:.9}
 .evid-catalog-filter-row{padding:8px 10px;border:1px solid #d4d0c8;border-radius:18px;background:rgba(255,255,255,.76);box-shadow:0 6px 18px rgba(30,41,59,.035)}
 .evid-catalog-filter-row button{transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease}
 .evid-catalog-filter-row button:hover{transform:translateY(-1px)}
@@ -322,6 +372,7 @@ body{background:#fff;color:#1a1a1a}
 .evid-answer-pro-badge{margin-left:auto;padding:5px 9px;border:1px solid rgba(226,201,126,.5);border-radius:999px;color:#e2c97e;font-size:9px;font-weight:900;letter-spacing:.12em}
 .evid-answer-kicker{margin:0 0 10px;color:#a47b22;font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
 .evid-answer-paywall{padding:clamp(28px,5vw,58px);border-radius:28px;background:linear-gradient(135deg,#171916 0%,#2b3028 65%,#315747 100%);color:#fff;box-shadow:0 24px 60px rgba(30,41,59,.16);overflow:hidden;position:relative}
+.evid-answer-art{display:block;width:100%;height:176px;object-fit:cover;object-position:center 54%;margin:0 0 28px;border-radius:18px;opacity:.9;mix-blend-mode:screen;box-shadow:0 12px 28px rgba(0,0,0,.18)}
 .evid-answer-paywall:after{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-110px;border:1px solid rgba(226,201,126,.3);border-radius:50%;box-shadow:0 0 0 24px rgba(226,201,126,.04),0 0 0 48px rgba(226,201,126,.03);pointer-events:none}
 .evid-answer-mark{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;background:#e2c97e;color:#171916;font-size:24px;margin-bottom:22px;box-shadow:0 12px 24px rgba(226,201,126,.2)}
 .evid-answer-paywall .evid-answer-kicker{color:#e2c97e}
@@ -343,12 +394,54 @@ body{background:#fff;color:#1a1a1a}
 .evid-answer-input-card{padding:22px;border:1px solid #d4d0c8;border-radius:20px;background:#fff;box-shadow:0 10px 28px rgba(30,41,59,.04);margin-bottom:24px}.evid-answer-input-card label{display:block;margin-bottom:10px;color:#6b7280;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.evid-answer-input-row{display:flex;align-items:stretch;border:2px solid #1a1a1a;border-radius:14px;overflow:hidden}.evid-answer-input-row textarea{flex:1;min-height:70px;padding:15px 16px;border:0;outline:0;resize:vertical;color:#1a1a1a;background:#fff;font:500 14px/1.6 Montserrat,sans-serif}.evid-answer-input-row button{display:inline-flex;align-items:center;gap:12px;padding:0 23px;border:0;background:#1a1a1a;color:#fff;font:900 12px Montserrat,sans-serif;cursor:pointer}.evid-answer-input-row button:disabled{cursor:default;opacity:.45}.evid-answer-suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.evid-answer-suggestions button{padding:8px 11px;border:1px solid #d4d0c8;border-radius:999px;background:#f8f7f3;color:#6b7280;font:600 10px Montserrat,sans-serif;cursor:pointer;transition:background .2s,color .2s,border-color .2s}.evid-answer-suggestions button:hover{border-color:#315747;background:#f0f7f2;color:#315747}
 .evid-answer-scanning{display:flex;align-items:center;gap:12px;padding:18px 20px;border-radius:16px;background:#1a1a1a;color:#fff;margin-bottom:22px}.evid-answer-scan-dot{width:9px;height:9px;border-radius:50%;background:#e2c97e;box-shadow:0 0 0 7px rgba(226,201,126,.12);animation:evidAnswerPulse 1.2s ease-in-out infinite}.evid-answer-scanning b{display:block;font-size:12px}.evid-answer-scanning small{display:block;margin-top:5px;color:#a9aaa2;font-size:11px}.evid-answer-error{padding:12px 15px;border-radius:12px;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;font-size:12px;font-weight:700}.evid-answer-clarify{padding:22px;border:1px solid #d4d0c8;border-radius:18px;background:#fff;margin-bottom:24px}.evid-answer-clarify h2{margin:0 0 8px;font-size:20px;letter-spacing:-.04em}.evid-answer-clarify p:last-child{margin:0;color:#6b7280;font-size:12px}
 .evid-answer-verdict{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin:34px 0 16px;padding:24px;border-radius:20px;background:#f0f7f2;border:1px solid #b9d6c0}.evid-answer-verdict h2{max-width:670px;margin:0 0 9px;font-size:clamp(22px,3vw,34px);line-height:1.08;letter-spacing:-.05em}.evid-answer-verdict p:last-child{margin:0;color:#5b6b61;font-size:12px;line-height:1.6}.evid-answer-verdict-badge{padding:8px 10px;border-radius:12px;background:#315747;color:#fff;font-size:9px;font-weight:900;line-height:1.35;letter-spacing:.12em;text-align:center;flex-shrink:0}
-.evid-answer-compound{margin-bottom:14px;border:1px solid #d4d0c8;border-radius:20px;background:#fff;box-shadow:0 10px 28px rgba(30,41,59,.04);overflow:hidden}.evid-answer-compound-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 24px 14px;border-bottom:1px solid #e8e5df}.evid-answer-tier{display:inline-flex;padding:4px 8px;border-radius:999px;background:#315747;color:#fff;font-size:9px;font-weight:900;letter-spacing:.08em}.evid-answer-compound h3{display:inline-block;margin:0 0 8px 10px;font-size:19px;letter-spacing:-.04em}.evid-answer-compound-head p{max-width:700px;margin:0;color:#6b7280;font-size:12px;line-height:1.7}.evid-answer-score{min-width:62px;text-align:center}.evid-answer-score b{display:block;color:#315747;font-size:30px;line-height:1;font-weight:900}.evid-answer-score span{display:block;margin-top:4px;color:#6b7280;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.evid-answer-score-bars{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:14px 24px;border-bottom:1px solid #e8e5df}.evid-answer-score-bars>div>span{display:block;margin-bottom:5px;color:#6b7280;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.evid-answer-score-bars i{display:block;height:5px;border-radius:999px;background:#ecebe6;overflow:hidden}.evid-answer-score-bars em{display:block;height:100%;border-radius:inherit;background:#315747;transition:width .5s ease}.evid-answer-detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0}.evid-answer-detail-grid>div{min-height:102px;padding:15px 20px;border-bottom:1px solid #e8e5df}.evid-answer-detail-grid>div:nth-child(odd){border-right:1px solid #e8e5df}.evid-answer-detail-grid b{display:block;margin-bottom:6px;color:#6b7280;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.evid-answer-detail-grid p{margin:0;color:#1a1a1a;font-size:12px;line-height:1.6}.evid-answer-compound-foot{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 20px;background:#fafaf8}.evid-answer-references{display:flex;flex-wrap:wrap;align-items:center;gap:7px}.evid-answer-references b{margin-right:4px;color:#6b7280;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.evid-answer-references a,.evid-answer-references span{padding:4px 7px;border-radius:999px;background:#fff;border:1px solid #d4d0c8;color:#2563eb;font-size:10px;font-weight:700;text-decoration:none}.evid-answer-references span{color:#6b7280}.evid-answer-compound-foot>button{padding:8px 0;border:0;background:transparent;color:#315747;font:800 10px Montserrat,sans-serif;cursor:pointer;white-space:nowrap}.evid-answer-empty{padding:30px;border-radius:18px;background:#fff;border:1px solid #d4d0c8;text-align:center}.evid-answer-empty h2{margin:0 0 8px;font-size:22px;letter-spacing:-.04em}.evid-answer-empty p{margin:0;color:#6b7280;font-size:12px}.evid-answer-next{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:36px;padding:24px 26px;border-radius:20px;background:#1a1a1a;color:#fff}.evid-answer-next .evid-answer-kicker{color:#e2c97e}.evid-answer-next h2{margin:0 0 7px;font-size:26px;letter-spacing:-.05em}.evid-answer-next p:last-child{max-width:570px;margin:0;color:#c4c3ba;font-size:12px;line-height:1.7}.evid-answer-next>div:last-child{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.evid-answer-next button{padding:11px 14px;border-radius:999px;border:1px solid rgba(226,201,126,.5);background:#e2c97e;color:#171916;font:900 10px Montserrat,sans-serif;cursor:pointer;white-space:nowrap}.evid-answer-next button+button{background:transparent;color:#e2c97e}.evid-answer-disclaimer{margin:22px 0 0;color:#9ca3af;font-size:10px;line-height:1.6;text-align:center}
+.evid-answer-compound{margin-bottom:14px;border:1px solid #d4d0c8;border-radius:20px;background:#fff;box-shadow:0 10px 28px rgba(30,41,59,.04);overflow:hidden}.evid-answer-compound-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 24px 14px;border-bottom:1px solid #e8e5df}.evid-answer-tier{display:inline-flex;padding:4px 8px;border-radius:999px;background:#315747;color:#fff;font-size:9px;font-weight:900;letter-spacing:.08em}.evid-answer-compound h3{display:inline-block;margin:0 0 8px 10px;font-size:19px;letter-spacing:-.04em}.evid-answer-compound-head p{max-width:700px;margin:0;color:#6b7280;font-size:12px;line-height:1.7}.evid-answer-editorial-status{display:block;margin-top:7px;color:#6b7280;font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.evid-answer-editorial-status.is-needs-review,.evid-answer-editorial-status.is-auto-linked{color:#a47b22}.evid-answer-editorial-status.is-replaced-mismatch{color:#315747}.evid-answer-score{min-width:62px;text-align:center}.evid-answer-score b{display:block;color:#315747;font-size:30px;line-height:1;font-weight:900}.evid-answer-score span{display:block;margin-top:4px;color:#6b7280;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.evid-answer-score-bars{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:14px 24px;border-bottom:1px solid #e8e5df}.evid-answer-score-bars>div>span{display:block;margin-bottom:5px;color:#6b7280;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.evid-answer-score-bars i{display:block;height:5px;border-radius:999px;background:#ecebe6;overflow:hidden}.evid-answer-score-bars em{display:block;height:100%;border-radius:inherit;background:#315747;transition:width .5s ease}.evid-answer-detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0}.evid-answer-detail-grid>div{min-height:102px;padding:15px 20px;border-bottom:1px solid #e8e5df}.evid-answer-detail-grid>div:nth-child(odd){border-right:1px solid #e8e5df}.evid-answer-detail-grid b{display:block;margin-bottom:6px;color:#6b7280;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.evid-answer-detail-grid p{margin:0;color:#1a1a1a;font-size:12px;line-height:1.6}.evid-answer-compound-foot{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 20px;background:#fafaf8}.evid-answer-references{display:flex;flex-wrap:wrap;align-items:center;gap:7px}.evid-answer-references b{margin-right:4px;color:#6b7280;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.evid-answer-references a,.evid-answer-references span{padding:4px 7px;border-radius:999px;background:#fff;border:1px solid #d4d0c8;color:#2563eb;font-size:10px;font-weight:700;text-decoration:none}.evid-answer-references span{color:#6b7280}.evid-answer-compound-foot>button{padding:8px 0;border:0;background:transparent;color:#315747;font:800 10px Montserrat,sans-serif;cursor:pointer;white-space:nowrap}.evid-answer-empty{padding:30px;border-radius:18px;background:#fff;border:1px solid #d4d0c8;text-align:center}.evid-answer-empty h2{margin:0 0 8px;font-size:22px;letter-spacing:-.04em}.evid-answer-empty p{margin:0;color:#6b7280;font-size:12px}.evid-answer-next{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:36px;padding:24px 26px;border-radius:20px;background:#1a1a1a;color:#fff}.evid-answer-next .evid-answer-kicker{color:#e2c97e}.evid-answer-next h2{margin:0 0 7px;font-size:26px;letter-spacing:-.05em}.evid-answer-next p:last-child{max-width:570px;margin:0;color:#c4c3ba;font-size:12px;line-height:1.7}.evid-answer-next>div:last-child{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.evid-answer-next button{padding:11px 14px;border-radius:999px;border:1px solid rgba(226,201,126,.5);background:#e2c97e;color:#171916;font:900 10px Montserrat,sans-serif;cursor:pointer;white-space:nowrap}.evid-answer-next button+button{background:transparent;color:#e2c97e}.evid-answer-disclaimer{margin:22px 0 0;color:#9ca3af;font-size:10px;line-height:1.6;text-align:center}
 .evid-pricing-answer-cta{display:flex;align-items:center;justify-content:space-between;gap:26px;margin:0 0 56px;padding:28px 30px;border-radius:22px;background:#1a1a1a;color:#fff;box-shadow:0 14px 34px rgba(30,41,59,.1)}.evid-pricing-answer-kicker{margin:0 0 9px;color:#e2c97e;font-size:10px;font-weight:900;letter-spacing:.16em}.evid-pricing-answer-cta h2{margin:0 0 8px;font-size:clamp(24px,3.5vw,38px);line-height:1;letter-spacing:-.06em}.evid-pricing-answer-cta p:last-child{max-width:600px;margin:0;color:#c4c3ba;font-size:12px;line-height:1.7}.evid-pricing-answer-cta button{display:inline-flex;align-items:center;gap:12px;padding:13px 18px;border:0;border-radius:999px;background:#e2c97e;color:#171916;font:900 11px Montserrat,sans-serif;cursor:pointer;white-space:nowrap}
 @keyframes evidAnswerPulse{0%,100%{opacity:.45;transform:scale(.92)}50%{opacity:1;transform:scale(1.12)}}
 @media(max-width:800px){.evid-answer-preview-grid{grid-template-columns:repeat(2,1fr)}.evid-answer-heading{display:block}.evid-answer-context{display:inline-flex;margin-top:18px}.evid-answer-sample{display:block}.evid-answer-sample-card{margin-top:22px}.evid-answer-next{display:block}.evid-answer-next>div:last-child{justify-content:flex-start;margin-top:20px}.evid-pricing-answer-cta{display:block}.evid-pricing-answer-cta button{margin-top:20px}}
 @media(max-width:600px){.evid-answer-topbar>div{padding:0 16px;gap:10px}.evid-answer-topbar-title{font-size:10px}.evid-answer-preview-grid{gap:8px}.evid-answer-preview-item{min-height:110px;padding:12px}.evid-answer-preview-item span{margin-bottom:14px}.evid-answer-cta{width:100%;justify-content:center;text-align:center}.evid-answer-note{display:block;margin:12px 0 0}.evid-answer-input-card{padding:16px}.evid-answer-input-row{display:block}.evid-answer-input-row textarea{display:block;width:100%;min-height:86px}.evid-answer-input-row button{width:100%;justify-content:center;padding:14px}.evid-answer-suggestions{display:none}.evid-answer-verdict{display:block;padding:18px}.evid-answer-verdict-badge{display:inline-block;margin-top:16px}.evid-answer-compound-head{padding:18px 16px 13px}.evid-answer-compound h3{font-size:16px}.evid-answer-compound-head p{font-size:11px}.evid-answer-score{min-width:48px}.evid-answer-score b{font-size:24px}.evid-answer-score-bars{padding:12px 16px;gap:10px}.evid-answer-detail-grid{display:block}.evid-answer-detail-grid>div{min-height:0;padding:13px 16px;border-right:0!important}.evid-answer-compound-foot{display:block;padding:13px 16px}.evid-answer-compound-foot>button{margin-top:12px}.evid-answer-next{padding:20px}.evid-answer-next>div:last-child{display:grid}.evid-answer-next button{width:100%;justify-content:center}.evid-answer-sample-rows>div{display:block}.evid-answer-sample-rows b{display:block;width:auto;margin-bottom:5px}}
 @media(prefers-reduced-motion:reduce){.evid-answer-cta,.evid-answer-scan-dot{animation:none;transition:none}}
+
+/* Keep every workspace tab in the same soft pill language. */
+.evid-main-nav .evid-nav-link,
+.evid-main-nav .evid-mobile-nav-link{
+  border:1px solid transparent!important;
+  border-radius:999px!important;
+}
+.evid-main-nav .evid-nav-link:hover{
+  border-color:#d4d0c8!important;
+  background:#fafaf8!important;
+  color:#1a1a1a!important;
+}
+.evid-main-nav .evid-nav-link.is-active:hover{color:#fff!important}
+.evid-main-nav .evid-mobile-nav-link{
+  background:#fff!important;
+  border-color:#e8e5df!important;
+}
+.evid-main-nav .evid-mobile-nav-link.is-active{
+  background:#1a1a1a!important;
+  border-color:#1a1a1a!important;
+  color:#fff!important;
+}
+.evid-main-nav .evid-mobile-nav-link.workspace-nav-feature,
+.evid-main-nav .evid-mobile-nav-link.peptide-tools-nav-feature,
+.evid-main-nav .evid-mobile-nav-link.atlas-nav-feature{border-radius:999px!important}
+
+/* The Pro workspace now puts its connected tools front and centre. */
+.evid-workspace-toolkit.evid-pro-tools-focus{
+  margin:0 0 34px;
+  padding:34px 28px 30px;
+  border:1px solid #e2c97e;
+  border-radius:26px;
+  background:linear-gradient(145deg,#fffdf7 0%,#fafaf8 70%,#fff 100%);
+  box-shadow:0 16px 36px rgba(164,123,34,.08);
+}
+.evid-workspace-toolkit.evid-pro-tools-focus .evid-workspace-toolkit-heading{margin-bottom:26px}
+.evid-workspace-toolkit.evid-pro-tools-focus .evid-workspace-section-kicker{color:#a47b22}
+.evid-workspace-toolkit.evid-pro-tools-focus .evid-workspace-tool-grid{gap:14px}
+.evid-workspace-toolkit.evid-pro-tools-focus .evid-workspace-tool{border-radius:20px}
+@media(max-width:767px){
+  .evid-workspace-toolkit.evid-pro-tools-focus{margin:0 0 28px;padding:25px 16px 20px;border-radius:22px}
+}
 
 /* Conversion and trust surfaces for the subscription roadmap. */
 .evid-answer-free-preview-note{display:flex;flex-direction:column;gap:4px;max-width:520px;margin:18px 0 0;padding:12px 14px;border:1px solid rgba(226,201,126,.28);border-radius:14px;background:rgba(255,255,255,.06);color:#e8e5df;font-size:11px;line-height:1.5}
@@ -433,9 +526,9 @@ body{background:#fff;color:#1a1a1a}
 .evid-shared-report-cta .evid-report-kicker{margin-bottom:8px;color:#e2c97e}
 .evid-shared-report-cta h2{margin:0 0 8px;font-size:clamp(24px,4vw,40px);line-height:1;letter-spacing:-.06em}
 .evid-shared-report-cta p:last-child{max-width:560px;margin:0;color:#d6d5cc;font-size:12px;line-height:1.7}
-.evid-shared-report-cta button{display:inline-flex;align-items:center;gap:10px;padding:13px 17px;border:0;border-radius:999px;background:#e2c97e;color:#1a1a1a;font:900 11px Montserrat,sans-serif;cursor:pointer;white-space:nowrap}
+.evid-shared-report-cta-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;flex-shrink:0}.evid-shared-report-cta button{display:inline-flex;align-items:center;gap:10px;padding:13px 17px;border:0;border-radius:999px;background:#e2c97e;color:#1a1a1a;font:900 11px Montserrat,sans-serif;cursor:pointer;white-space:nowrap}.evid-shared-report-cta button.is-secondary{border:1px solid rgba(255,255,255,.32);background:transparent;color:#fff}.evid-shared-report-cta button:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,.18)}.evid-shared-report-cta button.is-secondary:hover{background:rgba(255,255,255,.1)}
 .evid-shared-report-missing{margin-top:20px}
-@media(max-width:700px){.evid-shared-report-card{padding:17px}.evid-shared-report-cta{display:block;padding:22px}.evid-shared-report-cta button{margin-top:18px;width:100%;justify-content:center}}
+@media(max-width:700px){.evid-shared-report-card{padding:17px}.evid-shared-report-cta{display:block;padding:22px}.evid-shared-report-cta-actions{display:grid;grid-template-columns:1fr;margin-top:18px}.evid-shared-report-cta button{width:100%;justify-content:center}}
 
 /* Visible trust signals on every compound record. */
 .evid-trust-card{margin-top:16px;padding:18px 18px 16px;border:1px solid #d4d0c8;border-radius:18px;background:linear-gradient(145deg,#fafaf8,#f3f7f3);box-shadow:0 8px 20px rgba(30,41,59,.04)}
@@ -538,4 +631,202 @@ body{background:#fff;color:#1a1a1a}
 @media(max-width:700px){.evid-coverage-map{margin:48px 0 42px;padding:19px;border-radius:20px}.evid-coverage-head{display:block;padding-bottom:20px}.evid-coverage-head h2{font-size:clamp(28px,9vw,42px)}.evid-coverage-lede{font-size:12px}.evid-coverage-stats{margin-top:18px;min-width:0}.evid-coverage-panel{padding:15px 13px 13px}.evid-coverage-list{display:block}.evid-coverage-row+.evid-coverage-row{margin-top:14px}.evid-coverage-row-head{gap:7px}.evid-coverage-meta{font-size:7px}.evid-coverage-note{margin-top:14px;font-size:9px}}
 @media(max-width:390px){.evid-coverage-stats{gap:5px}.evid-coverage-stats div{padding:9px 5px}.evid-coverage-stats strong{font-size:22px}.evid-coverage-stats span{font-size:7px}.evid-coverage-meta{font-size:6.5px}}
 @media(prefers-reduced-motion:reduce){.evid-coverage-total-bar,.evid-coverage-linked-bar{transform:scaleX(1);transition:none}}
+
+/* Connected Pro workflows: every tool points to a useful next action. */
+.evid-tool-utility{max-width:960px;margin:18px auto 44px;padding:26px;border:1px solid #d4d0c8;border-radius:24px;background:#fff;box-shadow:0 14px 32px rgba(30,41,59,.045)}
+.evid-tool-utility-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:22px;border-bottom:1px solid #e8e5df}.evid-tool-utility-eyebrow{margin:0 0 9px;color:#a47b22;font-size:9px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.evid-tool-utility-head h2{max-width:580px;margin:0 0 8px;color:#1a1a1a;font-size:clamp(25px,3.5vw,39px);line-height:1;letter-spacing:-.065em}.evid-tool-utility-head p:last-child{max-width:610px;margin:0;color:#6b7280;font-size:12px;line-height:1.7}.evid-tool-utility-upgrade{flex:none;padding:11px 15px;border:0;border-radius:999px;background:#315747;color:#fff;font:900 10px Montserrat,sans-serif;cursor:pointer;white-space:nowrap}.evid-tool-utility-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}.evid-tool-utility-card{display:flex;min-height:112px;flex-direction:column;align-items:flex-start;padding:16px;border:1px solid #e8e5df;border-radius:16px;background:#fafaf8;color:#1a1a1a;text-align:left;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.evid-tool-utility-card:hover{transform:translateY(-2px);border-color:#9ab9a5;box-shadow:0 10px 20px rgba(49,87,71,.08)}.evid-tool-utility-card>span{display:grid;place-items:center;min-width:28px;height:22px;margin-bottom:17px;border-radius:999px;background:#eaf3ed;color:#315747;font-size:8px;font-weight:900;letter-spacing:.08em}.evid-tool-utility-card b{font-size:13px;letter-spacing:-.02em}.evid-tool-utility-card small{margin-top:5px;color:#6b7280;font-size:10px;line-height:1.45}.evid-tool-utility-card small:after{content:"  ↗";color:#315747;font-weight:900}
+
+.evid-workspace-command{margin:0 auto 34px;max-width:1080px;padding:27px;border:1px solid #d4d0c8;border-radius:24px;background:#fafaf8}.evid-workspace-command-head{display:flex;align-items:flex-end;justify-content:space-between;gap:28px}.evid-workspace-command-head>div:first-child{max-width:590px}.evid-workspace-command-head h2{margin:0 0 10px;color:#1a1a1a;font-size:clamp(29px,4vw,47px);line-height:.98;letter-spacing:-.07em}.evid-workspace-command-head>div:first-child>p:last-child{max-width:560px;margin:0;color:#6b7280;font-size:12px;line-height:1.7}.evid-workspace-recommendation{min-width:235px;padding:16px;border:1px solid #b9d6c0;border-radius:18px;background:#f0f7f2}.evid-workspace-recommendation>span{display:block;margin-bottom:8px;color:#315747;font-size:8px;font-weight:900;letter-spacing:.15em}.evid-workspace-recommendation>b{display:block;color:#1a1a1a;font-size:13px;line-height:1.2}.evid-workspace-recommendation>small{display:block;margin-top:6px;color:#6b7280;font-size:10px;line-height:1.4}.evid-workspace-recommendation>button{margin-top:12px;padding:9px 12px;border:0;border-radius:999px;background:#315747;color:#fff;font:900 10px Montserrat,sans-serif;cursor:pointer}.evid-workspace-command-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}.evid-workspace-command-card{display:flex;min-height:106px;flex-direction:column;align-items:flex-start;padding:16px;border:1px solid #e8e5df;border-radius:16px;background:#fff;color:#1a1a1a;text-align:left;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.evid-workspace-command-card:hover{transform:translateY(-2px);border-color:#9ab9a5;box-shadow:0 10px 20px rgba(49,87,71,.08)}.evid-workspace-command-card>span{color:#a47b22;font-size:9px;font-weight:900;letter-spacing:.13em}.evid-workspace-command-card>b{margin-top:16px;font-size:14px;letter-spacing:-.025em}.evid-workspace-command-card>small{margin-top:6px;color:#6b7280;font-size:10px;line-height:1.5}.evid-workspace-command-card>em{margin-top:auto;padding-top:13px;color:#315747;font-size:9px;font-style:normal;font-weight:900}
+
+.evid-stack-guest-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;padding-bottom:34px;border-bottom:1px solid #d4d0c8}.evid-stack-guest-count{display:flex;min-width:142px;flex-direction:column;align-items:center;padding:19px;border:1px solid #d4d0c8;border-radius:20px;background:#fff}.evid-stack-guest-count strong{color:#315747;font-size:48px;line-height:.9;letter-spacing:-.08em}.evid-stack-guest-count span{margin-top:8px;color:#1a1a1a;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}.evid-stack-guest-count small{margin-top:6px;color:#6b7280;font-size:10px}.evid-stack-guest-preview{margin-top:27px;padding:22px;border:1px solid #d4d0c8;border-radius:24px;background:#fff}.evid-stack-guest-preview-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}.evid-stack-guest-preview-head p{margin:0 0 8px;color:#a47b22;font-size:9px;font-weight:900;letter-spacing:.15em}.evid-stack-guest-preview-head h2{margin:0;color:#1a1a1a;font-size:clamp(23px,3vw,34px);line-height:1;letter-spacing:-.06em}.evid-stack-guest-preview-head>span{padding:6px 9px;border-radius:999px;background:#f4f2ee;color:#6b7280;font-size:8px;font-weight:900;letter-spacing:.1em;white-space:nowrap}.evid-stack-guest-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:22px}.evid-stack-guest-card{display:flex;min-height:142px;justify-content:space-between;gap:12px;padding:16px;border:1px solid #e8e5df;border-top:3px solid;border-radius:16px;background:#fafaf8}.evid-stack-guest-card>div:first-child>span{font-size:8px;font-weight:900;letter-spacing:.12em}.evid-stack-guest-card h3{margin:9px 0 6px;color:#1a1a1a;font-size:15px;line-height:1.1;letter-spacing:-.035em}.evid-stack-guest-card p{margin:0;color:#6b7280;font-size:10px;line-height:1.45}.evid-stack-guest-card>div:last-child{display:flex;flex-direction:column;align-items:flex-end}.evid-stack-guest-card>div:last-child b{color:#315747;font-size:19px;letter-spacing:-.05em}.evid-stack-guest-card>div:last-child small{margin-top:3px;color:#6b7280;font-size:8px;text-align:right}.evid-stack-guest-preview-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px;padding-top:16px;border-top:1px solid #e8e5df;color:#6b7280;font-size:10px}.evid-stack-guest-preview-footer button{border:0;background:transparent;color:#315747;font:900 10px Montserrat,sans-serif;cursor:pointer}.evid-stack-guest-benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}.evid-stack-guest-benefits article{padding:18px;border:1px solid #d4d0c8;border-radius:18px;background:#fafaf8}.evid-stack-guest-benefits article>span{color:#a47b22;font-size:9px;font-weight:900;letter-spacing:.13em}.evid-stack-guest-benefits h3{margin:17px 0 7px;color:#1a1a1a;font-size:15px;letter-spacing:-.03em}.evid-stack-guest-benefits p{margin:0;color:#6b7280;font-size:11px;line-height:1.6}
+@media(max-width:760px){.evid-tool-utility{margin:14px 16px 34px;padding:19px;border-radius:20px}.evid-tool-utility-head,.evid-workspace-command-head,.evid-stack-guest-hero{display:block}.evid-tool-utility-upgrade{margin-top:17px}.evid-tool-utility-grid,.evid-workspace-command-grid,.evid-stack-guest-cards,.evid-stack-guest-benefits{grid-template-columns:1fr}.evid-tool-utility-card{min-height:88px}.evid-workspace-command{margin:0 16px 26px;padding:19px;border-radius:20px}.evid-workspace-recommendation{margin-top:18px}.evid-stack-guest-count{margin-top:24px;max-width:160px}.evid-stack-guest-preview{padding:16px;border-radius:20px}.evid-stack-guest-preview-footer{display:block}.evid-stack-guest-preview-footer button{display:block;margin-top:12px}.evid-stack-guest-benefits{margin-top:12px}}
+@media(prefers-reduced-motion:reduce){.evid-tool-utility-card:hover,.evid-workspace-command-card:hover{transform:none;box-shadow:none}.evid-tool-utility-card,.evid-workspace-command-card{transition:none}}
+
+/* The homepage now exposes the product's core loop before the catalogue: ask,
+   verify, then keep the decision connected. Starter prompts are real catalogue
+   searches so a visitor reaches a useful result in one click. */
+.evid-home-loop{max-width:1100px;margin:0 auto;padding:68px 24px 56px;color:#1a1a1a}
+.evid-home-loop-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:42px;padding-bottom:28px;border-bottom:1px solid #d4d0c8}
+.evid-home-loop-heading>div{max-width:590px}
+.evid-home-loop-kicker{margin:0 0 11px;color:#a47b22;font-size:9px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
+.evid-home-loop-heading h2{margin:0;font-size:clamp(30px,4.3vw,51px);line-height:.98;letter-spacing:-.07em;font-weight:900}
+.evid-home-loop-heading>p{max-width:420px;margin:0;color:#6b7280;font-size:13px;line-height:1.75}
+.evid-home-loop-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:22px}
+.evid-home-loop-steps article{padding:19px 18px;border:1px solid #d4d0c8;border-radius:18px;background:#fff}
+.evid-home-loop-steps article>span{color:#a47b22;font-size:10px;font-weight:900;letter-spacing:.14em}
+.evid-home-loop-steps h3{margin:18px 0 7px;font-size:18px;letter-spacing:-.04em}
+.evid-home-loop-steps p{margin:0;color:#6b7280;font-size:11px;line-height:1.6}
+.evid-home-loop-starters{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:24px;margin-top:14px;padding:24px;border:1px solid #d4d0c8;border-radius:22px;background:#fafaf8}
+.evid-home-loop-starters-copy{max-width:340px}
+.evid-home-loop-starters-copy h3{margin:0 0 10px;font-size:25px;line-height:1.03;letter-spacing:-.055em}
+.evid-home-loop-starters-copy>p:last-child{margin:0;color:#6b7280;font-size:11px;line-height:1.7}
+.evid-home-loop-starter-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.evid-home-loop-starter{display:flex;min-height:84px;align-items:center;gap:11px;padding:13px 14px;border:1px solid #e8e5df;border-radius:15px;background:#fff;color:#1a1a1a;text-align:left;font-family:Montserrat,sans-serif;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.evid-home-loop-starter:hover{transform:translateY(-2px);border-color:#9ab9a5;box-shadow:0 10px 20px rgba(49,87,71,.08)}
+.evid-home-loop-starter-mark{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:10px;background:#eaf3ed;color:#315747;font-size:8px;font-weight:900;letter-spacing:.08em}
+.evid-home-loop-starter strong{display:block;font-size:11px;line-height:1.25;letter-spacing:-.02em}
+.evid-home-loop-starter small{display:block;margin-top:5px;color:#6b7280;font-size:9px;line-height:1.35}
+.evid-home-loop-starter em{margin-left:auto;color:#315747;font-size:14px;font-style:normal;font-weight:900}
+.evid-home-loop-footer{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:14px;padding-top:17px;border-top:1px solid #d4d0c8;color:#6b7280;font-size:10px;line-height:1.5}
+.evid-home-loop-footer>div{display:flex;gap:16px;flex-wrap:wrap}
+.evid-home-loop-footer button{padding:0;border:0;background:transparent;color:#315747;font:900 10px Montserrat,sans-serif;cursor:pointer}
+.evid-home-loop-footer button:last-child{color:#a47b22}
+@media(max-width:760px){.evid-home-loop{padding:48px 16px 40px}.evid-home-loop-heading{display:block}.evid-home-loop-heading>p{margin-top:16px}.evid-home-loop-steps{grid-template-columns:1fr}.evid-home-loop-steps article{padding:16px}.evid-home-loop-steps h3{margin-top:12px}.evid-home-loop-starters{display:block;padding:18px;border-radius:20px}.evid-home-loop-starters-copy{max-width:none}.evid-home-loop-starter-grid{grid-template-columns:1fr;margin-top:18px}.evid-home-loop-footer{display:block}.evid-home-loop-footer>div{margin-top:13px;gap:12px}}
+@media(prefers-reduced-motion:reduce){.evid-home-loop-starter{transition:none}.evid-home-loop-starter:hover{transform:none;box-shadow:none}}
+
+/* Partner acquisition surface: give coaches, creators and communities a
+   measurable, low-friction way to introduce the free research workflow. */
+.evid-partner-link-builder{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:24px;margin:0 0 28px;padding:24px;border:1px solid #b9d6c0;border-radius:22px;background:linear-gradient(145deg,#f0f7f2,#fff);box-shadow:0 12px 30px rgba(49,87,71,.06)}
+.evid-partner-kicker{margin:0 0 9px;color:#315747;font-size:9px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.evid-partner-link-builder h2{margin:0 0 9px;color:#1a1a1a;font-size:clamp(24px,3.2vw,36px);line-height:1;letter-spacing:-.06em}
+.evid-partner-link-builder>div:first-child>p:last-child{max-width:420px;margin:0;color:#5b6b61;font-size:12px;line-height:1.7}
+.evid-partner-link-form{display:flex;flex-direction:column;gap:11px}
+.evid-partner-link-form label{display:block;color:#5b6b61;font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.evid-partner-link-form input,.evid-partner-link-form select{display:block;width:100%;margin-top:6px;padding:11px 12px;border:1px solid #c6d8ca;border-radius:11px;background:#fff;color:#1a1a1a;font:600 12px Montserrat,sans-serif;outline:none;box-sizing:border-box}
+.evid-partner-link-form input:focus,.evid-partner-link-form select:focus{border-color:#315747;box-shadow:0 0 0 3px rgba(49,87,71,.1)}
+.evid-partner-link-output{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid #c6d8ca;border-radius:12px;background:#fff}
+.evid-partner-link-output code{min-width:0;flex:1;overflow:hidden;color:#5b6b61;font:600 10px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap;text-overflow:ellipsis}
+.evid-partner-link-output button{flex:none;padding:9px 12px;border:0;border-radius:999px;background:#315747;color:#fff;font:900 10px Montserrat,sans-serif;cursor:pointer}
+@media(max-width:760px){.evid-partner-link-builder{display:block;padding:19px;border-radius:20px}.evid-partner-link-form{margin-top:18px}.evid-partner-link-output code{font-size:9px}}
+
+/* Product-led guide paths bridge search intent to a concrete first action. */
+.evid-learning-paths{margin:0 0 38px;padding:24px;border:1px solid #d4d0c8;border-radius:22px;background:#fafaf8}
+.evid-learning-paths-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:20px;border-bottom:1px solid #e8e5df}
+.evid-learning-paths-kicker{margin:0 0 9px;color:#a47b22;font-size:9px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.evid-learning-paths-head h2{margin:0;color:#1a1a1a;font-size:clamp(26px,3.6vw,42px);line-height:.98;letter-spacing:-.065em}
+.evid-learning-paths-head>p{max-width:350px;margin:0;color:#6b7280;font-size:11px;line-height:1.7}
+.evid-learning-path-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}
+.evid-learning-path{display:flex;min-height:205px;flex-direction:column;align-items:flex-start;padding:18px;border:1px solid #e8e5df;border-top:3px solid #315747;border-radius:16px;background:#fff}
+.evid-learning-path.is-blue{border-top-color:#2563eb}.evid-learning-path.is-gold{border-top-color:#e2c97e}
+.evid-learning-path-number{color:#a47b22;font-size:9px;font-weight:900;letter-spacing:.15em}
+.evid-learning-path h3{margin:18px 0 8px;color:#1a1a1a;font-size:16px;line-height:1.08;letter-spacing:-.04em}
+.evid-learning-path p{margin:0;color:#6b7280;font-size:11px;line-height:1.6}
+.evid-learning-path button{margin-top:auto;padding:0;border:0;background:transparent;color:#315747;font:900 10px Montserrat,sans-serif;cursor:pointer}
+.evid-learning-path button span{margin-left:5px}
+.evid-learning-path-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:17px;padding-top:15px;border-top:1px solid #e8e5df;color:#6b7280;font-size:10px}
+.evid-learning-path-footer button{padding:0;border:0;background:transparent;color:#a47b22;font:900 10px Montserrat,sans-serif;cursor:pointer}
+@media(max-width:760px){.evid-learning-paths{padding:18px;border-radius:20px}.evid-learning-paths-head{display:block}.evid-learning-paths-head>p{margin-top:14px}.evid-learning-path-grid{grid-template-columns:1fr}.evid-learning-path{min-height:0}.evid-learning-path-footer{display:block}.evid-learning-path-footer button{display:block;margin-top:10px}}
+
+/* Audience-specific entry pages make the ICP explicit without changing the
+   shared evidence model or inventing outcomes. */
+.evid-audience-page{min-height:100vh;background:#f4f2ee;color:#1a1a1a}
+.evid-audience-hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(250px,.8fr);gap:40px;max-width:1120px;margin:0 auto;padding:72px 32px 58px;border-bottom:1px solid #d4d0c8}
+.evid-audience-hero-copy{max-width:720px}.evid-audience-back{display:block;margin:0 0 42px;padding:0;border:0;background:transparent;color:#6b7280;font:700 11px Montserrat,sans-serif;cursor:pointer}
+.evid-audience-kicker{margin:0 0 12px;color:#a47b22;font-size:9px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
+.evid-audience-hero h1{max-width:760px;margin:0 0 16px;font-size:clamp(42px,6vw,78px);line-height:.94;letter-spacing:-.075em;font-weight:900}
+.evid-audience-lede{max-width:660px;margin:0;color:#596273;font-size:15px;line-height:1.8}
+.evid-audience-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:27px}.evid-audience-actions button{padding:12px 16px;border-radius:999px;font:900 11px Montserrat,sans-serif;cursor:pointer}
+.evid-audience-primary{border:0;background:#315747;color:#fff}.evid-audience-secondary{border:1px solid #d4d0c8;background:#fff;color:#1a1a1a}.evid-audience-actions span{margin-left:7px}
+.evid-audience-note{max-width:620px;margin:18px 0 0;color:#9ca3af;font-size:10px;line-height:1.6}
+.evid-audience-signal{align-self:center;display:flex;min-height:240px;flex-direction:column;align-items:center;justify-content:center;gap:15px;padding:28px;border:1px solid #b9d6c0;border-radius:28px;background:linear-gradient(145deg,#edf7ef,#fff);box-shadow:0 18px 38px rgba(49,87,71,.08);color:#315747}
+.evid-audience-signal span{padding:8px 13px;border:1px solid #b9d6c0;border-radius:999px;background:#fff;font-size:9px;font-weight:900;letter-spacing:.15em}.evid-audience-signal i{font-style:normal;font-size:18px;color:#a47b22}
+.evid-audience-points{max-width:1120px;margin:0 auto;padding:58px 32px}.evid-audience-points-head{max-width:620px}.evid-audience-points-head h2{margin:0;color:#1a1a1a;font-size:clamp(30px,4vw,50px);line-height:.97;letter-spacing:-.07em}
+.evid-audience-point-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:24px}.evid-audience-point-grid article{min-height:160px;padding:20px;border:1px solid #d4d0c8;border-radius:18px;background:#fff}.evid-audience-point-grid article>span{color:#a47b22;font-size:10px;font-weight:900;letter-spacing:.15em}.evid-audience-point-grid h3{margin:18px 0 8px;font-size:17px;line-height:1.08;letter-spacing:-.04em}.evid-audience-point-grid p{margin:0;color:#6b7280;font-size:11px;line-height:1.65}
+.evid-audience-proof{display:flex;align-items:center;justify-content:space-between;gap:28px;max-width:1120px;margin:0 auto 70px;padding:28px 32px;border:1px solid #b9d6c0;border-radius:22px;background:#f0f7f2}.evid-audience-proof h2{max-width:650px;margin:0 0 9px;font-size:clamp(24px,3vw,38px);line-height:1;letter-spacing:-.06em}.evid-audience-proof p:last-child{max-width:650px;margin:0;color:#5b6b61;font-size:12px;line-height:1.7}.evid-audience-proof button{flex:none;padding:11px 15px;border:1px solid #315747;border-radius:999px;background:#315747;color:#fff;font:900 10px Montserrat,sans-serif;cursor:pointer}.evid-audience-proof button span{margin-left:5px}
+@media(max-width:760px){.evid-audience-hero{display:block;padding:42px 16px 38px}.evid-audience-back{margin-bottom:30px}.evid-audience-hero h1{font-size:clamp(40px,12vw,60px)}.evid-audience-lede{font-size:13px}.evid-audience-signal{min-height:0;margin-top:34px;padding:20px}.evid-audience-points{padding:42px 16px}.evid-audience-point-grid{grid-template-columns:1fr}.evid-audience-point-grid article{min-height:0}.evid-audience-proof{display:block;margin:0 16px 50px;padding:21px;border-radius:20px}.evid-audience-proof button{margin-top:18px;width:100%}}
+
+/* A one-question activation pulse gives the product a real customer signal
+   while sending the user directly into the workflow they chose. */
+.evid-research-intent{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:22px;max-width:1080px;margin:0 auto 20px;padding:20px 22px;border:1px solid #b9d6c0;border-radius:20px;background:#f0f7f2}
+.evid-research-intent-copy h2{max-width:420px;margin:0 0 8px;color:#1a1a1a;font-size:clamp(24px,3vw,34px);line-height:1;letter-spacing:-.06em}
+.evid-research-intent-copy>p:last-child{max-width:420px;margin:0;color:#5b6b61;font-size:11px;line-height:1.65}
+.evid-research-intent-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.evid-research-intent-options button{display:flex;min-height:78px;flex-direction:column;align-items:flex-start;padding:13px;border:1px solid #c6d8ca;border-radius:14px;background:#fff;color:#1a1a1a;text-align:left;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.evid-research-intent-options button:hover{transform:translateY(-2px);border-color:#315747;box-shadow:0 8px 18px rgba(49,87,71,.08)}
+.evid-research-intent-options b{font-size:11px;letter-spacing:-.02em}.evid-research-intent-options small{margin-top:5px;color:#6b7280;font-size:9px;line-height:1.4}.evid-research-intent-options span{margin-top:auto;align-self:flex-end;color:#315747;font-size:13px}
+@media(max-width:760px){.evid-research-intent{display:block;margin:0 16px 18px;padding:18px;border-radius:18px}.evid-research-intent-options{margin-top:16px}.evid-research-intent-options button{min-height:74px}}
+@media(prefers-reduced-motion:reduce){.evid-research-intent-options button{transition:none}.evid-research-intent-options button:hover{transform:none;box-shadow:none}}
+
+/* Final responsive and account polish. Keep the hero readable when the app is
+   viewed in a narrow desktop window, and keep the navigation drawer inside the
+   viewport at every compact breakpoint. */
+.evid-hero-actions .evid-hero-pro-cta{background:#e2c97e!important;color:#1a1a1a!important;border-color:#e2c97e!important}
+.evid-hero-actions .evid-hero-pro-cta:hover{background:#c9ad57!important;border-color:#c9ad57!important}
+.evid-mobile-menu-backdrop{overflow:hidden;max-width:100vw}
+.evid-mobile-menu-drawer{box-sizing:border-box;max-width:calc(100vw - 24px);overflow-x:hidden}
+.evid-mobile-menu-drawer button{min-width:0;max-width:100%;overflow-wrap:anywhere;font-family:Montserrat,sans-serif!important}
+.evid-pro-member-badge,.evid-account-action-button,.evid-account-signout-button{font-family:Montserrat,sans-serif!important;border-radius:14px!important}
+.evid-pro-member-badge{display:inline-flex;align-items:center}
+.evid-pricing-page .evid-plan-card{border-radius:16px!important}
+.evid-pricing-page .evid-pricing-outcome,.evid-pricing-page .evid-professional-card,.evid-pricing-page .evid-pricing-answer-cta{border-radius:14px!important}
+.evid-pricing-page .evid-pricing-table{border-radius:14px!important}
+.evid-pricing-page button{border-radius:10px!important}
+.evid-pro-page .evid-pro-tool-topbar{border-radius:0 0 16px 16px!important}
+.evid-pro-page .evid-pro-tool-page{border-radius:14px!important}
+.evid-pro-page .evid-pro-tool-page button,.evid-pro-page .evid-cycle-alerts-page button,.evid-pro-page .evid-legacy-pro-page button{border-radius:10px!important}
+.evid-pro-page .evid-pro-tool-page [style*="border"],.evid-pro-page .evid-pro-tool-page [style*="box-shadow"]{border-radius:14px!important}
+@media (min-width:768px) and (max-width:1279px){
+  .evid-homepage .evid-hero-art{opacity:.28}
+  .evid-homepage .evid-hero-art img{opacity:.55}
+  .evid-hero-description,.evid-hero-support,.evid-hero-access{text-shadow:0 1px 8px rgba(255,255,255,.9)}
+  .evid-homepage .evid-access-strip{padding:18px 20px 0;border-radius:16px;background:rgba(255,255,255,.82)}
+}
+@media(max-width:420px){.evid-mobile-menu-drawer{width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)}}
+
+/* A single, quiet frame identifies the full Pro toolkit without covering its
+   contents or competing with the surrounding sections. */
+.evid-pro-tools-focus{
+  position:relative;
+  max-width:1120px;
+  margin:28px auto 0;
+  padding:24px 20px 22px;
+  border:1px solid #e2c97e;
+  border-radius:10px;
+  background:transparent;
+  overflow:visible;
+  box-shadow:0 0 0 1px rgba(226,201,126,.2),0 0 14px rgba(226,201,126,.12);
+}
+
+/* Keep the three access labels optically centred in their strip. */
+.evid-homepage .evid-access-strip{padding:16px 0 12px;align-items:center}
+.evid-homepage .evid-access-strip span{display:flex;min-height:31px;flex-direction:column;justify-content:center}
+.evid-homepage .evid-access-strip button{align-self:center}
+@media(max-width:767px){.evid-homepage .evid-access-strip{padding:14px 0 10px}}
+@media (min-width:768px) and (max-width:1279px){.evid-homepage .evid-access-strip{padding:14px 20px 10px}}
+@media(max-width:760px){.evid-pro-tools-focus{margin:22px 12px 0;padding:18px 12px 16px;border-radius:8px}}
+
+/* Pro frame belongs to the viewport; inward light stays visible above page backgrounds. */
+/* Remove only the document scrollbar gutter in Pro; scrolling remains native. */
+html:has(.evid-pro-member-shell){scrollbar-width:none;scrollbar-gutter:auto}
+html:has(.evid-pro-member-shell)::-webkit-scrollbar{width:0;height:0}
+.evid-pro-member-shell{position:relative;isolation:isolate;overflow-x:clip}
+.evid-pro-member-shell::before{content:"";position:fixed;inset:0;box-sizing:border-box;z-index:150;pointer-events:none;border:2px solid #eac04e;box-shadow:inset 0 0 10px 2px rgba(245,192,55,.65),inset 0 0 28px rgba(234,182,44,.25);animation:evid-pro-frame-pulse 1s ease-in-out infinite}
+@keyframes evid-pro-frame-pulse{0%,100%{opacity:.7}50%{opacity:1}}
+@media(max-width:767px){.evid-pro-member-shell::before{box-shadow:inset 0 0 8px 1px rgba(245,192,55,.65),inset 0 0 20px rgba(234,182,44,.25)}}
+@media(prefers-reduced-motion:reduce){.evid-pro-member-shell::before{animation:none;opacity:1}}
+
+/* Production polish: source cards, hero actions, and the full-catalogue checker. */
+.evid-source-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.evid-homepage .evid-hero-actions .evid-hero-pro-cta{background:#e2c97e!important;color:#1a1a1a!important;border-color:#e2c97e!important}
+.evid-homepage .evid-hero-actions .evid-hero-pro-cta:hover{background:#c9ad57!important;border-color:#c9ad57!important}
+.evid-homepage .evid-hero-secondary-links .evid-snapshot-home-link{color:#315747!important}
+.evid-homepage .evid-hero-secondary-links .evid-hero-see-pro-link{color:#a47b22!important}
+
+/* Keep the Pro frame attached to the viewport and visible over light artwork. */
+.evid-pro-member-shell::before{z-index:1800!important;border:3px solid rgba(234,192,78,.96)!important;box-shadow:inset 0 0 16px 3px rgba(245,192,55,.82),inset 0 0 44px rgba(234,182,44,.42),0 0 0 1px rgba(234,192,78,.35)!important;animation:evid-pro-frame-pulse 1s ease-in-out infinite}
+@media(max-width:767px){.evid-pro-member-shell::before{border-width:2px!important;box-shadow:inset 0 0 12px 2px rgba(245,192,55,.82),inset 0 0 32px rgba(234,182,44,.42),0 0 0 1px rgba(234,192,78,.35)!important}}
+
+.evid-general-checker-page{background:linear-gradient(180deg,#f7f5f0 0%,#f1eee8 100%)!important}
+.evid-general-checker-page .evid-pro-tool-topbar{background:linear-gradient(100deg,#315747,#3f6f5a)!important;border-radius:0 0 18px 18px!important}
+.evid-general-checker-page .evid-interaction-shell{max-width:920px!important}
+.evid-general-checker-page .evid-interaction-shell>h1{font-size:clamp(32px,5vw,54px)!important;letter-spacing:-.065em!important}
+.evid-general-checker-page .evid-interaction-picker-row{display:flex;gap:10px;align-items:stretch;margin-bottom:12px}
+.evid-general-checker-page .evid-interaction-picker{position:relative;flex:1;min-width:0;border:1px solid #d4d0c8;border-radius:16px;background:#fff;box-shadow:0 8px 24px rgba(30,41,59,.05)}
+.evid-general-checker-page .evid-interaction-picker>input{box-sizing:border-box;border-radius:16px}
+.evid-general-checker-page .evid-interaction-picker-row>button{border-radius:999px!important;padding:0 24px!important;background:#315747!important;color:#fff!important}
+.evid-general-checker-page .evid-interaction-suggestions{position:absolute;z-index:60;left:0;right:0;top:calc(100% + 8px);max-height:300px;overflow:auto;padding:6px;border:1px solid #d4d0c8;border-radius:16px;background:#fff;box-shadow:0 18px 40px rgba(30,41,59,.16)}
+.evid-general-checker-page .evid-interaction-suggestion{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border:0;border-radius:11px;background:#fff;color:#1a1a1a;text-align:left;cursor:pointer;font:700 12px Montserrat,sans-serif}
+.evid-general-checker-page .evid-interaction-suggestion:hover,.evid-general-checker-page .evid-interaction-suggestion:focus-visible{background:#f5f1e8;outline:none}
+.evid-general-checker-page .evid-interaction-suggestion small{max-width:48%;overflow:hidden;color:#7a8495;font-size:9px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+.evid-general-checker-page .evid-compound-chip{border-radius:999px!important;background:#315747!important;padding:8px 13px!important}
+.evid-general-checker-page .ic-card{border-radius:20px!important}
+@media(max-width:760px){
+  .evid-source-grid{grid-template-columns:1fr!important}
+  .evid-general-checker-page .evid-interaction-picker-row{display:block}
+  .evid-general-checker-page .evid-interaction-picker-row>button{width:100%;min-height:44px;margin-top:9px}
+  .evid-general-checker-page .evid-interaction-suggestion{display:block}
+  .evid-general-checker-page .evid-interaction-suggestion small{display:block;max-width:100%;margin-top:4px}
+}
+@media(prefers-reduced-motion:reduce){.evid-pro-member-shell::before{animation:none!important;opacity:1!important}}
+
 

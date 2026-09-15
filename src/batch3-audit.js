@@ -3,7 +3,7 @@
 export const BATCH3_EVIDENCE_AUDITS = [
   {
     "recordNumber": 1,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "ecdysterone",
     "inputName": "Ecdysterone (20-Hydroxyecdysone)",
     "canonicalName": "20-hydroxyecdysone (ecdysterone)",
@@ -77,7 +77,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 2,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "laxogenin",
     "inputName": "Laxogenin (5-Alpha-Hydroxy-Laxogenin)",
     "canonicalName": "Laxogenin (5-alpha-hydroxy-laxogenin)",
@@ -99,7 +99,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 3,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "deer-velvet-antler",
     "inputName": "Deer Velvet Antler",
     "canonicalName": "Deer velvet antler",
@@ -139,7 +139,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 4,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "carnosine",
     "inputName": "Carnosine",
     "canonicalName": "Carnosine",
@@ -179,7 +179,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 5,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "hexarelin",
     "inputName": "Hexarelin",
     "canonicalName": "Hexarelin",
@@ -253,7 +253,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 6,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "ghrp-2",
     "inputName": "GHRP-2",
     "canonicalName": "GHRP-2",
@@ -327,7 +327,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 7,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "sermorelin",
     "inputName": "Sermorelin",
     "canonicalName": "Sermorelin",
@@ -349,7 +349,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 8,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "mk-677",
     "inputName": "MK-677 (Ibutamoren)",
     "canonicalName": "MK-677 (ibutamoren)",
@@ -406,7 +406,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 9,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "tesamorelin",
     "inputName": "Tesamorelin",
     "canonicalName": "Tesamorelin",
@@ -446,7 +446,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 10,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "aod-9604",
     "inputName": "AOD-9604",
     "canonicalName": "AOD-9604",
@@ -486,7 +486,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 11,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "thymosin-alpha-1",
     "inputName": "Thymosin Alpha-1",
     "canonicalName": "Thymosin alpha-1",
@@ -526,7 +526,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 12,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "humanin",
     "inputName": "Humanin",
     "canonicalName": "Humanin peptide",
@@ -548,7 +548,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 13,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "mots-c",
     "inputName": "MOTS-c",
     "canonicalName": "MOTS-c peptide",
@@ -570,7 +570,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 14,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "ll-37",
     "inputName": "LL-37 (Cathelicidin)",
     "canonicalName": "LL-37 cathelicidin (human cathelicidin LL-37)",
@@ -627,7 +627,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 15,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "kpv",
     "inputName": "KPV",
     "canonicalName": "KPV peptide (Lys-Pro-Val)",
@@ -667,7 +667,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 16,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "dihexa",
     "inputName": "Dihexa",
     "canonicalName": "Dihexa",
@@ -689,7 +689,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 17,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "igf-1-lr3",
     "inputName": "IGF-1 LR3",
     "canonicalName": "IGF-1 LR3",
@@ -711,7 +711,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 18,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "pegmgf",
     "inputName": "PEG-MGF (Mechano Growth Factor)",
     "canonicalName": "PEG-MGF mechano growth factor",
@@ -733,7 +733,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 19,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "pregnenolone",
     "inputName": "Pregnenolone",
     "canonicalName": "Pregnenolone",
@@ -807,7 +807,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 20,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "progesterone",
     "inputName": "Progesterone (Bioidentical)",
     "canonicalName": "Bioidentical progesterone",
@@ -829,7 +829,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 21,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "valerian-root",
     "inputName": "Valerian Root",
     "canonicalName": "Valerian root (species not resolved)",
@@ -869,7 +869,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 22,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "passionflower",
     "inputName": "Passionflower",
     "canonicalName": "Passionflower (Passiflora incarnata)",
@@ -926,7 +926,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 23,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "lemon-balm",
     "inputName": "Lemon Balm",
     "canonicalName": "Lemon balm (Melissa officinalis)",
@@ -1000,7 +1000,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 24,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "magnolia-bark",
     "inputName": "Magnolia Bark",
     "canonicalName": "Magnolia bark",
@@ -1022,7 +1022,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 25,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "l-glutamine",
     "inputName": "L-Glutamine",
     "canonicalName": "L-glutamine",
@@ -1079,7 +1079,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 26,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "butyrate",
     "inputName": "Sodium Butyrate",
     "canonicalName": "Sodium butyrate",
@@ -1119,7 +1119,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 27,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "betaine",
     "inputName": "Betaine (TMG)",
     "canonicalName": "Betaine (trimethylglycine; TMG)",
@@ -1176,7 +1176,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 28,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "aged-garlic",
     "inputName": "Aged Garlic Extract",
     "canonicalName": "Aged garlic extract",
@@ -1250,7 +1250,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 29,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "hawthorn-berry",
     "inputName": "Hawthorn Berry",
     "canonicalName": "Hawthorn berry",
@@ -1290,7 +1290,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 30,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "olive-leaf-extract",
     "inputName": "Olive Leaf Extract",
     "canonicalName": "Olive leaf extract",
@@ -1364,7 +1364,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 31,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "acetyl-l-carnitine",
     "inputName": "Acetyl-L-Carnitine (ALCAR)",
     "canonicalName": "Acetyl-L-carnitine (ALCAR)",
@@ -1404,7 +1404,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 32,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "centrophenoxine",
     "inputName": "Centrophenoxine",
     "canonicalName": "Centrophenoxine",
@@ -1444,7 +1444,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 33,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "dmae",
     "inputName": "DMAE",
     "canonicalName": "Dimethylaminoethanol (DMAE)",
@@ -1484,7 +1484,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 34,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "uridine",
     "inputName": "Uridine Monophosphate",
     "canonicalName": "Uridine monophosphate",
@@ -1506,7 +1506,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 35,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "choline-bitartrate",
     "inputName": "Choline Bitartrate",
     "canonicalName": "Choline bitartrate",
@@ -1563,7 +1563,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 36,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "cdp-choline",
     "inputName": "CDP-Choline (Citicoline)",
     "canonicalName": "Citicoline (CDP-choline)",
@@ -1603,7 +1603,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 37,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "inositol",
     "inputName": "Inositol",
     "canonicalName": "Inositol",
@@ -1660,7 +1660,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 38,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "shilajit",
     "inputName": "Shilajit",
     "canonicalName": "Shilajit",
@@ -1734,7 +1734,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 39,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "cordyceps",
     "inputName": "Cordyceps",
     "canonicalName": "Cordyceps (identity/formulation unresolved across candidate records)",
@@ -1774,7 +1774,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 40,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "reishi-mushroom",
     "inputName": "Reishi Mushroom",
     "canonicalName": "Reishi mushroom (Ganoderma lucidum)",
@@ -1814,7 +1814,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 41,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "chaga-mushroom",
     "inputName": "Chaga Mushroom",
     "canonicalName": "Chaga mushroom (Inonotus obliquus)",
@@ -1836,7 +1836,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 42,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "turkey-tail",
     "inputName": "Turkey Tail Mushroom",
     "canonicalName": "Turkey tail mushroom (Trametes versicolor)",
@@ -1876,7 +1876,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 43,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "ergothioneine",
     "inputName": "Ergothioneine",
     "canonicalName": "Ergothioneine",
@@ -1950,7 +1950,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 44,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "plasmalogens",
     "inputName": "Plasmalogens",
     "canonicalName": "Plasmalogens",
@@ -1972,7 +1972,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 45,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "pqq",
     "inputName": "PQQ (Pyrroloquinoline Quinone)",
     "canonicalName": "Pyrroloquinoline quinone (PQQ)",
@@ -2029,7 +2029,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 46,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "kava",
     "inputName": "Kava Kava",
     "canonicalName": "Kava (Piper methysticum)",
@@ -2086,7 +2086,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 47,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "sulbutiamine",
     "inputName": "Sulbutiamine",
     "canonicalName": "Sulbutiamine",
@@ -2160,7 +2160,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 48,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "saffron",
     "inputName": "Saffron",
     "canonicalName": "Saffron (Crocus sativus)",
@@ -2217,7 +2217,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 49,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "st-johns-wort",
     "inputName": "St. John's Wort",
     "canonicalName": "St. John's wort (Hypericum perforatum)",
@@ -2274,7 +2274,7 @@ export const BATCH3_EVIDENCE_AUDITS = [
   },
   {
     "recordNumber": 50,
-    "batchNumber": 2,
+    "batchNumber": 3,
     "catalogId": "agmatine",
     "inputName": "Agmatine Sulfate",
     "canonicalName": "Agmatine sulfate",

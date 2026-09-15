@@ -126,6 +126,13 @@ const ROUTES = {
   "/evidence-snapshot":"evidence-snapshot",
   "/demo":"demo",
   "/compare":"compare",
+  "/peptide-tools":"peptide-tools",
+  "/tools/peptide-calculator":"peptide-calculator",
+  "/tools/peptide-interaction-checker":"peptide-interaction-checker",
+  "/guides/peptide-dosage":"peptide-dosage",
+  "/guides/peptide-reconstitution":"peptide-reconstitution",
+  "/guides/peptide-safety":"peptide-safety",
+  "/guides/peptide-half-life":"peptide-half-life",
 };
 
 function getShareIdFromPath(){
@@ -152,6 +159,11 @@ function getGuideIdFromPath(){
   if(p.startsWith("/guide/"))return p.replace("/guide/","");
   return null;
 }
+function getAudienceIdFromPath(){
+  const p=window.location.pathname;
+  if(p.startsWith("/for/"))return p.replace("/for/","");
+  return null;
+}
 function getEvidenceSnapshotIdFromPath(){
   const p=window.location.pathname;
   if(p.startsWith("/evidence-snapshot/"))return p.replace("/evidence-snapshot/","");
@@ -165,6 +177,7 @@ function getComparisonIdsFromPath(){
 }
 function getPageFromPath(){
   const path=window.location.pathname;
+  if(path.startsWith("/compounds/")&&path.endsWith("/dosage"))return "compound-dosage";
   if(path.startsWith("/compound/"))return "compound";
   if(path.startsWith("/evidence-snapshot/"))return "evidence-snapshot";
   if(path.startsWith("/compare/"))return "compare";
@@ -172,11 +185,17 @@ function getPageFromPath(){
   if(path.startsWith("/report/"))return "shared-report";
   if(path.startsWith("/goal/"))return "goal-page";
   if(path.startsWith("/guide/"))return "guide-page";
+  if(path.startsWith("/for/"))return "audience-page";
   return ROUTES[path]||"supplements";
 }
 function getCompoundIdFromPath(){
   const path=window.location.pathname;
   if(path.startsWith("/compound/"))return path.replace("/compound/","");
+  return null;
+}
+function getDosageCompoundIdFromPath(){
+  const path=window.location.pathname;
+  if(path.startsWith("/compounds/")&&path.endsWith("/dosage"))return path.slice("/compounds/".length,-"/dosage".length);
   return null;
 }
 
@@ -185,8 +204,11 @@ function navigate(page){
   window.history.pushState({},"",path);
 }
 import { SUPPLEMENTS, GOALS, TIERS } from "./data.js";
+import { PEPTIDE_COMPOUNDS } from "./peptide-catalog.js";
 import { AuthProvider, useAuth } from "./AuthContext.jsx";
 import BodyAtlasPage from "./BodyAtlas.jsx";
+import { SEO_DOSAGE_IDS, PeptideCalculatorPage, PeptideInteractionCheckerPage, CompoundDosagePage, PeptideDosageGuidePage } from "./SeoPages.jsx";
+import { PeptideToolsPage, PeptideKnowledgePage } from "./PeptideTools.jsx";
 
 // v2
 const C = {
@@ -257,6 +279,32 @@ const GOAL_MARKS={
   endurance:"∿",energy:"ϟ",hormones:"●",stress:"≈",longevity:"♡",skin:"✧",
   cardio:"◉",weight:"◌",hair:"⌇",liver:"◒",recomp:"△",eyes:"◎",
 };
+// Goal artwork supplied by the product team. Keep a text marker as a
+// graceful fallback for categories without a matching asset (All and Eyes).
+const GOAL_ICON_PATHS={
+  sleep:"/goal-icons/1_sleep.png",
+  focus:"/goal-icons/2_Focus.png",
+  memory:"/goal-icons/3_Memory.png",
+  mood:"/goal-icons/4_Mood.png",
+  force:"/goal-icons/5_Strenght.png",
+  recovery:"/goal-icons/6_Recovery.png",
+  endurance:"/goal-icons/7_Endurance.png",
+  energy:"/goal-icons/8_Energy.png",
+  hormones:"/goal-icons/9_Testosterone.png",
+  stress:"/goal-icons/10_Stress.png",
+  longevity:"/goal-icons/11_Longevity.png",
+  skin:"/goal-icons/12_Skin.png",
+  cardio:"/goal-icons/13_Cardio.png",
+  weight:"/goal-icons/14_Weight-Loss.png",
+  liver:"/goal-icons/15_Liver.png",
+  recomp:"/goal-icons/16_Body-Recomposition.png",
+  hair:"/goal-icons/17_Hair-Health.png",
+};
+function GoalIcon({id,className="",style}){
+  const src=GOAL_ICON_PATHS[id];
+  if(src)return <img className={className} src={src} alt="" aria-hidden="true" style={style}/>;
+  return <span className={className} aria-hidden="true" style={style}>{GOAL_MARKS[id]||"•"}</span>;
+}
 const sourceLabel=(sources)=>Array.isArray(sources)?sources.map(source=>typeof source==="string"?source:(source?.id||source?.title||"")).filter(Boolean).join(", "):"";
 const sourceHref=(source)=>{
   const value=typeof source==="string"?source:String(source?.id||source?.url||"");
@@ -274,13 +322,57 @@ const CATALOG_VERIFIED_LABEL="12 Sep 2026";
 const effectStudyYears=(effect)=>[
   effect?.publicationYear,effect?.studyYear,effect?.study_year,effect?.year,
 ].map(value=>Number.parseInt(value,10)).filter(value=>Number.isFinite(value)&&value>=1900&&value<=new Date().getFullYear());
-const studyFreshness=(effects)=>{
+const studyFreshness=(effects,audit)=>{
+  if(audit?.latestVerifiedPublicationYear)return auditFreshness(audit);
   const years=(effects||[]).flatMap(effectStudyYears);
-  if(!years.length)return {label:"Publication year not recorded",detail:"The current entry does not include a reliable study year."};
+  if(!years.length){
+    if(audit)return {label:"Publication year needs review",detail:"The supplied Batch 1 audit did not verify a year for this record."};
+    return {label:"Publication year not recorded",detail:"The current entry does not include a reliable study year."};
+  }
   const latest=Math.max(...years);
   const age=new Date().getFullYear()-latest;
   return {label:`Latest recorded study: ${latest}`,detail:age<=5?"Recent study year in the current record.":age<=10?"Study year is recorded, but the evidence is not recent.":"Older study year in the current record; check for newer research."};
 };
+const auditFreshness=(audit)=>{
+  if(!audit)return null;
+  if(audit.latestVerifiedPublicationYear)return {
+    label:`Latest audit year: ${audit.latestVerifiedPublicationYear}`,
+    detail:"Year reported in the supplied Elicit export; editorial source confirmation is still required.",
+  };
+  return {label:"Publication year needs review",detail:"The supplied Elicit export did not verify a publication year for this record."};
+};
+const auditSourceHref=(source)=>{
+  if(source?.pmid)return `https://pubmed.ncbi.nlm.nih.gov/${source.pmid}/`;
+  if(source?.doi)return `https://doi.org/${source.doi}`;
+  return source?.sourceUrl||null;
+};
+const auditSourceLabel=(source)=>source?.pmid?`PMID:${source.pmid}`:source?.doi?`DOI:${source.doi}`:source?.sourceUrl?"Source link":"Reference details";
+
+function EvidenceAuditPanel({supplement,isMob=false,compact=false}){
+  const audit=supplement?.evidenceAudit;
+  if(!audit)return null;
+  const humanCount=Number.isFinite(audit.humanStudyCount)?String(audit.humanStudyCount):"Not verified";
+  const totalCount=Number.isFinite(audit.totalStudyCount)?String(audit.totalStudyCount):"Not verified";
+  const sourceRecords=(audit.sources||[]).filter(source=>source.title||source.doi||source.pmid||source.sourceUrl);
+  const auditText=(value)=>value||"Not reported in the supplied audit.";
+  return <section className="evid-audit-card" aria-labelledby={`audit-${supplement.id}`} style={{background:compact?C.bg:C.white,border:`1px solid ${C.border}`,padding:isMob?"18px 16px":"24px 28px",marginBottom:24}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap",marginBottom:16}}>
+      <div><p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 6px",textTransform:"uppercase"}}>Batch 1 · Elicit audit</p><h2 id={`audit-${supplement.id}`} style={{fontSize:isMob?20:24,fontWeight:900,color:C.ink,letterSpacing:"-.03em",margin:0}}>What the supplied audit found.</h2></div>
+      <span style={{fontSize:9,fontWeight:800,color:audit.editorialReviewRequired?C.amber:C.green,border:`1px solid ${audit.editorialReviewRequired?C.amber:C.green}55`,padding:"5px 9px",letterSpacing:".08em",textTransform:"uppercase"}}>{audit.editorialReviewRequired?"Editorial review required":"Audit reviewed"}</span>
+    </div>
+    <p style={{fontSize:11,color:C.gray,lineHeight:1.65,margin:"0 0 16px"}}>Imported from the supplied Elicit export. It is an audit lead sheet, so unresolved fields remain visible until a human confirms the underlying publication.</p>
+    <div style={{background:C.white,border:`1px solid ${C.border}`,padding:"12px 14px",marginBottom:16}}><p style={{fontSize:10,color:C.ink,lineHeight:1.55,margin:0}}><strong>Canonical name:</strong> {audit.canonicalName||supplement.name}</p>{audit.aliases&&<p style={{fontSize:10,color:C.gray,lineHeight:1.55,margin:"5px 0 0"}}><strong style={{color:C.ink}}>Alias and name notes:</strong> {audit.aliases}</p>}</div>
+    <div style={{display:"grid",gridTemplateColumns:isMob?"1fr 1fr":"repeat(5,1fr)",gap:8,marginBottom:16}}>
+      {[["Human studies",humanCount],["Total studies",totalCount],["Latest year",audit.latestVerifiedPublicationYear||"Needs review"],["Efficacy score",Number.isFinite(audit.efficacyScore)?`${audit.efficacyScore}/5`:"Not assessed"],["Quality score",Number.isFinite(audit.evidenceQualityScore)?`${audit.evidenceQualityScore}/5`:"Not assessed"]].map(([label,value])=><div key={label} style={{background:C.white,border:`1px solid ${C.border}`,padding:"11px 12px"}}><span style={{display:"block",fontSize:9,fontWeight:800,color:C.gray,letterSpacing:".08em",textTransform:"uppercase",marginBottom:4}}>{label}</span><strong style={{fontSize:14,color:C.ink}}>{value}</strong></div>)}
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1.2fr .8fr",gap:12,marginBottom:12}}>
+      <div style={{background:C.white,border:`1px solid ${C.border}`,padding:"14px 16px"}}><p style={{fontSize:9,fontWeight:800,letterSpacing:".1em",color:C.gray,margin:"0 0 7px",textTransform:"uppercase"}}>Evidence by goal</p><p style={{fontSize:12,color:C.ink,lineHeight:1.65,margin:0}}>{auditText(audit.evidenceByGoal)}</p></div>
+      <div style={{display:"flex",flexDirection:"column",gap:12}}><div style={{background:C.white,border:`1px solid ${C.border}`,padding:"14px 16px"}}><p style={{fontSize:9,fontWeight:800,letterSpacing:".1em",color:C.gray,margin:"0 0 7px",textTransform:"uppercase"}}>Safety and regulation</p><p style={{fontSize:11,color:C.ink,lineHeight:1.6,margin:0}}>{auditText(audit.safetySummary)}</p><p style={{fontSize:11,color:C.gray,lineHeight:1.6,margin:"8px 0 0"}}>{auditText(audit.regulatoryStatus)}</p></div><div style={{background:`${C.amber}0a`,border:`1px solid ${C.amber}40`,padding:"14px 16px"}}><p style={{fontSize:9,fontWeight:800,letterSpacing:".1em",color:C.amber,margin:"0 0 7px",textTransform:"uppercase"}}>Missing or unresolved</p><p style={{fontSize:11,color:C.ink,lineHeight:1.6,margin:0}}>{auditText(audit.missingFields)}</p></div></div>
+    </div>
+    <div style={{background:C.white,border:`1px solid ${C.border}`,padding:"14px 16px",marginBottom:12}}><p style={{fontSize:9,fontWeight:800,letterSpacing:".1em",color:C.gray,margin:"0 0 7px",textTransform:"uppercase"}}>Audit limitations</p><p style={{fontSize:11,color:C.ink,lineHeight:1.6,margin:0}}>{auditText(audit.limitations)}</p></div>
+    <details style={{borderTop:`1px solid ${C.border}`,paddingTop:12}}><summary style={{cursor:"pointer",fontSize:11,fontWeight:800,color:C.ink}}>Show {sourceRecords.length} audit reference{sourceRecords.length===1?"":"s"}</summary><div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>{sourceRecords.map((source,index)=>{const href=auditSourceHref(source);return <article key={`${source.doi||source.pmid||source.sourceUrl||index}-${index}`} style={{background:C.white,border:`1px solid ${C.border}`,padding:"12px 14px"}}><p style={{fontSize:11,fontWeight:800,color:C.ink,lineHeight:1.45,margin:"0 0 5px"}}>{source.title||"Untitled reference"}</p><p style={{fontSize:10,color:C.gray,margin:"0 0 7px"}}>{[source.year,source.journal,source.studyDesign].filter(Boolean).join(" · ")||"Publication details not reported"}</p><p style={{fontSize:10,color:C.gray,lineHeight:1.55,margin:"0 0 7px"}}>{[source.population,source.sampleSize&&`n=${source.sampleSize}`,source.doseStudied&&`Dose studied: ${source.doseStudied}`,source.duration&&`Duration: ${source.duration}`].filter(Boolean).join(" · ")||"Study context not reported"}</p><p style={{fontSize:10,color:C.gray,lineHeight:1.55,margin:"0 0 7px"}}>{source.outcomes||"Outcome details not reported in the export."}</p>{href?<a href={href} target="_blank" rel="noreferrer" style={{fontSize:10,fontWeight:800,color:C.green}}>{auditSourceLabel(source)} ↗</a>:<span style={{fontSize:10,color:C.gray}}>No verified link in export</span>}</article>;})}</div></details>
+  </section>;
+}
 const compoundConfidence=(supplement)=>{
   const effects=supplement?.effects||[];
   const sourced=effects.filter(effect=>effect.sources?.length).length;
@@ -295,6 +387,8 @@ const compoundConfidence=(supplement)=>{
 const effectEvidenceState=(effect)=>{
   const explicitNoEffect=effect?.noEffect===true||effect?.effectDirection==="none"||/no (significant )?effect|no benefit|did not improve/i.test(String(effect?.result||effect?.results||""));
   if(explicitNoEffect&&effect?.sources?.length)return {label:"Evidence of no effect reported",tone:"neutral",detail:"This statement refers to the cited study result; it is not a claim that no future study can find an effect."};
+  if(effect?.sourceStatus==="auto-linked"&&effect?.sources?.length)return {label:"Candidate source linked",tone:"caution",detail:"A source candidate was found by automated review; editorial confirmation is still pending."};
+  if(effect?.sourceStatus==="replaced-mismatch"&&effect?.sources?.length)return {label:"Source corrected and linked",tone:"neutral",detail:"The original citation was replaced during source review. Read the linked paper before relying on the summary."};
   if(effect?.sources?.length)return {label:"Evidence found in linked source",tone:"positive",detail:"At least one reference is attached to this outcome record."};
   return {label:"No verified evidence found in this entry",tone:"caution",detail:"This is a data gap, not proof that the compound has no effect."};
 };
@@ -372,7 +466,7 @@ function SearchSuggestions({query,onSelect,compact=false}){
 
 function SourceProofSection({onNavigate}){
   const [ref,visible]=useScrollReveal(0.16);
-  const sourceLogos={PM:"/pubmed-mark.png",C:"/cochrane-mark.png",E:"/examine-mark.png"};
+  const sourceLogos={PM:"/pubmed-mark.png",C:"/cochrane-mark.png"};
   const cards=[
     {
       index:"01",
@@ -389,14 +483,6 @@ function SourceProofSection({onNavigate}){
       detail:"Systematic reviews are used when a higher-level synthesis is available.",
       note:"Independent evidence synthesis",
       href:"https://www.cochranelibrary.com/",
-    },
-    {
-      index:"03",
-      mark:"E",
-      name:"Examine",
-      detail:"A secondary cross-check for supplement context, claims and study quality.",
-      note:"Research summary cross-reference",
-      href:"https://examine.com/",
     },
   ];
   return(
@@ -415,7 +501,7 @@ function SourceProofSection({onNavigate}){
         <div className="evid-source-grid">
           {cards.map(card=>(
             <a key={card.name} className="evid-source-card" href={card.href} target="_blank" rel="noreferrer">
-              <span className="evid-source-card-top"><span className="evid-source-index">{card.index}</span><span className={`evid-source-mark is-${card.mark.toLowerCase()}`} aria-hidden="true"><img src={sourceLogos[card.mark]} alt="" /></span></span>
+              <span className="evid-source-card-top"><span className="evid-source-index">{card.index}</span><span className={`evid-source-mark is-${card.mark.toLowerCase()}`}><img src={sourceLogos[card.mark]} alt={card.name}/></span></span>
               <span className="evid-source-name">{card.name}</span>
               <span className="evid-source-detail">{card.detail}</span>
               <span className="evid-source-note">{card.note}<span aria-hidden="true"> ↗</span></span>
@@ -561,6 +647,37 @@ function ActivationNudge({onClose,onChooseGoal,onOpenStack}){
       <button onClick={dismiss} style={{padding:"10px 10px",marginLeft:8,background:"transparent",color:"#9ca3af",border:"none",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Later</button>
     </aside>
   );
+}
+
+function ActivationChecklist({profileReady,stackCount,freePreviewDone,onNavigate,onUpgrade,onDismiss}){
+  const [viewed,setViewed]=useState(false);
+  const steps=[
+    {id:"context",label:"Add your context",detail:"Optional profile details make follow-up notes easier to interpret.",done:profileReady,cta:"Open My Stack",run:()=>onNavigate("my-stack")},
+    {id:"stack",label:"Save your first compound",detail:stackCount?`${stackCount} compound${stackCount===1?"":"s"} saved. Keep the shortlist you want to revisit.`:"Keep a shortlist so every review starts with the same context.",done:stackCount>0,cta:"Browse compounds",run:()=>onNavigate("supplements")},
+    {id:"answer",label:"Use your free Evidence Answer",detail:"Ask one question and see how a cited answer fits into the rest of the workspace.",done:freePreviewDone,cta:"Try Evidence Answer",run:()=>onNavigate("evidence-answer")},
+    {id:"pro",label:"Connect the full research loop",detail:"Unlock comparisons, audits, reports and ongoing research context when you need them.",done:false,cta:"Explore Pro",run:onUpgrade},
+  ];
+  const completed=steps.filter(step=>step.done).length;
+  useEffect(()=>{
+    if(viewed)return;
+    setViewed(true);
+    trackEvent("activation_checklist_view",{completed,total:steps.length});
+  },[viewed,completed,steps.length]);
+  const activate=(step)=>{trackEvent("activation_checklist_action",{step:step.id,completed});step.run();};
+  return <section className="evid-activation-checklist" aria-labelledby="evid-activation-checklist-title">
+    <div className="evid-activation-checklist-head">
+      <div><p className="evid-workspace-section-kicker">YOUR FIRST RESEARCH SESSION</p><h2 id="evid-activation-checklist-title">Build value before you decide on Pro.</h2><p>Complete the short path below to get a useful result from your free account. You can return to any step later.</p></div>
+      <div className="evid-activation-progress"><strong>{completed}/{steps.length-1}</strong><span>free setup steps</span><i><b style={{width:`${Math.min(100,(completed/Math.max(1,steps.length-1))*100)}%`}}/></i></div>
+    </div>
+    <div className="evid-activation-checklist-grid">
+      {steps.map((step,index)=><button key={step.id} className={`evid-activation-step${step.done?" is-done":""}${step.id==="pro"?" is-pro":""}`} onClick={()=>activate(step)}>
+        <span className="evid-activation-step-number">{step.done?"✓":String(index+1).padStart(2,"0")}</span>
+        <span className="evid-activation-step-copy"><b>{step.label}</b><small>{step.detail}</small></span>
+        <em>{step.done?"Completed":step.cta}<span aria-hidden="true"> ↗</span></em>
+      </button>)}
+    </div>
+    <button className="evid-activation-dismiss" onClick={()=>{trackEvent("activation_checklist_dismissed");onDismiss();}}>Hide this checklist</button>
+  </section>;
 }
 
 // ── PROFILE SETUP MODAL ───────────────────────────────────────────────────────
@@ -870,17 +987,6 @@ function UpgradeModal({onClose,onAuthNeeded}){
     }catch(e){setError(e.message||"Something went wrong.");setLoading(false);}
   };
 
-  const features=[
-    {icon:"🔬",text:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+ compounds including Tier 2-4`},
-    {icon:"📌",text:"My Stack - save up to 20 compounds and return across devices"},
-    {icon:"✦",text:"Evidence Answer - cited questions and ranked options"},
-    {icon:"⚗️",text:"Interaction Checker - full stack safety analysis"},
-    {icon:"🎯",text:"Stack Audit AI - score and optimize your current stack"},
-    {icon:"🩸",text:"Bloodwork History - track 16 biomarkers over time"},
-    {icon:"📊",text:"My Tracker - weekly supplement log"},
-    {icon:"💾",text:"Save and name your stacks"},
-  ];
-
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
       <div className="evid-upgrade-modal" onClick={e=>e.stopPropagation()} style={{background:C.white,width:"100%",maxWidth:480,maxHeight:"90vh",overflow:"auto",position:"relative"}}>
@@ -922,16 +1028,22 @@ function UpgradeModal({onClose,onAuthNeeded}){
             {[
               {feature:"Compounds",free:"Tier 1 only (33)",pro:`All ${Math.floor(SUPPLEMENTS.length/10)*10}+`,highlight:true},
               {feature:"Peptides & GLP-1s",free:false,pro:true},
-              {feature:"Biohacking tier",free:false,pro:true},
+              {feature:"Biohacking tier (T4)",free:false,pro:true},
+              {feature:"Compound pages",free:"Tier 1 evidence profiles",pro:"Full Tier 2–4 profiles"},
               {feature:"Evidence Answer",free:"Preview",pro:"Cited answers and ranked options",highlight:true},
               {feature:"Conversation memory",free:false,pro:true},
-              {feature:"Interaction Checker",free:false,pro:true,highlight:true},
-              {feature:"Stack Audit AI",free:false,pro:true},
-              {feature:"Bloodwork History",free:false,pro:true},
-              {feature:"AI Bloodwork Analyzer",free:false,pro:true},
-              {feature:"My Tracker",free:false,pro:true},
-              {feature:"Compare compounds",free:false,pro:true},
-              {feature:"Save your stacks",free:false,pro:true,highlight:true},
+              {feature:"Synergy and protocol suggestions",free:false,pro:true},
+              {feature:"Research Feed",free:"Preview",pro:"Follow goals, compounds and source updates",highlight:true},
+              {feature:"Interaction Checker",free:false,pro:"Evidence strength + clinical severity",highlight:true},
+              {feature:"Peptide Tools",free:"2 previews per tool",pro:"Unlimited calculator, checker and guides",highlight:true},
+              {feature:"Stack Audit AI",free:false,pro:"Coverage, overlap and next questions"},
+              {feature:"Study Comparator",free:false,pro:"Population, sample size, dose, duration, results and adverse effects",highlight:true},
+              {feature:"Shareable Evidence Report",free:false,pro:"A source-linked brief with doses, risks, limits and sources",highlight:true},
+              {feature:"Bloodwork Analyzer",free:false,pro:"Markers, units, ranges and goal context",highlight:true},
+              {feature:"Outcome Tracker",free:false,pro:"Baselines, check-ins and personal trends",highlight:true},
+              {feature:"Evidence Timeline",free:false,pro:"Decisions, measurements and research updates",highlight:true},
+              {feature:"Visible trust signals",free:"Basic source labels",pro:"Verification date, study freshness and source reporting",highlight:true},
+              {feature:"My Stack",free:"Up to 5 saved compounds",pro:"Up to 20, synced across devices",highlight:true},
             ].map((row,i)=>(
               <div key={row.feature} className="evid-upgrade-table-row" style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr"}}>
                 <div className="evid-upgrade-table-cell" style={{padding:"9px 12px",background:row.highlight?`${C.gold}0a`:C.white,border:`1px solid ${C.border}`,borderTop:"none",borderRight:"none"}}>
@@ -1357,7 +1469,7 @@ function WeeklyProtocolAI({onUpgrade}){
 
 /* INTERACTION CHECKER */
 function InteractionChecker({onUpgrade}){
-  const {isPro}=useAuth();
+  const {isPro,userProfile}=useAuth();
   const isMob=useIsMobile();
   const [input,setInput]=useState("");
   const [compounds,setCompounds]=useState([]);
@@ -1365,7 +1477,7 @@ function InteractionChecker({onUpgrade}){
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
 
-  const NAMES=SUPPLEMENTS.map(s=>s.name);
+  const NAMES=PEPTIDE_COMPOUNDS.map(s=>s.name);
   const [suggestions,setSuggestions]=useState([]);
   const [showSugg,setShowSugg]=useState(false);
 
@@ -1381,6 +1493,7 @@ function InteractionChecker({onUpgrade}){
   const addCompound=(name)=>{
     const t=(name||input).trim();
     if(!t||compounds.includes(t))return;
+    if(!NAMES.includes(t)){setError("Choose a peptide from the suggestions.");return;}
     if(compounds.length>=8){setError("Max 8 compounds.");return;}
     setCompounds(c=>[...c,t]);setInput("");setSuggestions([]);setShowSugg(false);setError("");
   };
@@ -1421,7 +1534,7 @@ function InteractionChecker({onUpgrade}){
           <input value={input} onChange={e=>onInputChange(e.target.value)}
             onKeyDown={e=>{if(e.key==="Enter")addCompound();if(e.key==="Escape"){setShowSugg(false);}}}
             onBlur={()=>setTimeout(()=>setShowSugg(false),150)}
-            onFocus={()=>input.length>=2&&setSuggestions.length>0&&setShowSugg(true)}
+            onFocus={()=>input.length>=2&&suggestions.length>0&&setShowSugg(true)}
             placeholder="Type a compound name..."
             style={{flex:1,padding:"13px 16px",border:`1px solid ${C.border}`,borderRight:"none",fontSize:13,fontFamily:"Montserrat,sans-serif",outline:"none",minWidth:0}}/>
           <button onClick={()=>addCompound()} style={{padding:"13px 20px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",flexShrink:0,fontFamily:"Montserrat,sans-serif"}}>Add</button>
@@ -2064,29 +2177,40 @@ function CompoundmaxxingPage({onUpgrade,onNavigate}){
 }
 
 /* AFFILIATE */
-function AffiliatePage(){
+function AffiliatePage({onNavigate}){
   const isMob=useIsMobile();
   const [copied,setCopied]=useState(false);
+  const [partnerName,setPartnerName]=useState("");
+  const [partnerAudience,setPartnerAudience]=useState("coach");
+  const [partnerLinkCopied,setPartnerLinkCopied]=useState(false);
 
   const copy=(text)=>{
     navigator.clipboard.writeText(text).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});
+  };
+  const partnerSlug=(partnerName.trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")||"your-name").slice(0,32);
+  const partnerLink=`https://evidstack.com/?ref=partner-${partnerSlug}&utm_source=partner&utm_medium=referral&utm_campaign=partner_launch&utm_content=${partnerAudience}`;
+  const copyPartnerLink=()=>{
+    navigator.clipboard.writeText(partnerLink).then(()=>{
+      setPartnerLinkCopied(true);setTimeout(()=>setPartnerLinkCopied(false),2200);
+      trackEvent("partner_link_copied",{audience:partnerAudience,slug:partnerSlug});
+    });
   };
 
   return(
     <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"40px 16px 80px":"64px 48px 100px"}}>
       {/* Header */}
-      <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Evidstack  -  Affiliate Program</p>
-      <h1 style={{fontSize:isMob?28:44,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 16px",lineHeight:1.05}}>Earn 30% recurring commission.</h1>
+      <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 8px",textTransform:"uppercase"}}>Evidstack  -  Partner program</p>
+      <h1 style={{fontSize:isMob?28:44,fontWeight:900,letterSpacing:"-.04em",color:C.ink,margin:"0 0 16px",lineHeight:1.05}}>Give your audience a clearer evidence trail.</h1>
       <p style={{fontSize:14,color:C.gray,lineHeight:1.8,margin:"0 0 40px",maxWidth:560}}>
-        Recommend Evidstack to your audience and earn 30% on every payment  -  every month, for as long as they stay subscribed.
+        Share a source-first research workflow with people who care about supplement context. Approved partners receive a tracked link and 30% recurring commission under the written partner terms.
       </p>
 
       {/* Numbers */}
       <div style={{display:"grid",gridTemplateColumns:isMob?"1fr 1fr":"repeat(3,1fr)",gap:12,marginBottom:40}}>
         {[
-          {val:"30%",label:"Recurring commission"},
-          {val:"$3/mo",label:"Per monthly subscriber"},
-          {val:"$23.70/yr",label:"Per annual subscriber"},
+          {val:"30%",label:"Partner commission"},
+          {val:"$9.99",label:"Monthly Pro plan"},
+          {val:"$79",label:"Annual Pro plan"},
         ].map(s=>(
           <div key={s.label} style={{background:C.ink,padding:"20px 16px",textAlign:"center"}}>
             <p style={{fontSize:isMob?22:28,fontWeight:900,color:C.gold,margin:"0 0 4px"}}>{s.val}</p>
@@ -2100,10 +2224,10 @@ function AffiliatePage(){
         <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>How it works</p>
         <div style={{display:"flex",flexDirection:"column",gap:1}}>
           {[
-            {n:"01",title:"Apply below",desc:"Send us your name, platform, and audience size. We review and send you a custom link within 48h."},
-            {n:"02",title:"Share your link",desc:"Use your tracking link in videos, posts, or bio. No minimum audience required."},
-            {n:"03",title:"Earn every month",desc:"30% of every payment your referrals make, automatically, for their entire subscription lifetime."},
-            {n:"04",title:"Get paid",desc:"Payouts monthly via PayPal or bank transfer once you hit $20 minimum."},
+            {n:"01",title:"Apply below",desc:"Tell us who you help and where you publish. We review the fit and confirm the partner terms."},
+            {n:"02",title:"Use a tracked link",desc:"Create a campaign link for a guide, a compound question or a shared report."},
+            {n:"03",title:"Lead with value",desc:"Show the evidence workflow first. The best partners teach a useful question before mentioning Pro."},
+            {n:"04",title:"Review performance",desc:"We use referral events to understand which audiences reach a free preview and which convert."},
           ].map(s=>(
             <div key={s.n} style={{display:"flex",gap:20,padding:"18px 20px",background:C.bg,alignItems:"flex-start"}}>
               <span style={{fontSize:11,fontWeight:900,color:C.gold,flexShrink:0,letterSpacing:".04em"}}>{s.n}</span>
@@ -2121,13 +2245,13 @@ function AffiliatePage(){
         <p style={{fontSize:10,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 16px",textTransform:"uppercase"}}>Who it is for</p>
         <div style={{display:"grid",gridTemplateColumns:isMob?"1fr":"1fr 1fr",gap:10}}>
           {[
-            {icon:"📱",title:"Content creators",desc:"TikTok, YouTube, Instagram  -  fitness, biohacking, looksmaxxing, nootropics content"},
-            {icon:"🧬",title:"Peptide / biohacking communities",desc:"Discord servers, Telegram groups, Reddit moderators in relevant communities"},
-            {icon:"🏋️",title:"Fitness coaches",desc:"Personal trainers, online coaches with a client base interested in optimization"},
-            {icon:"✍️",title:"Newsletter writers",desc:"Health, longevity, or performance newsletters with engaged readers"},
+            {mark:"01",title:"Coaches & practitioners",desc:"Use client-ready, source-linked briefs to support a better research conversation."},
+            {mark:"02",title:"Evidence-led creators",desc:"Turn a supplement question into a clear, responsible explainer with references."},
+            {mark:"03",title:"Research communities",desc:"Give members a consistent way to compare compounds and inspect source status."},
+            {mark:"04",title:"Newsletter writers",desc:"Link readers to a free snapshot before offering the connected Pro workspace."},
           ].map(s=>(
             <div key={s.title} style={{padding:"16px 18px",border:`1px solid ${C.border}`,background:C.white}}>
-              <p style={{fontSize:18,margin:"0 0 6px"}}>{s.icon}</p>
+              <p style={{fontSize:10,fontWeight:900,letterSpacing:".12em",color:C.gold,margin:"0 0 10px"}}>{s.mark}</p>
               <p style={{fontSize:13,fontWeight:800,color:C.ink,margin:"0 0 4px"}}>{s.title}</p>
               <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}>{s.desc}</p>
             </div>
@@ -2135,11 +2259,25 @@ function AffiliatePage(){
         </div>
       </div>
 
+      {/* Tracked partner link builder */}
+      <div className="evid-partner-link-builder">
+        <div>
+          <p className="evid-partner-kicker">BUILD A TRACKED LINK</p>
+          <h2>Make every introduction measurable.</h2>
+          <p>Use a short name and choose the audience you are helping. The link opens Evidstack's free first step and records the referral source.</p>
+        </div>
+        <div className="evid-partner-link-form">
+          <label>Partner or campaign name<input value={partnerName} onChange={e=>setPartnerName(e.target.value)} placeholder="e.g. Alex or Sleep Club"/></label>
+          <label>Audience<select value={partnerAudience} onChange={e=>setPartnerAudience(e.target.value)}><option value="coach">Coaches & practitioners</option><option value="creator">Evidence-led creators</option><option value="community">Research communities</option><option value="newsletter">Newsletter readers</option></select></label>
+          <div className="evid-partner-link-output"><code>{partnerLink}</code><button onClick={copyPartnerLink}>{partnerLinkCopied?"Copied":"Copy link"}</button></div>
+        </div>
+      </div>
+
       {/* Apply form / CTA */}
       <div style={{background:C.ink,padding:isMob?"24px 20px":"32px 40px"}}>
-        <p style={{fontSize:14,fontWeight:900,color:C.white,margin:"0 0 8px",letterSpacing:"-.02em"}}>Apply to become an affiliate.</p>
+        <p style={{fontSize:14,fontWeight:900,color:C.white,margin:"0 0 8px",letterSpacing:"-.02em"}}>Apply to become an Evidstack partner.</p>
         <p style={{fontSize:12,color:"#9ca3af",margin:"0 0 24px",lineHeight:1.7}}>
-          Send an email to <strong style={{color:C.gold}}>evidstack@protonmail.com</strong> with the subject line <strong style={{color:C.white}}>"Affiliate Application"</strong> and include:
+          Send an email to <strong style={{color:C.gold}}>evidstack@protonmail.com</strong> with the subject line <strong style={{color:C.white}}>"Partner Application"</strong> and include:
         </p>
         <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:24}}>
           {["Your name and platform (TikTok, YouTube, etc.)","Your niche (looksmaxxing, fitness, biohacking, nootropics...)","Approximate audience size","Why you think Evidstack fits your audience"].map(item=>(
@@ -2156,7 +2294,7 @@ function AffiliatePage(){
       </div>
 
       <p style={{fontSize:11,color:C.gray,margin:"20px 0 0",lineHeight:1.7}}>
-        We review all applications within 48 hours. No minimum follower count. We prioritize engaged niche audiences over large generic ones.
+        We review applications within 48 hours. There is no minimum follower count. We prioritize engaged niche audiences over large generic ones and confirm commission terms before any promotion.
       </p>
     </div>
   );
@@ -2167,11 +2305,12 @@ function EvidenceSnapshotPage({compoundId,onUpgrade}){
   const isMob=useIsMobile();
   const [copied,setCopied]=useState(false);
   const supp=SUPPLEMENTS.find(s=>s.id===compoundId);
+  const audit=supp?.evidenceAudit;
   const effects=supp?.effects||[];
   const primaryEffect=[...effects].sort((a,b)=>(Number(b.evidence||0)+Number(b.efficacy||0))-(Number(a.evidence||0)+Number(a.efficacy||0)))[0];
   const sourceCount=new Set(effects.flatMap(effect=>effect.sources||[])).size;
   const trustConfidence=supp?compoundConfidence(supp):null;
-  const trustFreshness=supp?studyFreshness(effects):null;
+  const trustFreshness=supp?studyFreshness(effects,audit):null;
   const category=supp?compoundCategory(supp):null;
   const safetyLabel=supp?["","Risky","Caution","Caution","Safe","Very safe"][supp.safety]||"Not recorded":"";
   const safetyTone=supp?(supp.safety<=2?"is-caution":"is-positive"):"";
@@ -2245,7 +2384,7 @@ function EvidenceSnapshotPage({compoundId,onUpgrade}){
       <section className="evid-snapshot-card">
         <div className="evid-snapshot-section-heading"><span>02</span><div><p className="evid-snapshot-section-kicker">STUDY CONTEXT</p><h2>What was actually recorded.</h2></div></div>
         <div className="evid-snapshot-facts">
-          {[['Studied population',studiedPopulation],['Dose in record',dose],['Study duration',studyDuration],['Observed result',observedResult],['Study freshness',trustFreshness.label],['Catalog confidence',trustConfidence.label]].map(([label,value])=><div key={label}><span>{label}</span><strong>{value}</strong></div>)}
+          {[['Studied population',studiedPopulation],['Dose in record',dose],['Study duration',studyDuration],['Observed result',observedResult],['Study freshness',trustFreshness.label],['Audited human studies',audit?(Number.isFinite(audit.humanStudyCount)?audit.humanStudyCount:'Not verified'):'Not available'],['Catalog confidence',trustConfidence.label]].map(([label,value])=><div key={label}><span>{label}</span><strong>{value}</strong></div>)}
         </div>
       </section>
 
@@ -2256,6 +2395,8 @@ function EvidenceSnapshotPage({compoundId,onUpgrade}){
           <div><span>Evidence status</span><p>{effects.length?`${effects.filter(effect=>effect.sources?.length).length} of ${effects.length} outcomes have an attached source.`:"No outcome record is available."}</p><p className="evid-snapshot-small">“No verified evidence found” is a data gap, not proof of no effect. A no-effect statement is shown only when a cited study reports it.</p></div>
         </div>
       </section>
+
+      <EvidenceAuditPanel supplement={supp} isMob={isMob} />
 
       <section className="evid-snapshot-card evid-snapshot-sources">
         <div className="evid-snapshot-section-heading"><span>04</span><div><p className="evid-snapshot-section-kicker">SOURCE TRAIL</p><h2>References attached to this record.</h2></div><span className="evid-snapshot-source-count">{sourceCount} linked</span></div>
@@ -2390,13 +2531,15 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   const efColor=(v)=>v>=4?C.green:v===3?C.blue:v===2?C.amber:C.red;
   const sourcedEffects=(supp.effects||[]).filter(e=>e.sources?.length>0).length;
   const sourceCount=new Set((supp.effects||[]).flatMap(e=>e.sources||[])).size;
+  const audit=supp.evidenceAudit;
   const trustConfidence=compoundConfidence(supp);
-  const trustFreshness=studyFreshness(supp.effects||[]);
+  const trustFreshness=studyFreshness(supp.effects||[],audit);
   const primaryEffect=[...(supp.effects||[])].sort((a,b)=>(Number(b.evidence||0)+Number(b.efficacy||0))-(Number(a.evidence||0)+Number(a.efficacy||0)))[0];
-  const researchConclusion=primaryEffect?.summary||"No concise research conclusion is recorded for this entry.";
+  const primaryHasReviewedSource=Boolean(primaryEffect?.sources?.length&&primaryEffect?.sourceStatus!=="auto-linked");
+  const researchConclusion=primaryHasReviewedSource?primaryEffect.summary:"No verified conclusion is recorded for the selected outcome yet. The catalogue note is still pending source review.";
   const studiedPopulation=primaryEffect?.population||primaryEffect?.populationStudied||primaryEffect?.participants||"Not recorded in this entry";
   const studyDuration=primaryEffect?.duration||primaryEffect?.studyDuration||primaryEffect?.study_duration||"Not recorded in this entry";
-  const observedResult=primaryEffect?`${Math.abs(primaryEffect.efficacy||0)}/5 efficacy score in the recorded evidence summary (${primaryEffect.studies??primaryEffect.study_count??"study count not recorded"} studies).`:"Not recorded in this entry";
+  const observedResult=primaryEffect&&primaryHasReviewedSource?`${Math.abs(primaryEffect.efficacy||0)}/5 efficacy score in the recorded evidence summary (${primaryEffect.studies??primaryEffect.study_count??"study count not recorded"} studies).`:primaryEffect?"A catalogue score is recorded, but the selected outcome has no verified linked source yet.":"Not recorded in this entry";
   const researchLimits=sourcedEffects<((supp.effects||[]).length)||Number(primaryEffect?.evidence||0)<=2
     ?"The evidence record is incomplete or limited. Treat this as an area of uncertainty and review the linked sources before acting."
     :"The entry does not record a specific unresolved limitation beyond the usual differences between study populations and real-world use.";
@@ -2457,13 +2600,21 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
           </div>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap",marginTop:18}}>
             <p style={{fontSize:12,color:C.gray,margin:0,lineHeight:1.5}}>Save compounds you are considering so your research stays in one place.</p>
-            <button onClick={()=>{if(!user){onAuth("signup");return;}if(!inStack&&!isPro&&stackIds.length>=5){onUpgrade();return;}toggleStack(supp.id,isPro?20:5);}} style={{padding:"10px 16px",background:inStack?C.bg:C.ink,color:inStack?C.ink:C.white,border:`1px solid ${inStack?C.border:C.ink}`,fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
-              {inStack?"Saved to My Stack":user?"Save to My Stack":"Create a free account to save"}
-            </button>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"flex-end"}}>
+              {SEO_DOSAGE_IDS.includes(supp.id)&&<button onClick={()=>{window.history.pushState({},"",`/compounds/${supp.id}/dosage`);window.dispatchEvent(new PopStateEvent("popstate"));}} style={{padding:"10px 14px",background:C.bg,color:C.ink,border:`1px solid ${C.border}`,fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Read dosage research ↗</button>}
+              <button onClick={()=>{if(!user){onAuth("signup");return;}if(!inStack&&!isPro&&stackIds.length>=5){onUpgrade();return;}toggleStack(supp.id,isPro?20:5);}} style={{padding:"10px 16px",background:inStack?C.bg:C.ink,color:inStack?C.ink:C.white,border:`1px solid ${inStack?C.border:C.ink}`,fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>
+                {inStack?"Saved to My Stack":user?"Save to My Stack":"Create a free account to save"}
+              </button>
+            </div>
           </div>
           <div style={{marginTop:14,padding:"10px 14px",background:`${C.blue}08`,borderLeft:`3px solid ${C.blue}`}}>
             <p style={{fontSize:11,color:C.gray,margin:0,lineHeight:1.6}}><strong style={{color:C.ink}}>Evidence record:</strong> {sourcedEffects} of {supp.effects.length} effect summaries have linked references ({sourceCount} total). {sourcedEffects<supp.effects.length?"Some claims are still awaiting source review.":"Each listed effect has a linked reference."}</p>
           </div>
+          <nav aria-label="Compound research tools" style={{marginTop:14,padding:"12px 14px",background:C.bg,border:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+            <span style={{fontSize:9,fontWeight:800,letterSpacing:".12em",color:C.gray,textTransform:"uppercase",marginRight:4}}>Continue the research</span>
+            <button onClick={()=>{window.history.pushState({},"","/tools/peptide-interaction-checker");window.dispatchEvent(new PopStateEvent("popstate"));}} style={{padding:"7px 10px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:10,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Check interactions ↗</button>
+            <button onClick={()=>{window.history.pushState({},"","/tools/peptide-calculator");window.dispatchEvent(new PopStateEvent("popstate"));}} style={{padding:"7px 10px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,fontSize:10,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Peptide calculator ↗</button>
+          </nav>
           <section className="evid-trust-card" aria-labelledby="trust-signals-title">
             <div className="evid-trust-heading">
               <div><p className="evid-trust-kicker">TRUST SIGNALS</p><h2 id="trust-signals-title">Know what this record can support.</h2></div>
@@ -2500,6 +2651,8 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
         </div>
         <p style={{fontSize:11,color:C.gray,lineHeight:1.6,margin:"16px 0 0"}}>This snapshot reflects the current Evidstack record. “Not recorded” means the entry needs editorial review; it is not proof that the information does not exist.</p>
       </section>
+
+      <EvidenceAuditPanel supplement={supp} isMob={isMob} compact />
 
       {isLocked?(
         <div style={{background:C.ink,padding:"40px 36px",textAlign:"center",marginBottom:24}}>
@@ -3263,14 +3416,13 @@ function EvidenceCoverageMap(){
   const compounds=useCountUp(SUPPLEMENTS.length,900,visible);
   const effects=useCountUp(EVIDENCE_COVERAGE_TOTAL_EFFECTS,1100,visible);
   const linked=useCountUp(EVIDENCE_COVERAGE_LINKED_EFFECTS,1000,visible);
-  const maxEffects=Math.max(...EVIDENCE_COVERAGE_DATA.map(row=>row.effects));
   return(
     <section ref={ref} className={`evid-coverage-map evid-reveal${visible?" visible":""}`} aria-labelledby="evid-coverage-title">
       <div className="evid-coverage-head">
         <div>
           <p className="evid-about-label">Evidence Coverage Map</p>
           <h2 id="evid-coverage-title">See where the source trail is strongest.</h2>
-          <p className="evid-coverage-lede">This view counts the catalogue's effect records by goal. The green segment shows records with an attached source, while the full bar shows every recorded effect.</p>
+          <p className="evid-coverage-lede">This view counts the catalogue's effect records by goal. Each track is normalized to that goal's full record count, so the green segment always matches the sourced percentage shown beside it.</p>
         </div>
         <div className="evid-coverage-stats" aria-label="Catalogue totals">
           <div><strong>{compounds}</strong><span>compounds</span></div>
@@ -3286,16 +3438,15 @@ function EvidenceCoverageMap(){
         </div>
         <ol className="evid-coverage-list">
           {EVIDENCE_COVERAGE_DATA.map((row,index)=>{
-            const totalWidth=Math.max(5,(row.effects/maxEffects)*100);
-            const linkedWidth=row.effects?((row.linked/row.effects)*100):0;
+            const linkedWidth=row.coverage;
             return(
               <li key={row.id} className="evid-coverage-row" aria-label={`${row.label}: ${row.effects} effect records, ${row.linked} with an attached source, ${row.avgEvidence.toFixed(1)} out of 5 average evidence score`}>
                 <div className="evid-coverage-row-head">
                   <span className="evid-coverage-goal">{row.label}</span>
                   <span className="evid-coverage-meta">{row.linked}/{row.effects} sourced · {row.coverage}% · avg {row.avgEvidence.toFixed(1)}/5</span>
                 </div>
-                <div className="evid-coverage-track" aria-hidden="true">
-                  <span className="evid-coverage-total-bar" style={{width:`${totalWidth}%`,transitionDelay:`${index*28}ms`}}>
+                <div className="evid-coverage-track" role="progressbar" aria-label={`${row.label} source coverage`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={row.coverage}>
+                  <span className="evid-coverage-total-bar" style={{width:"100%",transitionDelay:`${index*28}ms`}}>
                     <span className="evid-coverage-linked-bar" style={{width:`${linkedWidth}%`}}/>
                   </span>
                 </div>
@@ -3609,7 +3760,7 @@ function AccountCenter({onClose,onUpgrade}){
                 </div>
               </div>
 
-              <button onClick={()=>{logout();onClose();}}
+              <button className="evid-account-signout-button" onClick={()=>{logout();onClose();}}
                 style={{width:"100%",padding:"11px",background:"transparent",border:`1px solid ${C.border}`,fontSize:12,fontWeight:700,color:C.gray,cursor:"pointer",letterSpacing:".04em"}}>
                 Sign out
               </button>
@@ -3963,6 +4114,7 @@ function StudyComparatorScreen({onUpgrade,onNavigate}){
 
   if(!isPro)return <div style={{maxWidth:760,margin:"0 auto",padding:isMob?"48px 16px 80px":"76px 32px 110px",textAlign:"center"}}>
     <button onClick={()=>onNavigate?.("workspace")} style={{background:"transparent",border:"none",color:C.gray,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Montserrat,sans-serif",marginBottom:28}}>← Pro Workspace</button>
+    <img className="evid-pro-page-art" src="/study-comparator-visual-ai.webp" alt="" width="1536" height="1024" loading="lazy" decoding="async" />
     <span style={{fontSize:48,display:"block",marginBottom:18}}>⇄</span>
     <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gold,margin:"0 0 10px"}}>PRO RESEARCH TOOL</p>
     <h1 style={{fontSize:isMob?32:46,fontWeight:900,letterSpacing:"-.05em",color:C.ink,margin:"0 0 14px"}}>Study Comparator</h1>
@@ -4254,12 +4406,23 @@ function reportShareUrl(report){
   if(report.title)params.set("title",report.title);
   if(report.audience)params.set("for",report.audience);
   if(report.note)params.set("note",report.note);
+  params.set("ref","evidstack-report");
+  params.set("utm_source","shared_report");
+  params.set("utm_medium","referral");
+  params.set("utm_campaign","share_loop");
+  params.set("utm_content","evidence_brief");
   return `${window.location.origin}/report/${ids}?${params.toString()}`;
 }
 
-function SharedReportPage({shareData,onNavigate}){
+function SharedReportPage({shareData,onNavigate,onTryFree}){
   const items=(shareData?.ids||[]).map(id=>SUPPLEMENTS.find(s=>s.id===id)).filter(Boolean);
   const report=items.length?buildShareableReport(items,{title:shareData.title,audience:shareData.audience,note:shareData.note}):null;
+  const handleCta=(action)=>{
+    if(!report)return;
+    trackEvent("shared_report_cta_click",{action,compound_count:report.compounds.length});
+    if(action==="free_snapshot"){onTryFree?.();return;}
+    onNavigate("share-report");
+  };
   useEffect(()=>{
     if(report)trackEvent("shared_report_view",{compound_count:report.compounds.length});
   },[shareData?.ids?.join(",")]);
@@ -4292,7 +4455,7 @@ function SharedReportPage({shareData,onNavigate}){
           <p><strong>Sources:</strong> {compound.sources.length?compound.sources.slice(0,4).map(reportSourceLabel).join(", "):"No linked source in this entry."}</p>
         </article>)}
       </section>
-      <section className="evid-shared-report-cta"><div><p className="evid-report-kicker">KEEP RESEARCHING</p><h2>Build your own evidence brief.</h2><p>Choose compounds from your own stack, add context, and share a clean report with the people helping you decide.</p></div><button onClick={()=>onNavigate("share-report")}>Create your own report <span aria-hidden="true">↗</span></button></section>
+      <section className="evid-shared-report-cta"><div><p className="evid-report-kicker">KEEP RESEARCHING</p><h2>Build your own evidence brief.</h2><p>Choose compounds from your own stack, add context, and share a clean report with the people helping you decide.</p></div><div className="evid-shared-report-cta-actions"><button onClick={()=>handleCta("free_snapshot")}>Try a free snapshot <span aria-hidden="true">↗</span></button><button className="is-secondary" onClick={()=>handleCta("create_report")}>Create your own report <span aria-hidden="true">↗</span></button></div></section>
       <p className="evid-report-disclaimer">Evidstack is a research aid. It does not diagnose, prescribe or determine whether a compound is appropriate for you.</p>
     </main>
   );
@@ -4329,7 +4492,9 @@ function ShareableReportPage({onNavigate,onUpgrade,onAuth}){
     const url=reportShareUrl(report);
     try{
       trackEvent("report_shared",{compound_count:report.compounds.length,source:"shareable-report"});
-      if(navigator.share){await navigator.share({title:report.title,text:"Evidence brief from Evidstack",url});setMessage("Share link ready.");}
+      trackEvent("report_share_link_generated",{compound_count:report.compounds.length,source:"shareable-report"});
+      const shareText=`Source-linked evidence brief from Evidstack: ${report.compounds.slice(0,2).map(compound=>compound.name).join(" and ")}.`;
+      if(navigator.share){await navigator.share({title:report.title,text:shareText,url});setMessage("Share link ready.");}
       else {await navigator.clipboard.writeText(url);setMessage("Public link copied. Anyone with the link can read this brief without an account.");}
     }catch(error){if(error?.name!=="AbortError")setMessage("Sharing was unavailable. You can copy the report text instead.");}
   };
@@ -4340,8 +4505,8 @@ function ShareableReportPage({onNavigate,onUpgrade,onAuth}){
     popup.document.write(reportPrintHtml(report));popup.document.close();popup.focus();setTimeout(()=>popup.print(),250);
   };
 
-  if(!user)return <div className="evid-report-guest"><p className="evid-report-kicker">PRO WORKSPACE</p><h1>Send a clear evidence brief.</h1><p>Build a clean report from your saved compounds, with studied doses, outcomes, risks, limits and source links ready to share.</p><button onClick={()=>onAuth("signup")}>Create a free account ↗</button></div>;
-  if(!isPro)return <div className="evid-report-guest"><p className="evid-report-kicker">PRO RESEARCH TOOL</p><h1>Share the evidence, not a screenshot.</h1><p>Pro turns your saved compounds into a structured brief that a clinician, coach or partner can review quickly.</p><div className="evid-report-preview-list"><span>Selected compounds and tiers</span><span>Studied doses and timing</span><span>Evidence, outcomes and study counts</span><span>Risks, limits and linked sources</span></div><button onClick={onUpgrade}>Unlock Shareable Reports · $9.99/month ↗</button><small>Included with the full Pro Workspace. Cancel anytime.</small></div>;
+  if(!user)return <div className="evid-report-guest"><img className="evid-pro-page-art" src="/shared-report-visual-ai.webp" alt="" width="1536" height="1024" loading="lazy" decoding="async" /><p className="evid-report-kicker">PRO WORKSPACE</p><h1>Send a clear evidence brief.</h1><p>Build a clean report from your saved compounds, with studied doses, outcomes, risks, limits and source links ready to share.</p><button onClick={()=>onAuth("signup")}>Create a free account ↗</button></div>;
+  if(!isPro)return <div className="evid-report-guest"><img className="evid-pro-page-art" src="/shared-report-visual-ai.webp" alt="" width="1536" height="1024" loading="lazy" decoding="async" /><p className="evid-report-kicker">PRO RESEARCH TOOL</p><h1>Share the evidence, not a screenshot.</h1><p>Pro turns your saved compounds into a structured brief that a clinician, coach or partner can review quickly.</p><div className="evid-report-preview-list"><span>Selected compounds and tiers</span><span>Studied doses and timing</span><span>Evidence, outcomes and study counts</span><span>Risks, limits and linked sources</span></div><button onClick={onUpgrade}>Unlock Shareable Reports · $9.99/month ↗</button><small>Included with the full Pro Workspace. Cancel anytime.</small></div>;
 
   return <main className="evid-report-page">
     <div className="evid-report-top"><div><button className="evid-report-back" onClick={()=>onNavigate("workspace")}>← Pro Workspace</button><p className="evid-report-kicker">PRO RESEARCH TOOL</p><h1>Shareable Evidence Report</h1><p className="evid-report-lede">Turn the compounds you selected into a calm, source-first brief for a clinician, coach or partner. Missing fields stay visible instead of being guessed.</p></div><span className="evid-report-badge">PRO ACTIVE</span></div>
@@ -4355,6 +4520,7 @@ function ShareableReportPage({onNavigate,onUpgrade,onAuth}){
 
 const PRO_TOOL_PREVIEWS={
   "evidence-answer":{
+    art:"/evidence-answer-visual-ai.webp",
     eyebrow:"CITED RESEARCH BRIEF",
     headline:"Start with a conclusion you can verify.",
     lede:"Evidence Answer turns a question into a short, cited brief with the population, dose, outcome and uncertainty visible.",
@@ -4363,6 +4529,7 @@ const PRO_TOOL_PREVIEWS={
     cta:"Ask your first evidence question"
   },
   "study-comparator":{
+    art:"/study-comparator-visual-ai.webp",
     eyebrow:"STUDY-BY-STUDY VIEW",
     headline:"See why two studies disagree.",
     lede:"Compare the actual populations, participant counts, dose, duration, results, adverse effects and source links side by side.",
@@ -4371,6 +4538,7 @@ const PRO_TOOL_PREVIEWS={
     cta:"Compare two recorded studies"
   },
   "share-report":{
+    art:"/shared-report-visual-ai.webp",
     eyebrow:"SHAREABLE EVIDENCE REPORT",
     headline:"Send a brief, not a screenshot.",
     lede:"Build a calm summary for a clinician, coach or partner with the evidence, studied doses, risks, limits and references together.",
@@ -4431,6 +4599,9 @@ const PRO_TOOL_PREVIEWS={
 function ProToolPreviewModal({tool,onClose,onUpgrade,onAuth,user}){
   const preview=PRO_TOOL_PREVIEWS[tool?.id];
   useEffect(()=>{
+    if(preview)trackEvent("pro_tool_preview_view",{tool:tool?.id});
+  },[preview,tool?.id]);
+  useEffect(()=>{
     if(!preview)return undefined;
     const onKeyDown=(event)=>{if(event.key==="Escape")onClose();};
     document.addEventListener("keydown",onKeyDown);
@@ -4444,6 +4615,7 @@ function ProToolPreviewModal({tool,onClose,onUpgrade,onAuth,user}){
       <section className="evid-tool-preview-modal" role="dialog" aria-modal="true" aria-labelledby="evid-tool-preview-title">
         <button className="evid-tool-preview-close" onClick={onClose} aria-label="Close preview">×</button>
         <div className="evid-tool-preview-top"><span className="evid-workspace-tool-icon" aria-hidden="true">{tool.icon}</span><span className="evid-tool-preview-label">FREE PREVIEW</span></div>
+        {preview.art&&<img className="evid-tool-preview-art" src={preview.art} alt="" width="1536" height="1024" loading="lazy" decoding="async" />}
         <p className="evid-tool-preview-eyebrow">{preview.eyebrow}</p>
         <h2 id="evid-tool-preview-title">{preview.headline}</h2>
         <p className="evid-tool-preview-lede">{preview.lede}</p>
@@ -4453,12 +4625,33 @@ function ProToolPreviewModal({tool,onClose,onUpgrade,onAuth,user}){
         </div>
         <p className="evid-tool-preview-note">This preview uses an example record. Pro unlocks the live workflow with your saved compounds and research context.</p>
         <div className="evid-tool-preview-actions">
-          <button className="evid-tool-preview-primary" onClick={()=>user?onUpgrade():onAuth("signup")}>{user?"Unlock with Pro":"Create a free account"} <span aria-hidden="true">↗</span></button>
-          <button className="evid-tool-preview-secondary" onClick={onClose}>{preview.cta}</button>
+          <button className="evid-tool-preview-primary" onClick={()=>{trackEvent("pro_tool_preview_cta",{tool:tool.id,action:user?"upgrade":"signup"});user?onUpgrade():onAuth("signup")}}>{user?"Unlock with Pro":"Create a free account"} <span aria-hidden="true">↗</span></button>
+          <button className="evid-tool-preview-secondary" onClick={()=>{trackEvent("pro_tool_preview_secondary_click",{tool:tool.id});onClose();}}>{preview.cta}</button>
         </div>
       </section>
     </div>
   );
+}
+
+const PRO_TOOL_UTILITY_PLANS={
+  "evidence-answer":{eyebrow:"KEEP GOING",title:"Turn the answer into a reviewable decision.",body:"Use the same question across a comparison, a saved stack and a shareable brief so the reasoning stays connected.",actions:[["study-comparator","Compare the studies","Population, dose and outcomes"],["share-report","Share the brief","Sources, risks and limits"],["research-feed","Follow the question","Updates when the record changes"]]},
+  "study-comparator":{eyebrow:"NEXT VIEW",title:"Compare the evidence, then keep the context.",body:"A comparison is most useful when you can save the decision and return when a new study changes the picture.",actions:[["evidence-answer","Ask for the conclusion","A cited answer in plain language"],["my-stack","Save the candidates","Keep the shortlist together"],["share-report","Create a report","Send a clean evidence brief"]]},
+  "share-report":{eyebrow:"MAKE IT USEFUL",title:"Give the next conversation a source trail.",body:"Reports are built from the same records you reviewed, with doses, risks, uncertainty and links ready to revisit.",actions:[["my-stack","Open My Stack","Choose the compounds to include"],["evidence-answer","Add a conclusion","Lead with the decision context"],["research-feed","Watch for changes","Keep the report current"]]},
+  "research-feed":{eyebrow:"WHEN THE RECORD MOVES",title:"Make updates actionable.",body:"Follow a goal or compound, then jump straight into the answer, comparison or report when a source changes.",actions:[["evidence-answer","Review the update","See what the new evidence says"],["study-comparator","Compare the new study","Place it beside the existing record"],["bloodwork-history","Add it to the timeline","Keep decisions and dates together"]]},
+  "stack-audit":{eyebrow:"VERIFY THE WHOLE STACK",title:"Move from a score to a safer review.",body:"Use coverage, overlap and missing context as prompts for the next question instead of treating a single score as a recommendation.",actions:[["interaction-checker","Check interactions","Evidence strength and severity"],["study-comparator","Compare alternatives","See what was actually tested"],["my-stack","Edit My Stack","Keep the review focused"]]},
+  "interaction-checker":{eyebrow:"PUT THE SIGNAL IN CONTEXT",title:"Check the pair, then document the decision.",body:"Separate how well an interaction is supported from how serious it might be, then keep the source trail available for review.",actions:[["stack-audit","Audit the stack","Find overlaps beyond this pair"],["evidence-answer","Read the evidence","Open a cited explanation"],["share-report","Share the context","Give a clinician the details"]]},
+  "bloodwork":{eyebrow:"MEASURE, THEN REVIEW",title:"Connect a marker to the decision around it.",body:"Lab values are a context signal. Pair them with a timeline, outcomes and source notes before drawing conclusions.",actions:[["bloodwork-history","Open the timeline","See values and decisions together"],["tracker","Log an outcome","Record what changed"],["stack-audit","Review the stack","Check the compounds in context"]]},
+  "tracker":{eyebrow:"CLOSE THE LOOP",title:"Make personal trends easier to interpret.",body:"Capture a baseline, note what changed and keep the research context visible so a trend does not become an overconfident claim.",actions:[["bloodwork-history","Add a measurement","Keep dates and context together"],["evidence-answer","Revisit the question","Separate evidence from experience"],["share-report","Share a summary","Prepare a concise review"]]},
+  "bloodwork-history":{eyebrow:"ONE CONTINUOUS RECORD",title:"Keep measurements and research in the same conversation.",body:"A timeline makes follow-up easier: what you saved, what you measured and what the evidence looked like at the time.",actions:[["bloodwork","Review markers","Read the latest values"],["tracker","Add an outcome","Record the lived result"],["research-feed","Watch the evidence","Catch meaningful updates"]]},
+};
+
+function ProToolUtilityFooter({page,onNavigate,onUpgrade,isPro}){
+  const plan=PRO_TOOL_UTILITY_PLANS[page];
+  if(!plan)return null;
+  return <section className="evid-tool-utility" aria-label="Continue your research workflow">
+    <div className="evid-tool-utility-head"><div><p className="evid-tool-utility-eyebrow">{plan.eyebrow}</p><h2>{plan.title}</h2><p>{plan.body}</p></div>{!isPro&&<button className="evid-tool-utility-upgrade" onClick={onUpgrade}>Unlock the full workflow <span aria-hidden="true">↗</span></button>}</div>
+    <div className="evid-tool-utility-grid">{plan.actions.map(([target,label,detail])=><button key={target} onClick={()=>onNavigate(target)} className="evid-tool-utility-card"><span>{isPro?"→":"PRO"}</span><b>{label}</b><small>{detail}</small></button>)}</div>
+  </section>;
 }
 
 function EvidenceWorkspacePage({onNavigate,onUpgrade,onAuth}){
@@ -4467,6 +4660,19 @@ function EvidenceWorkspacePage({onNavigate,onUpgrade,onAuth}){
   const stack=stackIds.map(id=>SUPPLEMENTS.find(s=>s.id===id)).filter(Boolean);
   const profileReady=Boolean(userProfile&&Object.values(userProfile).some(Boolean));
   const [previewTool,setPreviewTool]=useState(null);
+  const [freePreviewDone,setFreePreviewDone]=useState(()=>{
+    try{return localStorage.getItem("evidstack_free_preview_completed")==="1";}catch{return false;}
+  });
+  const [showActivationChecklist,setShowActivationChecklist]=useState(()=>{
+    try{return localStorage.getItem("evidstack_activation_checklist_hidden")!=="1";}catch{return true;}
+  });
+  useEffect(()=>{
+    const sync=()=>{
+      try{setFreePreviewDone(localStorage.getItem("evidstack_free_preview_completed")==="1");}catch{}
+    };
+    window.addEventListener("evidstack:free-preview-completed",sync);
+    return()=>window.removeEventListener("evidstack:free-preview-completed",sync);
+  },[]);
   const tools=[
     {id:"evidence-answer",group:"Understand the evidence",icon:"✦",label:"Evidence Answer",description:"Ask a question or describe a goal, then get a cited conclusion and evidence-ranked options in one place.",action:"Ask for an answer",featured:true},
     {id:"study-comparator",group:"Understand the evidence",icon:"⇄",label:"Study Comparator",description:"Compare populations, sample sizes, dose, duration, results, evidence quality and adverse effects.",action:"Compare studies"},
@@ -4483,14 +4689,12 @@ function EvidenceWorkspacePage({onNavigate,onUpgrade,onAuth}){
     const tool=tools.find(item=>item.id===id);
     if(tool)setPreviewTool(tool);
   };
-  const profileAction=()=>user?onNavigate("my-stack"):onAuth("signup");
-
   return(
     <main className="evid-workspace">
       <section className="evid-workspace-hero">
         <div className="evid-workspace-hero-copy">
           <p className="evid-workspace-kicker">PERSONAL PRO WORKSPACE</p>
-          <h1>Turn research into a plan.</h1>
+          <h1>Nine evidence tools, one calm workspace.</h1>
           <p className="evid-workspace-lede">Keep your goals, compounds, bloodwork, and follow-up questions in one calm place. Evidstack helps you move from “what does the evidence say?” to “what should I review next?”</p>
           <div className="evid-workspace-hero-actions">
             <span className={`evid-workspace-status${isPro?" is-pro":""}`}>{isPro?"PRO ACTIVE":"FREE PREVIEW"}</span>
@@ -4502,29 +4706,25 @@ function EvidenceWorkspacePage({onNavigate,onUpgrade,onAuth}){
         <div className="evid-workspace-orbit" aria-hidden="true"><span>GOAL</span><span>STACK</span><span>EVIDENCE</span><i/></div>
       </section>
 
+      {user&&!isPro&&showActivationChecklist&&<ActivationChecklist
+        profileReady={profileReady}
+        stackCount={stack.length}
+        freePreviewDone={freePreviewDone}
+        onNavigate={onNavigate}
+        onUpgrade={onUpgrade}
+        onDismiss={()=>{try{localStorage.setItem("evidstack_activation_checklist_hidden","1");}catch{}setShowActivationChecklist(false);}}
+      />}
+
       <section className="evid-workspace-stats" aria-label="Workspace overview">
         <div className="evid-workspace-stat"><strong>{user?(stackLoading?"…":stack.length):"—"}</strong><span>compounds in My Stack</span></div>
         <div className="evid-workspace-stat"><strong>{user?(profileReady?"Ready":"Next"):"—"}</strong><span>personal context</span></div>
-        <div className="evid-workspace-stat"><strong>{isPro?"9":"1"}</strong><span>evidence tools available</span></div>
+        <div className="evid-workspace-stat"><strong>9</strong><span>{isPro?"evidence tools available":"tools to explore in Pro"}</span></div>
       </section>
 
-      <section className="evid-workspace-start">
-        <div>
-          <p className="evid-workspace-section-kicker">START HERE</p>
-          <h2>Build a clearer evidence trail.</h2>
-          <p>Small actions compound. Set your context, save what you take, then use the right tool when a decision comes up.</p>
-        </div>
-        <div className="evid-workspace-steps">
-          <button onClick={profileAction}><span>01</span><b>{profileReady?"Review your context":"Add your context"}</b><small>{profileReady?"Keep age, weight, and sex up to date.":"Help us make notes more relevant."}<em>→</em></small></button>
-          <button onClick={()=>onNavigate("my-stack")}><span>02</span><b>Save your stack</b><small>{stack.length?`${stack.length} compound${stack.length===1?"":"s"} saved so far.`:"Start with the compounds you already use."}<em>→</em></small></button>
-          <button onClick={()=>openTool("stack-audit")}><span>03</span><b>Run a review</b><small>{isPro?"Find the next useful question.":"See what Pro adds to your review."}<em>→</em></small></button>
-        </div>
-      </section>
-
-      <section className="evid-workspace-toolkit">
+      <section className="evid-workspace-toolkit evid-pro-tools-focus">
         <div className="evid-workspace-toolkit-heading">
-        <div><p className="evid-workspace-section-kicker">YOUR EVIDENCE TOOLKIT</p><h2>Three workflows, one workspace.</h2></div>
-          <p>Understand the evidence, verify your stack, then track what changes. Each focused tool uses the same verified compound context.</p>
+        <div><p className="evid-workspace-section-kicker">YOUR EVIDENCE TOOLKIT · 9 TOOLS</p><h2>Nine connected tools, one workspace.</h2></div>
+          <p>Understand the evidence, verify your stack, then track what changes. Every tool keeps the same verified compound context in view.</p>
         </div>
         {Array.from(new Set(tools.map(tool=>tool.group))).map(group=><div key={group} className="evid-workspace-tool-group"><p className="evid-workspace-group-label">{group}</p><div className="evid-workspace-tool-grid">
           {tools.filter(tool=>tool.group===group).map(tool=><article key={tool.id} className={`evid-workspace-tool${tool.featured?" is-featured":""}${isPro?"":" is-locked"}`} role="button" tabIndex={0} aria-label={`${isPro?"Open":"Unlock"} ${tool.label}`} onClick={()=>openTool(tool.id)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openTool(tool.id);}}}>
@@ -4532,6 +4732,11 @@ function EvidenceWorkspacePage({onNavigate,onUpgrade,onAuth}){
             <h3>{tool.label}</h3><p>{tool.description}</p><button onClick={e=>{e.stopPropagation();openTool(tool.id);}}>{isPro?tool.action:"Unlock with Pro"}<span aria-hidden="true">↗</span></button>
           </article>)}
         </div></div>)}
+      </section>
+
+      <section className="peptide-workspace-callout" aria-labelledby="peptide-workspace-title">
+        <div><p className="peptide-eyebrow">PEPTIDE TOOLS</p><h2 id="peptide-workspace-title">A focused research loop for peptides.</h2><p>Open the calculator, interaction checker and evidence guides in their own calm workspace. Everyone gets two previews per tool before the optional Pro upgrade.</p></div>
+        <button className="peptide-button peptide-button-primary" onClick={()=>onNavigate("peptide-tools")}>Open Peptide Tools <span aria-hidden="true">↗</span></button>
       </section>
 
       {isPro&&stack.length>0&&<section className="evid-workspace-stack-preview">
@@ -4569,21 +4774,36 @@ function AppInner(){
     document.head.appendChild(s);
   },[]);
   useEffect(()=>{
-    const ref=new URLSearchParams(window.location.search).get("ref");
-    if(!ref)return;
+    const params=new URLSearchParams(window.location.search);
+    const ref=params.get("ref");
+    const source=params.get("utm_source");
+    const medium=params.get("utm_medium");
+    const campaign=params.get("utm_campaign");
+    const content=params.get("utm_content");
+    if(!ref&&!source&&!medium&&!campaign&&!content)return;
+    const campaignKey=[ref,source,medium,campaign,content].filter(Boolean).join("_").slice(0,100);
     let key="";
-    try{key=`evid_ref_${ref.slice(0,40)}`;if(sessionStorage.getItem(key)==="1")return;sessionStorage.setItem(key,"1");}catch{}
-    trackEvent("referral_visit",{ref:ref.slice(0,40),path:window.location.pathname});
+    try{key=`evid_campaign_${campaignKey}`;if(sessionStorage.getItem(key)==="1")return;sessionStorage.setItem(key,"1");}catch{}
+    const payload={path:window.location.pathname};
+    if(ref)payload.ref=ref.slice(0,40);
+    if(source)payload.utm_source=source.slice(0,40);
+    if(medium)payload.utm_medium=medium.slice(0,40);
+    if(campaign)payload.utm_campaign=campaign.slice(0,60);
+    if(content)payload.utm_content=content.slice(0,60);
+    trackEvent("campaign_visit",payload);
+    if(ref)trackEvent("referral_visit",{ref:ref.slice(0,40),path:window.location.pathname});
   },[]);
 
   const [page,setPage]=useState(()=>getPageFromPath());
   const [compoundId,setCompoundId]=useState(()=>getCompoundIdFromPath());
   const [goalId,setGoalId]=useState(()=>getGoalIdFromPath());
   const [guideId,setGuideId]=useState(()=>getGuideIdFromPath());
+  const [audienceId,setAudienceId]=useState(()=>getAudienceIdFromPath());
   const [shareId,setShareId]=useState(()=>getShareIdFromPath());
   const [reportShareData,setReportShareData]=useState(()=>getReportShareDataFromPath());
   const [snapshotId,setSnapshotId]=useState(()=>getEvidenceSnapshotIdFromPath());
   const [comparisonIds,setComparisonIds]=useState(()=>getComparisonIdsFromPath());
+  const [dosageCompoundId,setDosageCompoundId]=useState(()=>getDosageCompoundIdFromPath());
   const [goal,setGoal]=useState("all");
   const [search,setSearch]=useState("");
   const [showSuggest,setShowSuggest]=useState(false);
@@ -4671,23 +4891,25 @@ function AppInner(){
 
   const navigateTo=(p)=>{
     const target=p==="advisor"?"evidence-answer":p;
-    const update=()=>{navigate(target);setPage(target);setCompoundId(null);setSnapshotId(null);setComparisonIds(null);setReportShareData(null);setNavSearchOpen(false);setShowSuggest(false);window.scrollTo({top:0,behavior:"instant"});};
+    const update=()=>{navigate(target);setPage(getPageFromPath());setCompoundId(null);setDosageCompoundId(getDosageCompoundIdFromPath());setSnapshotId(null);setComparisonIds(null);setReportShareData(null);setAudienceId(null);setNavSearchOpen(false);setShowSuggest(false);window.scrollTo({top:0,behavior:"instant"});};
     if(typeof document.startViewTransition==="function"&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.startViewTransition(update);}
     else update();
   };
 
-  useEffect(()=>{applyPageSeo(getPageSeo(window.location.pathname));},[page,compoundId,goalId,guideId,shareId,snapshotId,comparisonIds]);
+  useEffect(()=>{applyPageSeo(getPageSeo(window.location.pathname));},[page,compoundId,dosageCompoundId,goalId,guideId,audienceId,shareId,snapshotId,comparisonIds]);
 
   useEffect(()=>{
     const onPop=()=>{
       setPage(getPageFromPath());
       setCompoundId(getCompoundIdFromPath());
+      setDosageCompoundId(getDosageCompoundIdFromPath());
       setSnapshotId(getEvidenceSnapshotIdFromPath());
       setComparisonIds(getComparisonIdsFromPath());
       setShareId(getShareIdFromPath());
       setReportShareData(getReportShareDataFromPath());
       setGoalId(getGoalIdFromPath());
       setGuideId(getGuideIdFromPath());
+      setAudienceId(getAudienceIdFromPath());
     };
     window.addEventListener("popstate",onPop);
     return()=>window.removeEventListener("popstate",onPop);
@@ -4778,20 +5000,23 @@ function AppInner(){
     {id:"body-atlas",label:"Body Atlas"},
     {id:"my-stack",label:"My Stack"},
     {id:"workspace",label:"Pro Workspace"},
+    {id:"peptide-tools",label:"Peptide Tools"},
     {id:"guides",label:"Guides"},
     {id:"pricing",label:"Pricing"},
     {id:"about",label:"About"},
   ];
+  const peptidePages=["peptide-tools","peptide-calculator","peptide-interaction-checker","peptide-dosage","peptide-reconstitution","peptide-safety","peptide-half-life"];
+  const isNavActive=(id)=>page===id||(id==="peptide-tools"&&peptidePages.includes(page));
   const isProToolPage=["weekly-protocol","interactions","tracker","evidence-answer","study-comparator","share-report","research-feed","interaction-checker","stack-audit","bloodwork-history","stack-builder","cycle-alerts","stack-optimizer","bloodwork","body-atlas","workspace"].includes(page);
 
   const scrollToResults=()=>{
     if(page!=="supplements")navigateTo("supplements");
     requestAnimationFrame(()=>document.getElementById("compounds-grid")?.scrollIntoView({behavior:"smooth",block:"start"}));
   };
-  const openFreeSnapshot=()=>{
+  const openFreeSnapshot=(source="homepage")=>{
     const featured=SUPPLEMENTS.find(s=>s.id==="creatine-monohydrate")||SUPPLEMENTS.find(s=>s.tier===1);
     if(!featured)return;
-    trackEvent("evidence_snapshot_cta",{source:"homepage",compound:featured.id});
+    trackEvent("evidence_snapshot_cta",{source,compound:featured.id});
     window.history.pushState({},"",`/evidence-snapshot/${featured.id}`);
     window.dispatchEvent(new PopStateEvent("popstate"));
   };
@@ -4830,8 +5055,13 @@ function AppInner(){
     </div>
   );
 
+  const shellClass=[
+    page==="supplements"?"evid-homepage":isProToolPage?"evid-pro-page":"",
+    isPro?"evid-pro-member-shell":"",
+  ].filter(Boolean).join(" ");
+
   return(
-    <div className={page==="supplements"?"evid-homepage":isProToolPage?"evid-pro-page":undefined} style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
+    <div className={shellClass||undefined} style={{minHeight:"100vh",background:C.bg,fontFamily:"Montserrat,sans-serif",color:C.ink}}>
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} initialMode={authMode}/>}
       {showUpgrade&&<UpgradeModal onClose={()=>setShowUpgrade(false)} onAuthNeeded={()=>openAuth("signup")}/>}
       {showAccount&&<AccountCenter onClose={()=>setShowAccount(false)} onUpgrade={openUpgrade}/>}
@@ -4855,17 +5085,17 @@ function AppInner(){
 
       {/* Mobile menu drawer */}
       {compactNav&&mobileMenu&&(
-        <div onClick={()=>setMobileMenu(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200}}>
-          <div onClick={e=>e.stopPropagation()} onTouchMove={e=>e.stopPropagation()} style={{position:"absolute",top:0,right:0,width:280,height:"100%",background:C.white,padding:"24px 20px",display:"flex",flexDirection:"column",gap:4,overflowY:"auto",WebkitOverflowScrolling:"touch"}}>
+        <div className="evid-mobile-menu-backdrop" onClick={()=>setMobileMenu(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200}}>
+          <div className="evid-mobile-menu-drawer" onClick={e=>e.stopPropagation()} onTouchMove={e=>e.stopPropagation()} style={{position:"absolute",top:0,right:0,width:280,height:"100%",background:C.white,padding:"24px 20px",display:"flex",flexDirection:"column",gap:4,overflowY:"auto",WebkitOverflowScrolling:"touch"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
               <span style={{fontSize:14,fontWeight:900,letterSpacing:"-.04em"}}>EVIDSTACK</span>
               <button onClick={()=>setMobileMenu(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:C.gray}}>x</button>
             </div>
             {[...navItems,{id:"legal",label:"Terms & Privacy"}].map(item=>(
-              <button key={item.id} className={`evid-mobile-nav-link${item.id==="body-atlas"?" atlas-nav-feature":""}${page===item.id?" is-active":""}`} onClick={()=>{navigateTo(item.id);setMobileMenu(false);}}
+              <button key={item.id} className={`evid-mobile-nav-link${item.id==="body-atlas"?" atlas-nav-feature":""}${item.id==="workspace"?" workspace-nav-feature":""}${item.id==="peptide-tools"?" peptide-tools-nav-feature":""}${isNavActive(item.id)?" is-active":""}`} onClick={()=>{navigateTo(item.id);setMobileMenu(false);}}
                 style={{padding:"14px 16px",fontSize:14,fontWeight:700,
-                  background:page===item.id?C.ink:"transparent",
-                  color:page===item.id?C.white:C.gray,
+                  background:isNavActive(item.id)?C.ink:"transparent",
+                  color:isNavActive(item.id)?C.white:C.gray,
                   border:"none",cursor:"pointer",textAlign:"left",borderRadius:4,
                   display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                 <span>{item.label}</span>
@@ -4874,10 +5104,10 @@ function AppInner(){
             <div style={{height:1,background:C.border,margin:"12px 0"}}/>
             {user?(
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                {isPro&&<span style={{fontSize:11,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px",alignSelf:"flex-start"}}>PRO MEMBER</span>}
+                {isPro&&<span className="evid-pro-member-badge" style={{fontSize:11,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px",alignSelf:"flex-start"}}>PRO MEMBER</span>}
                 {!isPro&&<button onClick={()=>{openUpgrade();setMobileMenu(false);}} style={{padding:"12px 16px",background:C.gold,color:C.ink,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",width:"100%"}}>Upgrade to Pro</button>}
-                <button onClick={()=>{setShowAccount(true);setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:C.bg,color:C.ink,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>My Account</button>
-                <button onClick={()=>{logout();setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>Sign out</button>
+                <button className="evid-account-action-button" onClick={()=>{setShowAccount(true);setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:C.bg,color:C.ink,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>My Account</button>
+                <button className="evid-account-action-button" onClick={()=>{logout();setMobileMenu(false);}} style={{padding:"12px 16px",fontSize:13,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer",width:"100%"}}>Sign out</button>
               </div>
             ):(
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
@@ -4910,10 +5140,10 @@ function AppInner(){
         ):(
           <div style={{display:"flex",alignItems:"center",gap:4}}>
             {navItems.map(item=>(
-              <button key={item.id} className={`evid-nav-link${item.id==="body-atlas"?" atlas-nav-feature":""}${page===item.id?" is-active":""}`} onClick={()=>navigateTo(item.id)}
+              <button key={item.id} className={`evid-nav-link${item.id==="body-atlas"?" atlas-nav-feature":""}${item.id==="workspace"?" workspace-nav-feature":""}${item.id==="peptide-tools"?" peptide-tools-nav-feature":""}${isNavActive(item.id)?" is-active":""}`} onClick={()=>navigateTo(item.id)}
                 style={{padding:"8px 14px",fontSize:12,fontWeight:700,fontFamily:"Montserrat,sans-serif",
                   background:"transparent",
-                  color:page===item.id?C.white:C.gray,
+                  color:isNavActive(item.id)?C.white:C.gray,
                   border:"none",cursor:"pointer",letterSpacing:"-.01em",transition:"all .15s"}}>
                 <span>{item.label}</span>
               </button>
@@ -4922,7 +5152,7 @@ function AppInner(){
              <div style={{width:1,height:24,background:C.border,margin:"0 10px"}}/>
             {user?(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
-                {isPro&&<span className="evid-pulse-pro" style={{fontSize:10,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px"}}>PRO</span>}
+                {isPro&&<span className="evid-pulse-pro evid-pro-member-badge" style={{fontSize:10,fontWeight:800,color:C.gold,letterSpacing:".12em",border:`1px solid ${C.gold}`,padding:"4px 10px"}}>PRO</span>}
                 {!isPro&&<button onClick={openUpgrade} className="evid-shimmer-btn" style={{padding:"8px 16px",background:C.gold,color:C.ink,border:"none",fontSize:12,fontWeight:800,cursor:"pointer",letterSpacing:".04em"}}>Upgrade</button>}
                 <button onClick={()=>setShowAccount(true)} style={{padding:"8px 14px",fontSize:11,fontWeight:700,background:"transparent",color:C.gray,border:`1px solid ${C.border}`,cursor:"pointer"}}>Account</button>
               </div>
@@ -4937,6 +5167,7 @@ function AppInner(){
       </nav>
 
       {page==="about"         &&<AboutPage/>}
+      {page==="audience-page"&&audienceId&&<AudienceLandingPage audienceId={audienceId} onNavigate={navigateTo} onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="body-atlas"&&<BodyAtlasPage isPro={isPro} onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
       {page==="founding-testers"&&<FoundingTestersPage onAuth={openAuth}/>}
       {page==="my-stack"&&<MyStackPage onNavigate={navigateTo} onUpgrade={openUpgrade} onAuth={openAuth}/>}
@@ -4945,13 +5176,21 @@ function AppInner(){
       {page==="evidence-answer"&&<EvidenceAnswerScreen onUpgrade={openUpgrade} onNavigate={navigateTo} onAuth={openAuth}/>}
       {page==="study-comparator"&&<StudyComparatorScreen onUpgrade={openUpgrade} onNavigate={navigateTo}/>}
       {page==="share-report"&&<ShareableReportPage onNavigate={navigateTo} onUpgrade={openUpgrade} onAuth={openAuth}/>}
-      {page==="shared-report"&&<SharedReportPage shareData={reportShareData} onNavigate={navigateTo}/>}
+      {page==="shared-report"&&<SharedReportPage shareData={reportShareData} onNavigate={navigateTo} onTryFree={()=>openFreeSnapshot("shared_report")}/>}
       {page==="evidence-snapshot"&&<EvidenceSnapshotPage compoundId={snapshotId} onUpgrade={openUpgrade}/>}
       {page==="demo"&&<ProductDemoPage onNavigate={navigateTo} onUpgrade={openUpgrade}/>}
       {page==="compare"&&<CompoundComparisonPage comparisonIds={comparisonIds} onUpgrade={openUpgrade}/>}
       {page==="pricing"        &&<PricingPage onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
-      {page==="affiliate"&&<AffiliatePage/>}
+      {page==="peptide-tools"&&<PeptideToolsPage isPro={isPro} onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
+      {page==="affiliate"&&<AffiliatePage onNavigate={navigateTo}/>}
       {page==="compound"&&<CompoundPage compoundId={compoundId} onUpgrade={openUpgrade} onAuth={openAuth} onBack={()=>{window.history.pushState({},"","/supplements");window.dispatchEvent(new PopStateEvent("popstate"));}}/>}
+      {page==="compound-dosage"&&<CompoundDosagePage compoundId={dosageCompoundId} onUpgrade={openUpgrade} onNavigate={navigateTo}/>} 
+      {page==="peptide-calculator"&&<PeptideCalculatorPage isPro={isPro} onUpgrade={openUpgrade} onNavigate={navigateTo}/>} 
+      {page==="peptide-interaction-checker"&&<PeptideInteractionCheckerPage isPro={isPro} onUpgrade={openUpgrade} onNavigate={navigateTo}/>} 
+      {page==="peptide-dosage"&&<PeptideDosageGuidePage isPro={isPro} onUpgrade={openUpgrade} onNavigate={navigateTo}/>} 
+      {page==="peptide-reconstitution"&&<PeptideKnowledgePage kind="peptide-reconstitution" isPro={isPro} onUpgrade={openUpgrade} onNavigate={navigateTo}/>} 
+      {page==="peptide-safety"&&<PeptideKnowledgePage kind="peptide-safety" isPro={isPro} onUpgrade={openUpgrade} onNavigate={navigateTo}/>} 
+      {page==="peptide-half-life"&&<PeptideKnowledgePage kind="peptide-half-life" isPro={isPro} onUpgrade={openUpgrade} onNavigate={navigateTo}/>} 
       {page==="shared-stack"&&<SharedStackPage shareId={shareId}/>}
       {page==="guides"&&<GuidesIndexPage onNavigate={navigateTo} onUpgrade={openUpgrade} onAuth={openAuth}/>}
       {page==="goal-page"&&goalId&&<GoalPage goalId={goalId} onUpgrade={openUpgrade} onAuth={openAuth} onNavigate={navigateTo}/>}
@@ -4970,16 +5209,19 @@ function AppInner(){
       {page==="bloodwork"     &&<BloodWorkScreen onUpgrade={openUpgrade}/>}
       {page==="changelog"    &&<ChangelogPage onNavigate={navigateTo}/>}
 
+      {isProToolPage&&!['body-atlas','workspace'].includes(page)&&<ProToolUtilityFooter page={page} onNavigate={navigateTo} onUpgrade={openUpgrade} isPro={isPro}/>}
+
       {page==="supplements"&&<>
         <section className="evid-home-hero" aria-labelledby="evid-home-title">
+          <div className="evid-hero-art" aria-hidden="true"><img src="/archaeofuturist-home-bg.png" alt="" width="2048" height="1365" fetchPriority="high" decoding="async" /></div>
           <div className="evid-hero-content">
-          <p className="evid-hero-kicker">SUPPLEMENTS. COMPOUNDS. CONTEXT.</p>
-          <h1 id="evid-home-title">Before it goes<br/>in your <span>stack.</span></h1>
-          <p className="evid-hero-description">A research database for supplements and compounds. Compare evidence, understand doses and spot potential interactions before building your stack.</p>
-          <p className="evid-hero-support">Explore {SUPPLEMENTS.length} compound profiles, from everyday supplements to specialist compounds. Pro adds the full catalogue, stack analysis and research tools.</p>
-          <div className="evid-hero-actions"><button className="atlas-home-feature" onClick={()=>navigateTo("body-atlas")}><span aria-hidden="true">◎</span> Body Atlas <span className="atlas-new-badge">NEW</span></button><button className="evid-hero-primary-cta" onClick={()=>{trackEvent("search_started",{source:"hero_cta"});document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Browse compounds <span aria-hidden="true">↓</span></button><button className="evid-hero-pro-cta" onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
-          <p className="evid-hero-access">Start with a free preview. Go deeper with Pro.</p>
-          <div className="evid-hero-secondary-links"><span>Free evidence snapshot</span><button className="evid-snapshot-home-link" onClick={openFreeSnapshot}>Try it free <span aria-hidden="true">↗</span></button><span aria-hidden="true">·</span><span>Building a better evidence map?</span><button onClick={()=>{trackEvent("pilot_interest",{source:"homepage-secondary"});navigateTo("founding-testers");}}>Join the pilot <span aria-hidden="true">↗</span></button></div>
+          <p className="evid-hero-kicker">EVIDENCE DATABASE · SUPPLEMENTS · COMPOUNDS.</p>
+          <h1 id="evid-home-title">Research before<br/><span>you decide.</span></h1>
+          <p className="evid-hero-description">Ask what the evidence says before you add a compound to your stack. Compare studies, understand studied doses and keep the risks and limits visible.</p>
+          <p className="evid-hero-support">390+ compounds across peptides, SARMs, GLP-1s, anabolics, nootropics, skin and aesthetics. Start with one evidence question, then connect the full research loop in Pro.</p>
+          <div className="evid-hero-actions"><button className="evid-hero-primary-cta" onClick={()=>{trackEvent("search_started",{source:"hero_cta"});document.getElementById("evidstack-search")?.focus();document.getElementById("evidstack-search")?.scrollIntoView({behavior:"smooth",block:"center"});}}>Browse compounds <span aria-hidden="true">↓</span></button><button className="evid-hero-pro-cta" onClick={openUpgrade}>Explore Pro <span aria-hidden="true">↗</span></button></div>
+          <p className="evid-hero-access">Start with one question. Keep the answer connected.</p>
+          <div className="evid-hero-secondary-links"><span>Free evidence snapshot</span><button className="evid-snapshot-home-link" onClick={openFreeSnapshot}>Try it free <span aria-hidden="true">↗</span></button><span aria-hidden="true">·</span><span>Need the full catalogue?</span><button onClick={openUpgrade}>See Pro <span aria-hidden="true">↗</span></button></div>
           <div ref={searchContainerRef} className={`evid-hero-search${searchFocused||search?" is-expanded":""}`}>
             <div className="evid-hero-search-row">
               <span className="evid-hero-search-icon" aria-hidden="true"/>
@@ -5000,7 +5242,6 @@ function AppInner(){
         </section>
 
         <SourceProofSection onNavigate={navigateTo}/>
-
       <div style={{height:1,background:C.border,maxWidth:680,margin:"0 auto 24px"}}/>
 
         <div className="evid-goal-bar" style={{borderBottom:`1px solid ${C.border}`,background:C.white}}>
@@ -5009,7 +5250,7 @@ function AppInner(){
               <div key={g.id} style={{display:"flex",alignItems:"stretch",position:"relative"}}>
                 <button onClick={()=>setGoal(g.id)}
                   style={{padding:"9px 12px",fontSize:11,fontWeight:700,letterSpacing:".04em",background:goal===g.id?"#f0f7f2":"transparent",color:goal===g.id?"#315747":C.gray,border:"1px solid transparent",borderBottom:goal===g.id?`2px solid #315747`:"2px solid transparent",borderRadius:999,cursor:"pointer",fontFamily:"Montserrat,sans-serif",whiteSpace:"nowrap",transition:"background .18s,color .18s,border-color .18s"}}>
-                  <span className="evid-goal-mark" aria-hidden="true">{GOAL_MARKS[g.id]||"•"}</span>{T.controls.goals[i]||g.label}
+                  <GoalIcon id={g.id} className="evid-goal-mark" />{T.controls.goals[i]||g.label}
                 </button>
                 {g.id!=="all"&&<button title={`Browse all ${g.label} compounds`}
                   onClick={e=>{e.stopPropagation();window.history.pushState({},"",`/goal/${g.id}`);window.dispatchEvent(new PopStateEvent("popstate"));}}
@@ -5143,14 +5384,14 @@ function AppInner(){
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Tools</p>
-            {[["workspace","Pro Workspace"]].map(([p,l])=>(
+            {[["peptide-tools","Peptide Tools"],["workspace","Pro Workspace"],["tools/peptide-calculator","Peptide calculator"],["tools/peptide-interaction-checker","Interaction checker"],["guides/peptide-dosage","Dosage guide"],["guides/peptide-reconstitution","Reconstitution guide"],["guides/peptide-safety","Safety guide"],["guides/peptide-half-life","Half-life guide"]].map(([p,l])=>(
               <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>
           <div>
             <p style={{fontSize:9,fontWeight:800,letterSpacing:".14em",color:C.gray,margin:"0 0 12px",textTransform:"uppercase"}}>Company</p>
-            {[["about","About"],["pricing","Pricing"],["affiliate","Affiliate Program"],["legal","Terms & Privacy"],["changelog","Changelog"]].map(([p,l])=>(
-              <button key={p} onClick={()=>navigateTo(p)} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
+            {[["about","About"],["pricing","Pricing"],["affiliate","Partner Program"],["/for/researchers","For research-first users"],["/for/coaches","For coaches"],["/for/creators","For creators"],["legal","Terms & Privacy"],["changelog","Changelog"]].map(([p,l])=>(
+              <button key={p} onClick={()=>{if(p.startsWith("/for/")){window.history.pushState({},"",p);window.dispatchEvent(new PopStateEvent("popstate"));}else navigateTo(p);}} style={{display:"block",fontSize:12,color:C.gray,background:"none",border:"none",cursor:"pointer",fontFamily:"Montserrat,sans-serif",padding:"3px 0",textAlign:"left"}}>{l}</button>
             ))}
           </div>
         </div>
@@ -6161,10 +6402,11 @@ function EvidenceAnswerScreen({onUpgrade,onNavigate,onAuth}){
     ...data,
     compounds:(data.compounds||[]).map(compound=>{
       const supplement=findSupplement(compound.name);
-      const effect=(supplement?.effects||[]).slice().sort((a,b)=>(Number(b.evidence||0)+Number(b.efficacy||0))-(Number(a.evidence||0)+Number(a.efficacy||0)))[0]||null;
+      const effects=(supplement?.effects||[]).slice().sort((a,b)=>(Number(b.evidence||0)+Number(b.efficacy||0))-(Number(a.evidence||0)+Number(a.efficacy||0)));
+      const effect=effects.find(item=>item.sources?.length&&item.sourceStatus!=="auto-linked")||effects[0]||null;
       // Keep references anchored to the local catalogue. Model output can describe
       // the answer, but it must never introduce a PMID that is not in our record.
-      return {...compound,supplement,sourceEffect:effect,sources:effect?.sources||[]};
+      return {...compound,supplement,sourceEffect:effect,sourceStatus:effect?.sourceStatus||"needs-review",sources:effect?.sources||[]};
     }),
   });
 
@@ -6184,6 +6426,10 @@ function EvidenceAnswerScreen({onUpgrade,onNavigate,onAuth}){
       if(!isPro){localStorage.setItem("evidstack_evidence_answer_used","1");setFreeUsed(true);}
       trackEvent("evidence_answer_completed",{compoundCount:data.compounds?.length||0,isPro,freePreview:!isPro});
       trackEvent(isPro?"first_action_pro":"free_preview_completed",{tool:"evidence_answer"});
+      if(!isPro){
+        try{localStorage.setItem("evidstack_free_preview_completed","1");}catch{}
+        window.dispatchEvent(new Event("evidstack:free-preview-completed"));
+      }
     }catch{setErr("Evidence Answer could not complete. Please try again.");setPhase("idle");}
     finally{setLoading(false);setQuery("");}
   };
@@ -6207,6 +6453,7 @@ function EvidenceAnswerScreen({onUpgrade,onNavigate,onAuth}){
       </div>
       <div style={innerStyle}>
         <div className="evid-answer-paywall">
+          <img className="evid-answer-art" src="/evidence-answer-visual-ai.webp" alt="" width="1536" height="1024" loading="lazy" decoding="async" />
           <div className="evid-answer-mark" aria-hidden="true">✦</div>
           <p className="evid-answer-kicker">A CITED RESEARCH BRIEF</p>
           <h1>Get the answer before you change your stack.</h1>
@@ -6260,8 +6507,9 @@ function EvidenceAnswerScreen({onUpgrade,onNavigate,onAuth}){
             const risks=Array.isArray(compound.risks)?compound.risks.join(" "):compound.risks;
             const fallbackRisks=supp?.sideEffects?.slice(0,3).map(item=>`${item.effect} (${item.frequency})`).join("; ");
             const references=(compound.sources||[]).slice(0,6);
+            const editorialSummary=effect?.sources?.length?effect.summary:"No verified outcome source is attached to this result yet. Treat the catalogue score as unestablished pending editorial review.";
             return <article key={`${compound.name}-${index}`} className="evid-answer-compound">
-              <div className="evid-answer-compound-head"><div><span className="evid-answer-tier">T{compound.tier||supp?.tier||"?"}</span><h3>{compound.name}</h3><p>{compound.goal_match||effect?.summary||"Evidence-ranked option from the current catalogue."}</p></div><div className="evid-answer-score"><b>{compound.combined_score??(Number(efficacy||0)*Number(evidence||0))}</b><span>/25 score</span></div></div>
+              <div className="evid-answer-compound-head"><div><span className="evid-answer-tier">T{compound.tier||supp?.tier||"?"}</span><h3>{compound.name}</h3><p>{compound.goal_match||editorialSummary}</p><small className={`evid-answer-editorial-status is-${compound.sourceStatus}`}>{compound.sourceStatus==="auto-linked"?"Candidate source pending review":compound.sourceStatus==="replaced-mismatch"?"Source corrected during review":effect?.sources?.length?"Linked source checked":"No verified source attached"}</small></div><div className="evid-answer-score"><b>{compound.combined_score??(Number(efficacy||0)*Number(evidence||0))}</b><span>/25 score</span></div></div>
               <div className="evid-answer-score-bars"><div><span>Efficacy {efficacy??"-"}/5</span><i><em style={{width:`${Math.max(0,Math.min(5,Number(efficacy||0)))*20}%`}}/></i></div><div><span>Evidence {evidence??"-"}/5</span><i><em style={{width:`${Math.max(0,Math.min(5,Number(evidence||0)))*20}%`}}/></i></div></div>
               <div className="evid-answer-detail-grid">
                 <div><b>Population studied</b><p>{detailValue(compound.population,effect?.population)}</p></div>
@@ -7104,6 +7352,104 @@ function BloodworkHistoryScreen({onUpgrade}){
   );
 }
 
+// ── AUDIENCE LANDING PAGES ────────────────────────────────────────────────────
+const AUDIENCE_PAGE_DATA={
+  researchers:{
+    kicker:"FOR EVIDENCE-DRIVEN USERS",
+    title:"Before it goes in your stack, see the context.",
+    lede:"Evidstack turns a supplement question into a source-linked brief: who was studied, what dose was tested, what changed, and where the record is still uncertain.",
+    points:[["01","Ask a focused question","Start with a compound or goal instead of a generic search."],["02","Read the tested context","Keep population, dose, duration, outcomes and risks visible."],["03","Keep the decision connected","Save the compound, compare alternatives and return to the source trail."]],
+    primary:"Try a free Evidence Snapshot",
+    secondary:"Browse the database",
+    primaryAction:"snapshot",
+  },
+  coaches:{
+    kicker:"FOR COACHES & PRACTITIONERS",
+    title:"Give every client conversation a clearer evidence brief.",
+    lede:"Bring the same source-first context to a review with a client: studied populations, doses, outcomes, limits and potential stack overlaps in one readable workspace.",
+    points:[["01","Compare before recommending a discussion","See what was actually tested and where the evidence differs."],["02","Keep uncertainty visible","Separate an evidence signal from a clinical decision."],["03","Share a clean brief","Generate a report a client or clinician can review with you."]],
+    primary:"Create a free research space",
+    secondary:"See the partner program",
+    primaryAction:"account",
+  },
+  creators:{
+    kicker:"FOR EVIDENCE-LED CREATORS",
+    title:"Turn a supplement question into a source-linked story.",
+    lede:"Use the catalogue to make research details easier to explain. Link readers to the original source trail and invite them to try the same question for free.",
+    points:[["01","Start with the question people ask","Use goals, compounds and comparisons as useful content prompts."],["02","Show the evidence behind the claim","Keep population, dose, outcome and limits in the frame."],["03","Share a next step","Send readers to a free snapshot or a readable evidence report."]],
+    primary:"Take the interactive demo",
+    secondary:"Partner with Evidstack",
+    primaryAction:"demo",
+  },
+};
+
+function AudienceLandingPage({audienceId,onNavigate,onUpgrade,onAuth}){
+  const isMob=useIsMobile();
+  const data=AUDIENCE_PAGE_DATA[audienceId]||AUDIENCE_PAGE_DATA.researchers;
+  const primary=()=>{
+    trackEvent("audience_landing_cta",{audience:audienceId,action:data.primaryAction});
+    if(data.primaryAction==="snapshot"){window.history.pushState({},"","/evidence-snapshot/creatine-monohydrate");window.dispatchEvent(new PopStateEvent("popstate"));}
+    else if(data.primaryAction==="demo")onNavigate("demo");
+    else onAuth("signup");
+  };
+  const secondary=()=>{
+    trackEvent("audience_landing_secondary",{audience:audienceId});
+    if(audienceId==="coaches"||audienceId==="creators")onNavigate("affiliate");
+    else onNavigate("supplements");
+  };
+  return <main className="evid-audience-page">
+    <section className="evid-audience-hero">
+      <div className="evid-audience-hero-copy">
+        <button className="evid-audience-back" onClick={()=>onNavigate("supplements")}>← Back to the catalogue</button>
+        <p className="evid-audience-kicker">{data.kicker}</p>
+        <h1>{data.title}</h1>
+        <p className="evid-audience-lede">{data.lede}</p>
+        <div className="evid-audience-actions"><button className="evid-audience-primary" onClick={primary}>{data.primary}<span aria-hidden="true">↗</span></button><button className="evid-audience-secondary" onClick={secondary}>{data.secondary}<span aria-hidden="true">↗</span></button></div>
+        <p className="evid-audience-note">For research and education. Evidstack does not diagnose, prescribe or replace a qualified clinician.</p>
+      </div>
+      <div className="evid-audience-signal" aria-hidden="true"><span>QUESTION</span><i>→</i><span>CONTEXT</span><i>→</i><span>NEXT REVIEW</span></div>
+    </section>
+    <section className="evid-audience-points" aria-labelledby="evid-audience-points-title">
+      <div className="evid-audience-points-head"><p className="evid-audience-kicker">A USEFUL RESEARCH LOOP</p><h2 id="evid-audience-points-title">Make the next decision easier to explain.</h2></div>
+      <div className="evid-audience-point-grid">{data.points.map(([number,title,body])=><article key={number}><span>{number}</span><h3>{title}</h3><p>{body}</p></article>)}</div>
+    </section>
+    <section className="evid-audience-proof">
+      <div><p className="evid-audience-kicker">SOURCE-FIRST BY DESIGN</p><h2>{EVIDENCE_SOURCE_STATS.sourcedEffects}+ recorded outcomes already carry a reference.</h2><p>The catalogue keeps the source trail and the evidence score separate, so a missing citation is visible instead of being mistaken for proof.</p></div>
+      <button onClick={()=>{trackEvent("audience_source_proof_click",{audience:audienceId});onNavigate("about");}}>See how the evidence is mapped <span aria-hidden="true">↗</span></button>
+    </section>
+  </main>;
+}
+
+// ── PRODUCT-LED LEARNING PATHS ────────────────────────────────────────────────
+function LearningPaths({onNavigate,onUpgrade}) {
+  const paths=[
+    {id:"question",number:"01",title:"Start with one compound question",body:"Open a free snapshot and see the population, dose, outcome, risks and source status together.",cta:"Open a free snapshot",path:"/evidence-snapshot/creatine-monohydrate",tone:"green"},
+    {id:"compare",number:"02",title:"Compare two options",body:"Put two recorded compounds side by side before you decide which question deserves deeper research.",cta:"Compare a real pair",path:"/compare/creatine-monohydrate-vs-caffeine",tone:"blue"},
+    {id:"review",number:"03",title:"Review a stack",body:"See how the Pro workspace connects evidence, interaction review and a shareable brief.",bodyShort:"See how the Pro workspace connects evidence, interaction review and a shareable brief.",cta:"See the workspace",path:"/workspace",tone:"gold"},
+  ];
+  const go=(item)=>{
+    trackEvent("learning_path_click",{path:item.id});
+    if(item.id==="review"){onNavigate("workspace");return;}
+    window.history.pushState({},"",item.path);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  };
+  return <section className="evid-learning-paths" aria-labelledby="evid-learning-paths-title">
+    <div className="evid-learning-paths-head">
+      <div><p className="evid-learning-paths-kicker">START WITH A USEFUL QUESTION</p><h2 id="evid-learning-paths-title">Three short paths through the research.</h2></div>
+      <p>Each path ends in a real Evidstack action, so education leads naturally to a source-linked result.</p>
+    </div>
+    <div className="evid-learning-path-grid">
+      {paths.map(item=><article key={item.id} className={`evid-learning-path is-${item.tone}`}>
+        <span className="evid-learning-path-number">{item.number}</span>
+        <h3>{item.title}</h3>
+        <p>{item.body}</p>
+        <button onClick={()=>go(item)}>{item.cta}<span aria-hidden="true">↗</span></button>
+      </article>)}
+    </div>
+    <div className="evid-learning-path-footer"><span>No card needed for the first path.</span><button onClick={()=>{trackEvent("learning_paths_upgrade_click");onUpgrade();}}>Connect the full loop with Pro <span aria-hidden="true">↗</span></button></div>
+  </section>;
+}
+
 // ── GUIDES INDEX PAGE ──────────────────────────────────────────────────────────
 function GuidesIndexPage({onNavigate,onUpgrade,onAuth}){
   const {isPro,user}=useAuth();
@@ -7139,6 +7485,7 @@ function GuidesIndexPage({onNavigate,onUpgrade,onAuth}){
         </div>
       </div>
       <div style={{maxWidth:960,margin:"0 auto",padding:isMob?"20px 16px 80px":"40px 48px 80px"}}>
+        <LearningPaths onNavigate={onNavigate} onUpgrade={onUpgrade}/>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:16}}>
           <p style={{fontSize:10,fontWeight:800,letterSpacing:".16em",color:C.gray,margin:0,textTransform:"uppercase"}}>Protocol guides</p>
           {!isPro&&<span style={{fontSize:10,color:C.gray}}>{FREE_GUIDE_IDS.length} free - {GUIDE_ITEMS.length-FREE_GUIDE_IDS.length} Pro only</span>}
@@ -7152,7 +7499,7 @@ function GuidesIndexPage({onNavigate,onUpgrade,onAuth}){
                 onMouseEnter={e=>e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,.07)"}
                 onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
                 <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
-                  <span style={{fontSize:22,filter:locked?"grayscale(1)":"none"}}>{g.icon}</span>
+                  <GoalIcon id={g.id} className={`evid-guide-icon${locked?" is-locked":""}`} />
                   <span style={{fontSize:15,fontWeight:900,color:locked?C.gray:C.ink,letterSpacing:"-.02em"}}>{g.label}</span>
                   {locked
                     ?<span style={{marginLeft:"auto",fontSize:9,fontWeight:800,background:C.ink,color:C.gold,padding:"2px 7px",letterSpacing:".08em"}}>PRO</span>
@@ -7186,7 +7533,7 @@ function GuidesIndexPage({onNavigate,onUpgrade,onAuth}){
                 style={{background:C.white,border:`1px solid ${C.border}`,padding:"14px 16px",cursor:"pointer",transition:"box-shadow .15s"}}
                 onMouseEnter={e=>e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,.06)"}
                 onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
-                <div style={{fontSize:20,marginBottom:6}}>{g.icon}</div>
+                <GoalIcon id={g.id} className="evid-guide-goal-icon" />
                 <p style={{fontSize:12,fontWeight:800,color:C.ink,margin:"0 0 3px"}}>{g.label}</p>
                 <p style={{fontSize:10,color:C.gray,margin:0}}>{count} compounds</p>
               </div>
@@ -7639,8 +7986,8 @@ const CHANGELOG = [
     entries: [
       {
         tags: ["Improvement"],
-        title: "USPs and competitor comparison table",
-        desc: "Added a competitor comparison table on the Pricing page (Evidstack vs Examine.com vs ConsumerLab) and updated copy across the site."
+        title: "Clearer product positioning",
+        desc: "Refined the Pricing page and product copy to make the evidence workflows and Pro value easier to understand."
       },
       {
         tags: ["Database Update"],
@@ -7806,14 +8153,16 @@ function MyStackPage({onNavigate,onUpgrade,onAuth}){
   const remove=(id)=>saveStack(stackIds.filter(x=>x!==id));
   useEffect(()=>{if(user)trackEvent("my_stack_view",{count:stackIds.length});},[user?.uid]);
 
-  if(!user)return(
-    <div className="evid-stack-page" style={{maxWidth:760,margin:"0 auto",padding:isMob?"48px 18px 90px":"80px 40px 120px"}}>
-      <p style={{fontSize:10,fontWeight:900,color:C.gold,letterSpacing:".18em",margin:"0 0 14px"}}>MY STACK</p>
-      <h1 style={{fontSize:isMob?34:46,fontWeight:900,color:C.ink,letterSpacing:"-.06em",lineHeight:1.05,margin:"0 0 16px"}}>Keep your research together.</h1>
-      <p style={{fontSize:16,color:C.gray,lineHeight:1.7,maxWidth:600,margin:"0 0 28px"}}>Save compounds, compare options and return to the evidence you care about. Create a free account to keep your list across devices.</p>
-      <button onClick={()=>onAuth("signup")} style={{padding:"13px 22px",background:C.ink,color:C.white,border:"none",fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Create a free account</button>
-    </div>
-  );
+  if(!user){
+    const previewIds=["creatine-monohydrate","magnesium-bisglycinate","omega-3"];
+    const previewItems=previewIds.map(id=>SUPPLEMENTS.find(s=>s.id===id)).filter(Boolean);
+    return <div className="evid-stack-page evid-stack-guest" style={{maxWidth:1040,margin:"0 auto",padding:isMob?"42px 16px 90px":"68px 40px 120px"}}>
+      <div className="evid-stack-guest-hero"><div><p style={{fontSize:10,fontWeight:900,color:C.gold,letterSpacing:".18em",margin:"0 0 14px"}}>MY STACK · FREE PREVIEW</p><h1 style={{fontSize:isMob?34:52,fontWeight:900,color:C.ink,letterSpacing:"-.07em",lineHeight:1.02,margin:"0 0 16px"}}>Keep your research together.</h1><p style={{fontSize:16,color:C.gray,lineHeight:1.7,maxWidth:620,margin:"0 0 24px"}}>Start with an example shortlist, then create a free account to save your own compounds across devices and return to the same evidence trail.</p><div style={{display:"flex",gap:9,flexWrap:"wrap"}}><button onClick={()=>onAuth("signup")} style={{padding:"13px 22px",background:C.ink,color:C.white,border:"none",borderRadius:999,fontSize:12,fontWeight:900,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Create a free account <span aria-hidden="true">↗</span></button><button onClick={()=>onNavigate("supplements")} style={{padding:"13px 20px",background:C.white,color:C.ink,border:`1px solid ${C.border}`,borderRadius:999,fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"Montserrat,sans-serif"}}>Browse compounds</button></div></div><div className="evid-stack-guest-count"><strong>5</strong><span>free saves</span><small>Up to 20 with Pro</small></div></div>
+      <section className="evid-stack-guest-preview" aria-label="Example saved stack"><div className="evid-stack-guest-preview-head"><div><p>EXAMPLE SHORTLIST</p><h2>A useful stack starts with questions.</h2></div><span>READ ONLY</span></div><div className="evid-stack-guest-cards">{previewItems.map(s=>{const avg=(s.effects.reduce((sum,e)=>sum+Math.abs(e.efficacy),0)/Math.max(1,s.effects.length)).toFixed(1);const tc=tierColor(s.tier);return <article key={s.id} className="evid-stack-guest-card" style={{borderTopColor:tc}}><div><span style={{color:tc}}>TIER {s.tier}</span><h3>{s.name}</h3><p>{s.effects.slice(0,3).map(e=>e.goal).join(" · ")}</p></div><div><b>{avg}/5</b><small>avg. efficacy</small></div></article>;})}</div><div className="evid-stack-guest-preview-footer"><span>Save a compound from any profile to build your own view.</span><button onClick={()=>onUpgrade()}>See what Pro adds <span aria-hidden="true">↗</span></button></div></section>
+      <section className="evid-stack-guest-benefits" aria-label="My Stack benefits">{[["01","Save the context","Keep your shortlist, goals and questions together across devices."],["02","Review with one click","Jump from a saved compound into comparisons, audits and interactions."],["03","Share a clean brief","Turn selected compounds into a source-linked report for a second opinion."]].map(([n,t,d])=><article key={n}><span>{n}</span><h3>{t}</h3><p>{d}</p></article>)}</section>
+      <p style={{margin:"22px 0 0",padding:"16px 18px",background:`${C.blue}08`,borderLeft:`3px solid ${C.blue}`,borderRadius:14,fontSize:12,color:C.gray,lineHeight:1.6}}>My Stack organizes research; it does not replace medical advice or tell you what you should take.</p>
+    </div>;
+  }
 
   return(
     <div className="evid-stack-page" style={{maxWidth:980,margin:"0 auto",padding:isMob?"36px 16px 90px":"58px 40px 120px"}}>
@@ -7885,13 +8234,15 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
     {feature:"Evidence Answer",free:"Preview",pro:"Structured answers with citations",highlight:true},
     {feature:"Conversation memory",free:false,pro:true},
     {feature:"Synergy and protocol suggestions",free:false,pro:true},
+    {feature:"Research Feed",free:"Preview",pro:"Follow goals, compounds and source updates",highlight:true},
     {feature:"Interaction Checker",free:false,pro:"Two-level ratings: evidence strength + clinical severity",highlight:true},
+    {feature:"Peptide Tools",free:"2 previews per tool",pro:"Unlimited calculator, checker and guides",highlight:true},
     {feature:"Stack Audit AI",free:false,pro:true},
-    {feature:"Bloodwork History",free:false,pro:true},
-    {feature:"AI Bloodwork Analyzer",free:false,pro:true},
-    {feature:"My Tracker",free:false,pro:true},
     {feature:"Study Comparator",free:false,pro:"Compare population, sample size, dose, duration, results, evidence quality and adverse effects",highlight:true},
     {feature:"Shareable Evidence Report",free:false,pro:"Export a clean brief with doses, risks, limits and sources",highlight:true},
+    {feature:"Bloodwork Analyzer",free:false,pro:"Markers, units, ranges and goal context",highlight:true},
+    {feature:"Outcome Tracker",free:false,pro:"Baseline, check-ins and personal trend context",highlight:true},
+    {feature:"Evidence Timeline",free:false,pro:"Join research updates, measurements and decisions",highlight:true},
     {feature:"Visible trust signals",free:"Basic source labels",pro:"Verification date, study freshness, confidence and source reporting",highlight:true},
     {feature:"My Stack",free:"Up to 5 saved compounds",pro:"Up to 20, synced across devices",highlight:true},
   ];
@@ -7909,7 +8260,7 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
   return(
     <div className="evid-pricing-page" style={S.page}><div style={S.inner}>
       <h1 style={S.h1}>Simple, honest pricing.</h1>
-      <p style={S.sub}>One Pro plan. Ask better questions, see the evidence behind each answer, and keep your research connected. Cancel anytime.</p>
+      <p style={S.sub}>Start free, then connect the full research loop when you need it. Pro keeps answers, comparisons, source updates and your stack in one place. Cancel anytime.</p>
 
       <section className="evid-pricing-outcomes" aria-label="What you can do with Evidstack">
         {[
@@ -7934,7 +8285,7 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
           </div>
           <p style={{fontSize:13,color:C.gray,margin:"0 0 24px"}}>Forever free. No credit card needed.</p>
           <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:28}}>
-            {["Tier 1 compounds (33)","Browse the full database","Evidence Answer preview","Save up to 5 compounds in My Stack","Compound header info (name, tier, safety)"].map(f=>(
+            {["Tier 1 compounds (33)","Browse the full database","Preview all 9 Pro workflows","Peptide Tools (2 previews per tool)","Save up to 5 compounds in My Stack","Compound header info (name, tier, safety)"].map(f=>(
               <div key={f} style={{display:"flex",gap:10,alignItems:"center"}}>
                 <span style={{color:C.green,fontWeight:900,fontSize:14}}>✓</span>
                 <span style={{fontSize:13,color:C.ink}}>{f}</span>
@@ -7955,7 +8306,7 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
           <p style={{fontSize:12,color:C.green,fontWeight:700,margin:"0 0 4px"}}>Or $79/year - save 34%</p>
           <p style={{fontSize:13,color:C.gray,margin:"0 0 24px"}}>Full access. Cancel in one click.</p>
           <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:28}}>
-            {[`All ${count}+ compounds (Tier 1-4)`,"Peptides, GLP-1s, SARMs, nootropics","Evidence Answer - cited conclusion, population, dose, effects, risks, limits and confidence signals","Interaction Checker - separate evidence strength from clinical severity","Stack Audit AI - score and optimize your stack","Visible trust signals - verification date, study freshness and source reporting","Bloodwork History - track 16 biomarkers over time","AI Bloodwork Analyzer","My Tracker","Compare compounds","Save your stacks"].map(f=>(
+            {[`All ${count}+ compounds (Tier 1-4)`,"Peptides, GLP-1s, SARMs, nootropics","Peptide Tools - calculator, interaction checker, dosage, reconstitution, safety and half-life guides","Evidence Answer - cited conclusion, population, dose, effects, risks, limits and confidence signals","Study Comparator - population, sample size, dose, duration, outcomes and adverse effects","Shareable Evidence Report - a source-linked brief for a clinician or coach","Research Feed - follow goals, compounds and source corrections","Interaction Checker - separate evidence strength from clinical severity","Stack Audit - coverage, overlap, missing context and next questions","Bloodwork Analyzer - markers with units, ranges and goal context","Outcome Tracker - baselines, check-ins and personal trends","Evidence Timeline - decisions, measurements and research updates in one view","Visible trust signals - verification date, study freshness and source reporting","My Stack - save and connect up to 20 compounds"].map(f=>(
               <div key={f} style={{display:"flex",gap:10,alignItems:"center"}}>
                 <span style={{color:C.gold,fontWeight:900,fontSize:14}}>✓</span>
                 <span style={{fontSize:13,color:C.ink,fontWeight:600}}>{f}</span>
@@ -7985,6 +8336,11 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
           <p>Evidence Answer handles both sides of a decision: ask a research question or describe a goal, then review the conclusion, evidence-ranked options, confidence signals and limits in one source-first brief.</p>
         </div>
         <button onClick={()=>isPro?onNavigate?.("evidence-answer"):onUpgrade()}>{isPro?"Open Evidence Answer":"Unlock Evidence Answer"}<span aria-hidden="true">↗</span></button>
+      </section>
+
+      <section className="peptide-pricing-card" aria-labelledby="peptide-pricing-title">
+        <div><p className="peptide-eyebrow">NEW RESEARCH TOOLS</p><h2 id="peptide-pricing-title">Peptide tools with room to test.</h2><p>Try two previews of each calculator, checker or guide for free. Upgrade only when the connected peptide workspace becomes useful to you.</p></div>
+        <div className="peptide-pricing-actions"><button className="peptide-button peptide-button-primary" onClick={()=>onNavigate?.("peptide-tools")}>Open Peptide Tools <span aria-hidden="true">↗</span></button>{!isPro&&<button className="peptide-button peptide-button-outline" onClick={onUpgrade}>Unlock unlimited access</button>}</div>
       </section>
 
       {/* Comparison table */}
@@ -8018,7 +8374,7 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
         {[
           ["Can I cancel anytime?","Yes. Cancel directly from your account in one click. You keep access until the end of your billing period."],
           ["Is my payment secure?","All payments processed by Stripe. We never see or store your card details."],
-          ["What is included in the free plan?","The free plan gives you access to all 33 Tier 1 compounds, the ability to browse the full database, an Evidence Answer preview and up to 5 saved compounds in My Stack."],
+          ["What is included in the free plan?","The free plan gives you access to all 33 Tier 1 compounds, the ability to browse the full database, previews of all nine Pro workflows and up to 5 saved compounds in My Stack."],
           ["What is Evidence Answer?","Evidence Answer turns a research question into a structured brief with a conclusion, studied population, dose and duration, effect direction, risks, limitations and linked references. It only uses information available in the verified Evidstack context."],
           ["What counts as a Tier 1 compound?","Tier 1 covers the 33 most widely studied foundational compounds: Creatine, Magnesium, Vitamin D3, Omega-3, Zinc, and others with the strongest evidence base."],
           ["Does Evidence Answer replace a doctor?","No. It provides informational context based on published research. Always consult a healthcare professional before making changes based on blood work or supplements."],
@@ -8036,5 +8392,4 @@ function PricingPage({onUpgrade,onAuth,onNavigate}){
 export default function App(){
   return <AuthProvider><AppInner/></AuthProvider>;
 }
-
 

@@ -786,15 +786,6 @@ body{background:#fff;color:#1a1a1a}
 @media (min-width:768px) and (max-width:1279px){.evid-homepage .evid-access-strip{padding:14px 20px 10px}}
 @media(max-width:760px){.evid-pro-tools-focus{margin:22px 12px 0;padding:18px 12px 16px;border-radius:8px}}
 
-/* Pro frame belongs to the viewport; inward light stays visible above page backgrounds. */
-/* Remove only the document scrollbar gutter in Pro; scrolling remains native. */
-html:has(.evid-pro-member-shell){scrollbar-width:none;scrollbar-gutter:auto}
-html:has(.evid-pro-member-shell)::-webkit-scrollbar{width:0;height:0}
-.evid-pro-member-shell{position:relative;isolation:isolate;overflow-x:clip}
-.evid-pro-member-shell::before{content:"";position:fixed;inset:0;box-sizing:border-box;z-index:150;pointer-events:none;border:2px solid #eac04e;box-shadow:inset 0 0 10px 2px rgba(245,192,55,.65),inset 0 0 28px rgba(234,182,44,.25);animation:evid-pro-frame-pulse 1s ease-in-out infinite}
-@keyframes evid-pro-frame-pulse{0%,100%{opacity:.7}50%{opacity:1}}
-@media(max-width:767px){.evid-pro-member-shell::before{box-shadow:inset 0 0 8px 1px rgba(245,192,55,.65),inset 0 0 20px rgba(234,182,44,.25)}}
-@media(prefers-reduced-motion:reduce){.evid-pro-member-shell::before{animation:none;opacity:1}}
 
 /* Production polish: source cards, hero actions, and the full-catalogue checker. */
 .evid-source-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
@@ -803,9 +794,6 @@ html:has(.evid-pro-member-shell)::-webkit-scrollbar{width:0;height:0}
 .evid-homepage .evid-hero-secondary-links .evid-snapshot-home-link{color:#315747!important}
 .evid-homepage .evid-hero-secondary-links .evid-hero-see-pro-link{color:#a47b22!important}
 
-/* Keep the Pro frame attached to the viewport and visible over light artwork. */
-.evid-pro-member-shell::before{z-index:900!important;border:3px solid rgba(234,192,78,.96)!important;box-shadow:inset 0 0 16px 3px rgba(245,192,55,.82),inset 0 0 44px rgba(234,182,44,.42),0 0 0 1px rgba(234,192,78,.35)!important;animation:evid-pro-frame-pulse 1s ease-in-out infinite}
-@media(max-width:767px){.evid-pro-member-shell::before{border-width:2px!important;box-shadow:inset 0 0 12px 2px rgba(245,192,55,.82),inset 0 0 32px rgba(234,182,44,.42),0 0 0 1px rgba(234,192,78,.35)!important}}
 
 .evid-general-checker-page{background:linear-gradient(180deg,#f7f5f0 0%,#f1eee8 100%)!important}
 .evid-general-checker-page .evid-pro-tool-topbar{background:linear-gradient(100deg,#315747,#3f6f5a)!important;border-radius:0 0 18px 18px!important}
@@ -828,7 +816,6 @@ html:has(.evid-pro-member-shell)::-webkit-scrollbar{width:0;height:0}
   .evid-general-checker-page .evid-interaction-suggestion{display:block}
   .evid-general-checker-page .evid-interaction-suggestion small{display:block;max-width:100%;margin-top:4px}
 }
-@media(prefers-reduced-motion:reduce){.evid-pro-member-shell::before{animation:none!important;opacity:1!important}}
 
 /* Keep the archaeofuturist artwork visible across the responsive hero. The
    medium-width tuning above intentionally softened the artwork too far, so
@@ -846,3 +833,11 @@ html:has(.evid-pro-member-shell)::-webkit-scrollbar{width:0;height:0}
 .evid-brand-link:focus-visible{outline:2px solid #e2c97e;outline-offset:4px}
 .evid-brand-logo{display:block;width:132px;height:auto;max-width:38vw;filter:brightness(0)}
 @media(max-width:767px){.evid-brand-logo{width:112px;max-width:34vw}}
+
+/* A larger branded pointer makes desktop interactions feel deliberate while
+   leaving touch screens and text-entry controls native. */
+@media (pointer:fine) and (hover:hover){
+  html,body,#root,#root *{cursor:url("/brand/evidstack-cursor.svg") 7 4,auto!important}
+  #root input,#root textarea{cursor:text!important}
+  #root select{cursor:url("/brand/evidstack-cursor.svg") 7 4,default!important}
+}

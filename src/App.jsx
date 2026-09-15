@@ -5098,7 +5098,6 @@ function AppInner(){
 
   const shellClass=[
     page==="supplements"?"evid-homepage":isProToolPage?"evid-pro-page":"",
-    isPro?"evid-pro-member-shell":"",
   ].filter(Boolean).join(" ");
 
   return(
@@ -5255,7 +5254,6 @@ function AppInner(){
         <section className="evid-home-hero" aria-labelledby="evid-home-title">
           <div className="evid-hero-art" aria-hidden="true"><img src="/archaeofuturist-home-bg.png?v=2" alt="" width="2048" height="1365" fetchPriority="high" decoding="async" /></div>
           <div className="evid-hero-content">
-          <p className="evid-hero-kicker">EVIDENCE DATABASE · SUPPLEMENTS · COMPOUNDS.</p>
           <h1 id="evid-home-title">Research before<br/><span>you decide.</span></h1>
           <p className="evid-hero-description">Ask what the evidence says before you add a compound to your stack. Compare studies, understand studied doses and keep the risks and limits visible.</p>
           <p className="evid-hero-support">390+ compounds across peptides, SARMs, GLP-1s, anabolics, nootropics, skin and aesthetics. Start with one evidence question, then connect the full research loop in Pro.</p>

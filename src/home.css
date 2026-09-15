@@ -829,3 +829,14 @@ html:has(.evid-pro-member-shell)::-webkit-scrollbar{width:0;height:0}
 }
 @media(prefers-reduced-motion:reduce){.evid-pro-member-shell::before{animation:none!important;opacity:1!important}}
 
+/* Keep the archaeofuturist artwork visible across the responsive hero. The
+   medium-width tuning above intentionally softened the artwork too far, so
+   restore a readable layer and make the image fill its complete art frame. */
+.evid-homepage .evid-hero-art{opacity:.74!important}
+.evid-homepage .evid-hero-art img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center center;opacity:.9!important}
+@media(max-width:767px){
+  .evid-homepage .evid-hero-art{opacity:.7!important}
+  .evid-homepage .evid-hero-art img{object-fit:fill;object-position:center;transform:none;width:100%;height:100%;opacity:.84!important}
+}
+
+

@@ -803,7 +803,7 @@ html:has(.evid-pro-member-shell)::-webkit-scrollbar{width:0;height:0}
 .evid-homepage .evid-hero-secondary-links .evid-hero-see-pro-link{color:#a47b22!important}
 
 /* Keep the Pro frame attached to the viewport and visible over light artwork. */
-.evid-pro-member-shell::before{z-index:1100!important;border:3px solid rgba(234,192,78,.96)!important;box-shadow:inset 0 0 16px 3px rgba(245,192,55,.82),inset 0 0 44px rgba(234,182,44,.42),0 0 0 1px rgba(234,192,78,.35)!important;animation:evid-pro-frame-pulse 1s ease-in-out infinite}
+.evid-pro-member-shell::before{z-index:900!important;border:3px solid rgba(234,192,78,.96)!important;box-shadow:inset 0 0 16px 3px rgba(245,192,55,.82),inset 0 0 44px rgba(234,182,44,.42),0 0 0 1px rgba(234,192,78,.35)!important;animation:evid-pro-frame-pulse 1s ease-in-out infinite}
 @media(max-width:767px){.evid-pro-member-shell::before{border-width:2px!important;box-shadow:inset 0 0 12px 2px rgba(245,192,55,.82),inset 0 0 32px rgba(234,182,44,.42),0 0 0 1px rgba(234,192,78,.35)!important}}
 
 .evid-general-checker-page{background:linear-gradient(180deg,#f7f5f0 0%,#f1eee8 100%)!important}

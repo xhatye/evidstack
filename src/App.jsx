@@ -5213,7 +5213,7 @@ function AppInner(){
 
       {page==="supplements"&&<>
         <section className="evid-home-hero" aria-labelledby="evid-home-title">
-          <div className="evid-hero-art" aria-hidden="true"><img src="/archaeofuturist-home-bg.png" alt="" width="2048" height="1365" fetchPriority="high" decoding="async" /></div>
+          <div className="evid-hero-art" aria-hidden="true"><img src="/archaeofuturist-home-bg.png?v=2" alt="" width="2048" height="1365" fetchPriority="high" decoding="async" /></div>
           <div className="evid-hero-content">
           <p className="evid-hero-kicker">EVIDENCE DATABASE · SUPPLEMENTS · COMPOUNDS.</p>
           <h1 id="evid-home-title">Research before<br/><span>you decide.</span></h1>

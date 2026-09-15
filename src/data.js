@@ -436,8 +436,14 @@ export const SUPPLEMENTS = [
   {id:"calcium-d-glucarate",name:"Calcium D-Glucarate",aliases:["CDG","D-glucaric acid","calcium glucarate","estrogen detox"],tier:2,tags:[],safety:5,legal:"Legal worldwide. Available OTC.",cost:"$20-40/month",effects:[{goal:"hormones",efficacy:3,evidence:3,study_count:15,study_type:"RCTs",summary:"Inhibits beta-glucuronidase enzyme in the gut, preventing re-absorption of conjugated estrogens and toxins. Accelerates hepatic estrogen clearance. Used for estrogen dominance, PCOS, and post-cycle therapy."},{goal:"liver",efficacy:3,evidence:3,study_count:12,study_type:"RCTs",summary:"Enhances glucuronidation - a primary liver detoxification pathway. Reduces circulating levels of carcinogens, hormones, and environmental toxins that have been conjugated for excretion."},{goal:"longevity",efficacy:2,evidence:2,study_count:8,study_type:"Controlled trials",summary:"Inverse correlation between D-glucarate intake and cancer incidence in population studies. Detoxification pathway support reduces toxic burden accumulation."}],dosage:{amount:"500-3000mg/day",timing:"With meals, divided doses",note:"1500mg/day is a common starting dose. Higher doses for post-cycle therapy or active estrogen management. Pairs well with DIM and broccoli extract for comprehensive estrogen metabolism support."},interactions:["Hormone therapies - may alter estrogen levels","Medications processed by glucuronidation (some statins, NSAIDs) - may reduce their blood levels"],sideEffects:[{effect:"GI discomfort",severity:"mild",frequency:"uncommon",note:"Start with lower doses and titrate up."},{effect:"Altered medication levels",severity:"moderate",frequency:"rare",note:"Glucuronidation affects many drugs; monitor if on medications."}]}
 ];
 
-// Apply the source audit at load time so every surface uses the same repaired
-// references and every unresolved effect is explicitly marked for review.
+// Apply source repairs and the supplied compound audits at load time so every
+// surface uses the same data. Audit references stay separate from verified
+// effect citations because the export is compound-level rather than
+// effect-level evidence mapping.
+const hasAuditReferenceIdentity = (source) => Boolean(
+  source && (source.title || source.doi || source.pmid || source.sourceUrl),
+);
+
 for (const supplement of SUPPLEMENTS) {
   (supplement.effects || []).forEach((effect, effectIndex) => {
     const repair = SCIENTIFIC_SOURCE_REPAIRS[`${supplement.id}:${effectIndex}`];
@@ -445,13 +451,21 @@ for (const supplement of SUPPLEMENTS) {
     effect.sources = repair.sources;
     effect.sourceStatus = repair.status;
   });
-  const evidenceAudit = BATCH1_EVIDENCE_AUDIT_BY_ID[supplement.id];
-  const batch2Audit = BATCH2_EVIDENCE_AUDIT_BY_ID[supplement.id];
-  const batch3Audit = BATCH3_EVIDENCE_AUDIT_BY_ID[supplement.id];
-  const batch4Audit = BATCH4_EVIDENCE_AUDIT_BY_ID[supplement.id];
-  if (evidenceAudit) supplement.evidenceAudit = evidenceAudit;
-  if (batch2Audit) supplement.evidenceAudit = batch2Audit;
-  if (batch3Audit) supplement.evidenceAudit = batch3Audit;
-  if (batch4Audit) supplement.evidenceAudit = batch4Audit;
+  const evidenceAudit = BATCH4_EVIDENCE_AUDIT_BY_ID[supplement.id]
+    || BATCH3_EVIDENCE_AUDIT_BY_ID[supplement.id]
+    || BATCH2_EVIDENCE_AUDIT_BY_ID[supplement.id]
+    || BATCH1_EVIDENCE_AUDIT_BY_ID[supplement.id];
+  if (!evidenceAudit) continue;
+
+  supplement.evidenceAudit = evidenceAudit;
+  const auditSources = (evidenceAudit.sources || []).filter(hasAuditReferenceIdentity);
+  if (auditSources.length) {
+    (supplement.effects || []).forEach((effect) => {
+      // These are compound-audit references, not confirmed citations for each
+      // individual outcome. Keeping them separate preserves source integrity
+      // while making the completed audit available on every relevant effect.
+      effect.auditSources = auditSources;
+    });
+  }
 }
 

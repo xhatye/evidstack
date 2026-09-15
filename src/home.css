@@ -834,13 +834,7 @@ body{background:#fff;color:#1a1a1a}
 .evid-brand-logo{display:block;width:116px;height:auto;max-width:38vw;filter:brightness(0)}
 @media(max-width:767px){.evid-brand-logo{width:100px;max-width:34vw}}
 
-/* A larger branded pointer makes desktop interactions feel deliberate while
-   leaving touch screens and text-entry controls native. */
-@media (pointer:fine) and (hover:hover){
-  html,body,#root,#root *{cursor:url("/brand/evidstack-cursor.svg") 7 4,auto!important}
-  #root input,#root textarea{cursor:text!important}
-  #root select{cursor:url("/brand/evidstack-cursor.svg") 7 4,default!important}
-}
+
 
 
 /* Keep the hero actions, access links, and search field in separate rows. */
@@ -852,11 +846,17 @@ body{background:#fff;color:#1a1a1a}
 }
 
 
-/* Switch to a hand pointer while hovering links and buttons. */
+
+
+/* Desktop cursors inherit through button labels, icons, cards and portals. */
 @media (pointer:fine) and (hover:hover){
-  #root a:hover,
-  #root button:hover,
-  #root [role="button"]:hover{
-    cursor:url("/brand/evidstack-hand.svg") 19 7,pointer!important;
+  html,body{cursor:url("/brand/evidstack-cursor.svg") 7 4,auto!important}
+  body *,#root,#root *{cursor:inherit!important}
+  body :is(a,button,summary,select,[role="button"],[role="link"],[role="tab"],[role="checkbox"],[role="switch"],[role="menuitem"],input[type="checkbox"],input[type="radio"],input[type="submit"],input[type="button"],[style*="cursor: pointer"],[style*="cursor:pointer"]),
+  #root :is(a,button,summary,select,[role="button"],[role="link"],[role="tab"],[role="checkbox"],[role="switch"],[role="menuitem"],input[type="checkbox"],input[type="radio"],input[type="submit"],input[type="button"],[style*="cursor: pointer"],[style*="cursor:pointer"]){
+    cursor:url("/brand/evidstack-hand-v2.svg") 11 4,pointer!important;
   }
+  body :is(input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),textarea,[contenteditable="true"]),
+  #root :is(input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),textarea,[contenteditable="true"]){cursor:text!important}
+  body :is(:disabled,[aria-disabled="true"]),#root :is(:disabled,[aria-disabled="true"]){cursor:not-allowed!important}
 }

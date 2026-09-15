@@ -841,3 +841,8 @@ html:has(.evid-pro-member-shell)::-webkit-scrollbar{width:0;height:0}
 }
 
 
+
+.evid-brand-link{display:flex;align-items:center;flex:0 0 auto;cursor:pointer;line-height:0;outline:none}
+.evid-brand-link:focus-visible{outline:2px solid #e2c97e;outline-offset:4px}
+.evid-brand-logo{display:block;width:132px;height:auto;max-width:38vw;filter:brightness(0)}
+@media(max-width:767px){.evid-brand-logo{width:112px;max-width:34vw}}

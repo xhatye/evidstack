@@ -5161,9 +5161,8 @@ function AppInner(){
       )}
 
       <nav className="evid-main-nav" style={{borderBottom:`1px solid ${C.border}`,padding:compactNav?"0 16px":"0 40px",display:"flex",alignItems:"center",justifyContent:"space-between",height:72,position:"sticky",top:0,zIndex:100,background:`${C.bg}f0`,backdropFilter:"blur(12px)"}}>
-        <div onClick={()=>navigateTo("supplements")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
-          <div style={{width:30,height:30,border:`2px solid ${C.black}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:10,fontWeight:900}}>E</span></div>
-          <span style={{fontSize:13,fontWeight:900,letterSpacing:"-.04em",color:C.ink,cursor:"pointer"}} onClick={()=>navigateTo("supplements")}>EVIDSTACK</span>
+        <div onClick={()=>navigateTo("supplements")} className="evid-brand-link" role="link" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();navigateTo("supplements");}}}>
+          <img className="evid-brand-logo" src="/brand/evidstack-wordmark-white-transparent.png" alt="Evidstack" />
         </div>
         {compactNav?(
            <div style={{display:"flex",alignItems:"center",gap:8}}>

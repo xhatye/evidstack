@@ -841,3 +841,12 @@ body{background:#fff;color:#1a1a1a}
   #root input,#root textarea{cursor:text!important}
   #root select{cursor:url("/brand/evidstack-cursor.svg") 7 4,default!important}
 }
+
+
+/* Keep the hero actions, access links, and search field in separate rows. */
+.evid-homepage .evid-hero-actions{margin-bottom:18px}
+.evid-homepage .evid-hero-secondary-links{margin:0 auto 24px}
+@media(max-width:767px){
+  .evid-homepage .evid-hero-actions{margin-bottom:14px}
+  .evid-homepage .evid-hero-secondary-links{margin:0 auto 20px}
+}

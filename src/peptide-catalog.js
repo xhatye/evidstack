@@ -1,0 +1,58 @@
+import { SUPPLEMENTS } from "./data.js";
+
+// Curated from the full catalogue. These are peptide, peptide-fragment,
+// peptide-hormone or GLP-1 records; small-molecule mimetics and general
+// protein supplements stay out of the peptide-only tools.
+export const PEPTIDE_IDS = Object.freeze([
+  "bpc-157",
+  "cerebrolysin",
+  "semax",
+  "tb-500",
+  "ipamorelin",
+  "cjc-1295",
+  "ghk-cu",
+  "epitalon",
+  "selank",
+  "pt-141",
+  "melanotan-2",
+  "ss-31",
+  "hexarelin",
+  "ghrp-2",
+  "sermorelin",
+  "tesamorelin",
+  "aod-9604",
+  "thymosin-alpha-1",
+  "humanin",
+  "mots-c",
+  "ll-37",
+  "kpv",
+  "igf-1-lr3",
+  "pegmgf",
+  "semaglutide",
+  "tirzepatide",
+  "retatrutide",
+  "cagrilintide",
+  "mazdutide",
+  "somatropin",
+  "hgh-fragment",
+  "cjc-1293",
+  "ghrp-6",
+  "ghrp-1",
+  "ghrp-3",
+  "ghrp-4",
+  "ghrp-5",
+  "mgf",
+  "lonapegsomatropin",
+  "somapacitan",
+  "somatrogon",
+  "alexamorelin",
+  "cjc-1295-no-dac",
+  "kisspeptin",
+  "liraglutide",
+  "oxytocin",
+  "hcg",
+]);
+
+export const PEPTIDE_ID_SET = new Set(PEPTIDE_IDS);
+export const isPeptideCompound = (compound) => Boolean(compound && PEPTIDE_ID_SET.has(compound.id));
+export const PEPTIDE_COMPOUNDS = Object.freeze(SUPPLEMENTS.filter(isPeptideCompound));

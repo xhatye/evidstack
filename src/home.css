@@ -871,4 +871,6 @@ body{background:#fff;color:#1a1a1a}
 .evid-home-demo-heading p:last-child{margin:0;color:#596273;font-size:14px;line-height:1.75}
 .evid-home-demo-frame{position:relative;box-sizing:content-box;max-height:80vh;max-height:80svh;width:100%;aspect-ratio:1.62;padding:40px 0;overflow:hidden;border:1px solid #d4d0c8;border-radius:22px;background:#fff;box-shadow:0 18px 48px rgba(30,41,59,.12)}
 .evid-home-demo-frame iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.evid-home-demo-fallback{margin:16px 0 0;text-align:center;color:#697386;font-size:12px;line-height:1.5}
+.evid-home-demo-fallback a{color:#75632d;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 @media(max-width:767px){.evid-home-demo{padding:46px 16px}.evid-home-demo-heading{margin-bottom:22px}.evid-home-demo-heading h2{font-size:clamp(30px,9vw,46px)}.evid-home-demo-heading p:last-child{font-size:13px;line-height:1.65}.evid-home-demo-frame{padding:28px 0;border-radius:18px}}

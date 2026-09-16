@@ -5277,6 +5277,27 @@ function AppInner(){
           <div className="evid-access-strip"><span><strong>Free</strong> A first look at the fundamentals</span><span><strong>Pro</strong> Full catalogue + research tools</span><button onClick={openUpgrade}>$9.99 / month ↗</button></div>
           </div>
         </section>
+ 
+        <section className="evid-home-demo" aria-labelledby="evid-home-demo-title">
+          <div className="evid-home-demo-inner">
+            <div className="evid-home-demo-heading">
+              <p className="evid-home-demo-kicker">SEE EVIDSTACK IN ACTION</p>
+              <h2 id="evid-home-demo-title">From one question to a clearer answer.</h2>
+              <p>Follow a quick Semaglutide example: search the compound, open its profile, and explore the research tools.</p>
+            </div>
+            <div className="evid-home-demo-frame">
+              <iframe
+                src="https://app.supademo.com/embed/cmu3dey0p03iiqmpxlgt8kev0?embed_v=2&utm_source=embed"
+                loading="lazy"
+                title="Search and Explore Compound Research on Evidstack"
+                allow="clipboard-write"
+                frameBorder={0}
+                allowFullScreen
+                style={{position:"absolute",top:0,left:0,width:"100%",height:"100%"}}
+              />
+            </div>
+          </div>
+        </section>
 
         <SourceProofSection onNavigate={navigateTo}/>
       <div style={{height:1,background:C.border,maxWidth:680,margin:"0 auto 24px"}}/>

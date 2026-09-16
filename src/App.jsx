@@ -5302,8 +5302,6 @@ function AppInner(){
           </div>
         </section>
 
-        <SourceProofSection onNavigate={navigateTo}/>
-      <div style={{height:1,background:C.border,maxWidth:680,margin:"0 auto 24px"}}/>
 
         <div className="evid-goal-bar" style={{borderBottom:`1px solid ${C.border}`,background:C.white}}>
           <div style={{display:"flex",gap:0,overflowX:"auto",padding:isMobile?"4px 12px":"6px 32px"}}>

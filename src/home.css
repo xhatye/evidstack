@@ -879,3 +879,9 @@ body{background:#fff;color:#1a1a1a}
 @media (min-width:768px){
   .evid-homepage .evid-home-hero{padding-bottom:76px}
 }
+
+/* Keep Pro Workspace unmistakable when it is the active navigation tab. */
+.evid-main-nav .evid-nav-link.workspace-nav-feature.is-active::before{background:#e2c97e!important}
+.evid-main-nav .evid-nav-link.workspace-nav-feature.is-active,
+.evid-main-nav .evid-nav-link.workspace-nav-feature.is-active:hover{color:#1a1a1a!important}
+.evid-main-nav .evid-mobile-nav-link.workspace-nav-feature.is-active{background:#e2c97e!important;border-color:#e2c97e!important;color:#1a1a1a!important}

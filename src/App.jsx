@@ -5296,6 +5296,9 @@ function AppInner(){
                 style={{position:"absolute",top:0,left:0,width:"100%",height:"100%"}}
               />
             </div>
+            <p className="evid-home-demo-fallback">
+              If the preview is blocked, <a href="https://app.supademo.com/demo/cmu3dey0p03iiqmpxlgt8kev0" target="_blank" rel="noreferrer">open the guided demo in a new tab ↗</a>
+            </p>
           </div>
         </section>
 

@@ -874,3 +874,8 @@ body{background:#fff;color:#1a1a1a}
 .evid-home-demo-fallback{margin:16px 0 0;text-align:center;color:#697386;font-size:12px;line-height:1.5}
 .evid-home-demo-fallback a{color:#75632d;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 @media(max-width:767px){.evid-home-demo{padding:46px 16px}.evid-home-demo-heading{margin-bottom:22px}.evid-home-demo-heading h2{font-size:clamp(30px,9vw,46px)}.evid-home-demo-heading p:last-child{font-size:13px;line-height:1.65}.evid-home-demo-frame{padding:28px 0;border-radius:18px}}
+
+/* Balance the desktop hero's lower breathing room with its upper space. */
+@media (min-width:768px){
+  .evid-homepage .evid-home-hero{padding-bottom:76px}
+}

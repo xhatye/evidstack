@@ -1,0 +1,3552 @@
+{
+  "asOf": "2026-09-16",
+  "total": 394,
+  "records": [
+    {
+      "id": "magnesium-bisglycinate",
+      "name": "Magnesium Bisglycinate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 6,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "creatine-monohydrate",
+      "name": "Creatine Monohydrate",
+      "migration": "contrast_preview_only",
+      "review": "partially_documented",
+      "legacyEffectCount": 5,
+      "auditPresent": true,
+      "nextAction": "Complete literature/safety review and validate preview"
+    },
+    {
+      "id": "vitamine-d3-k2",
+      "name": "Vitamin D3 + K2",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 6,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "zinc-bisglycinate",
+      "name": "Zinc Bisglycinate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 4,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "omega-3",
+      "name": "Omega-3 EPA/DHA",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 6,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ashwagandha-ksm66",
+      "name": "Ashwagandha KSM-66",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 6,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "l-theanine",
+      "name": "L-Theanine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 4,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "caffeine",
+      "name": "Caffeine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 5,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "lions-mane",
+      "name": "Lion's Mane",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 4,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "nmn",
+      "name": "NMN / NR",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 4,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "vitamin-c",
+      "name": "Vitamin C",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "vitamin-b12",
+      "name": "Vitamin B12",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "taurine",
+      "name": "Taurine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "glycine",
+      "name": "Glycine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "melatonin",
+      "name": "Melatonin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "spirulina",
+      "name": "Spirulina",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "rhodiola-rosea",
+      "name": "Rhodiola Rosea",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 4,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "berberine",
+      "name": "Berberine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "collagen",
+      "name": "Hydrolyzed Collagen",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "curcumin",
+      "name": "Curcumin (Bioavailable)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "bacopa-monnieri",
+      "name": "Bacopa Monnieri",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "coq10",
+      "name": "CoQ10 (Ubiquinol)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "citrulline",
+      "name": "L-Citrulline",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tongkat-ali",
+      "name": "Tongkat Ali",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "boron",
+      "name": "Boron",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "probiotics",
+      "name": "Probiotics",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "nac",
+      "name": "N-Acetylcysteine (NAC)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "beta-alanine",
+      "name": "Beta-Alanine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ginseng",
+      "name": "Panax Ginseng",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "maca",
+      "name": "Maca (Lepidium Meyenii)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "resveratrol",
+      "name": "Resveratrol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "huperzine-a",
+      "name": "Huperzine A",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "sulforaphane",
+      "name": "Sulforaphane",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "apigenin",
+      "name": "Apigenin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "alpha-gpc",
+      "name": "Alpha-GPC",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "fadogia-agrestis",
+      "name": "Fadogia Agrestis",
+      "migration": "contrast_preview_only",
+      "review": "partially_documented",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Complete literature/safety review and validate preview"
+    },
+    {
+      "id": "bpc-157",
+      "name": "BPC-157",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cerebrolysin",
+      "name": "Cerebrolysin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "semax",
+      "name": "Semax",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "methylene-blue",
+      "name": "Methylene Blue",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "whey-protein",
+      "name": "Whey Protein",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "bcaa",
+      "name": "BCAA",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cbd",
+      "name": "CBD (Cannabidiol)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "dhea",
+      "name": "DHEA",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "l-carnitine",
+      "name": "L-Carnitine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "l-tyrosine",
+      "name": "L-Tyrosine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "nattokinase",
+      "name": "Nattokinase",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tb-500",
+      "name": "TB-500 (Thymosin Beta-4)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ipamorelin",
+      "name": "Ipamorelin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cjc-1295",
+      "name": "CJC-1295",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ghk-cu",
+      "name": "GHK-Cu (Copper Peptide)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "epitalon",
+      "name": "Epithalon",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "selank",
+      "name": "Selank",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pt-141",
+      "name": "PT-141 (Bremelanotide)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "melanotan-2",
+      "name": "Melanotan II",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ss-31",
+      "name": "SS-31 (Elamipretide)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "noopept",
+      "name": "Noopept",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "piracetam",
+      "name": "Piracetam",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "aniracetam",
+      "name": "Aniracetam",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "phenylpiracetam",
+      "name": "Phenylpiracetam",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pramiracetam",
+      "name": "Pramiracetam",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "oxiracetam",
+      "name": "Oxiracetam",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "coluracetam",
+      "name": "Coluracetam",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "fasoracetam",
+      "name": "Fasoracetam",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "bromantane",
+      "name": "Bromantane",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "phenibut",
+      "name": "Phenibut",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "5-htp",
+      "name": "5-HTP",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "d-aspartic-acid",
+      "name": "D-Aspartic Acid",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "phosphatidylserine",
+      "name": "Phosphatidylserine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mucuna-pruriens",
+      "name": "Mucuna Pruriens",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "vinpocetine",
+      "name": "Vinpocetine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "vitamin-b3",
+      "name": "Vitamin B3 (Niacin/Niacinamide)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "vitamin-b6",
+      "name": "Vitamin B6",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "vitamin-b9",
+      "name": "Folate (Methylfolate)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "vitamin-e",
+      "name": "Vitamin E",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "vitamin-k2",
+      "name": "Vitamin K2 (MK-7)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "selenium",
+      "name": "Selenium",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "iodine",
+      "name": "Iodine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "lithium-orotate",
+      "name": "Lithium Orotate (Microdose)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "chromium",
+      "name": "Chromium Picolinate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "schisandra",
+      "name": "Schisandra Chinensis",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "astragalus",
+      "name": "Astragalus Membranaceus",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "holy-basil",
+      "name": "Holy Basil (Tulsi)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "eleuthero",
+      "name": "Eleuthero (Siberian Ginseng)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "boswellia",
+      "name": "Boswellia Serrata",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "gotu-kola",
+      "name": "Gotu Kola (Centella Asiatica)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "black-seed-oil",
+      "name": "Black Seed Oil (Nigella Sativa)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "fenugreek",
+      "name": "Fenugreek",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tribulus-terrestris",
+      "name": "Tribulus Terrestris",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "saw-palmetto",
+      "name": "Saw Palmetto",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "quercetin",
+      "name": "Quercetin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "fisetin",
+      "name": "Fisetin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "spermidine",
+      "name": "Spermidine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "urolithin-a",
+      "name": "Urolithin A",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "astaxanthin",
+      "name": "Astaxanthin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pine-bark-pycnogenol",
+      "name": "Pycnogenol (Pine Bark Extract)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "andrographis",
+      "name": "Andrographis Paniculata",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "gynostemma",
+      "name": "Gynostemma (Jiaogulan)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "hmb",
+      "name": "HMB (Beta-Hydroxy Beta-Methylbutyrate)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "turkesterone",
+      "name": "Turkesterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ecdysterone",
+      "name": "Ecdysterone (20-Hydroxyecdysone)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "laxogenin",
+      "name": "Laxogenin (5-Alpha-Hydroxy-Laxogenin)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "deer-velvet-antler",
+      "name": "Deer Velvet Antler",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "carnosine",
+      "name": "Carnosine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "hexarelin",
+      "name": "Hexarelin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ghrp-2",
+      "name": "GHRP-2",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "sermorelin",
+      "name": "Sermorelin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mk-677",
+      "name": "MK-677 (Ibutamoren)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tesamorelin",
+      "name": "Tesamorelin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "aod-9604",
+      "name": "AOD-9604",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "thymosin-alpha-1",
+      "name": "Thymosin Alpha-1",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "humanin",
+      "name": "Humanin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mots-c",
+      "name": "MOTS-c",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ll-37",
+      "name": "LL-37 (Cathelicidin)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "kpv",
+      "name": "KPV",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "dihexa",
+      "name": "Dihexa",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "igf-1-lr3",
+      "name": "IGF-1 LR3",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pegmgf",
+      "name": "PEG-MGF (Mechano Growth Factor)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pregnenolone",
+      "name": "Pregnenolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "progesterone",
+      "name": "Progesterone (Bioidentical)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "valerian-root",
+      "name": "Valerian Root",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "passionflower",
+      "name": "Passionflower",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "lemon-balm",
+      "name": "Lemon Balm",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "magnolia-bark",
+      "name": "Magnolia Bark",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "l-glutamine",
+      "name": "L-Glutamine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "butyrate",
+      "name": "Sodium Butyrate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "betaine",
+      "name": "Betaine (TMG)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "aged-garlic",
+      "name": "Aged Garlic Extract",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "hawthorn-berry",
+      "name": "Hawthorn Berry",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "olive-leaf-extract",
+      "name": "Olive Leaf Extract",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "acetyl-l-carnitine",
+      "name": "Acetyl-L-Carnitine (ALCAR)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "centrophenoxine",
+      "name": "Centrophenoxine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "dmae",
+      "name": "DMAE",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "uridine",
+      "name": "Uridine Monophosphate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "choline-bitartrate",
+      "name": "Choline Bitartrate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cdp-choline",
+      "name": "CDP-Choline (Citicoline)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "inositol",
+      "name": "Inositol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "shilajit",
+      "name": "Shilajit",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cordyceps",
+      "name": "Cordyceps",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "reishi-mushroom",
+      "name": "Reishi Mushroom",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "chaga-mushroom",
+      "name": "Chaga Mushroom",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "turkey-tail",
+      "name": "Turkey Tail Mushroom",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ergothioneine",
+      "name": "Ergothioneine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "plasmalogens",
+      "name": "Plasmalogens",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pqq",
+      "name": "PQQ (Pyrroloquinoline Quinone)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "kava",
+      "name": "Kava Kava",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "sulbutiamine",
+      "name": "Sulbutiamine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "saffron",
+      "name": "Saffron",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "st-johns-wort",
+      "name": "St. John's Wort",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "agmatine",
+      "name": "Agmatine Sulfate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cistanche",
+      "name": "Cistanche Tubulosa",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pine-pollen",
+      "name": "Pine Pollen",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "zeolite",
+      "name": "Zeolite (Clinoptilolite)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "semaglutide",
+      "name": "Semaglutide (Ozempic / Wegovy)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tirzepatide",
+      "name": "Tirzepatide (Mounjaro / Zepbound)",
+      "migration": "preview_migrated",
+      "review": "partially_documented",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Complete literature/safety review and validate preview"
+    },
+    {
+      "id": "retatrutide",
+      "name": "Retatrutide",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cagrilintide",
+      "name": "Cagrilintide",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mazdutide",
+      "name": "Mazdutide (IBI362)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "finasteride",
+      "name": "Finasteride (Propecia)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "minoxidil",
+      "name": "Minoxidil",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pyrilutamide",
+      "name": "Pyrilutamide (KX-826)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ru-58841",
+      "name": "RU-58841",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tudca",
+      "name": "TUDCA (Tauroursodeoxycholic Acid)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "milk-thistle",
+      "name": "Milk Thistle (Silymarin)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "amla",
+      "name": "Amla (Indian Gooseberry)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tadalafil",
+      "name": "Tadalafil (Cialis)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "hcg",
+      "name": "HCG (Human Chorionic Gonadotropin)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "meldonium",
+      "name": "Meldonium (Mildronate)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "fabomotizole",
+      "name": "Fabomotizole (Afobazole)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pantogam",
+      "name": "Pantogam (Hopantenic Acid)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "emoxypine",
+      "name": "Emoxypine (Mexidol)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "l-ornithine",
+      "name": "L-Ornithine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "msm",
+      "name": "MSM (Methylsulfonylmethane)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "apple-cider-vinegar",
+      "name": "Apple Cider Vinegar",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "injectable-b12",
+      "name": "Injectable Vitamin B12 (Methylcobalamin)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "biotin",
+      "name": "Biotin (Vitamin B7)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "hyaluronic-acid",
+      "name": "Hyaluronic Acid",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mastic-gum",
+      "name": "Mastic Gum (Pistacia lentiscus)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "lutein-zeaxanthin",
+      "name": "Lutein + Zeaxanthin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pumpkin-seed-oil",
+      "name": "Pumpkin Seed Oil",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "armodafinil",
+      "name": "Armodafinil (Nuvigil)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "modafinil",
+      "name": "Modafinil (Provigil)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "adrafinil",
+      "name": "Adrafinil",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "flmodafinil",
+      "name": "Flmodafinil (CRL-40,940)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "sunifiram",
+      "name": "Sunifiram (DM-235)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "nsi-189",
+      "name": "NSI-189 Phosphate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "9-me-bc",
+      "name": "9-Methyl-beta-carboline (9-MBC)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tianeptine",
+      "name": "Tianeptine (Stablon)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "rad-140",
+      "name": "RAD-140 (Testolone)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "lgd-4033",
+      "name": "LGD-4033 (Ligandrol)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mk-2866",
+      "name": "MK-2866 (Ostarine)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cardarine",
+      "name": "GW-501516 (Cardarine)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "sr9009",
+      "name": "SR9009 (Stenabolic)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "rapamycin",
+      "name": "Rapamycin (Sirolimus)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "metformin",
+      "name": "Metformin (Anti-Aging Protocol)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "low-dose-naltrexone",
+      "name": "Low Dose Naltrexone (LDN)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "acarbose",
+      "name": "Acarbose",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "nicotine",
+      "name": "Nicotine (Sublingual / Patches)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "oxaloacetate",
+      "name": "Oxaloacetate (benaGene)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "potassium-chloride",
+      "name": "Potassium Chloride (KCl)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "lycopene",
+      "name": "Lycopene",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "beta-carotene",
+      "name": "Beta-Carotene",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "isotretinoin",
+      "name": "Isotretinoin (Accutane)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "dutasteride",
+      "name": "Dutasteride (Avodart)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "egcg",
+      "name": "Green Tea Extract (EGCG)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ginkgo-biloba",
+      "name": "Ginkgo Biloba",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "gaba",
+      "name": "GABA",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "glucosamine",
+      "name": "Glucosamine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "casein",
+      "name": "Casein Protein",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "krill-oil",
+      "name": "Krill Oil",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "iron",
+      "name": "Iron",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "lysine",
+      "name": "L-Lysine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mct-oil",
+      "name": "Medium-Chain Triglycerides",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pea-protein",
+      "name": "Pea Protein",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "psyllium",
+      "name": "Psyllium Husk",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pterostilbene",
+      "name": "Pterostilbene",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "sam-e",
+      "name": "SAMe",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "sodium-bicarbonate",
+      "name": "Sodium Bicarbonate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tart-cherry",
+      "name": "Tart Cherry",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "theacrine",
+      "name": "Theacrine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "yohimbine",
+      "name": "Yohimbine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "white-kidney-bean",
+      "name": "White Kidney Bean Extract",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "dim",
+      "name": "DIM",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "bromelain",
+      "name": "Bromelain",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "chondroitin",
+      "name": "Chondroitin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cla",
+      "name": "Conjugated Linoleic Acid",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "colostrum",
+      "name": "Colostrum",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "serrapeptase",
+      "name": "Serrapeptase",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "grains-of-paradise",
+      "name": "Grains of Paradise",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "echinacea",
+      "name": "Echinacea",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "elderberry",
+      "name": "Elderberry",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "flaxseed",
+      "name": "Flaxseed",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "hesperidin",
+      "name": "Hesperidin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "artichoke-extract",
+      "name": "Artichoke Extract",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "capsaicin",
+      "name": "Capsaicin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "coleus-forskohlii",
+      "name": "Coleus Forskohlii",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cinnamon",
+      "name": "Cinnamon",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "d-ribose",
+      "name": "D-Ribose",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "panax-ginseng",
+      "name": "Panax Ginseng",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "glucuronolactone",
+      "name": "Glucuronolactone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "green-coffee",
+      "name": "Green Coffee Extract",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "raspberry-ketone",
+      "name": "Raspberry Ketones",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "rauwolscine",
+      "name": "Rauwolscine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "pygeum",
+      "name": "Pygeum",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ursolic-acid",
+      "name": "Ursolic Acid",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "phosphatidylcholine",
+      "name": "Phosphatidylcholine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "inulin",
+      "name": "Inulin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "black-pepper",
+      "name": "Black Pepper Extract",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "soy-isoflavones",
+      "name": "Soy Isoflavones",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "calcium",
+      "name": "Calcium",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "stinging-nettle",
+      "name": "Stinging Nettle",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "policosanol",
+      "name": "Policosanol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "arginine",
+      "name": "L-Arginine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "copper",
+      "name": "Copper",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "leucine",
+      "name": "Leucine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "isoleucine",
+      "name": "Isoleucine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "valine",
+      "name": "Valine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "phenylethylamine",
+      "name": "Phenylethylamine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "thiamine",
+      "name": "Thiamine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "riboflavin",
+      "name": "Riboflavin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "manganese",
+      "name": "Manganese",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "molybdenum",
+      "name": "Molybdenum",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "kanna",
+      "name": "Kanna",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "akg",
+      "name": "Alpha-Ketoglutarate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "chlorella",
+      "name": "Chlorella",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "glutathione-supp",
+      "name": "L-Glutathione",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "somatropin",
+      "name": "Somatropin (HGH)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "hgh-fragment",
+      "name": "HGH Fragment 176-191",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cjc-1293",
+      "name": "CJC-1293",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "anamorelin",
+      "name": "Anamorelin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ghrp-6",
+      "name": "GHRP-6",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ghrp-1",
+      "name": "GHRP-1",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ghrp-3",
+      "name": "GHRP-3",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ghrp-4",
+      "name": "GHRP-4",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ghrp-5",
+      "name": "GHRP-5",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mgf",
+      "name": "Mechano Growth Factor",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "macimorelin",
+      "name": "Macimorelin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "andarine",
+      "name": "Andarine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "s23",
+      "name": "S-23",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "yk11",
+      "name": "YK-11",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "lgd3303",
+      "name": "LGD-3303",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "rad150",
+      "name": "RAD150",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "clenbuterol",
+      "name": "Clenbuterol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "testosterone",
+      "name": "Testosterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "nandrolone",
+      "name": "Nandrolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "stanozolol",
+      "name": "Stanozolol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "oxandrolone",
+      "name": "Oxandrolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "oxymetholone",
+      "name": "Oxymetholone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "metandienone",
+      "name": "Metandienone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "trenbolone",
+      "name": "Trenbolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "boldenone",
+      "name": "Boldenone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "drostanolone",
+      "name": "Drostanolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "metenolone",
+      "name": "Metenolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mesterolone",
+      "name": "Mesterolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "danazol",
+      "name": "Danazol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tibolone",
+      "name": "Tibolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "trestolone",
+      "name": "Trestolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "fluoxymesterone",
+      "name": "Fluoxymesterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "androstenedione",
+      "name": "Androstenedione",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "androstanolone",
+      "name": "Androstanolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "epiandrosterone",
+      "name": "Epiandrosterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "exemestane",
+      "name": "Exemestane",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "formestane",
+      "name": "Formestane",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "methasterone",
+      "name": "Methasterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "chlorodehydromethyltestosterone",
+      "name": "Turinabol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "atamestane",
+      "name": "Atamestane",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "lonapegsomatropin",
+      "name": "Lonapegsomatropin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "somapacitan",
+      "name": "Somapacitan",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "somatrogon",
+      "name": "Somatrogon",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "capromorelin",
+      "name": "Capromorelin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "lenomorelin",
+      "name": "Lenomorelin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tabimorelin",
+      "name": "Tabimorelin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "alexamorelin",
+      "name": "Alexamorelin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "osilodrostat",
+      "name": "Osilodrostat",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ractopamine",
+      "name": "Ractopamine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "zeranol",
+      "name": "Zeranol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "zilpaterol",
+      "name": "Zilpaterol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "one-androstenediol",
+      "name": "1-Androstenediol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "one-androstenedione",
+      "name": "1-Androstenedione",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "one-androsterone",
+      "name": "1-Androsterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "one-testosterone",
+      "name": "1-Testosterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "four-androstenediol",
+      "name": "4-Androstenediol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "four-hydroxytestosterone",
+      "name": "4-Hydroxytestosterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "seventeen-methylepithiostanol",
+      "name": "Epistane",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "boldione",
+      "name": "Boldione",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "calusterone",
+      "name": "Calusterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "clostebol",
+      "name": "Clostebol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "desoxymethyltestosterone",
+      "name": "Desoxymethyltestosterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "dimethandrolone",
+      "name": "Dimethandrolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "epitestosterone",
+      "name": "Epitestosterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ethylestrenol",
+      "name": "Ethylestrenol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "formebolone",
+      "name": "Formebolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "furazabol",
+      "name": "Furazabol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "gestrinone",
+      "name": "Gestrinone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mestanolone",
+      "name": "Mestanolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "methandriol",
+      "name": "Methandriol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "methyl-1-testosterone",
+      "name": "Methyl-1-Testosterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "methyltestosterone",
+      "name": "Methyltestosterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "metribolone",
+      "name": "Metribolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mibolerone",
+      "name": "Mibolerone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "norboletone",
+      "name": "Norboletone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "norclostebol",
+      "name": "Norclostebol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "norethandrolone",
+      "name": "Norethandrolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "oxabolone",
+      "name": "Oxabolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "oxymesterone",
+      "name": "Oxymesterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "prostanozol",
+      "name": "Prostanozol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "quinbolone",
+      "name": "Quinbolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "stenbolone",
+      "name": "Stenbolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tetrahydrogestrinone",
+      "name": "Tetrahydrogestrinone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "adrenosterone",
+      "name": "Adrenosterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "four-dhea",
+      "name": "4-DHEA",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "five-dha",
+      "name": "5-Dehydroandrosterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "eleven-beta-hydroxyandrostenedione",
+      "name": "11beta-Hydroxyandrostenedione",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "bolandione",
+      "name": "Bolandione",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "plomestane",
+      "name": "Plomestane",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "silandrone",
+      "name": "Silandrone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "ethyltestosterone",
+      "name": "Ethisterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "epitiostanol",
+      "name": "Epitiostanol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mepitiostane",
+      "name": "Mepitiostane",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "mesabolone",
+      "name": "Mesabolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "methylstenbolone",
+      "name": "Methylstenbolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "dienolone",
+      "name": "Dienolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "trendione",
+      "name": "Trendione",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "dimethyltrienolone",
+      "name": "Dimethyltrienolone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "normethandrone",
+      "name": "Normethandrone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "norethisterone",
+      "name": "Norethisterone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "levonorgestrel",
+      "name": "Levonorgestrel",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "lynestrenol",
+      "name": "Lynestrenol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "norgestrel",
+      "name": "Norgestrel",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "norgestrienone",
+      "name": "Norgestrienone",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "quingestanol",
+      "name": "Quingestanol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 1,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "alpha-lipoic-acid",
+      "name": "Alpha-Lipoic Acid (ALA)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "kisspeptin",
+      "name": "Kisspeptin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "cjc-1295-no-dac",
+      "name": "CJC-1295 No DAC",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "liraglutide",
+      "name": "Liraglutide (Victoza / Saxenda)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "oxytocin",
+      "name": "Oxytocin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "galantamine",
+      "name": "Galantamine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "7-keto-dhea",
+      "name": "7-Keto DHEA",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "luteolin",
+      "name": "Luteolin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "honokiol",
+      "name": "Honokiol",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "tesofensine",
+      "name": "Tesofensine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "enclomiphene",
+      "name": "Enclomiphene",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "berberine-hcl",
+      "name": "Berberine HCL",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "magnesium-threonate",
+      "name": "Magnesium L-Threonate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "epicatechin",
+      "name": "Epicatechin",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "beet-root",
+      "name": "Beetroot Extract",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "synephrine",
+      "name": "Synephrine (Bitter Orange)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "phosphatidic-acid",
+      "name": "Phosphatidic Acid",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "arachidonic-acid",
+      "name": "Arachidonic Acid",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "sea-moss",
+      "name": "Sea Moss (Irish Moss)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "moringa",
+      "name": "Moringa Oleifera",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "hordenine",
+      "name": "Hordenine",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 2,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "dihydromyricetin",
+      "name": "Dihydromyricetin (DHM)",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    },
+    {
+      "id": "calcium-d-glucarate",
+      "name": "Calcium D-Glucarate",
+      "migration": "not_migrated",
+      "review": "not_reassessed",
+      "legacyEffectCount": 3,
+      "auditPresent": true,
+      "nextAction": "Reconcile claims with primary sources before migration"
+    }
+  ]
+}

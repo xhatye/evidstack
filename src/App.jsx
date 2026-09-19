@@ -1,4 +1,8 @@
 import "./home.css";
+import CompoundResearch from "./research/CompoundResearch.jsx";
+import { ResearchSnapshot, ResearchComparison } from "./research/ResearchSummary.jsx";
+import { RESEARCH_PROFILES } from "./research/profiles.js";
+import { interactionSelection } from "./research/model.js";
 import { getPageSeo, applyPageSeo } from "./seo.js";
 import { authenticatedFetch } from "./api.js";
 import { trackEvent } from "./analytics.js";
@@ -78,6 +82,7 @@ function useMyStack(){
       return true;
     }catch(error){
       console.error("Unable to save My Stack",error);
+      setStackIds(stackIds);
       setStackError("Your change could not be saved. Please try again.");
       return false;
     }
@@ -2385,6 +2390,8 @@ function EvidenceSnapshotPage({compoundId,onUpgrade}){
     </main>
   );
 
+  if(supp.id==="tirzepatide")return <ResearchSnapshot profile={RESEARCH_PROFILES.tirzepatide} onOpen={openProfile} onShare={copyLink} copied={copied}/>;
+
   return(
     <main className="evid-snapshot-page">
       <div className="evid-snapshot-topbar">
@@ -2485,6 +2492,7 @@ function CompoundComparisonPage({comparisonIds,onUpgrade}){
   const openProfile=(supp)=>{window.history.pushState({},"",`/compound/${supp.id}`);window.dispatchEvent(new PopStateEvent("popstate"));};
   const openSnapshot=(supp)=>{window.history.pushState({},"",`/evidence-snapshot/${supp.id}`);window.dispatchEvent(new PopStateEvent("popstate"));};
   if(!left||!right)return <main className="evid-compare-page evid-compare-not-found"><p className="evid-compare-kicker">EVIDSTACK COMPOUND COMPARISON</p><h1>Comparison not found</h1><p>Choose a comparison from the catalogue to see the recorded evidence side by side.</p><button className="evid-compare-button is-dark" onClick={()=>{window.history.pushState({},"","/");window.dispatchEvent(new PopStateEvent("popstate"));}}>Browse compounds</button></main>;
+  if(left.id==="tirzepatide"||right.id==="tirzepatide")return <ResearchComparison profile={RESEARCH_PROFILES.tirzepatide} other={left.id==="tirzepatide"?right:left} onOpen={openProfile}/>;
   const tierLabel=(supp)=>`T${supp.tier} · ${TIERS[supp.tier]?.label||"Catalogue"}`;
   const safetyLabel=(supp)=>["","Risky","Caution","Caution","Safe","Very safe"][supp.safety]||"Not recorded";
   const bestEffect=(supp)=>[...(supp.effects||[])].sort((a,b)=>(Number(b.evidence||0)+Number(b.efficacy||0))-(Number(a.evidence||0)+Number(a.efficacy||0)))[0];
@@ -2525,6 +2533,21 @@ function CompoundComparisonPage({comparisonIds,onUpgrade}){
 }
 
 /* COMPOUND PAGE */
+function ResearchProfilePage({supp,profile,onUpgrade,onBack,onAuth}){
+  const {user,isPro}=useAuth();
+  const {stackIds,saveStack,stackLoading,stackError}=useMyStack();
+  const [saving,setSaving]=useState(false);
+  const saved=stackIds.includes(supp.id);
+  const save=async()=>{
+    if(!user){onAuth("signup");return;}
+    if(saved||saving||stackLoading)return;
+    if(stackIds.length>=(isPro?20:5)){onUpgrade();return;}
+    setSaving(true);
+    try{await saveStack([...stackIds,supp.id]);}finally{setSaving(false);}
+  };
+  return <CompoundResearch profile={profile} locked={supp.tier>=2&&!isPro} onUpgrade={onUpgrade} onBack={onBack} onSave={save} saved={saved} saving={saving||stackLoading} saveError={stackError}
+    onInteractions={()=>{window.history.pushState({},"",`/interaction-checker?compounds=${encodeURIComponent(supp.id)}`);window.dispatchEvent(new PopStateEvent("popstate"));}}/>;
+}
 function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   const {user,isPro}=useAuth();
   const {stackIds,toggleStack}=useMyStack();
@@ -2538,6 +2561,12 @@ function CompoundPage({compoundId,onUpgrade,onBack,onAuth}){
   useEffect(()=>{
     if(supp)trackEvent("compound_view",{compound:supp.id,tier:supp.tier});
   },[supp?.id,supp?.tier]);
+
+  // Only the pilot replaces its public profile. Contrast records require an explicit preview query.
+  const researchProfile=RESEARCH_PROFILES[compoundId];
+  if(supp&&researchProfile&&(compoundId==="tirzepatide"||new URLSearchParams(window.location.search).get("research-preview")==="1")){
+    return <ResearchProfilePage key={compoundId} supp={supp} profile={researchProfile} onUpgrade={onUpgrade} onBack={onBack} onAuth={onAuth}/>;
+  }
 
   if(!supp)return(
     <div className="evid-compound-profile evid-compound-profile-not-found" style={{maxWidth:680,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
@@ -5040,7 +5069,7 @@ function AppInner(){
     {id:"supplements",label:"Supplements"},
     {id:"body-atlas",label:"Body Atlas"},
     {id:"my-stack",label:"My Stack"},
-    {id:"workspace",label:"Pro Workspace"},
+    {id:"workspace",label:"Research Tools · Pro"},
     {id:"peptide-tools",label:"Peptide Tools"},
     {id:"guides",label:"Guides"},
     {id:"pricing",label:"Pricing"},
@@ -6597,7 +6626,7 @@ function InteractionCheckerPro({onUpgrade}){
   const {stackIds}=useMyStack();
   const isMob=useIsMobile();
   const [input,setInput]=useState("");
-  const [compounds,setCompounds]=useState([]);
+  const [compounds,setCompounds]=useState(()=>interactionSelection(window.location.search,SUPPLEMENTS));
   const [result,setResult]=useState(null);
   const [loading,setLoading]=useState(false);
   const [err,setErr]=useState("");

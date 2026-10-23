@@ -5281,7 +5281,6 @@ function AppInner(){
 
       {page==="supplements"&&<>
         <section className="evid-home-hero" aria-labelledby="evid-home-title">
-          <div className="evid-hero-art" aria-hidden="true"><img src="/archaeofuturist-home-bg.png?v=2" alt="" width="2048" height="1365" fetchPriority="high" decoding="async" /></div>
           <div className="evid-hero-content">
           <h1 id="evid-home-title">Research before<br/><span>you decide.</span></h1>
           <p className="evid-hero-description">Ask what the evidence says before you add a compound to your stack. Compare studies, understand studied doses and keep the risks and limits visible.</p>

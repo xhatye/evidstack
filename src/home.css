@@ -817,15 +817,20 @@ body{background:#fff;color:#1a1a1a}
   .evid-general-checker-page .evid-interaction-suggestion small{display:block;max-width:100%;margin-top:4px}
 }
 
-/* Keep the archaeofuturist artwork visible across the responsive hero. The
-   medium-width tuning above intentionally softened the artwork too far, so
-   restore a readable layer and make the image fill its complete art frame. */
-.evid-homepage .evid-hero-art{opacity:.74!important}
-.evid-homepage .evid-hero-art img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center center;opacity:.9!important}
-@media(max-width:1279px){
-  .evid-homepage .evid-hero-art{opacity:.74!important}
-  .evid-homepage .evid-hero-art img{object-fit:cover;object-position:center center;transform:none;width:100%;height:100%;opacity:.84!important}
-}
+/* Pure black homepage backdrop, without decorative artwork. */
+.evid-homepage{background:#000!important}
+.evid-homepage .evid-home-hero{background:#000!important;color:#f4f2ee;border-bottom-color:#292929}
+.evid-homepage .evid-hero-content h1{color:#f4f2ee}
+.evid-homepage .evid-hero-content h1 span{color:#e2c97e}
+.evid-homepage .evid-hero-description{color:#d4d0c8}
+.evid-homepage .evid-hero-support{color:#a8a8a8}
+.evid-homepage .evid-hero-actions .evid-hero-primary-cta{background:#f4f2ee;color:#1a1a1a;border-color:#f4f2ee}
+.evid-homepage .evid-hero-secondary-links{color:#a8a8a8}
+.evid-homepage .evid-hero-secondary-links .evid-snapshot-home-link{color:#b9d7c6!important}
+.evid-homepage .evid-hero-secondary-links .evid-hero-see-pro-link{color:#e2c97e!important}
+.evid-homepage .evid-access-strip{background:transparent;border-top-color:#333}
+.evid-homepage .evid-access-strip span{color:#a8a8a8}
+.evid-homepage .evid-access-strip strong,.evid-homepage .evid-access-strip button{color:#e2c97e}
 
 
 
